@@ -1,13 +1,16 @@
 import pygame
 
-class Label:
+from .base_elm import BaseElm
+
+class Label(BaseElm):
     def __init__(self, screen, **kwargs):
-        self.screen = screen
-        self.font = kwargs.get('font', 'monospace')
+        self.font = kwargs.get('font', 'sans serif')
         self.size = kwargs.get('size', 50)
         self.text = kwargs.get('text', '<Label>')
         self.color = kwargs.get('color', (255, 255, 255))
-        self.pos = kwargs.get('pos', (0, 0))
+
+        pos = kwargs.get('pos', (0, 0))
+        super(Label, self).__init__(screen, pos, self.size, -1)
 
         self.__load_font()
 

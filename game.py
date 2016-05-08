@@ -7,6 +7,8 @@ from screen import get_screen
 
 from elements.label import Label
 from elements.image import Image
+from elements.elm_list import ElmList
+
 from drinks_log.log import Log as DrinksLog
 
 from webserver.webserver import run as run_webserver
@@ -34,21 +36,22 @@ objects.append(Image(
     pos=(100, 100)
 ))
 
+log_elm = ElmList(
+    screen,
+    pos=(20, 270),
+    max_elm_count=15
+)
+objects.append(log_elm)
+
 ##### Drinks log #####
 
-drinks_vars = {}
-
-drinks_vars['log_last_pos'] = 150
 def append_label(text):
-    size = 10
-    objects.append(Label(
+    log_elm.add_elm(Label(
         screen,
         text=text,
-        size=size,
-        color=(255, 255, 0),
-        pos=(20, drinks_vars['log_last_pos'])
+        size=25,
+        color=(255, 255, 0)
     ))
-    drinks_vars['log_last_pos'] += size + 5
 
 log = DrinksLog()
 log.register_handler(append_label)
