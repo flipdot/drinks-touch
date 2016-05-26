@@ -9,6 +9,7 @@ class Button(BaseElm):
         self.text = kwargs.get('text', '<Label>')
         self.color = kwargs.get('color', (255, 255, 255))
         self.clicked = kwargs.get('click', self.__clicked)
+        self.click_param = kwargs.get('click_param', None)
 
         pos = kwargs.get('pos', (0, 0))
         super(Button, self).__init__(screen, pos, self.size, -1)
@@ -18,7 +19,7 @@ class Button(BaseElm):
     def __load_font(self):
         self.font = pygame.font.SysFont(self.font, self.size)
 
-    def __clicked(self, pos):
+    def __clicked(self, param, pos):
         print "Clicked on button without handler"
 
     def render(self):
@@ -45,4 +46,4 @@ class Button(BaseElm):
             if event.type == pygame.MOUSEBUTTONUP:
                 pos = pygame.mouse.get_pos()
                 if pygame.Rect(self.box).collidepoint(pos):
-                    self.clicked(pos)
+                    self.clicked(self.click_param, pos)

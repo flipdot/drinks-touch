@@ -4,8 +4,8 @@ from threading import Thread
 
 from pygame.locals import *
 from screen import get_screen
+from screens.screen_manager import ScreenManager
 
-from screens.main import MainScreen
 
 from drinks_log.log import Log as DrinksLog
 
@@ -13,9 +13,8 @@ from webserver.webserver import run as run_webserver
 
 
 screen = get_screen()
-screens = []
-
-screens.append(MainScreen(screen))
+screen_manager = ScreenManager(screen)
+ScreenManager.set_instance(screen_manager)
 
 
 ##### Drinks log #####
@@ -41,9 +40,9 @@ while not done:
 
     events = pygame.event.get()
 
-    for s in screens:
-        s.render()
-        s.events(events)
+    current_screen = screen_manager.get_active()
+    current_screen.render()
+    current_screen.events(events)
 
     pygame.display.flip()
 
