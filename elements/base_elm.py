@@ -6,3 +6,6 @@ class BaseElm(object):
         self.pos = pos
         self.height = height
         self.width = width
+
+    def events(self, events):
+        pass

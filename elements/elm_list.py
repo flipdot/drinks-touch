@@ -1,6 +1,8 @@
 import pygame
 
-class ElmList:
+from .base_elm import BaseElm
+
+class ElmList(BaseElm):
     def __init__(self, screen, **kwargs):
         self.screen = screen
         self.pos = kwargs.get('pos', (0, 0))
