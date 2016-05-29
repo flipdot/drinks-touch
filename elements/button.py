@@ -4,10 +4,10 @@ from .base_elm import BaseElm
 
 class Button(BaseElm):
     def __init__(self, screen, **kwargs):
-        self.font = kwargs.get('font', 'sans serif')
-        self.size = kwargs.get('size', 50)
+        self.font = kwargs.get('font', 'monospace')
+        self.size = kwargs.get('size', 30)
         self.text = kwargs.get('text', '<Label>')
-        self.color = kwargs.get('color', (255, 255, 255))
+        self.color = kwargs.get('color', (246, 198, 0))
         self.clicked = kwargs.get('click', self.__clicked)
         self.click_param = kwargs.get('click_param', None)
 

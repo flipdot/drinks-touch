@@ -13,16 +13,16 @@ class MainScreen(Screen):
     def __init__(self, screen, **kwargs):
         super(MainScreen, self).__init__(screen)
 
-        self.objects.append(Label(
-            self.screen,
-            text ='flipdot Getraenkezaehler',
-            pos=(20, 20),
-            color = (255, 255, 0),
-        ))
-
         self.objects.append(Image(
             self.screen,
-            pos=(100, 70)
+            pos=(30, 20)
+        ))
+
+        self.objects.append(Label(
+            self.screen,
+            text = u'Getränkezähler',
+            pos=(65, 250),
+            size=70
         ))
 
         i = 0
@@ -32,7 +32,6 @@ class MainScreen(Screen):
                 self.screen,
                 text = text,
                 pos=self.__get_pos(i),
-                color = (255, 255, 0),
                 click=self.switch_to_screen,
                 click_param=text
             ))
@@ -61,4 +60,4 @@ class MainScreen(Screen):
                 x = (i - b - 1) * 60
             j += 1
 
-        return (x + 20, y + 250)
+        return (x + 20, y + 350)
