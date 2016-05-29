@@ -14,6 +14,7 @@ class ProfileScreen(Screen):
         super(ProfileScreen, self).__init__(screen)
 
         self.user = user
+        Users.set_active(user)
 
         self.objects.append(Button(
             self.screen,
@@ -86,6 +87,7 @@ class ProfileScreen(Screen):
             i += 1
 
     def back(self, param, pos):
+        Users.reset_active()
         from .screen_manager import ScreenManager
         screen_manager = ScreenManager.get_instance()
         screen_manager.set_default()

@@ -37,7 +37,7 @@ class NamesScreen(Screen):
             self.objects.append(Button(
                 self.screen,
                 text = user["name"],
-                pos=(30,190 + (i * 35)),
+                pos=(30,190 + (i * 55)),
                 click=self.switch_to_screen,
                 click_param=user               
             ))

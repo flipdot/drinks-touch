@@ -1,5 +1,14 @@
+import datetime
+
 from flask import Flask
 from flask import request
+
+from users.users import Users
+from database.storage import get_session
+from database.storage import init_db
+from database.models.scan_event import ScanEvent
+
+init_db()
 
 app = Flask(__name__)
 
@@ -17,6 +26,28 @@ def hello_world():
         return 'ok'
     except Exception, e:
         print e
+
+@app.route('/barcode_scanned')
+def barcode_scanned():
+    barcode = request.args.get('barcode')
+    if barcode == None:
+        return ('No Barcode send', 500)
+
+    user = Users.get_active_user()
+    if user == None:
+        return ('No active user', 500)
+
+    session = get_session()
+    ev = ScanEvent(barcode, user['id'], datetime.datetime.now())
+    
+    session.add(ev)
+    session.commit()
+
+    from screens.screen_manager import ScreenManager
+    screen = ScreenManager.get_active()
+    screen.back(None, None)  
+
+    return 'ok'
 
 def run(log):
     container['log'] = log
