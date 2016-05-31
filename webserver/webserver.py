@@ -44,7 +44,7 @@ def barcode_scanned():
     session.commit()
 
     from screens.screen_manager import ScreenManager
-    screen = ScreenManager.get_active()
+    screen = ScreenManager.get_instance().get_active()
     screen.back(None, None)  
 
     return 'ok'
