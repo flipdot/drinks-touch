@@ -30,7 +30,7 @@ class WaitScanScreen(Screen):
                 self.screen,
                 pos=(60, 610),
                 text="verwerfen",
-                click=self.reset
+                click=self.btn_reset
             )            
         ]
 
@@ -48,7 +48,7 @@ class WaitScanScreen(Screen):
         for o in self.scanned_info:
             self.objects.append(o)
 
-        #self.show_scanned_info(False)
+        self.show_scanned_info(False)
 
     def show_scanned_info(self, show):
         for o in self.scanned_info:
@@ -63,9 +63,12 @@ class WaitScanScreen(Screen):
         main = MainScreen(self.screen)
         ScreenManager.get_instance().set_active(main)
 
-    def reset(self, args, pos):
+    def btn_reset(self, args, pos):
+        self.reset()
+
+    def reset(self):
         self.barcode_label.text = None
-        self.show_scanned_info(False)                
+        self.show_scanned_info(False)
 
     def back(self, param, pos):
         Users.reset_active()
