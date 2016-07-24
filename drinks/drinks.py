@@ -39,4 +39,4 @@ drinks = {
 }
 
 def get_by_ean(ean):
-    return eans[ean]
+    return drinks[ean]
