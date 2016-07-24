@@ -60,6 +60,9 @@ class WaitScanScreen(Screen):
             o.is_visible = show
     
     def on_barcode(self, barcode):
+        if not barcode:
+            return
+
         drink = get_by_ean(barcode)
         DrinksManager.get_instance().set_selected_drink(drink)
         self.barcode_label.text = drink['name']
