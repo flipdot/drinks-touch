@@ -5,4 +5,6 @@ class Worker:
         pass
 
     def on_barcode(self, barcode):
-        print(barcode)
+        from screens.screen_manager import ScreenManager
+        screen = ScreenManager.get_instance().get_active()
+        screen.on_barcode(barcode)    

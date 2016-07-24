@@ -9,7 +9,9 @@ class ScreenManager(object):
         self.set_default()
 
     def set_default(self):
-        self.current_screen = MainScreen(self.screen)
+        #self.current_screen = MainScreen(self.screen)
+        from screens.wait_scan import WaitScanScreen
+        self.current_screen = WaitScanScreen(self.screen)
 
     def set_active(self, screen):
         self.current_screen = screen

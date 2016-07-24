@@ -7,7 +7,8 @@ class Screen(object):
 
     def render(self):
         for o in self.objects:
-            o.render()
+            if o.visible():
+                o.render()
 
     def events(self, events):
         for o in self.objects:
