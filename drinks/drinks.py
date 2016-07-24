@@ -44,7 +44,7 @@ drinks = {
 }
 
 def get_by_ean(ean):
-    drink = drinks[ean]
+    drink = drinks.get(ean)
     if not drink:
         drink = {
             'name': 'Unbekannt ('+ean+')',
