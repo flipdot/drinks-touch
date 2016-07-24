@@ -31,12 +31,25 @@ drinks = {
         'size': 0.5,
         'tags': ['beer']
     },
+    'E4003892009218': {
+        'name': 'Eschweger',
+        'size': 0.33,
+        'tags': ['beer']
+    },
     'E41001318': {
         'name': 'BECKS',
         'size': 0.5,
         'tags': ['beer']
-    }
+    },
 }
 
 def get_by_ean(ean):
-    return drinks[ean]
+    drink = drinks[ean]
+    if not drink:
+        drink = {
+            'name': 'Unbekannt ('+ean+')',
+            'size': 0,
+            'tags': ['unkown']
+        }
+
+    return drink
