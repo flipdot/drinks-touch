@@ -17,7 +17,7 @@ drinks = {
         'tags': ['mate']
     },
     'E4069800005871': {
-        'name': 'Nörten-Hardenberger',
+        'name': u'Nörten-Hardenberger',
         'size': 0.33,
         'tags': ['beer']
     },
