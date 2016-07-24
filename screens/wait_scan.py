@@ -62,7 +62,7 @@ class WaitScanScreen(Screen):
     def on_barcode(self, barcode):
         drink = get_by_ean(barcode)
         DrinksManager.get_instance().set_selected_drink(drink)
-        self.barcode_label.text = drink.name
+        self.barcode_label.text = drink['name']
         self.show_scanned_info(True)
 
     def set_member(self, args, pos):
