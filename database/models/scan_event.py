@@ -1,3 +1,5 @@
+import datetime
+
 from sqlalchemy import Column, Integer, String, DateTime
 from database.storage import Base
 
@@ -8,7 +10,7 @@ class ScanEvent(Base):
     user_id = Column(String(20), unique=False)
     timestamp = Column(DateTime(), unique=False)
 
-    def __init__(self, barcode=None, user_id="1", timestamp=None):
+    def __init__(self, barcode=None, user_id="1", timestamp=datetime.datetime.now()):
         self.barcode = barcode
         self.timestamp = timestamp
         self.user_id = user_id

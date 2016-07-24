@@ -1,9 +1,13 @@
 # coding=utf-8
 import pygame
+from env import is_pi
 
 from elements.label import Label
 from elements.button import Button
 from elements.image import Image
+
+from drinks.drinks import get_by_ean
+from drinks.drinks_manager import DrinksManager
 
 from .screen import Screen
 from .main import MainScreen
@@ -48,14 +52,17 @@ class WaitScanScreen(Screen):
         for o in self.scanned_info:
             self.objects.append(o)
 
-        self.show_scanned_info(False)
+        if is_pi():
+            self.show_scanned_info(False)
 
     def show_scanned_info(self, show):
         for o in self.scanned_info:
             o.is_visible = show
     
     def on_barcode(self, barcode):
-        self.barcode_label.text = barcode
+        drink = get_by_ean(barcode)
+        DrinksManager.get_instance().set_selected_drink(drink)
+        self.barcode_label.text = drink.name
         self.show_scanned_info(True)
 
     def set_member(self, args, pos):
@@ -67,6 +74,7 @@ class WaitScanScreen(Screen):
         self.reset()
 
     def reset(self):
+        DrinksManager.get_instance().set_selected_drink(None)
         self.barcode_label.text = None
         self.show_scanned_info(False)
 

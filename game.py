@@ -11,15 +11,17 @@ from threading import Thread
 from pygame.locals import *
 from screen import get_screen
 from screens.screen_manager import ScreenManager
-
-
-from drinks_log.log import Log as DrinksLog
+from drinks.drinks_manager import DrinksManager
 
 from webserver.webserver import run as run_webserver
 from barcode.barcode_reader import run as run_barcode_reader
 from barcode.barcode_worker import Worker as BarcodeWorker
 
 screen = get_screen()
+
+drinks_manager = DrinksManager()
+DrinksManager.set_instance(drinks_manager)
+
 screen_manager = ScreenManager(screen)
 ScreenManager.set_instance(screen_manager)
 

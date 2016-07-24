@@ -4,6 +4,7 @@ import pygame
 from elements.label import Label
 from elements.button import Button
 from elements.image import Image
+from drinks.drinks_manager import DrinksManager
 
 from users.users import Users
 
@@ -42,7 +43,8 @@ class ProfileScreen(Screen):
             self.screen,
             text='Zuordnen',
             pos=(30, 600),
-            size=30
+            size=30,
+            click=self.save_drink
         ))    
 
         self.objects.append(Button(
@@ -62,6 +64,12 @@ class ProfileScreen(Screen):
                 pos=(30,210 + (i * 35)),
             ))
             i += 1
+
+    def save_drink(self, args, pos):
+        import pprint
+        pprint.pprint(
+            DrinksManager.get_instance().get_selected_drink()
+        )            
 
     def back(self, param, pos):
         from .screen_manager import ScreenManager
