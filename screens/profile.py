@@ -72,6 +72,7 @@ class ProfileScreen(Screen):
         session = get_session()
 
         drink = DrinksManager.get_instance().get_selected_drink()
+        print drink
         if drink:
             ev = ScanEvent(
                 drink['ean'],

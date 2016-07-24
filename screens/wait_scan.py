@@ -69,15 +69,16 @@ class WaitScanScreen(Screen):
         self.show_scanned_info(True)
 
     def set_member(self, args, pos):
-        self.reset()
+        self.reset(False)
         main = MainScreen(self.screen)
         ScreenManager.get_instance().set_active(main)
 
     def btn_reset(self, args, pos):
         self.reset()
 
-    def reset(self):
-        DrinksManager.get_instance().set_selected_drink(None)
+    def reset(self, reset_drink=True):
+        if reset_drink:
+            DrinksManager.get_instance().set_selected_drink(None)
         self.barcode_label.text = None
         self.show_scanned_info(False)
 
