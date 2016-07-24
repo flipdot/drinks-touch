@@ -52,4 +52,5 @@ def get_by_ean(ean):
             'tags': ['unkown']
         }
 
+    drink['ean'] = ean
     return drink

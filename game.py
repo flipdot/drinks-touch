@@ -6,7 +6,7 @@ import threading
 
 logging.basicConfig(level=logging.DEBUG)
 
-from threading import Thread
+from database.storage import init_db
 
 from pygame.locals import *
 from screen import get_screen
@@ -24,6 +24,8 @@ DrinksManager.set_instance(drinks_manager)
 
 screen_manager = ScreenManager(screen)
 ScreenManager.set_instance(screen_manager)
+
+init_db()
 
 ##### Barcode Scanner #####
 

@@ -10,6 +10,9 @@ from users.users import Users
 
 from .screen import Screen
 
+from database.storage import get_session
+from database.models.scan_event import ScanEvent
+
 class ProfileScreen(Screen):
     def __init__(self, screen, user, **kwargs):
         super(ProfileScreen, self).__init__(screen)
@@ -52,7 +55,7 @@ class ProfileScreen(Screen):
             text='Abbrechen',
             pos=(280, 600),
             size=30,
-            click=self.home,
+            click=self.btn_home,
         ))                   
 
         i = 0
@@ -66,17 +69,30 @@ class ProfileScreen(Screen):
             i += 1
 
     def save_drink(self, args, pos):
-        import pprint
-        pprint.pprint(
-            DrinksManager.get_instance().get_selected_drink()
-        )            
+        session = get_session()
+
+        drink = DrinksManager.get_instance().get_selected_drink()
+        if drink:
+            ev = ScanEvent(
+                drink['ean'],
+                self.user['id'],
+                datetime.datetime.now()
+            )
+            
+            session.add(ev)
+            session.commit()
+        
+        self.home()
 
     def back(self, param, pos):
         from .screen_manager import ScreenManager
         screen_manager = ScreenManager.get_instance()
         screen_manager.go_back()
 
-    def home(self, param, pos):
+    def home(self):
         from .screen_manager import ScreenManager
         screen_manager = ScreenManager.get_instance()
         screen_manager.set_default()
+
+    def btn_home(self, param, pos):
+        self.home()

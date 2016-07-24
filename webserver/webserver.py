@@ -8,8 +8,6 @@ from database.storage import get_session
 from database.storage import init_db
 from database.models.scan_event import ScanEvent
 
-init_db()
-
 app = Flask(__name__)
 
 container = {}
