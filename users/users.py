@@ -65,6 +65,8 @@ class Users(object):
         
         users = []
         for path, user in con.search_s( base_dn, ldap.SCOPE_SUBTREE, filter, attrs ):
+            if not 'uidNumber' in user:
+                user['uidNumber'] = user['uid']
             users.append(user)
 
         con.unbind()
