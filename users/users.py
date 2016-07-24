@@ -37,18 +37,6 @@ class Users(object):
             })
 
         return users
-    
-    @staticmethod
-    def set_active(user):
-        Users.active_user = user
-
-    @staticmethod
-    def reset_active():
-        Users.set_active(None)
-
-    @staticmethod
-    def get_active_user():
-        return Users.active_user
 
     @staticmethod
     def read_all_users_ldap():

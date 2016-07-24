@@ -14,11 +14,10 @@ class ProfileScreen(Screen):
         super(ProfileScreen, self).__init__(screen)
 
         self.user = user
-        Users.set_active(user)
 
         self.objects.append(Button(
             self.screen,
-            text = "HOME",
+            text = "BACK",
             pos=(30,30),
             font = "monospace",
             click=self.back,
@@ -34,47 +33,25 @@ class ProfileScreen(Screen):
 
         self.objects.append(Label(
             self.screen,
-            text = u"Scanne dein Getränk!",
+            text='Bisheriger Verbrauch: (TODO)',
             pos=(30, 170),
-        ))
+            size=30
+        ))  
 
-        self.objects.append(Image(
+        self.objects.append(Button(
             self.screen,
-            src = "img/chart.png",
-            pos=(30, 235),
-        ))        
+            text='Zuordnen',
+            pos=(30, 600),
+            size=30
+        ))    
 
-        filters = [
-            {
-                "name": "Heute", 
-                "key": "today"
-            },
-            {
-                "name": "Woche", 
-                "key": "week"
-            },
-            {
-                "name": "Monat", 
-                "key": "month"
-            },
-            {
-                "name": "Insg.", 
-                "key": "total"
-            }
-        ]
-
-        i = 0
-        for filter in filters:
-            x = 30 + (i * 115)
-            self.objects.append(Button(
-                self.screen,
-                text = filter["name"],
-                pos=(x, 550),
-                font="monospace",
-                size=30
-            ))   
-
-            i += 1     
+        self.objects.append(Button(
+            self.screen,
+            text='Abbrechen',
+            pos=(280, 600),
+            size=30,
+            click=self.home,
+        ))                   
 
         i = 0
         for drinks in self.user["drinks"]:
@@ -82,12 +59,16 @@ class ProfileScreen(Screen):
             self.objects.append(Label(
                 self.screen,
                 text = text,
-                pos=(30,620 + (i * 35)),
+                pos=(30,210 + (i * 35)),
             ))
             i += 1
 
     def back(self, param, pos):
-        Users.reset_active()
+        from .screen_manager import ScreenManager
+        screen_manager = ScreenManager.get_instance()
+        screen_manager.go_back()
+
+    def home(self, param, pos):
         from .screen_manager import ScreenManager
         screen_manager = ScreenManager.get_instance()
         screen_manager.set_default()

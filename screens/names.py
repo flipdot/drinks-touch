@@ -41,12 +41,12 @@ class NamesScreen(Screen):
                 click=self.switch_to_screen,
                 click_param=user               
             ))
-            i += 1
+            i += 1        
 
     def back(self, param, pos):
         from .screen_manager import ScreenManager
         screen_manager = ScreenManager.get_instance()
-        screen_manager.set_default()
+        screen_manager.go_back()
 
     def switch_to_screen(self, param, pos):
         from .screen_manager import ScreenManager

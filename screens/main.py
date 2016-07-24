@@ -20,9 +20,9 @@ class MainScreen(Screen):
 
         self.objects.append(Label(
             self.screen,
-            text = u'Getränkezähler',
+            text = u'member auswählen',
             pos=(65, 250),
-            size=70
+            size=50
         ))
 
         i = 0
@@ -38,12 +38,24 @@ class MainScreen(Screen):
 
             i += 1
 
+        self.objects.append(Button(
+            self.screen,
+            text='Abbrechen',
+            pos=(150, 750),
+            size=30,
+            click=self.home,
+        ))              
+
     def switch_to_screen(self, param, pos):
         from .screen_manager import ScreenManager
         screen_manager = ScreenManager.get_instance()
         screen_manager.set_active(
             NamesScreen(self.screen, param)
         )
+
+    def home(self, param, pos):
+        from .screen_manager import ScreenManager
+        screen_manager = ScreenManager.get_instance().set_default()
 
     def __get_pos(self, i):
 

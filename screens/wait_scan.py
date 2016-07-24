@@ -6,6 +6,8 @@ from elements.button import Button
 from elements.image import Image
 
 from .screen import Screen
+from .main import MainScreen
+from .screen_manager import ScreenManager
 
 class WaitScanScreen(Screen):
     def __init__(self, screen, **kwargs):
@@ -21,8 +23,15 @@ class WaitScanScreen(Screen):
             Button(
                 self.screen,
                 pos=(60, 550),
-                text="jetzt member zuordnen"
-            )
+                text="jetzt member zuordnen",
+                click=self.set_member
+            ),
+            Button(
+                self.screen,
+                pos=(60, 610),
+                text="verwerfen",
+                click=self.reset
+            )            
         ]
 
         self.objects.append(Image(
@@ -39,7 +48,7 @@ class WaitScanScreen(Screen):
         for o in self.scanned_info:
             self.objects.append(o)
 
-        self.show_scanned_info(False)
+        #self.show_scanned_info(False)
 
     def show_scanned_info(self, show):
         for o in self.scanned_info:
@@ -48,6 +57,14 @@ class WaitScanScreen(Screen):
     def on_barcode(self, barcode):
         self.barcode_label.text = barcode
         self.show_scanned_info(True)
+
+    def set_member(self, args, pos):
+        main = MainScreen(self.screen)
+        ScreenManager.get_instance().set_active(main)
+
+    def reset(self, args, pos):
+        self.barcode_label.text = None
+        self.show_scanned_info(False)                
 
     def back(self, param, pos):
         Users.reset_active()
