@@ -53,7 +53,7 @@ class Users(object):
     @staticmethod
     def read_all_users_ldap():
         dn = "cn=admin,dc=flipdot,dc=org"
-        pw = "password"
+        pw = "atmega328"
         
         base_dn = 'ou=members,dc=flipdot,dc=org'
         filter = '(objectclass=person)'

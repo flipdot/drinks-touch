@@ -2,6 +2,7 @@
 # coding=utf-8
 import pygame
 import logging
+import threading
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -15,27 +16,22 @@ from screens.screen_manager import ScreenManager
 from drinks_log.log import Log as DrinksLog
 
 from webserver.webserver import run as run_webserver
-
+from barcode.barcode_reader import run as run_barcode_reader
+from barcode.barcode_worker import Worker as BarcodeWorker
 
 screen = get_screen()
 screen_manager = ScreenManager(screen)
 ScreenManager.set_instance(screen_manager)
 
+##### Barcode Scanner #####
 
-##### Drinks log #####
-
-def append_label(text):
-    print text
-
-log = DrinksLog()
-log.register_handler(append_label)
-
-webserver_thread = Thread(
-    target=run_webserver,
-    args=(log,)
+barcode_worker = BarcodeWorker()
+t = threading.Thread(
+    target=run_barcode_reader,
+    args=(barcode_worker,)
 )
-webserver_thread.daemon = True
-webserver_thread.start()
+t.daemon = True
+t.start()
 
 ##### Rendering #####
 
