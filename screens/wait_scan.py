@@ -59,6 +59,7 @@ class WaitScanScreen(Screen):
         self.show_scanned_info(True)
 
     def set_member(self, args, pos):
+        self.reset()
         main = MainScreen(self.screen)
         ScreenManager.get_instance().set_active(main)
 
