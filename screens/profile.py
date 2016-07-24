@@ -1,5 +1,6 @@
 # coding=utf-8
 import pygame
+import datetime
 
 from elements.label import Label
 from elements.button import Button
@@ -72,7 +73,6 @@ class ProfileScreen(Screen):
         session = get_session()
 
         drink = DrinksManager.get_instance().get_selected_drink()
-        print drink
         if drink:
             ev = ScanEvent(
                 drink['ean'],
