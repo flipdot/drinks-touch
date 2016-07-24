@@ -10,6 +10,7 @@ from drinks.drinks_manager import DrinksManager
 from users.users import Users
 
 from .screen import Screen
+from .success import SuccessScreen
 
 from database.storage import get_session
 from database.models.scan_event import ScanEvent
@@ -83,7 +84,9 @@ class ProfileScreen(Screen):
             session.add(ev)
             session.commit()
         
-        self.home()
+        from .screen_manager import ScreenManager
+        screen_manager = ScreenManager.get_instance()
+        screen_manager.set_active(SuccessScreen(self.screen))
 
     def back(self, param, pos):
         from .screen_manager import ScreenManager
