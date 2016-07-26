@@ -6,6 +6,7 @@ from elements.label import Label
 from elements.button import Button
 from elements.image import Image
 from drinks.drinks_manager import DrinksManager
+from drinks.drinks import get_by_ean
 
 from users.users import Users
 
@@ -14,6 +15,7 @@ from .success import SuccessScreen
 
 from database.storage import get_session
 from database.models.scan_event import ScanEvent
+from sqlalchemy.sql import text
 
 class ProfileScreen(Screen):
     def __init__(self, screen, user, **kwargs):
@@ -39,7 +41,7 @@ class ProfileScreen(Screen):
 
         self.objects.append(Label(
             self.screen,
-            text='Bisheriger Verbrauch: (TODO)',
+            text='Bisheriger Verbrauch:',
             pos=(30, 170),
             size=30
         ))  
@@ -61,8 +63,8 @@ class ProfileScreen(Screen):
         ))                   
 
         i = 0
-        for drinks in self.user["drinks"]:
-            text = drinks["name"] + ": " + str(drinks["count"])
+        for drinks in self.get_stats():
+            text = get_by_ean(drinks["name"])['name'] + ": " + str(drinks["count"])
             self.objects.append(Label(
                 self.screen,
                 text = text,
@@ -100,3 +102,19 @@ class ProfileScreen(Screen):
 
     def btn_home(self, param, pos):
         self.home()
+
+    def get_stats(self):
+        session = get_session()
+        sql = text("""
+            SELECT COUNT(*) as count, barcode as name
+            FROM scanevent
+            WHERE user_id = :userid
+            GROUP BY barcode
+        """)
+        userid=self.user['id']
+        result = session.connection().execute(sql, userid=userid).fetchall()
+
+        import pprint
+        pprint.pprint(result)
+
+        return result

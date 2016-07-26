@@ -19,21 +19,7 @@ class Users(object):
 
             users.append({
                 "name": name,
-                "id": ldap_user['uidNumber'][0],
-                "drinks": [
-                    {
-                        "name": "Mio Mate",
-                        "count": 6
-                    },
-                    {
-                        "name": "Krombacher",
-                        "count": 3
-                    },
-                    {
-                        "name": "Club Mate",
-                        "count": 2
-                    }                   
-                ]
+                "id": ldap_user['uidNumber'][0]
             })
 
         return users
@@ -41,7 +27,7 @@ class Users(object):
     @staticmethod
     def read_all_users_ldap():
         dn = "cn=admin,dc=flipdot,dc=org"
-        pw = "password"
+        pw = "atmega328"
         
         base_dn = 'ou=members,dc=flipdot,dc=org'
         filter = '(objectclass=person)'
