@@ -29,9 +29,9 @@ class Users(object):
         dn = "cn=admin,dc=flipdot,dc=org"
         pw = ''
 
-        with  open('ldap_pw', 'r') as ldap_pw
-            pw = ldap_pw.read()
-        
+        with  open('ldap_pw', 'r') as ldap_pw:
+            pw = ldap_pw.read().replace('\n', '')
+
         base_dn = 'ou=members,dc=flipdot,dc=org'
         filter = '(objectclass=person)'
         attrs = ['uid', 'uidNumber']
