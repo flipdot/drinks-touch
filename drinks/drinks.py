@@ -12,8 +12,9 @@ def get_by_ean(ean):
         WHERE ean = :ean
     """)
     row = session.connection().execute(sql, ean=ean).fetchone()
-    drink = dict(zip(row.keys(), row))
-    if not drink:
+    if row:
+        drink = dict(zip(row.keys(), row))
+    else        
         drink = {
             'name': 'Unbekannt ('+ean+')',
             'size': 0,
