@@ -10,6 +10,7 @@ class Button(BaseElm):
         self.color = kwargs.get('color', (246, 198, 0))
         self.clicked = kwargs.get('click', self.__clicked)
         self.click_param = kwargs.get('click_param', None)
+        self.box = None
 
         pos = kwargs.get('pos', (0, 0))
         super(Button, self).__init__(screen, pos, self.size, -1)
