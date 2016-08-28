@@ -44,9 +44,6 @@ t = threading.Thread(
 t.daemon = True
 t.start()
 
-from drinks.drinks import get_by_ean
-print get_by_ean('E4029764001807')
-
 ##### Rendering #####
 
 done = False

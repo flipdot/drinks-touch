@@ -14,7 +14,7 @@ def get_by_ean(ean):
     row = session.connection().execute(sql, ean=ean).fetchone()
     if row:
         drink = dict(zip(row.keys(), row))
-    else        
+    else: 
         drink = {
             'name': 'Unbekannt ('+ean+')',
             'size': 0,
