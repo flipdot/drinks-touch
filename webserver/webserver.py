@@ -1,5 +1,7 @@
 import datetime
 
+from env import is_pi
+
 from flask import Flask
 from flask import request
 from flask import render_template
@@ -45,6 +47,12 @@ def recharge_doit():
 
 
 def run():
+    port = 5000
+
+    if is_pi():
+        port = 80
+
     app.run(
-        host='0.0.0.0'
+        host='0.0.0.0',
+        port=port
     )
