@@ -1,5 +1,8 @@
 import ldap
 
+from database.storage import get_session
+from sqlalchemy.sql import text
+
 class Users(object):
     active_user = None
 
@@ -48,3 +51,32 @@ class Users(object):
         con.unbind()
         return users
         
+    @staticmethod
+    def get_balance(user_id):
+        session = get_session()
+
+        sql = text("""
+                SELECT user_id, sum(amount) as amount
+                FROM rechargeevent
+                WHERE user_id = :user_id
+                GROUP BY user_id
+            """)
+        row = session.connection().execute(sql, user_id=user_id).fetchone()
+        if not row:
+            return None
+
+        credit = row.amount
+
+        sql = text("""
+                SELECT user_id, count(*) as amount
+                FROM scanevent
+                WHERE user_id = :user_id
+                GROUP BY user_id
+            """)
+        row = session.connection().execute(sql, user_id=user_id).fetchone()
+        if not row:
+            return None
+
+        cost = row.amount
+
+        return credit - cost

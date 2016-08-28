@@ -41,6 +41,13 @@ class ProfileScreen(Screen):
 
         self.objects.append(Label(
             self.screen,
+            text = 'Guthaben',
+            pos=(330, 120),
+            size=30
+        ))           
+
+        self.objects.append(Label(
+            self.screen,
             text='Bisheriger Verbrauch:',
             pos=(30, 170),
             size=30
@@ -61,6 +68,13 @@ class ProfileScreen(Screen):
             size=30,
             click=self.btn_home,
         ))                   
+
+        self.objects.append(Label(
+            self.screen,
+            text = str(Users.get_balance(self.user['id']))+' EUR',
+            pos=(335, 145),
+            size=40
+        ))    
 
         i = 0
         for drinks in self.get_stats():
