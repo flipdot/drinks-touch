@@ -114,7 +114,4 @@ class ProfileScreen(Screen):
         userid=self.user['id']
         result = session.connection().execute(sql, userid=userid).fetchall()
 
-        import pprint
-        pprint.pprint(result)
-
         return result

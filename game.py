@@ -37,6 +37,13 @@ t = threading.Thread(
 t.daemon = True
 t.start()
 
+##### webserver #####
+t = threading.Thread(
+    target=run_webserver
+)
+t.daemon = True
+t.start()
+
 ##### Rendering #####
 
 done = False

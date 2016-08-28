@@ -1,0 +1,39 @@
+<html>
+    <head></head>
+    <body>
+        <h1>Guthaben aufladen</h1>
+        <p>Um Guthaben aufzuladen gehe folgendermaßen vor:</p>
+        <ol>
+            <li>Gib jemanden aus dem Space bescheid, dass du Guthaben aufladen willst. So ist im 4-Augen-Prinzip sichergestellt, dass alles legitim abläuft. (Im Streitfall hast du dann auch jemanden der dir hilft.)</li>
+            <li>Zahle den aufzuladenden Betrag in die Kasse ein</li>
+            <li>Wähle deinen eigenen, sowie den Namen der 4-Augen-Person aus und gib den aufzuladenen Betrag ein.</li>
+        </ol>
+
+        <form action="/recharge/doit" method="POST">
+            <fieldset>
+                <legend>Aufladedaten</legend>
+                <div>
+                    Aufladen für:
+                    <select name="user_user">
+                        {% for u in users %}
+                        <option value="{{ u.id }}">{{ u.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    4-Augen-Person:
+                    <select name="helper_user">
+                        {% for u in users %}
+                        <option value="{{ u.id }}">{{ u.name }}</option>
+                        {% endfor %}      
+                    </select>              
+                </div>
+                <div>
+                    Betrag:
+                    <input type="number" name="amount" step="0.5">
+                </div>
+                <div><input type="submit" value="Aufladung durchführen"></div>
+            </fieldset>
+        </form>
+    </body>
+</html>

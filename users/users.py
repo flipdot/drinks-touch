@@ -7,14 +7,14 @@ class Users(object):
         pass
 
     @staticmethod
-    def get_all(filter):
+    def get_all(filter=''):
         users = []
         ldap_users = Users.read_all_users_ldap()
 
         for ldap_user in ldap_users:
             name = ldap_user['uid'][0]
 
-            if name.lower().startswith(filter.lower()) == False:
+            if filter != '' and name.lower().startswith(filter.lower()) == False:
                 continue
 
             users.append({
