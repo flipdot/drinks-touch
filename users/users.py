@@ -56,18 +56,6 @@ class Users(object):
         session = get_session()
 
         sql = text("""
-                SELECT user_id, sum(amount) as amount
-                FROM rechargeevent
-                WHERE user_id = :user_id
-                GROUP BY user_id
-            """)
-        row = session.connection().execute(sql, user_id=user_id).fetchone()
-        if not row:
-            return None
-
-        credit = row.amount
-
-        sql = text("""
                 SELECT user_id, count(*) as amount
                 FROM scanevent
                 WHERE user_id = :user_id
@@ -78,5 +66,17 @@ class Users(object):
             return None
 
         cost = row.amount
+
+        sql = text("""
+                SELECT user_id, sum(amount) as amount
+                FROM rechargeevent
+                WHERE user_id = :user_id
+                GROUP BY user_id
+            """)
+        row = session.connection().execute(sql, user_id=user_id).fetchone()
+        if not row:
+            return cost * -1
+
+        credit = row.amount        
 
         return credit - cost
