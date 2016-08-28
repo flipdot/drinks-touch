@@ -27,12 +27,14 @@ class Users(object):
     @staticmethod
     def read_all_users_ldap():
         dn = "cn=admin,dc=flipdot,dc=org"
-        pw = "atmega328"
+        pw = ''
+
+        with  open('ldap_pw', 'r') as ldap_pw
+            pw = ldap_pw.read()
         
         base_dn = 'ou=members,dc=flipdot,dc=org'
         filter = '(objectclass=person)'
         attrs = ['uid', 'uidNumber']
-
 
         con = ldap.initialize('ldap://rail.fd')
         con.simple_bind_s( dn, pw )
