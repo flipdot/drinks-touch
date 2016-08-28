@@ -45,5 +45,5 @@ class Button(BaseElm):
         for event in events:
             if event.type == pygame.MOUSEBUTTONUP:
                 pos = pygame.mouse.get_pos()
-                if pygame.Rect(self.box).collidepoint(pos):
+                if self.box != None and pygame.Rect(self.box).collidepoint(pos):
                     self.clicked(self.click_param, pos)
