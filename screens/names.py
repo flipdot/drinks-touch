@@ -7,7 +7,7 @@ from elements.button import Button
 from users.users import Users
 
 from .screen import Screen
-from screens.profile import ProfileScreen
+from screens.enter_pin import EnterPinScreen
 
 class NamesScreen(Screen):
     def __init__(self, screen, char, **kwargs):
@@ -52,5 +52,5 @@ class NamesScreen(Screen):
         from .screen_manager import ScreenManager
         screen_manager = ScreenManager.get_instance()
         screen_manager.set_active(
-            ProfileScreen(self.screen, param)
+            EnterPinScreen(self.screen, param)
         )
