@@ -37,11 +37,12 @@ class NamesScreen(Screen):
             self.objects.append(Button(
                 self.screen,
                 text = user["name"],
-                pos=(30,190 + (i * 55)),
+                pos=(30,190 + (i * 80)),
                 click=self.switch_to_screen,
-                click_param=user               
+                click_param=user,
+                padding=20
             ))
-            i += 1        
+            i += 1
 
     def back(self, param, pos):
         from .screen_manager import ScreenManager
