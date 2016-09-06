@@ -119,4 +119,4 @@ class EnterPinScreen(Screen):
 
     def on_barcode(self, barcode):
         for c in barcode:
-            self.add_char(c, null)
+            self.add_char(c, None)
