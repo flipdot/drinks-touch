@@ -116,3 +116,7 @@ class EnterPinScreen(Screen):
         screen_manager.set_active(
             ProfileScreen(self.screen, param)
         )
+
+    def on_barcode(self, barcode):
+        for c in barcode:
+            self.add_char(c, null)
