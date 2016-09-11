@@ -7,6 +7,8 @@ from elements.image import Image
 
 from .names import NamesScreen
 
+from users.users import Users
+
 from .screen import Screen
 
 class MainScreen(Screen):
@@ -25,15 +27,21 @@ class MainScreen(Screen):
             size=50
         ))
 
+        all_users = Users.get_all()
         i = 0
         for c in range(97, 97+26):
             text = str(chr(c))
+            users = filter(lambda u: u["name"].startswith(text), all_users)
+            if len(users) == 0:
+                continue
             self.objects.append(Button(
                 self.screen,
-                text = text,
+                text=text,
                 pos=self.__get_pos(i),
                 click=self.switch_to_screen,
-                click_param=text
+                click_param=text,
+                force_width=500 / 7,
+                force_height=500 / 7,
             ))
 
             i += 1
@@ -44,7 +52,7 @@ class MainScreen(Screen):
             pos=(150, 750),
             size=30,
             click=self.home,
-        ))              
+        ))
 
     def switch_to_screen(self, param, pos):
         from .screen_manager import ScreenManager
@@ -59,17 +67,7 @@ class MainScreen(Screen):
 
     def __get_pos(self, i):
 
-        x = i * 60
-        y = 10
-        dd = 7
+        row = int(i / 7)
+        col = int(i % 7)
 
-        breaks = [7, 14, 21]
-
-        j = 1
-        for b in breaks:
-            if i > b:
-                y = j * 100
-                x = (i - b - 1) * 60
-            j += 1
-
-        return (x + 20, y + 350)
+        return (col * 80 + 30, row * 80 + 350)
