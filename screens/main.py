@@ -49,7 +49,7 @@ class MainScreen(Screen):
         self.objects.append(Button(
             self.screen,
             text='Abbrechen',
-            pos=(150, 750),
+            pos=(150, 700),
             size=30,
             click=self.home,
         ))

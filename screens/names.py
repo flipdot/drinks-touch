@@ -9,6 +9,8 @@ from users.users import Users
 from .screen import Screen
 from screens.enter_pin import EnterPinScreen
 
+from env import monospace
+
 class NamesScreen(Screen):
     def __init__(self, screen, char, **kwargs):
         super(NamesScreen, self).__init__(screen)
@@ -20,7 +22,7 @@ class NamesScreen(Screen):
             text = "BACK",
             pos=(30,30),
             click=self.back,
-            font = "monospace",
+            font = monospace,
             size=30
         ))
 

@@ -26,16 +26,24 @@ class WaitScanScreen(Screen):
             self.barcode_label,
             Button(
                 self.screen,
-                pos=(60, 550),
+                pos=(60, 630),
                 text="jetzt member zuordnen",
                 click=self.set_member
             ),
             Button(
                 self.screen,
-                pos=(60, 610),
+                pos=(270, 700),
                 text="verwerfen",
                 click=self.btn_reset
-            )            
+            )
+        ]
+        self.empty_info = [
+            Button(
+                self.screen,
+                pos=(60, 700),
+                text="stats",
+                click=self.set_member
+            )
         ]
 
         self.objects.append(Image(
@@ -49,7 +57,7 @@ class WaitScanScreen(Screen):
             pos=(60, 240),
         ))
 
-        for o in self.scanned_info:
+        for o in self.scanned_info + self.empty_info:
             self.objects.append(o)
 
         if is_pi():
@@ -58,7 +66,9 @@ class WaitScanScreen(Screen):
     def show_scanned_info(self, show):
         for o in self.scanned_info:
             o.is_visible = show
-    
+        for o in self.empty_info:
+            o.is_visible = not show
+
     def on_barcode(self, barcode):
         if not barcode:
             return
