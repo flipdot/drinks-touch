@@ -60,8 +60,7 @@ class WaitScanScreen(Screen):
         for o in self.scanned_info + self.empty_info:
             self.objects.append(o)
 
-        if is_pi():
-            self.reset()
+        self.reset()
 
     def show_scanned_info(self, show):
         for o in self.scanned_info:
