@@ -18,7 +18,8 @@ def get_by_ean(ean):
         drink = {
             'name': 'Unbekannt ('+ean+')',
             'size': 0,
-            'tags': ['unkown']
+            'tags': ['unkown'],
+            'ean': ean
         }
 
     return drink
