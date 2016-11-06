@@ -31,14 +31,12 @@ class SuccessScreen(Screen):
             self.screen,
             pos=(300, 600),
             size=100,
-            tick=self.tick
+            on_elapsed=self.time_elapsed
         )
         self.objects.append(self.progress)
 
-    def tick(self, value):
-        if value >= 1:
-            self.home()
-        return value + 0.008
+    def time_elapsed(self):
+        self.home()
 
     def home(self):
         from .screen_manager import ScreenManager
