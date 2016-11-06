@@ -5,6 +5,7 @@ from env import is_pi
 from elements.label import Label
 from elements.button import Button
 from elements.image import Image
+from elements.progress import Progress
 
 from drinks.drinks import get_by_ean
 from drinks.drinks_manager import DrinksManager
@@ -57,9 +58,21 @@ class WaitScanScreen(Screen):
             pos=(60, 240),
         ))
 
+        self.progress = Progress(
+            self.screen,
+            pos=(400, 555),
+            size=100,
+            speed=3,
+            on_elapsed=self.time_elapsed,
+        )
+        self.objects.append(self.progress)
+
         for o in self.scanned_info + self.empty_info:
             self.objects.append(o)
 
+        self.reset()
+
+    def time_elapsed(self):
         self.reset()
 
     def show_scanned_info(self, show):
@@ -76,6 +89,7 @@ class WaitScanScreen(Screen):
         DrinksManager.get_instance().set_selected_drink(drink)
         self.barcode_label.text = drink['name']
         self.show_scanned_info(True)
+        self.progress.start()       
 
     def set_member(self, args, pos):
         self.reset(False)
@@ -88,6 +102,8 @@ class WaitScanScreen(Screen):
     def reset(self, reset_drink=True):
         if reset_drink:
             DrinksManager.get_instance().set_selected_drink(None)
+            self.progress.stop()
+
         self.barcode_label.text = None
         self.show_scanned_info(False)
 

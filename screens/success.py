@@ -34,6 +34,7 @@ class SuccessScreen(Screen):
             on_elapsed=self.time_elapsed
         )
         self.objects.append(self.progress)
+        self.progress.start()
 
     def time_elapsed(self):
         self.home()
