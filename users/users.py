@@ -2,6 +2,7 @@ import ldap
 
 from database.storage import get_session
 from sqlalchemy.sql import text
+from env import is_pi
 
 class Users(object):
     active_user = None
@@ -10,22 +11,31 @@ class Users(object):
         pass
 
     @staticmethod
-    def get_all(filter=''):
-        users = []
-        ldap_users = Users.read_all_users_ldap()
+    def get_all(prefix=''):
+        try:
+            users = []
+            ldap_users = Users.read_all_users_ldap()
 
-        for ldap_user in ldap_users:
-            name = ldap_user['uid'][0]
+            for ldap_user in ldap_users:
+                name = ldap_user['uid'][0]
 
-            if filter != '' and name.lower().startswith(filter.lower()) == False:
-                continue
+                if prefix != '' and name.lower().startswith(prefix.lower()) == False:
+                    continue
 
-            users.append({
-                "name": name,
-                "id": ldap_user['uidNumber'][0]
-            })
-
-        return users
+                users.append({
+                    "name": name,
+                    "id": ldap_user['uidNumber'][0]
+                })
+            return users
+        except:
+            if not is_pi():
+                return filter(lambda u: prefix == '' or
+                    u['name'].lower().startswith(prefix.lower()),
+                    [{"name": "foo", "id":"1"},
+                    {"name": "bar", "id":"2"},
+                    {"name": "baz", "id":"3"}])
+            else:
+                raise
 
     @staticmethod
     def read_all_users_ldap():

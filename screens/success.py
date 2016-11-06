@@ -4,6 +4,7 @@ import pygame
 from elements.label import Label
 from elements.button import Button
 from elements.image import Image
+from elements.progress import Progress
 
 from .screen import Screen
 
@@ -24,7 +25,20 @@ class SuccessScreen(Screen):
             pos=(50, 600),
             size=30,
             click=self.btn_home
-        ))    
+        ))
+
+        self.progress = Progress(
+            self.screen,
+            pos=(300, 600),
+            size=100,
+            tick=self.tick
+        )
+        self.objects.append(self.progress)
+
+    def tick(self, value):
+        if value >= 1:
+            self.home()
+        return value + 0.008
 
     def home(self):
         from .screen_manager import ScreenManager

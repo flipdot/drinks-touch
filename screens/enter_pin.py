@@ -9,6 +9,8 @@ from users.users import Users
 from .screen import Screen
 from screens.profile import ProfileScreen
 
+from env import monospace
+
 class EnterPinScreen(Screen):
     def __init__(self, screen, user, **kwargs):
         super(EnterPinScreen, self).__init__(screen)
@@ -19,29 +21,29 @@ class EnterPinScreen(Screen):
             text = "BACK",
             pos=(30,30),
             click=self.back,
-            font = "monospace",
+            font = monospace,
             size=30
         ))
 
         self.objects.append(Button(
             self.screen,
             text = "UNLOCK!",
-            pos=(110, 700),
+            pos=(100, 680),
             click=self.btn_ok,
-            font = "monospace",
-            size=80
+            font = monospace,
+            size=70
         ))
 
         self.objects.append(Label(
             self.screen,
             text ='/s Barcode oder /e PIN:',
-            pos=(20, 130),
+            pos=(40, 110),
         ))        
 
         self.input = Label(
             self.screen,
             text = '_',
-            pos=(100, 200),
+            pos=(100, 180),
         )
         self.objects.append(self.input)
 
@@ -64,26 +66,27 @@ class EnterPinScreen(Screen):
         self.objects.append(Button(
             self.screen,
             text = 'DEL',
-            pos=(200, 560),
-            font = "monospace",
+            pos=(200, 580),
+            font = monospace,
             click=self.del_char,
-            size=60
+            size=50
         ))
 
     def render_digit_btn(self, label, x, y):
-        cord_x = 160 + x  * 70
-        cord_y = 280 + y  * 70
+        width = 480 / 6
+        cord_x = width*1.8 + x  * width
+        cord_y = 250 + y  * width
         self.objects.append(Button(
             self.screen,
             text = label,
             pos=(cord_x, cord_y),
             click=self.add_char,
             click_param=label,
-            font = "monospace",
-            size=60
+            font = monospace,
+            size=50,
+            force_width=width,
+            force_height=width,
         ))
-
-        print (cord_x, cord_y)
 
     def add_char(self, param, pos):
         self.input.text = self.input.text.split('_')[0] + param

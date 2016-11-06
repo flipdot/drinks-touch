@@ -18,6 +18,7 @@ from barcode.barcode_reader import run as run_barcode_reader
 from barcode.barcode_worker import Worker as BarcodeWorker
 
 screen = get_screen()
+clock = pygame.time.Clock()
 
 drinks_manager = DrinksManager()
 DrinksManager.set_instance(drinks_manager)
@@ -48,11 +49,13 @@ t.start()
 
 done = False
 while not done:
-    screen.fill((0, 0, 0))
+    clock.tick(60)
 
     events = pygame.event.get()
 
     current_screen = screen_manager.get_active()
+
+    screen.fill((0, 0, 0))
     current_screen.render()
     current_screen.events(events)
 

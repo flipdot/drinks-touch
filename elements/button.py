@@ -1,10 +1,11 @@
 import pygame
 
+from env import monospace
 from .base_elm import BaseElm
 
 class Button(BaseElm):
     def __init__(self, screen, **kwargs):
-        self.font = kwargs.get('font', 'monospace')
+        self.font = kwargs.get('font', monospace)
         self.size = kwargs.get('size', 30)
         self.text = kwargs.get('text', '<Label>')
         self.color = kwargs.get('color', (246, 198, 0))

@@ -17,6 +17,8 @@ from database.storage import get_session
 from database.models.scan_event import ScanEvent
 from sqlalchemy.sql import text
 
+from env import monospace
+
 class ProfileScreen(Screen):
     def __init__(self, screen, user, **kwargs):
         super(ProfileScreen, self).__init__(screen)
@@ -27,7 +29,7 @@ class ProfileScreen(Screen):
             self.screen,
             text = "BACK",
             pos=(30,30),
-            font = "monospace",
+            font = monospace,
             click=self.back,
             size=30
         ))
@@ -53,21 +55,22 @@ class ProfileScreen(Screen):
             size=30
         ))  
 
-        self.objects.append(Button(
-            self.screen,
-            text='Zuordnen',
-            pos=(30, 600),
-            size=30,
-            click=self.save_drink
-        ))    
+        if DrinksManager.get_instance().get_selected_drink():
+            self.objects.append(Button(
+                self.screen,
+                text='Zuordnen',
+                pos=(30, 690),
+                size=47,
+                click=self.save_drink
+            ))
 
         self.objects.append(Button(
             self.screen,
             text='Abbrechen',
-            pos=(280, 600),
+            pos=(290, 700),
             size=30,
             click=self.btn_home,
-        ))                   
+        ))
 
         self.objects.append(Label(
             self.screen,
@@ -99,6 +102,7 @@ class ProfileScreen(Screen):
             
             session.add(ev)
             session.commit()
+            DrinksManager.get_instance().set_selected_drink(None)
         
         from .screen_manager import ScreenManager
         screen_manager = ScreenManager.get_instance()
