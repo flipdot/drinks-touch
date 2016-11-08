@@ -49,7 +49,7 @@ t.start()
 
 done = False
 while not done:
-    clock.tick(60)
+    clock.tick(30)
 
     events = pygame.event.get()
 
