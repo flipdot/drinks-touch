@@ -7,4 +7,5 @@ class Worker:
     def on_barcode(self, barcode):
         from screens.screen_manager import ScreenManager
         screen = ScreenManager.get_instance().get_active()
-        screen.on_barcode(barcode)    
+        if 'on_barcode' in dir(screen):
+            screen.on_barcode(barcode)    
