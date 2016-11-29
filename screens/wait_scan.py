@@ -42,7 +42,7 @@ class WaitScanScreen(Screen):
             Button(
                 self.screen,
                 pos=(60, 700),
-                text="stats",
+                text="Benutzer",
                 click=self.set_member
             )
         ]

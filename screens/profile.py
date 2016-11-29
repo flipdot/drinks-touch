@@ -12,10 +12,13 @@ from users.users import Users
 
 from .screen import Screen
 from .success import SuccessScreen
+from .id_card_screen import IDCardScreen
 
 from database.storage import get_session
 from database.models.scan_event import ScanEvent
 from sqlalchemy.sql import text
+
+from .screen_manager import ScreenManager
 
 from env import monospace
 
@@ -31,6 +34,15 @@ class ProfileScreen(Screen):
             pos=(30,30),
             font = monospace,
             click=self.back,
+            size=30
+        ))
+
+        self.objects.append(Button(
+            self.screen,
+            text = "ID card",
+            pos=(350,30),
+            font = monospace,
+            click=self.id_card,
             size=30
         ))
 
@@ -60,7 +72,7 @@ class ProfileScreen(Screen):
                 self.screen,
                 text='Zuordnen',
                 pos=(30, 690),
-                size=47,
+                size=50,
                 click=self.save_drink
             ))
 
@@ -104,14 +116,16 @@ class ProfileScreen(Screen):
             session.commit()
             DrinksManager.get_instance().set_selected_drink(None)
         
-        from .screen_manager import ScreenManager
         screen_manager = ScreenManager.get_instance()
         screen_manager.set_active(SuccessScreen(self.screen))
 
     def back(self, param, pos):
-        from .screen_manager import ScreenManager
         screen_manager = ScreenManager.get_instance()
         screen_manager.go_back()
+
+    def id_card(self, params, pos):
+        screen_manager = ScreenManager.get_instance()
+        screen_manager.set_active(IDCardScreen(self.screen, self.user))
 
     def home(self):
         from .screen_manager import ScreenManager
