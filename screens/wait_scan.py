@@ -31,8 +31,9 @@ class WaitScanScreen(Screen):
             self.barcode_label,
             Button(
                 self.screen,
-                pos=(60, 630),
-                text="jetzt member zuordnen",
+                pos=(60, 600),
+                text="drink buchen",
+                size=60,
                 click=self.set_member
             ),
             Button(
@@ -64,7 +65,7 @@ class WaitScanScreen(Screen):
 
         self.progress = Progress(
             self.screen,
-            pos=(400, 555),
+            pos=(400, 500),
             size=100,
             speed=3,
             on_elapsed=self.time_elapsed,
