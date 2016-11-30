@@ -90,5 +90,5 @@ class IDCardScreen(Screen):
     def on_barcode(self, barcode):
         if not barcode:
             return
-        Users.set_id_card(self.user['path'], barcode)
+        Users.set_id_card(self.user, barcode)
         self.id_label.text = barcode

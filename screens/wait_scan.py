@@ -7,8 +7,12 @@ from elements.button import Button
 from elements.image import Image
 from elements.progress import Progress
 
+from users.users import Users
+
 from drinks.drinks import get_by_ean
 from drinks.drinks_manager import DrinksManager
+
+from screens.profile import ProfileScreen
 
 from .screen import Screen
 from .main import MainScreen
@@ -84,7 +88,12 @@ class WaitScanScreen(Screen):
     def on_barcode(self, barcode):
         if not barcode:
             return
-
+        user = Users.get_by_id_card(barcode)
+        if user:
+            ScreenManager.get_instance().set_active(
+                ProfileScreen(self.screen, user)
+            )
+            return
         drink = get_by_ean(barcode)
         DrinksManager.get_instance().set_selected_drink(drink)
         self.barcode_label.text = drink['name']

@@ -37,9 +37,9 @@ class Users(object):
                 print("falling back to test data")
                 return filter(lambda u: prefix == '' or
                     u['name'].lower().startswith(prefix.lower()),
-                    [{"name": "foo", "id":"1", "id_card": ""},
-                    {"name": "bar", "id":"2", "id_card": ""},
-                    {"name": "baz", "id":"3", "id_card": ""}])
+                    [{"name": "foo", "id":"1", "id_card": None},
+                    {"name": "bar", "id":"2", "id_card": "idcard2"},
+                    {"name": "baz", "id":"3", "id_card": "idcard"}])
             else:
                 raise
 
@@ -105,7 +105,15 @@ class Users(object):
         return credit - cost
 
     @staticmethod
-    def set_id_card(user_path, ean):
+    def set_id_card(user, ean):
         con = Users.get_ldap_instance()
         add_pass = [(ldap.MOD_REPLACE, 'carLicense', [ean])]
-        con.modify_s(user_path,add_pass)
+        con.modify_s(user['path'], add_pass)
+
+    @staticmethod
+    def get_by_id_card(ean):
+        all = Users.get_all()
+        by_card = dict([ (u['id_card'], u) for u in all if u['id_card'] ])
+        if ean in by_card:
+            return by_card[ean]
+        return None
