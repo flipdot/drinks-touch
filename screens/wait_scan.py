@@ -63,6 +63,15 @@ class WaitScanScreen(Screen):
             pos=(60, 240),
         ))
 
+        self.processing = Label(
+            self.screen,
+            text="Moment bitte...",
+            size=40,
+            pos=(80, 280)
+        )
+        self.processing.is_visible = False
+        self.objects.append(self.processing)
+
         self.progress = Progress(
             self.screen,
             pos=(400, 500),
@@ -89,17 +98,20 @@ class WaitScanScreen(Screen):
     def on_barcode(self, barcode):
         if not barcode:
             return
+        self.processing.is_visible = True
         user = Users.get_by_id_card(barcode)
         if user:
             ScreenManager.get_instance().set_active(
                 ProfileScreen(self.screen, user)
             )
+            self.processing.is_visible = False
             return
         drink = get_by_ean(barcode)
         DrinksManager.get_instance().set_selected_drink(drink)
         self.barcode_label.text = drink['name']
         self.show_scanned_info(True)
-        self.progress.start()       
+        self.processing.is_visible = False
+        self.progress.start()
 
     def set_member(self, args, pos):
         self.reset(False)
@@ -118,7 +130,6 @@ class WaitScanScreen(Screen):
         self.show_scanned_info(False)
 
     def back(self, param, pos):
-        Users.reset_active()
         from .screen_manager import ScreenManager
         screen_manager = ScreenManager.get_instance()
         screen_manager.set_default()
