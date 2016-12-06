@@ -12,10 +12,13 @@ from users.users import Users
 
 from .screen import Screen
 from .success import SuccessScreen
+from .id_card_screen import IDCardScreen
 
 from database.storage import get_session
 from database.models.scan_event import ScanEvent
 from sqlalchemy.sql import text
+
+from .screen_manager import ScreenManager
 
 from env import monospace
 
@@ -34,6 +37,15 @@ class ProfileScreen(Screen):
             size=30
         ))
 
+        self.objects.append(Button(
+            self.screen,
+            text = "ID card",
+            pos=(350,30),
+            font = monospace,
+            click=self.id_card,
+            size=30
+        ))
+
         self.objects.append(Label(
             self.screen,
             text =self.user["name"],
@@ -46,23 +58,31 @@ class ProfileScreen(Screen):
             text = 'Guthaben',
             pos=(330, 120),
             size=30
-        ))           
+        ))
 
         self.objects.append(Label(
             self.screen,
             text='Bisheriger Verbrauch:',
             pos=(30, 170),
             size=30
-        ))  
+        ))
 
-        if DrinksManager.get_instance().get_selected_drink():
-            self.objects.append(Button(
-                self.screen,
-                text='Zuordnen',
-                pos=(30, 690),
-                size=47,
-                click=self.save_drink
-            ))
+        drink = DrinksManager.get_instance().get_selected_drink()
+        self.drink_info = Label(
+            self.screen,
+            text=drink['name'] if drink else "",
+            pos=(30, 630)
+        )
+
+        self.zuordnen = Button(
+            self.screen,
+            text='Zuordnen',
+            pos=(30, 690),
+            size=50,
+            click=self.save_drink
+        )
+        if drink:
+            self.objects.extend([self.zuordnen, self.drink_info])
 
         self.objects.append(Button(
             self.screen,
@@ -77,15 +97,21 @@ class ProfileScreen(Screen):
             text = str(Users.get_balance(self.user['id']))+' EUR',
             pos=(335, 145),
             size=40
-        ))    
+        ))
 
         i = 0
         for drinks in self.get_stats():
-            text = get_by_ean(drinks["name"])['name'] + ": " + str(drinks["count"])
+            text = get_by_ean(drinks["name"])['name']
             self.objects.append(Label(
                 self.screen,
                 text = text,
                 pos=(30,210 + (i * 35)),
+                max_width=480-30-70
+            ))
+            self.objects.append(Label(
+                self.screen,
+                text = str(drinks["count"]),
+                pos=(480-75+10,210 + (i * 35)),
             ))
             i += 1
 
@@ -104,14 +130,26 @@ class ProfileScreen(Screen):
             session.commit()
             DrinksManager.get_instance().set_selected_drink(None)
         
-        from .screen_manager import ScreenManager
         screen_manager = ScreenManager.get_instance()
         screen_manager.set_active(SuccessScreen(self.screen))
 
+    def on_barcode(self, barcode):
+        if not barcode:
+            return
+        drink = get_by_ean(barcode)
+        DrinksManager.get_instance().set_selected_drink(drink)
+        self.drink_info.text = drink['name']
+        if self.zuordnen not in self.objects:
+            self.objects.extend([self.zuordnen, self.drink_info])       
+
+
     def back(self, param, pos):
-        from .screen_manager import ScreenManager
         screen_manager = ScreenManager.get_instance()
         screen_manager.go_back()
+
+    def id_card(self, params, pos):
+        screen_manager = ScreenManager.get_instance()
+        screen_manager.set_active(IDCardScreen(self.screen, self.user))
 
     def home(self):
         from .screen_manager import ScreenManager
