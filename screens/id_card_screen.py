@@ -8,6 +8,9 @@ from elements.image import Image
 
 from users.users import Users
 
+from drinks.drinks import get_by_ean
+from drinks.drinks_manager import DrinksManager
+
 from .screen import Screen
 from .success import SuccessScreen
 
@@ -50,7 +53,8 @@ class IDCardScreen(Screen):
             self.screen,
             text = self.user['id_card'],
             pos=(50, 400),
-            size=70
+            size=70,
+            font = "Serif"
         )
         self.objects.append(self.id_label)
 
@@ -69,7 +73,7 @@ class IDCardScreen(Screen):
 
         self.objects.append(Button(
             self.screen,
-            text='Abbrechen',
+            text='OK BYE',
             pos=(290, 700),
             size=30,
             click=self.btn_home,
@@ -89,6 +93,14 @@ class IDCardScreen(Screen):
 
     def on_barcode(self, barcode):
         if not barcode:
+            return
+        drink = get_by_ean(barcode)
+        if drink and not 'unknown' in drink['tags']:
+            from .profile import ProfileScreen
+            DrinksManager.get_instance().set_selected_drink(drink)
+            ScreenManager.get_instance().set_active(
+                ProfileScreen(self.screen, self.user)
+            )
             return
         Users.set_id_card(self.user, barcode)
         self.id_label.text = barcode
