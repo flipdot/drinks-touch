@@ -21,6 +21,10 @@ from .screen_manager import ScreenManager
 
 from env import monospace
 
+from hubarcode.code128 import Code128Encoder
+
+import subprocess
+
 class IDCardScreen(Screen):
     def __init__(self, screen, user, **kwargs):
         super(IDCardScreen, self).__init__(screen)
@@ -34,6 +38,14 @@ class IDCardScreen(Screen):
             font = monospace,
             click=self.back,
             size=30
+        ))
+
+        self.objects.append(Button(
+            self.screen,
+            text='Reset',
+            pos=(350, 30),
+            size=30,
+            click=self.reset_id
         ))
 
         self.objects.append(Label(
@@ -76,7 +88,15 @@ class IDCardScreen(Screen):
             text='OK BYE',
             pos=(290, 700),
             size=30,
-            click=self.btn_home,
+            click=self.btn_home
+        ))
+
+        self.objects.append(Button(
+            self.screen,
+            text='Drucken',
+            pos=(30, 700),
+            size=30,
+            click=self.print_id
         ))
 
     def back(self, param, pos):
@@ -91,6 +111,22 @@ class IDCardScreen(Screen):
     def btn_home(self, param, pos):
         self.home()
 
+    def set_id(self, ean):
+        self.user['id_card'] = ean
+        Users.set_id_card(self.user, ean)
+        self.id_label.text = ean
+
+    def reset_id(self, param, pos):
+        self.set_id(None)
+
+    def print_id(self, param, pos):
+        if not self.user['id_card']:
+            self.set_id("fd_"+self.user['name'])
+        enc = Code128Encoder(self.user['id_card'])
+        png = enc.get_imagedata()
+        p = subprocess.Popen(['lp', '-d', 'labeldrucker', '-'], stdin=subprocess.PIPE)
+        print p.communicate(input=png)
+
     def on_barcode(self, barcode):
         if not barcode:
             return
@@ -102,5 +138,4 @@ class IDCardScreen(Screen):
                 ProfileScreen(self.screen, self.user)
             )
             return
-        Users.set_id_card(self.user, barcode)
-        self.id_label.text = barcode
+        self.set_id(barcode)

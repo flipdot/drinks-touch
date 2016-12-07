@@ -107,7 +107,10 @@ class Users(object):
     @staticmethod
     def set_id_card(user, ean):
         con = Users.get_ldap_instance()
-        add_pass = [(ldap.MOD_REPLACE, 'carLicense', [ean])]
+        if ean:
+            add_pass = [(ldap.MOD_REPLACE, 'carLicense', [ean])]
+        else:
+            add_pass = [(ldap.MOD_DELETE, 'carLicense', [])]
         con.modify_s(user['path'], add_pass)
 
     @staticmethod
