@@ -18,6 +18,7 @@ from .screen import Screen
 from .main import MainScreen
 from .screen_manager import ScreenManager
 
+
 class WaitScanScreen(Screen):
     def __init__(self, screen, **kwargs):
         super(WaitScanScreen, self).__init__(screen)
@@ -67,7 +68,7 @@ class WaitScanScreen(Screen):
             self.screen,
             text="Moment bitte...",
             size=40,
-            pos=(80, 280)
+            pos=(80, 290)
         )
         self.processing.is_visible = False
         self.objects.append(self.processing)
@@ -76,7 +77,7 @@ class WaitScanScreen(Screen):
             self.screen,
             pos=(400, 500),
             size=100,
-            speed=3,
+            speed=1/10.0,
             on_elapsed=self.time_elapsed,
         )
         self.objects.append(self.progress)

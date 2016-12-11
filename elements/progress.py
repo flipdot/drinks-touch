@@ -5,12 +5,12 @@ from .base_elm import BaseElm
 
 class Progress(BaseElm):
     def __init__(self, screen, **kwargs):
-        self.size = kwargs.get('size', 30)
+        self.size = kwargs.get('size', 50)
         self.color = kwargs.get('color', (246, 198, 0))
         self.box = None
-        
+        self.aa = kwargs.get('aa', 8)
         self.tick = kwargs.get('tick', self.__default_tick)
-        self.speed = self.calc_speed(kwargs.get('speed', 8))
+        self.speed = kwargs.get('speed', 1/4.0) # 4 secs
         self.on_elapsed = kwargs.get('on_elapsed', None)
 
         pos = kwargs.get('pos', (0, 0))
@@ -24,7 +24,7 @@ class Progress(BaseElm):
             top, left,
             width, height
         )
-        self.start()        
+        self.start()
 
     def start(self):
         self.value = 0
@@ -33,29 +33,33 @@ class Progress(BaseElm):
     def stop(self):
         self.is_running = False
 
-    def calc_speed(self, value):
-        return value / 1000.0
-
-    def __default_tick(self, value):
-        if self.is_running and value >= 1 and self.on_elapsed:
-            self.on_elapsed()
+    def __default_tick(self, old_value, t, dt):
+        if self.is_running and old_value >= 1:
             self.stop()
+            if self.on_elapsed:
+                self.on_elapsed()
 
         if self.is_running:
-            return value + self.speed
+            return old_value + self.speed * dt
         else:
-            return value
-
+            return old_value
 
     def render(self, t, dt):
         if self.tick is not None:
-            self.value = self.tick(self.value)
+            self.value = self.tick(self.value, t, dt)
 
         if self.is_running:
+            surface = pygame.Surface((self.size * self.aa, self.size * self.aa))
+            extra_rounds = 0.75
+            start = 0.5*math.pi + self.value * math.pi * extra_rounds * 2
+            end = start + self.value * 2 * math.pi
             pygame.draw.arc(
-                self.screen,
+                surface,
                 self.color,
-                self.box,
-                0.5*math.pi - self.value * math.pi * 2, 0.5*math.pi,
-                int(self.size/5)
+                (0, 0, self.size * self.aa, self.size * self.aa),
+                start, end,
+                int(self.size * self.aa / 5)
             )
+            antialiased = pygame.transform.smoothscale(surface,
+                (self.size, self.size))
+            self.screen.blit(antialiased, self.box)
