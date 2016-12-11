@@ -1,10 +1,13 @@
 # coding=utf-8
 import pygame
 import datetime
+import subprocess
+import time
 
 from elements.label import Label
 from elements.button import Button
 from elements.image import Image
+from elements.progress import Progress
 
 from users.users import Users
 
@@ -22,8 +25,6 @@ from .screen_manager import ScreenManager
 from env import monospace
 
 from hubarcode.code128 import Code128Encoder
-
-import subprocess
 
 class IDCardScreen(Screen):
     def __init__(self, screen, user, **kwargs):
@@ -85,8 +86,8 @@ class IDCardScreen(Screen):
 
         self.objects.append(Button(
             self.screen,
-            text='OK BYE',
-            pos=(290, 700),
+            text='OK bye',
+            pos=(330, 700),
             size=30,
             click=self.btn_home
         ))
@@ -98,6 +99,13 @@ class IDCardScreen(Screen):
             size=30,
             click=self.print_id
         ))
+        self.progress = Progress(
+            self.screen,
+            pos=(200,720),
+            speed=1/8.0
+        )
+        self.progress.stop()
+        self.objects.append(self.progress)
 
     def back(self, param, pos):
         screen_manager = ScreenManager.get_instance()
@@ -121,12 +129,14 @@ class IDCardScreen(Screen):
         self.set_id(None)
 
     def print_id(self, param, pos):
+        self.progress.start()
         if not self.user['id_card']:
             self.set_id("Efd_"+self.user['name'])
         enc = Code128Encoder(self.user['id_card'][1:])
         png = enc.get_imagedata()
         p = subprocess.Popen(['lp', '-d', 'labeldrucker', '-'], stdin=subprocess.PIPE)
-        print p.communicate(input=png)
+        p.communicate(input=png)
+        time.sleep(3)
 
     def on_barcode(self, barcode):
         if not barcode:
