@@ -102,16 +102,21 @@ class ProfileScreen(Screen):
         i = 0
         for drinks in self.get_stats():
             text = get_by_ean(drinks["name"])['name']
+            x = 30
+            count_width = 80
+            margin_right = 10
             self.objects.append(Label(
                 self.screen,
                 text = text,
-                pos=(30,210 + (i * 35)),
-                max_width=480-30-70
+                pos=(x, 210 + (i * 35)),
+                max_width=480-x-margin_right-count_width
             ))
             self.objects.append(Label(
                 self.screen,
                 text = str(drinks["count"]),
-                pos=(480-75+10,210 + (i * 35)),
+                align_right=True,
+                pos=(480-margin_right, 210 + (i * 35)),
+                max_width=count_width
             ))
             i += 1
 
