@@ -15,6 +15,7 @@ class Button(BaseElm):
         self.force_width = kwargs.get('force_width', None)
         self.force_height = kwargs.get('force_height', None)
         self.box = None
+        self.clicking = False
 
         pos = kwargs.get('pos', (0, 0))
         super(Button, self).__init__(screen, pos, self.size, -1)
@@ -27,7 +28,16 @@ class Button(BaseElm):
     def __clicked(self, param, pos):
         print "Clicked on button without handler"
 
-    def render(self):
+    def pre_click(self, event):
+        self.clicking = True
+    
+    def post_click(self, event):
+        self.clicking = False
+
+    def render(self, t, dt):
+        if self.clicking:
+            self.screen.fill(tuple(c*0.7 for c in self.color), self.box)
+
         elm = self.font.render(self.text, 1, self.color)
         self.screen.blit(elm, self.pos)
 
@@ -58,6 +68,10 @@ class Button(BaseElm):
     def events(self, events):
         for event in events:
             if event.type == pygame.MOUSEBUTTONUP:
-                pos = pygame.mouse.get_pos()
+                pos = event.pos
                 if self.box != None and pygame.Rect(self.box).collidepoint(pos):
-                    self.clicked(self.click_param, pos)
+                    self.pre_click(event)
+                    try:
+                        self.clicked(self.click_param, pos)
+                    finally:
+                        self.post_click(event)

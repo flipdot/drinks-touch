@@ -5,10 +5,10 @@ class Screen(object):
         self.screen = screen
         self.objects = []
 
-    def render(self):
+    def render(self, t, dt):
         for o in self.objects:
             if o.visible():
-                o.render()
+                o.render(t, dt)
 
     def events(self, events):
         for o in self.objects:

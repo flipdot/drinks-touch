@@ -47,7 +47,7 @@ class Progress(BaseElm):
             return value
 
 
-    def render(self):
+    def render(self, t, dt):
         if self.tick is not None:
             self.value = self.tick(self.value)
 

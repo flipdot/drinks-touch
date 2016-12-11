@@ -18,7 +18,7 @@ class Label(BaseElm):
     def __load_font(self):
         self.font = pygame.font.SysFont(self.font, self.size)
 
-    def render(self):
+    def render(self, t, dt):
         elm = self.font.render(self.text, 1, self.color)
         area = pygame.Rect(0,0,
             self.max_width if self.max_width else elm.get_width(),

@@ -31,6 +31,6 @@ class ElmList(BaseElm):
             last_elm_pos = last_elm.pos[1]
             self.__next_elm_post = last_elm_pos + last_elm.height + self.elm_margin
 
-    def render(self):
+    def render(self, t, dt):
         for e in self.elements:
             e.render()
