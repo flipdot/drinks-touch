@@ -7,6 +7,8 @@ class Label(BaseElm):
         self.font = kwargs.get('font', 'sans serif')
         self.size = kwargs.get('size', 50)
         self.max_width = kwargs.get('max_width', None)
+        # if True, pos marks top-right instead of top-left corner
+        self.align_right = kwargs.get('align_right', False)
         self.text = kwargs.get('text', '<Label>')
         self.color = kwargs.get('color', (246, 198, 0))
 
@@ -20,8 +22,18 @@ class Label(BaseElm):
 
     def render(self, t, dt):
         elm = self.font.render(self.text, 1, self.color)
-        area = pygame.Rect(0,0,
+        cutx = 0
+        pos = self.pos
+        if self.align_right:
+            if self.max_width:
+                align_width = min(self.max_width, elm.get_width())
+                cutx = max(0, elm.get_width() - self.max_width) 
+            else:
+                align_width = elm.get_width()
+            pos = (self.pos[0] - align_width, self.pos[1])
+
+        area = pygame.Rect(cutx, 0,
             self.max_width if self.max_width else elm.get_width(),
             elm.get_height()
         )
-        self.screen.blit(elm, self.pos, area)
+        self.screen.blit(elm, pos, area)
