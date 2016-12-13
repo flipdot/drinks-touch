@@ -8,7 +8,6 @@ class Progress(BaseElm):
         self.size = kwargs.get('size', 50)
         self.color = kwargs.get('color', (246, 198, 0))
         self.box = None
-        self.aa = kwargs.get('aa', 8)
         self.tick = kwargs.get('tick', self.__default_tick)
         self.speed = kwargs.get('speed', 1/4.0) # 4 secs
         self.on_elapsed = kwargs.get('on_elapsed', None)
@@ -49,17 +48,13 @@ class Progress(BaseElm):
             self.value = self.tick(self.value, t, dt)
 
         if self.is_running:
-            surface = pygame.Surface((self.size * self.aa, self.size * self.aa))
             extra_rounds = 0.75
             start = 0.5*math.pi + self.value * math.pi * extra_rounds * 2
             end = start + self.value * 2 * math.pi
             pygame.draw.arc(
-                surface,
+                self.screen,
                 self.color,
-                (0, 0, self.size * self.aa, self.size * self.aa),
+                self.box,
                 start, end,
-                int(self.size * self.aa / 5)
+                int(self.size / 5)
             )
-            antialiased = pygame.transform.smoothscale(surface,
-                (self.size, self.size))
-            self.screen.blit(antialiased, self.box)
