@@ -41,6 +41,15 @@ class IDCardScreen(Screen):
             size=30
         ))
 
+        self.timeout = Progress(
+            self.screen,
+            pos=(200, 50),
+            speed=1/15.0,
+            on_elapsed=self.time_elapsed,
+        )
+        self.objects.append(self.timeout)
+        self.timeout.start()
+
         self.objects.append(Button(
             self.screen,
             text='Reset',
@@ -115,6 +124,9 @@ class IDCardScreen(Screen):
         from .screen_manager import ScreenManager
         screen_manager = ScreenManager.get_instance()
         screen_manager.set_default()
+
+    def time_elapsed(self):
+        self.home()
 
     def btn_home(self, param, pos):
         self.home()

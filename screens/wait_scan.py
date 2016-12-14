@@ -73,14 +73,14 @@ class WaitScanScreen(Screen):
         self.processing.is_visible = False
         self.objects.append(self.processing)
 
-        self.progress = Progress(
+        self.timeout = Progress(
             self.screen,
             pos=(400, 500),
             size=100,
             speed=1/10.0,
             on_elapsed=self.time_elapsed,
         )
-        self.objects.append(self.progress)
+        self.objects.append(self.timeout)
 
         for o in self.scanned_info + self.empty_info:
             self.objects.append(o)
@@ -112,7 +112,7 @@ class WaitScanScreen(Screen):
         self.barcode_label.text = drink['name']
         self.show_scanned_info(True)
         self.processing.is_visible = False
-        self.progress.start()
+        self.timeout.start()
 
     def set_member(self, args, pos):
         self.reset(False)
@@ -125,7 +125,7 @@ class WaitScanScreen(Screen):
     def reset(self, reset_drink=True):
         if reset_drink:
             DrinksManager.get_instance().set_selected_drink(None)
-            self.progress.stop()
+            self.timeout.stop()
 
         self.barcode_label.text = None
         self.show_scanned_info(False)

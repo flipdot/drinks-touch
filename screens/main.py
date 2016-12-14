@@ -4,6 +4,7 @@ import pygame
 from elements.label import Label
 from elements.button import Button
 from elements.image import Image
+from elements.progress import Progress
 
 from .names import NamesScreen
 
@@ -53,6 +54,14 @@ class MainScreen(Screen):
             size=30,
             click=self.home,
         ))
+        self.timeout = Progress(
+            self.screen,
+            pos=(380, 715),
+            speed=1/15.0,
+            on_elapsed=self.time_elapsed,
+        )
+        self.objects.append(self.timeout)
+        self.timeout.start()
 
     def switch_to_screen(self, param, pos):
         from .screen_manager import ScreenManager
@@ -64,6 +73,9 @@ class MainScreen(Screen):
     def home(self, param, pos):
         from .screen_manager import ScreenManager
         screen_manager = ScreenManager.get_instance().set_default()
+
+    def time_elapsed(self):
+        self.home(None, None)
 
     def __get_pos(self, i):
 

@@ -5,6 +5,8 @@ import datetime
 from elements.label import Label
 from elements.button import Button
 from elements.image import Image
+from elements.progress import Progress
+
 from drinks.drinks_manager import DrinksManager
 from drinks.drinks import get_by_ean
 
@@ -67,6 +69,15 @@ class ProfileScreen(Screen):
             size=30
         ))
 
+        self.timeout = Progress(
+            self.screen,
+            pos=(200, 50),
+            speed=1/15.0,
+            on_elapsed=self.time_elapsed,
+        )
+        self.objects.append(self.timeout)
+        self.timeout.start()
+
         drink = DrinksManager.get_instance().get_selected_drink()
         self.drink_info = Label(
             self.screen,
@@ -76,7 +87,7 @@ class ProfileScreen(Screen):
 
         self.zuordnen = Button(
             self.screen,
-            text='Zuordnen',
+            text='Trinken',
             pos=(30, 690),
             size=50,
             click=self.save_drink
@@ -145,8 +156,8 @@ class ProfileScreen(Screen):
         DrinksManager.get_instance().set_selected_drink(drink)
         self.drink_info.text = drink['name']
         if self.zuordnen not in self.objects:
-            self.objects.extend([self.zuordnen, self.drink_info])       
-
+            self.objects.extend([self.zuordnen, self.drink_info])
+        self.timeout.start()
 
     def back(self, param, pos):
         screen_manager = ScreenManager.get_instance()
@@ -162,6 +173,9 @@ class ProfileScreen(Screen):
         screen_manager.set_default()
 
     def btn_home(self, param, pos):
+        self.home()
+
+    def time_elapsed(self):
         self.home()
 
     def get_stats(self):

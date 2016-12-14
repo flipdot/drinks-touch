@@ -3,6 +3,7 @@ import pygame
 
 from elements.label import Label
 from elements.button import Button
+from elements.progress import Progress
 
 from users.users import Users
 
@@ -25,6 +26,15 @@ class EnterPinScreen(Screen):
             size=30
         ))
 
+        self.timeout = Progress(
+            self.screen,
+            pos=(200, 50),
+            speed=1/15.0,
+            on_elapsed=self.time_elapsed,
+        )
+        self.objects.append(self.timeout)
+        self.timeout.start()
+
         self.objects.append(Button(
             self.screen,
             text = "UNLOCK!",
@@ -38,7 +48,7 @@ class EnterPinScreen(Screen):
             self.screen,
             text ='/s Barcode oder /e PIN:',
             pos=(40, 110),
-        ))        
+        ))
 
         self.input = Label(
             self.screen,
@@ -123,3 +133,10 @@ class EnterPinScreen(Screen):
     def on_barcode(self, barcode):
         for c in barcode:
             self.add_char(c, None)
+
+    def home(self):
+        from .screen_manager import ScreenManager
+        screen_manager = ScreenManager.get_instance().set_default()
+
+    def time_elapsed(self):
+        self.home()
