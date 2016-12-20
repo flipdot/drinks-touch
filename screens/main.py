@@ -41,8 +41,8 @@ class MainScreen(Screen):
                 pos=self.__get_pos(i),
                 click=self.switch_to_screen,
                 click_param=text,
-                force_width=500 / 7,
-                force_height=500 / 7,
+                force_width=440 / 6,
+                force_height=440 / 6,
             ))
 
             i += 1
@@ -79,7 +79,7 @@ class MainScreen(Screen):
 
     def __get_pos(self, i):
 
-        row = int(i / 7)
-        col = int(i % 7)
+        row = int(i / 6)
+        col = int(i % 6)
 
         return (col * 80 + 30, row * 80 + 350)
