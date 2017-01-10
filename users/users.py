@@ -12,10 +12,10 @@ class Users(object):
         pass
 
     @staticmethod
-    def get_all(prefix=''):
+    def get_all(prefix='', filters=[]):
         try:
             users = []
-            ldap_users = Users.read_all_users_ldap()
+            ldap_users = Users.read_all_users_ldap(filters)
 
             for ldap_user in ldap_users:
                 name = ldap_user['uid'][0]
@@ -55,15 +55,19 @@ class Users(object):
         return con
 
     @staticmethod
-    def read_all_users_ldap():
+    def read_all_users_ldap(filters=[]):
         base_dn = 'ou=members,dc=flipdot,dc=org'
-        filter = '(objectclass=person)'
         attrs = ['uid', 'uidNumber', 'carLicense']
-        
+        filters.append("objectclass=person")
+
+        filters_str = "".join(['(' + f.replace(')', '_') + ')' for f in filters])
+        filter_str = '(%s%s)' % ('&' if len(filters) > 1 else '', filters_str)
+
+
         con = Users.get_ldap_instance()
         
         users = []
-        for path, user in con.search_s( base_dn, ldap.SCOPE_SUBTREE, filter, attrs ):
+        for path, user in con.search_s( base_dn, ldap.SCOPE_SUBTREE, filter_str, attrs ):
             if not 'uidNumber' in user:
                 user['uidNumber'] = user['uid']
             if not 'carLicense' in user:
@@ -115,7 +119,7 @@ class Users(object):
 
     @staticmethod
     def get_by_id_card(ean):
-        all = Users.get_all()
+        all = Users.get_all(filters=['carLicense='+ean])
         by_card = dict([ (u['id_card'], u) for u in all if u['id_card'] ])
         if ean in by_card:
             return by_card[ean]

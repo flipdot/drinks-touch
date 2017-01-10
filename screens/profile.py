@@ -42,7 +42,7 @@ class ProfileScreen(Screen):
         self.objects.append(Button(
             self.screen,
             text = "ID card",
-            pos=(350,30),
+            pos=(340,30),
             font = monospace,
             click=self.id_card,
             size=30

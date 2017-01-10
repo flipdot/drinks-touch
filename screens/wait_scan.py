@@ -34,7 +34,7 @@ class WaitScanScreen(Screen):
                 self.screen,
                 pos=(60, 600),
                 text="drink buchen",
-                size=60,
+                size=52,
                 click=self.set_member
             ),
             Button(
