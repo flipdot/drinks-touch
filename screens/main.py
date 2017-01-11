@@ -32,7 +32,7 @@ class MainScreen(Screen):
         i = 0
         for c in range(97, 97+26):
             text = str(chr(c))
-            users = filter(lambda u: u["name"].startswith(text), all_users)
+            users = filter(lambda u: u["name"].lower().startswith(text), all_users)
             if len(users) == 0:
                 continue
             self.objects.append(Button(

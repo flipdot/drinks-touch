@@ -39,7 +39,8 @@ class Users(object):
                     u['name'].lower().startswith(prefix.lower()),
                     [{"name": "foo", "id":"1", "id_card": None},
                     {"name": "bar", "id":"2", "id_card": "idcard2"},
-                    {"name": "baz", "id":"3", "id_card": "idcard"}])
+                    {"name": "Baz", "id":"3", "id_card": "idcard"},
+                    {"name": "Daz", "id":"3", "id_card": "idcard"}])
             else:
                 raise
 
