@@ -3,8 +3,10 @@ import pygame
 from .base_elm import BaseElm
 
 class Label(BaseElm):
+    _font_cache = {}
+
     def __init__(self, screen, **kwargs):
-        self.font = kwargs.get('font', 'sans serif')
+        self.font_face = kwargs.get('font', 'sans serif')
         self.size = kwargs.get('size', 50)
         self.max_width = kwargs.get('max_width', None)
         # if True, pos marks top-right instead of top-left corner
@@ -15,10 +17,14 @@ class Label(BaseElm):
         pos = kwargs.get('pos', (0, 0))
         super(Label, self).__init__(screen, pos, self.size, -1)
 
-        self.__load_font()
-
-    def __load_font(self):
-        self.font = pygame.font.SysFont(self.font, self.size)
+        self.font = Label.get_font(self.font_face, self.size)
+    
+    @classmethod
+    def get_font(cls, font_face, size):
+        if (font_face, size) not in cls._font_cache:
+            font = pygame.font.SysFont(font_face,size)
+            cls._font_cache[(font_face, size)] = font
+        return cls._font_cache[(font_face, size)]
 
     def render(self, t, dt):
         elm = self.font.render(self.text, 1, self.color)
