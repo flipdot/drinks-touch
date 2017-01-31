@@ -82,6 +82,7 @@ class ProfileScreen(Screen):
         self.drink_info = Label(
             self.screen,
             text=drink['name'] if drink else "",
+            size=60,
             pos=(30, 630)
         )
 
@@ -110,10 +111,19 @@ class ProfileScreen(Screen):
             size=40
         ))
 
-        i = 0
-        for drinks in self.get_stats():
-            text = get_by_ean(drinks["name"])['name']
+        drinks = self.get_stats()
+        for i, drinks in enumerate(drinks):
             x = 30
+            if i == 11:
+                self.objects.append(Label(
+                    self.screen,
+                    text = "...",
+                    pos=(x, 210 + (i * 35))
+                ))
+                continue
+            if i > 11:
+                continue
+            text = get_by_ean(drinks["name"])['name']
             count_width = 80
             margin_right = 10
             self.objects.append(Label(
@@ -129,7 +139,6 @@ class ProfileScreen(Screen):
                 pos=(480-margin_right, 210 + (i * 35)),
                 max_width=count_width
             ))
-            i += 1
 
     def save_drink(self, args, pos):
         session = get_session()
@@ -185,6 +194,7 @@ class ProfileScreen(Screen):
             FROM scanevent
             WHERE user_id = :userid
             GROUP BY barcode
+            ORDER by count DESC
         """)
         userid=self.user['id']
         result = session.connection().execute(sql, userid=userid).fetchall()
