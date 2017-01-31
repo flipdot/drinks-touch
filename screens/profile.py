@@ -69,6 +69,15 @@ class ProfileScreen(Screen):
             size=30
         ))
 
+        self.processing = Label(
+            self.screen,
+            text="Moment bitte...",
+            size=40,
+            pos=(150, 750)
+        )
+        self.processing.is_visible = False
+        self.objects.append(self.processing)
+
         self.timeout = Progress(
             self.screen,
             pos=(200, 50),
@@ -161,11 +170,20 @@ class ProfileScreen(Screen):
     def on_barcode(self, barcode):
         if not barcode:
             return
+        self.processing.is_visible = True
+        user = Users.get_by_id_card(barcode)
+        if user:
+            ScreenManager.get_instance().set_active(
+                ProfileScreen(self.screen, user)
+            )
+            self.processing.is_visible = False
+            return
         drink = get_by_ean(barcode)
         DrinksManager.get_instance().set_selected_drink(drink)
         self.drink_info.text = drink['name']
         if self.zuordnen not in self.objects:
             self.objects.extend([self.zuordnen, self.drink_info])
+        self.processing.is_visible = False
         self.timeout.start()
 
     def back(self, param, pos):
