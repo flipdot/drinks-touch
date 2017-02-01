@@ -67,11 +67,16 @@ class Button(BaseElm):
 
     def events(self, events):
         for event in events:
+            if 'consumed' in event.dict and event.consumed:
+                continue
             if event.type == pygame.MOUSEBUTTONUP:
                 pos = event.pos
-                if self.box != None and pygame.Rect(self.box).collidepoint(pos):
+                if self.box != None and \
+                        self.visible() and \
+                        pygame.Rect(self.box).collidepoint(pos):
                     self.pre_click(event)
                     try:
                         self.clicked(self.click_param, pos)
                     finally:
                         self.post_click(event)
+                    event.consumed = True

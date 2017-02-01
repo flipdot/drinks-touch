@@ -1,5 +1,7 @@
 import ldap
+import ldap.modlist as modlist
 import traceback
+import random
 
 from database.storage import get_session
 from sqlalchemy.sql import text
@@ -12,10 +14,10 @@ class Users(object):
         pass
 
     @staticmethod
-    def get_all(prefix='', filters=[]):
+    def get_all(prefix='', filters=[], include_temp=False):
         try:
             users = []
-            ldap_users = Users.read_all_users_ldap(filters)
+            ldap_users = Users.read_all_users_ldap(filters, include_temp)
 
             for ldap_user in ldap_users:
                 name = ldap_user['uid'][0]
@@ -56,19 +58,22 @@ class Users(object):
         return con
 
     @staticmethod
-    def read_all_users_ldap(filters=[]):
+    def read_all_users_ldap(filters=[], include_temp=False):
         base_dn = 'ou=members,dc=flipdot,dc=org'
+        temp_dn = 'ou=temp_members,dc=flipdot,dc=org'
         attrs = ['uid', 'uidNumber', 'carLicense']
         filters.append("objectclass=person")
 
         filters_str = "".join(['(' + f.replace(')', '_') + ')' for f in filters])
         filter_str = '(%s%s)' % ('&' if len(filters) > 1 else '', filters_str)
 
-
         con = Users.get_ldap_instance()
-        
+        ldap_res = con.search_s(base_dn, ldap.SCOPE_SUBTREE, filter_str, attrs)
+        if include_temp:
+            ldap_res.extend(con.search_s(temp_dn, ldap.SCOPE_SUBTREE, filter_str, attrs))
+
         users = []
-        for path, user in con.search_s( base_dn, ldap.SCOPE_SUBTREE, filter_str, attrs ):
+        for path, user in ldap_res:
             if not 'uidNumber' in user:
                 user['uidNumber'] = user['uid']
             if not 'carLicense' in user:
@@ -91,9 +96,9 @@ class Users(object):
             """)
         row = session.connection().execute(sql, user_id=user_id).fetchone()
         if not row:
-            return None
-
-        cost = row.amount
+            cost = 0
+        else:
+            cost = row.amount
 
         sql = text("""
                 SELECT user_id, sum(amount) as amount
@@ -101,11 +106,12 @@ class Users(object):
                 WHERE user_id = :user_id
                 GROUP BY user_id
             """)
+        print sql, user_id
         row = session.connection().execute(sql, user_id=user_id).fetchone()
         if not row:
-            return cost * -1
-
-        credit = row.amount        
+            credit = 0
+        else:
+            credit = row.amount
 
         return credit - cost
 
@@ -120,8 +126,34 @@ class Users(object):
 
     @staticmethod
     def get_by_id_card(ean):
-        all = Users.get_all(filters=['carLicense='+ean])
+        all = Users.get_all(filters=['carLicense='+ean], include_temp=True)
         by_card = dict([ (u['id_card'], u) for u in all if u['id_card'] ])
         if ean in by_card:
             return by_card[ean]
         return None
+
+    @staticmethod
+    def id_to_ean(id):
+        return "EFDT" + str(id)
+
+    @staticmethod
+    def create_temp_user():
+        id = 30000 + random.randint(1,2000)
+        print "trying user", id
+        while Users.get_by_id_card(Users.id_to_ean(id)):
+            id += 1
+            print "trying user", id
+        
+        barcode = Users.id_to_ean(id)
+        dn = "cn=" + str(id) + ",ou=temp_members,dc=flipdot,dc=org"
+        mods = {
+            'objectClass':  ["inetOrgPerson", "organizationalPerson", "person"],
+            'carLicense':   barcode,
+            'cn':           str(id),
+            'uid':          "geld-"+str(id),
+            'sn':           str(id),
+        }
+        print "adding: dn", dn, ":", mods
+        con = Users.get_ldap_instance()
+        con.add_s(dn, modlist.addModlist(mods))
+        return Users.get_by_id_card(barcode)
