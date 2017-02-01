@@ -25,6 +25,8 @@ from .screen_manager import ScreenManager
 from env import monospace
 
 from hubarcode.code128 import Code128Encoder
+from PIL import Image, ImageDraw, ImageFont
+from StringIO import StringIO
 
 class IDCardScreen(Screen):
     def __init__(self, screen, user, **kwargs):
@@ -111,7 +113,7 @@ class IDCardScreen(Screen):
         self.progress = Progress(
             self.screen,
             pos=(200,720),
-            speed=1/8.0
+            speed=1/15.0
         )
         self.progress.stop()
         self.objects.append(self.progress)
@@ -145,10 +147,11 @@ class IDCardScreen(Screen):
         if not self.user['id_card']:
             self.set_id("Efd_"+self.user['name'])
         enc = Code128Encoder(self.user['id_card'][1:])
+        enc.height = 300
         png = enc.get_imagedata()
         p = subprocess.Popen(['lp', '-d', 'labeldrucker', '-'], stdin=subprocess.PIPE)
         p.communicate(input=png)
-        time.sleep(3)
+        time.sleep(10)
 
     def on_barcode(self, barcode):
         if not barcode:
