@@ -17,6 +17,8 @@ from drinks.drinks_manager import DrinksManager
 from .screen import Screen
 from .success import SuccessScreen
 
+from .profile import ProfileScreen
+
 from database.storage import get_session
 from sqlalchemy.sql import text
 from database.models.recharge_event import RechargeEvent
@@ -104,33 +106,41 @@ class NewIDScreen(Screen):
         self.home()
 
     def btn_euro(self, euro, param, pos):
-        self.message.text = "Konto wird erzeugt..."
-        self.progress.speed = 0
-        self.progress.start()
-        self.progress.value = 0
-        user = Users.create_temp_user()
-        self.progress.value = 0.2
-        self.message.text = "Guthaben wird gespeichert..."
-        self.aufladen(user, euro)
+        try:
+            self.message.text = "Konto wird erzeugt..."
+            self.progress.speed = 0
+            self.progress.start()
+            self.progress.value = 0
+            user = Users.create_temp_user()
+            print "Created temp %s with EUR %d" % (user['id_card'], euro)
+            self.progress.value = 0.2
+            self.message.text = "Guthaben wird gespeichert..."
+            self.aufladen(user, euro)
 
-        barcode = user['id_card']
-        #barcode = "EFDT31456"
+            barcode = user['id_card']
 
-        if barcode.startswith("E"):
-            barcode = barcode[1:]
-        
-        self.message.text = "ID-Card wird gedruckt..."
-        code_img = self.generate_barcode(euro, barcode)
-        self.progress.value = 0.4
-        receipt_img = self.generate_receipt(euro, code_img)
-        self.progress.value = 0.5
-        png = self.to_png(receipt_img)
-        self.progress.value = 0.6
-        
-        self.print_png(png)
-        self.progress.value = 0.7
-        self.progress.speed = 1/10.0
-        time.sleep(self.progress.value / self.progress.speed)
+            if barcode.startswith("E"):
+                barcode = barcode[1:]
+            
+            self.message.text = "ID-Card wird generiert..."
+            code_img = self.generate_barcode(euro, barcode)
+            self.progress.value = 0.4
+            self.message.text = "reticulating splines..."
+            receipt_img = self.generate_receipt(euro, code_img)
+            self.progress.value = 0.6
+            self.message.text = "reloading fobblewobbles..."
+            png = self.to_png(receipt_img)
+            self.progress.value = 0.8
+            self.message.text = "ID-Card wird gedruckt..."
+            self.print_png(png)
+            self.progress.stop()
+            ScreenManager.get_instance().set_active(
+                ProfileScreen(self.screen, user)
+            )
+        except Exception as e:
+            self.message.text = "Fehler: " + str(e)
+            self.progress.value = 0
+            self.progress.speed = 1/5.0
 
     def aufladen(self, user, euro):
         session = get_session()
@@ -161,7 +171,7 @@ class NewIDScreen(Screen):
         img.paste(code_img, (int(-0.07*width), int(0.2*height)))
 
         draw = ImageDraw.Draw(img)
-        font = ImageFont.truetype(font="DejaVuSans.ttf", size=width/10)
+        font = ImageFont.truetype(font="/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", size=width/10)
         draw.text((int(0.05*width), int(0.0*height)),
             "flipdot ID-Card", fill="#000", font=font)
         draw.text((int(0.05*width), int(0.1*height)),
@@ -179,6 +189,6 @@ class NewIDScreen(Screen):
     def print_png(self, img):
         p = subprocess.Popen(['lp', '-d', 'bondrucker', '-'], stdin=subprocess.PIPE)
         p.communicate(input=img)
-        with open("print.png", "w") as f:
-            f.write(img)
-        print "image written to print.png"
+        #with open("print.png", "w") as f:
+        #    f.write(img)
+        #print "image written to print.png"

@@ -80,7 +80,7 @@ class WaitScanScreen(Screen):
             self.screen,
             text="Moment bitte...",
             size=40,
-            pos=(80, 290)
+            pos=(80, 350)
         )
         self.processing.is_visible = False
         self.objects.append(self.processing)

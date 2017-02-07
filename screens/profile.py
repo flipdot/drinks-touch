@@ -163,6 +163,7 @@ class ProfileScreen(Screen):
             session.add(ev)
             session.commit()
             DrinksManager.get_instance().set_selected_drink(None)
+            Users.delete_if_nomoney(self.user)
         
         screen_manager = ScreenManager.get_instance()
         screen_manager.set_active(SuccessScreen(self.screen))

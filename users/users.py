@@ -64,8 +64,9 @@ class Users(object):
         attrs = ['uid', 'uidNumber', 'carLicense']
         filters.append("objectclass=person")
 
-        filters_str = "".join(['(' + f.replace(')', '_') + ')' for f in filters])
-        filter_str = '(%s%s)' % ('&' if len(filters) > 1 else '', filters_str)
+        filter_str = "".join(['(' + f.replace(')', '_') + ')' for f in filters])
+        if len(filters) > 1:
+            filter_str = '(&%s)' % filter_str
 
         con = Users.get_ldap_instance()
         ldap_res = con.search_s(base_dn, ldap.SCOPE_SUBTREE, filter_str, attrs)
@@ -139,10 +140,8 @@ class Users(object):
     @staticmethod
     def create_temp_user():
         id = 30000 + random.randint(1,2000)
-        print "trying user", id
         while Users.get_by_id_card(Users.id_to_ean(id)):
             id += 1
-            print "trying user", id
         
         barcode = Users.id_to_ean(id)
         dn = "cn=" + str(id) + ",ou=temp_members,dc=flipdot,dc=org"
@@ -153,7 +152,24 @@ class Users(object):
             'uid':          "geld-"+str(id),
             'sn':           str(id),
         }
-        print "adding: dn", dn, ":", mods
         con = Users.get_ldap_instance()
         con.add_s(dn, modlist.addModlist(mods))
         return Users.get_by_id_card(barcode)
+
+    @staticmethod
+    def delete_if_nomoney(user):
+        if not user['path'].endswith(",ou=temp_members,dc=flipdot,dc=org"):
+            return
+        balance = Users.get_balance(user['id'])
+        if balance <= 0:
+            print "deleting user " + str(user['id']) + " because they are broke"
+            Users.delete(user)
+    
+    @staticmethod
+    def delete(user):
+        try:
+            con = Users.get_ldap_instance()
+            con.delete_s(user['path'])
+        except Exception as e:
+            print "Error: " + str(e)
+            traceback.print_tb(limit=4)
