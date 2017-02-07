@@ -13,6 +13,7 @@ from drinks.drinks import get_by_ean
 from drinks.drinks_manager import DrinksManager
 
 from screens.profile import ProfileScreen
+from screens.new_id_screen import NewIDScreen
 
 from .screen import Screen
 from .main import MainScreen
@@ -47,9 +48,15 @@ class WaitScanScreen(Screen):
         self.empty_info = [
             Button(
                 self.screen,
-                pos=(60, 700),
+                pos=(30, 700),
                 text="Benutzer",
                 click=self.set_member
+            ),
+            Button(
+                self.screen,
+                pos=(210, 700),
+                text="Geld einwerfen",
+                click=self.btn_new_id
             )
         ]
 
@@ -60,8 +67,13 @@ class WaitScanScreen(Screen):
 
         self.objects.append(Label(
             self.screen,
-            text = u"Scanne dein Getränk :)",
+            text = u"Scanne dein Getränk",
             pos=(60, 240),
+        ))
+        self.objects.append(Label(
+            self.screen,
+            text = u"oder deine ID-Card :)",
+            pos=(70, 280),
         ))
 
         self.processing = Label(
@@ -121,6 +133,10 @@ class WaitScanScreen(Screen):
 
     def btn_reset(self, args, pos):
         self.reset()
+
+    def btn_new_id(self, args, pos):
+        new_id = NewIDScreen(self.screen)
+        ScreenManager.get_instance().set_active(new_id)
 
     def reset(self, reset_drink=True):
         if reset_drink:
