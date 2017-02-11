@@ -108,8 +108,9 @@ class NewIDScreen(Screen):
     def btn_euro(self, euro, param, pos):
         try:
             self.message.text = "Konto wird erzeugt..."
-            self.progress.speed = 0
+            self.progress.speed = 1/20.0
             self.progress.start()
+            self.progress.on_elapsed = None
             self.progress.value = 0
             user = Users.create_temp_user()
             print "Created temp %s with EUR %d" % (user['id_card'], euro)
@@ -133,6 +134,7 @@ class NewIDScreen(Screen):
             self.progress.value = 0.8
             self.message.text = "ID-Card wird gedruckt..."
             self.print_png(png)
+            self.progress.on_elapsed = self.time_elapsed
             self.progress.stop()
             ScreenManager.get_instance().set_active(
                 ProfileScreen(self.screen, user)
