@@ -1,11 +1,15 @@
-<html>
-    <head></head>
-    <body>
-        <h1>Getränkescanner</h1>
-        <p>Was möchtest du tun?</p>
-
-        <ul>
-            <li><a href="/recharge">Guthaben aufladen</a></li>
-        </ul>
-    </body>
-</html>
+{% extends "layout.html" %}
+{% block title %}Start{% endblock %}
+{% block body %}
+<h1>Getränkescanner</h1>
+<hr>
+<div class="row">
+  <div class="col-sm-8 col-md-6">
+    {% include "recharge.html" %}
+  </div>
+  <div class="col-sm-4 col-md-6">
+    <h2>Stats</h2>
+    <p>test 3</p>
+  </div>
+</div>
+{% endblock %}

@@ -1,39 +1,47 @@
-<html>
-    <head></head>
-    <body>
-        <h1>Guthaben aufladen</h1>
-        <p>Um Guthaben aufzuladen gehe folgendermaßen vor:</p>
-        <ol>
-            <li>Gib jemanden aus dem Space bescheid, dass du Guthaben aufladen willst. So ist im 4-Augen-Prinzip sichergestellt, dass alles legitim abläuft. (Im Streitfall hast du dann auch jemanden der dir hilft.)</li>
-            <li>Zahle den aufzuladenden Betrag in die Kasse ein</li>
-            <li>Wähle deinen eigenen, sowie den Namen der 4-Augen-Person aus und gib den aufzuladenen Betrag ein.</li>
-        </ol>
+<h2>Guthaben aufladen</h2>
+<p>Um Guthaben aufzuladen gehe folgendermaßen vor:</p>
+<ol>
+  <li>Gib jemanden aus dem Space bescheid, dass du Guthaben aufladen willst. So ist im 4-Augen-Prinzip sichergestellt, dass alles legitim abläuft. (Im Streitfall hast du dann auch jemanden der dir hilft.)</li>
+  <li>Zahle den aufzuladenden Betrag in die Kasse ein</li>
+  <li>Wähle deinen eigenen, sowie den Namen der 4-Augen-Person aus und gib den aufzuladenen Betrag ein.</li>
+</ol>
 
-        <form action="/recharge/doit" method="POST">
-            <fieldset>
-                <legend>Aufladedaten</legend>
-                <div>
-                    Aufladen für:
-                    <select name="user_user">
-                        {% for u in users %}
-                        <option value="{{ u.id }}">{{ u.name }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div>
-                    4-Augen-Person:
-                    <select name="helper_user">
-                        {% for u in users %}
-                        <option value="{{ u.id }}">{{ u.name }}</option>
-                        {% endfor %}      
-                    </select>              
-                </div>
-                <div>
-                    Betrag:
-                    <input type="number" name="amount" step="0.5">
-                </div>
-                <div><input type="submit" value="Aufladung durchführen"></div>
-            </fieldset>
-        </form>
-    </body>
-</html>
+<form action="/recharge/doit" method="POST" class="form-horizontal">
+  <legend>Aufladedaten</legend>
+  <div class="form-group">
+    <label for="user_user" class="col-sm-3 control-label">Aufladen für:</label>
+    <div class="col-sm-9">
+      <select class="form-control" name="user_user" id="user_user">
+        {% for u in users %}
+        <option value="{{ u.id }}">{{ u.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="helper_user" class="col-sm-3 control-label">4-Augen-Person:</label>
+    <div class="col-sm-9">
+      <select class="form-control" name="helper_user" id="helper_user">
+        {% for u in users %}
+        <option value="{{ u.id }}">{{ u.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="amount" class="col-sm-3 control-label">Betrag:</label>
+    <div class="col-sm-9">
+      <div class="input-group">
+        <div class="input-group-addon">€</div>
+        <input type="number" class="form-control" name="amount" step="0.5" id="amount" placeholder="wieviel?">
+      </div>
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="col-sm-9 col-sm-offset-2">
+      <button type="submit" class="btn btn-default">
+        Aufladung durchführen
+      </button>
+    </div>
+  </div>
+</form>
