@@ -127,9 +127,9 @@ class WaitScanScreen(Screen):
         self.timeout.start()
 
     def set_member(self, args, pos):
-        self.reset(False)
         main = MainScreen(self.screen)
         ScreenManager.get_instance().set_active(main)
+        self.reset(False)
 
     def btn_reset(self, args, pos):
         self.reset()
