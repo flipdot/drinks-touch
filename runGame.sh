@@ -7,5 +7,5 @@ xinput set-prop "eGalax Inc. USB TouchController" "Coordinate Transformation Mat
 
 while [ 1 ];
 do
-    cd /home/pi/drinks-scanner-display && ENV=PI python game.py &>> /var/log/drinks/log.log
+    cd /home/pi/drinks-scanner-display && ENV=PI ./game.py &>> /var/log/drinks/log.log
 done
