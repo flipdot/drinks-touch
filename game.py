@@ -18,6 +18,7 @@ from screens.screen_manager import ScreenManager
 from drinks.drinks_manager import DrinksManager
 
 from webserver.webserver import run as run_webserver
+from stats.stats import run as stats_send, run_loop as stats_loop
 from barcode.barcode_reader import run as run_barcode_reader
 from barcode.barcode_worker import Worker as BarcodeWorker
 
@@ -45,6 +46,10 @@ def handle_events():
 def main(argv):
     if "--webserver" in argv:
         run_webserver()
+        return 0
+    
+    if "--stats" in argv:
+        stats_send()
         return 0
 
     screen = get_screen()
@@ -77,6 +82,11 @@ def main(argv):
     event_thread.daemon = True
     event_thread.start()
 
+    stats_thread = threading.Thread(
+        target=stats_loop
+    )
+    stats_thread.daemon = True
+    stats_thread.start()
 
     t = 0
     dt = 0
