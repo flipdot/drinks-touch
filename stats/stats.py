@@ -13,7 +13,7 @@ from database.storage import init_db
 
 font = ImageFont.truetype("stats/slkscr.ttf", 7)
 
-max_drinks = 8
+max_drinks = 6
 
 def scans(limit=1000, hours=None):
     session = get_session()
@@ -53,13 +53,13 @@ def create_image(scan_list):
 
     drinks = list(drinks.values())
     drinks = sorted(drinks, key=lambda d:-d['count'])
-    drinks = drinks[0:max_drinks]
+    drinks = drinks[:max_drinks]
     if not drinks:
         return None
     width = w / len(drinks)
     for i, drink in enumerate(drinks):
         height = int(drink['count'] * 1.0 / max_count * h)
-        coords = [(width * i, h), (int(width*(i+1)) - 2, h-height)]
+        coords = [(width * i, h), (int(width*(i+1)), h-height)]
         #print drink['name'], drink['count'], coords
         draw.rectangle(coords, 1, 1)
         draw_drinkname(text_draw, width*i, width, drink)
@@ -73,14 +73,14 @@ def draw_drinkname(text_draw, xoff, width, drink):
     split = re.split(r"[\- _,\.]", name)
     x = 0
     y = 0
-    for i, c in enumerate(split[0:2]):
+    for i, c in enumerate(split[0:3]):
         draw_char(text_draw, (xoff + x, -2 + y), c[0])
         x += 6
         if x + 6 > width:
             x = 0
             y += 6
 
-char_offsets = {'M': (-1, 0), 'C': (-1, 0)}
+char_offsets = {'M': (1, 0), 'C': (1, 0), 'E': (1, 0)}
 def draw_char(text_draw, pos, char):
     if char in char_offsets:
         offx, offy = char_offsets[char]
@@ -89,7 +89,7 @@ def draw_char(text_draw, pos, char):
     text_draw.text(pos, char, 1, font=font)
 
 def run():
-    scan_list = scans(limit=1000, hours=48)
+    scan_list = scans(limit=1000, hours=24)
     image = create_image(scan_list)
     if not image:
         return

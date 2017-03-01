@@ -1,6 +1,15 @@
 import datetime
 import requests
 import re
+import json
+from datetime import datetime
+
+class DateTimeEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, datetime):
+            return o.isoformat()
+
+        return json.JSONEncoder.default(self, o)
 
 from env import is_pi
 
@@ -12,6 +21,12 @@ from users.users import Users
 from database.storage import get_session
 from database.storage import init_db
 from database.models.recharge_event import RechargeEvent
+from database.models.scan_event import ScanEvent
+from database.models.drink import Drink
+
+from stats.stats import scans
+
+from sqlalchemy.orm import load_only, eagerload
 
 app = Flask(__name__)
 
@@ -23,6 +38,10 @@ def index():
     users = Users.get_all()
     users.insert(0,{})
     return render_template('index.html', users=users)
+
+@app.route('/stats')
+def stats():
+    return render_template('stats.html')
 
 @app.route('/recharge/doit', methods=['POST'])
 def recharge_doit():
@@ -59,6 +78,14 @@ def recharge_doit():
 
     return render_template('recharge_success.html', amount=amount, user=user)
 
+@app.route('/scans.json')
+def scans_json():
+    limit = int(request.args.get('limit', 1000))
+    return to_json(scans(limit))
+
+def to_json(dict_arr):
+    return json.dumps(dict_arr, cls=DateTimeEncoder)
+
 def run():
     port = 5000
     if is_pi():
@@ -66,6 +93,6 @@ def run():
 
     app.run(
         host='0.0.0.0',
-        port=port,
-        debug=not is_pi()
+        debug=not is_pi(),
+        port=port
     )

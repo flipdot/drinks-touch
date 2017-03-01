@@ -9,6 +9,7 @@ from users.users import Users
 
 from .screen import Screen
 from screens.enter_pin import EnterPinScreen
+from screens.profile import ProfileScreen
 
 from env import monospace
 
@@ -65,7 +66,7 @@ class NamesScreen(Screen):
         from .screen_manager import ScreenManager
         screen_manager = ScreenManager.get_instance()
         screen_manager.set_active(
-            EnterPinScreen(self.screen, param)
+            ProfileScreen(self.screen, param)
         )
 
     def home(self):
