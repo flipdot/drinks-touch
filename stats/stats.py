@@ -59,7 +59,7 @@ def create_image(scan_list):
     width = w / len(drinks)
     for i, drink in enumerate(drinks):
         height = int(drink['count'] * 1.0 / max_count * h)
-        coords = [(width * i, h), (int(width*(i+1)), h-height)]
+        coords = [(width * i + 1, h), (int(width*(i+1)) - 1, h-height)]
         #print drink['name'], drink['count'], coords
         draw.rectangle(coords, 1, 1)
         draw_drinkname(text_draw, width*i, width, drink)
@@ -80,7 +80,7 @@ def draw_drinkname(text_draw, xoff, width, drink):
             x = 0
             y += 6
 
-char_offsets = {'M': (1, 0), 'C': (1, 0), 'E': (1, 0)}
+char_offsets = {'M': (1, 0), 'C': (1, 0), 'E': (1, 0), 'G': (1,0)}
 def draw_char(text_draw, pos, char):
     if char in char_offsets:
         offx, offy = char_offsets[char]
