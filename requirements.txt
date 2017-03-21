@@ -4,3 +4,4 @@ pygame
 psycopg2
 python-ldap # sudo apt-get install python-dev libldap2-dev libsasl2-dev libssl-dev
 huBarcode # sudo apt-get install python-pil
+flask-compress

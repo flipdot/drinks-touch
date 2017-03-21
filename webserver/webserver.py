@@ -16,6 +16,7 @@ from env import is_pi
 from flask import Flask
 from flask import request
 from flask import render_template
+from flask_compress import Compress
 
 from users.users import Users
 from database.storage import get_session
@@ -29,6 +30,7 @@ from stats.stats import scans
 from sqlalchemy.orm import load_only, eagerload
 
 app = Flask(__name__)
+Compress(app)
 
 uid_pattern = re.compile("^\d+$")
 
