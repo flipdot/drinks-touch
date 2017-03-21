@@ -1,4 +1,5 @@
 var path = require('path');
+const webpack = require('webpack'); //to access built-in plugins
 
 module.exports = {
     entry: [
@@ -6,15 +7,19 @@ module.exports = {
         './js/index.js',
     ],
     output: {
-        filename: 'static/dist/bundle.js',
-        path: path.resolve(__dirname, '.')
+        filename: 'dist/bundle.js',
+        path: path.resolve(__dirname, 'static/')
     },
     module: {
         loaders: [
             {test: /\.css$/, loaders: ["style-loader", "css-loader"] },
-            { test: /\.(woff2?|svg)$/, loader: 'url-loader?limit=10000' },
-            { test: /\.(ttf|eot)$/, loader: 'file-loader' },
+            { test: /\.(woff2?|svg)$/, loader: 'url-loader?limit=10000&emitFile=false' },
+            { test: /\.(ttf|eot)$/, loader: 'file-loader?emitFile=false' },
             { test: /bootstrap-sass\/assets\/javascripts\//, loader: 'imports-loader?jQuery=jquery' },
+            {test: /\.(js|jsx)$/, use: 'babel-loader'},
         ],
-    }
+    },
+    plugins: [
+        //new webpack.optimize.UglifyJsPlugin(),
+    ],
 };
