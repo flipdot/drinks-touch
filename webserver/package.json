@@ -1,0 +1,27 @@
+{
+  "name": "drinks-scanner-display-assets",
+  "version": "1.0.0",
+  "description": "",
+  "main": "js/index.js",
+  "scripts": {
+    "build": "webpack --config webpack.config.js"
+  },
+  "author": "",
+  "license": "flipdot EULA",
+  "dependencies": {
+    "bootstrap-loader": "^2.0.0",
+    "bootstrap-sass": "^3.3.7",
+    "css-loader": "^0.27.3",
+    "exports-loader": "^0.6.4",
+    "file-loader": "^0.10.1",
+    "imports-loader": "^0.7.1",
+    "jquery": "^3.2.1",
+    "node-sass": "^4.5.1",
+    "resolve-url-loader": "^2.0.2",
+    "sass-loader": "^6.0.3",
+    "select2": "^4.0.3",
+    "style-loader": "^0.15.0",
+    "url-loader": "^0.5.8",
+    "webpack": "^2.2.1"
+  }
+}
