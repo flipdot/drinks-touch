@@ -35,7 +35,7 @@ uid_pattern = re.compile("^\d+$")
 @app.route('/')
 @app.route('/recharge')
 def index():
-    users = Users.get_all()
+    users = sorted(Users.get_all(), key=lambda u: u['name'].lower())
     users.insert(0,{})
     return render_template('index.html', users=users)
 

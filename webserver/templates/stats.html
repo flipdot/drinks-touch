@@ -1,0 +1,85 @@
+<style type="text/css">
+
+svg {
+  font-family: "Helvetica Neue", Helvetica;
+}
+
+.line {
+  fill: none;
+  stroke: #000;
+  stroke-width: 2px;
+}
+</style>
+<svg></svg>
+<script src="//d3js.org/d3.v3.min.js"></script>
+<script src="https://d3js.org/d3-time-format.v2.min.js"></script>
+
+<script>
+var w = 400,
+    h = 300,
+    m = [20, 20, 30, 20];
+
+var color = d3.scale.category10();
+
+var svg = d3.select("svg")
+    .attr("width", w + m[1] + m[3])
+    .attr("height", h + m[0] + m[2])
+  .append("g")
+    .attr("transform", "translate(" + m[3] + "," + m[0] + ")");
+
+var drinks, scans, x, y;
+
+var line = d3.svg.line()
+    .interpolate("basis")
+    .x(function(d) { return x(d.timestamp); })
+    .y(function(d) { return y(d.id); });
+
+var axis = d3.svg.line()
+    .interpolate("basis")
+    .x(function(d) {return x(d.timestamp)})
+    .y(h);
+
+// A area generator, for the dark stroke.
+var area = d3.svg.area()
+    .interpolate("basis")
+    .x(function(d) { return x(d.date); })
+    .y1(function(d) { return y(d.price); });
+
+var weekdays = ["Sonntag", "Montag", "Dienstag", "Mittwoch",
+    "Donnerstag", "Freitag", "Samstag"];
+
+d3.json("/scans.json", function(data){
+    var parse = d3.isoParse;
+    data.forEach(function(e){
+        e.timestamp = parse(e.timestamp);
+    });
+
+    drinks = d3.nest()
+        .key(function(d){return d.name})
+        .key(function(d){
+            return weekdays[d.timestamp.getDay()];
+        })
+        .rollup(function(d){
+            return d.length;
+        })
+        .entries(scans = data);
+    console.log(drinks);
+    drinks.forEach(function (d){
+        d.count = d.values.length;
+    });
+    console.log(drinks);
+    drinks.sort(function(a, b) {return a.count - b.count})
+    var g = svg.selectAll("g")
+        .data(drinks)
+        .enter().append("g")
+        .attr("class", "drink")
+        .style("width", function(d) {return d.count});
+    setTimeout(areas, 1000);
+});
+function areas() {
+    var g = svg.selectAll(".drink")
+      .attr("transform", function(d, i) {
+          return "translate(0," + (i * h / 4 + 10) + ")"; });
+
+}
+</script>
