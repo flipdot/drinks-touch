@@ -1,5 +1,6 @@
 # coding=utf-8
 import pygame
+import datetime
 from env import is_pi
 
 from elements.label import Label
@@ -14,6 +15,9 @@ from drinks.drinks_manager import DrinksManager
 
 from screens.profile import ProfileScreen
 from screens.new_id_screen import NewIDScreen
+
+from database.storage import get_session
+from database.models.scan_event import ScanEvent
 
 from .screen import Screen
 from .main import MainScreen
@@ -33,15 +37,21 @@ class WaitScanScreen(Screen):
             self.barcode_label,
             Button(
                 self.screen,
-                pos=(60, 600),
+                pos=(50, 600),
                 text="drink buchen",
                 size=52,
                 click=self.set_member
             ),
             Button(
                 self.screen,
-                pos=(270, 700),
-                text="verwerfen",
+                pos=(50, 700),
+                text="Nur Statistik",
+                click=self.stat_drink
+            ),
+            Button(
+                self.screen,
+                pos=(350, 700),
+                text="nope",
                 click=self.btn_reset
             )
         ]
@@ -130,6 +140,20 @@ class WaitScanScreen(Screen):
         main = MainScreen(self.screen)
         ScreenManager.get_instance().set_active(main)
         self.reset(False)
+
+    def stat_drink(self, args, pos):
+        drink = DrinksManager.get_instance().get_selected_drink()
+        if drink:
+            session = get_session()
+            ev = ScanEvent(
+                drink['ean'],
+                0,
+                datetime.datetime.now()
+            )
+            session.add(ev)
+            session.commit()
+            DrinksManager.get_instance().set_selected_drink(None)
+        self.reset()
 
     def btn_reset(self, args, pos):
         self.reset()

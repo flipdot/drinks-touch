@@ -25,7 +25,7 @@ def scans(limit=1000, hours=None):
     sql = """
     SELECT se.id, barcode, se.timestamp, name
     FROM scanevent se
-    JOIN drink d on se.barcode = d.ean
+    LEFT OUTER JOIN drink d on se.barcode = d.ean
     %s
     ORDER BY timestamp DESC
     LIMIT %d
@@ -43,6 +43,9 @@ def create_image(scan_list):
     max_count = 0
     for e in scan_list:
         name = e['name']
+        if not name:
+            name = 'Unknown'
+            e['name'] = name
         if name not in drinks:
             drinks[name] = e
             drinks[name]['count'] = 1
@@ -50,27 +53,26 @@ def create_image(scan_list):
             drinks[name]['count'] += 1
         if drinks[name]['count'] > max_count:
             max_count = drinks[name]['count']
-
+        
     drinks = list(drinks.values())
     drinks = sorted(drinks, key=lambda d:-d['count'])
     drinks = drinks[:max_drinks]
     if not drinks:
         return None
-    width = w / len(drinks)
+    width = (w-0) / len(drinks)
     for i, drink in enumerate(drinks):
         count = drink['count']
         height = int(count * 1.0 / max_count * (h-1))
-        coords = [(width * i + 1, h), (int(width*(i+1)) - 1, h-height)]
-        #print drink['name'], drink['count'], coords
+        coords = [(width * i, h), (int(width*(i+1)) - 2, h-height)]
         draw.rectangle(coords, 1, 1)
-        draw_drinkname(text_draw, width*i+1, width, drink)
+        draw_drinkname(text_draw, width*i, width, drink)
         _x = 0
         _y = 0
         for di in range(0,count):
             _x = di % (width - 5)
             _y = di / (width - 5)
             draw.point((
-                width * i + _x * 2 + 2,
+                width * i + _x * 2 + 1,
                 h - 1 - _y*2
                 ), 0)
     result = ImageMath.eval("255 - (a ^ b)", a=image, b=text_image)
