@@ -59,20 +59,20 @@ def create_image(scan_list):
     drinks = drinks[:max_drinks]
     if not drinks:
         return None
-    width = (w-0) / len(drinks)
+    width = w / len(drinks)
     for i, drink in enumerate(drinks):
         count = drink['count']
         height = int(count * 1.0 / max_count * (h-1))
-        coords = [(width * i, h), (int(width*(i+1)) - 2, h-height)]
+        coords = [(width * i + 1, h), (int(width*(i+1)) - 1, h-height)]
         draw.rectangle(coords, 1, 1)
-        draw_drinkname(text_draw, width*i, width, drink)
+        draw_drinkname(text_draw, width*i+1, width, drink)
         _x = 0
         _y = 0
         for di in range(0,count):
             _x = di % (width - 5)
             _y = di / (width - 5)
             draw.point((
-                width * i + _x * 2 + 1,
+                width * i + _x * 2 + 2,
                 h - 1 - _y*2
                 ), 0)
     result = ImageMath.eval("255 - (a ^ b)", a=image, b=text_image)
