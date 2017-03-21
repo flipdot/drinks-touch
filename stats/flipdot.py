@@ -4,7 +4,8 @@ import socket
 import sys
 from PIL import Image
 
-host = '192.168.3.36';
+host = '192.168.3.36'
+#host='127.0.0.1'
 port = 2323;
 
 w = 48
