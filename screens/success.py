@@ -1,5 +1,6 @@
 # coding=utf-8
 import pygame
+import os
 
 from elements.label import Label
 from elements.button import Button
@@ -35,6 +36,7 @@ class SuccessScreen(Screen):
         )
         self.objects.append(self.progress)
         self.progress.start()
+        os.system("ssh pi@pixelfun aplay cash.wav >/dev/null 2>&1 &")
 
     def time_elapsed(self):
         self.home()
