@@ -166,7 +166,7 @@ class ProfileScreen(Screen):
             Users.delete_if_nomoney(self.user)
         
         screen_manager = ScreenManager.get_instance()
-        screen_manager.set_active(SuccessScreen(self.screen))
+        screen_manager.set_active(SuccessScreen(self.screen, self.user))
 
     def on_barcode(self, barcode):
         if not barcode:

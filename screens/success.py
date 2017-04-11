@@ -7,10 +7,12 @@ from elements.button import Button
 from elements.image import Image
 from elements.progress import Progress
 
+from users.users import Users
+
 from .screen import Screen
 
 class SuccessScreen(Screen):
-    def __init__(self, screen, **kwargs):
+    def __init__(self, screen, user, **kwargs):
         super(SuccessScreen, self).__init__(screen)
 
         self.objects.append(Label(
@@ -36,7 +38,12 @@ class SuccessScreen(Screen):
         )
         self.objects.append(self.progress)
         self.progress.start()
-        os.system("ssh pi@pixelfun aplay cash.wav >/dev/null 2>&1 &")
+        balance = Users.get_balance(user['id'])
+        if balance > 0:
+            sound = "smb_coin.wav"
+        else:
+            sound = "smb_bowserfalls.wav"
+        os.system("ssh pi@pixelfun aplay sounds/%s >/dev/null 2>&1 &" % sound)
 
     def time_elapsed(self):
         self.home()

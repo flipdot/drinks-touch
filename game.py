@@ -7,6 +7,7 @@ import subprocess
 import Queue
 import traceback
 import sys
+import os
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -87,6 +88,8 @@ def main(argv):
     )
     stats_thread.daemon = True
     stats_thread.start()
+
+    os.system("rsync -a sounds/ pi@pixelfun:sounds/ &")
 
     t = 0
     dt = 0
