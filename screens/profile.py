@@ -151,7 +151,6 @@ class ProfileScreen(Screen):
 
     def save_drink(self, args, pos):
         session = get_session()
-
         drink = DrinksManager.get_instance().get_selected_drink()
         if drink:
             ev = ScanEvent(
@@ -159,14 +158,13 @@ class ProfileScreen(Screen):
                 self.user['id'],
                 datetime.datetime.now()
             )
-            
             session.add(ev)
             session.commit()
             DrinksManager.get_instance().set_selected_drink(None)
             Users.delete_if_nomoney(self.user)
         
         screen_manager = ScreenManager.get_instance()
-        screen_manager.set_active(SuccessScreen(self.screen, self.user))
+        screen_manager.set_active(SuccessScreen(self.screen, self.user, session))
 
     def on_barcode(self, barcode):
         if not barcode:

@@ -11,6 +11,8 @@ from .screen import Screen
 from screens.enter_pin import EnterPinScreen
 from screens.profile import ProfileScreen
 
+from .screen_manager import ScreenManager
+
 from env import monospace
 
 class NamesScreen(Screen):
@@ -58,20 +60,24 @@ class NamesScreen(Screen):
             i += 1
 
     def back(self, param, pos):
-        from .screen_manager import ScreenManager
-        screen_manager = ScreenManager.get_instance()
-        screen_manager.go_back()
+        ScreenManager.get_instance().go_back()
 
     def switch_to_screen(self, param, pos):
-        from .screen_manager import ScreenManager
-        screen_manager = ScreenManager.get_instance()
-        screen_manager.set_active(
+        ScreenManager.get_instance().set_active(
             ProfileScreen(self.screen, param)
         )
 
     def home(self):
-        from .screen_manager import ScreenManager
-        screen_manager = ScreenManager.get_instance().set_default()
+        ScreenManager.get_instance().set_default()
 
     def time_elapsed(self):
         self.home()
+
+    def on_barcode(self, barcode):
+        if not barcode:
+            return
+        user = Users.get_by_id_card(barcode)
+        if user:
+            ScreenManager.get_instance().set_active(
+                ProfileScreen(self.screen, user)
+            )

@@ -77,6 +77,17 @@ class MainScreen(Screen):
     def time_elapsed(self):
         self.home(None, None)
 
+    def on_barcode(self, barcode):
+        from .screen_manager import ScreenManager
+        from .profile import ProfileScreen
+        if not barcode:
+            return
+        user = Users.get_by_id_card(barcode)
+        if user:
+            ScreenManager.get_instance().set_active(
+                ProfileScreen(self.screen, user)
+            )
+
     def __get_pos(self, i):
 
         row = int(i / 6)

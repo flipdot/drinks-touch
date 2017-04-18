@@ -86,9 +86,7 @@ class Users(object):
         return users
         
     @staticmethod
-    def get_balance(user_id):
-        session = get_session()
-
+    def get_balance(user_id, session=get_session()):
         sql = text("""
                 SELECT user_id, count(*) as amount
                 FROM scanevent
@@ -157,10 +155,10 @@ class Users(object):
         return Users.get_by_id_card(barcode)
 
     @staticmethod
-    def delete_if_nomoney(user):
+    def delete_if_nomoney(user, session=get_session()):
         if not user['path'].endswith(",ou=temp_members,dc=flipdot,dc=org"):
             return
-        balance = Users.get_balance(user['id'])
+        balance = Users.get_balance(user['id'], session=session)
         if balance <= 0:
             print "deleting user " + str(user['id']) + " because they are broke"
             Users.delete(user)

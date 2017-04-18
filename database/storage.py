@@ -14,7 +14,7 @@ Base.query = db_session.query_property()
 if not is_pi():
     import logging
     logger = logging.getLogger('sqlalchemy.engine')
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(logging.INFO)
 
 def init_db():
     # import all modules here that might define models so that
