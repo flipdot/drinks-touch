@@ -42,6 +42,7 @@ def run(worker):
                 buffer = ''
             else:
                 buffer += c
+        process.communicate()
         reaper.join()
 
 def reap(process):
@@ -53,5 +54,3 @@ def reap(process):
             break
         else:
             time.sleep(0.5)
-    process.wait()
-    #print "barcode process exited with code", process.returncode
