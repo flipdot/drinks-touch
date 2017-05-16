@@ -23,6 +23,9 @@ from stats.stats import run as stats_send, run_loop as stats_loop
 from barcode.barcode_reader import run as run_barcode_reader
 from barcode.barcode_worker import Worker as BarcodeWorker
 
+import debug
+debug.listen()
+
 event_queue = Queue.Queue()
 screen_manager = None
 
