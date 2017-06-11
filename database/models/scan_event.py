@@ -1,6 +1,6 @@
 import datetime
 
-from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy import Column, Integer, String, DateTime, Boolean
 from database.storage import Base
 
 class ScanEvent(Base):
@@ -9,6 +9,7 @@ class ScanEvent(Base):
     barcode = Column(String(20), unique=False)
     user_id = Column(String(20), unique=False)
     timestamp = Column(DateTime(), unique=False)
+    uploaded_to_influx = Column(Boolean(), unique=False)
 
     def __init__(self, barcode=None, user_id="1", timestamp=datetime.datetime.now()):
         self.barcode = barcode
