@@ -30,6 +30,11 @@ def run(worker):
             print "barcode: ", keyboard_buffer
             worker.on_barcode(keyboard_buffer)
             keyboard_buffer = ''
+
+        if c == 'shift':
+            # we may ignore the shift
+            # at the beginning of a barcode
+            pass
         else:
             keyboard_buffer += c
 
