@@ -120,9 +120,6 @@ class NewIDScreen(Screen):
 
             barcode = user['id_card']
 
-            if barcode.startswith("E"):
-                barcode = barcode[1:]
-            
             self.message.text = "ID-Card wird generiert..."
             code_img = self.generate_barcode(euro, barcode)
             self.progress.value = 0.4

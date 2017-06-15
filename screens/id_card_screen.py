@@ -145,7 +145,7 @@ class IDCardScreen(Screen):
     def print_id(self, param, pos):
         self.progress.start()
         if not self.user['id_card']:
-            self.set_id("Efd_"+self.user['name'])
+            self.set_id("fd_"+self.user['name'])
         enc = Code128Encoder(self.user['id_card'][1:])
         enc.height = 300
         png = enc.get_imagedata()
