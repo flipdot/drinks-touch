@@ -42,8 +42,8 @@ def handle_events():
         current_screen = screen_manager.get_active()
         try:
             current_screen.events(events)
-        except:
-            traceback.print_exc()
+        except Exception as e:
+            print e
             pass
 
 ##### Rendering #####
