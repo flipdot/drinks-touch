@@ -12,5 +12,5 @@ def run(worker):
             worker.on_barcode(sys.stdin.readline().strip())
 
     while True:
-        for barcode in keyboard.get_typed_strings(keyboard.record()):
+        for barcode in keyboard.get_typed_strings(keyboard.record(until="tab")):
             worker.on_barcode(barcode)
