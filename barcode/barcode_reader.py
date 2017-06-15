@@ -22,10 +22,19 @@ def run(worker):
     global keyboard_buffer
     keyboard_buffer = ''
 
+    def apply_code_fix(char):
+        if char == '?':
+            return '_'
+
+        if char == '_':
+            return '?'
+
+        return char
+
     def keyboard_up_callback(event):
         global keyboard_buffer
 
-        c = event.name
+        c = apply_code_fix(event.name)
         if c == 'tab':
             print "barcode: ", keyboard_buffer
             worker.on_barcode(keyboard_buffer)
