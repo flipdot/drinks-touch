@@ -6,3 +6,4 @@ python-ldap # sudo apt-get install python-dev libldap2-dev libsasl2-dev libssl-d
 huBarcode # sudo apt-get install python-pil
 flask-compress
 influxdb
+keyboard
