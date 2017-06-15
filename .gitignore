@@ -1,2 +1,3 @@
 *.pyc
 ldap_pw
+.idea
