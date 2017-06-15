@@ -40,8 +40,7 @@ def run(worker):
 
     while True:
         for barcode in keyboard.get_typed_strings(keyboard.record(until="tab")):
-
-            barcode = replace_key_code(replace_key_code, {
+            barcode = replace_key_code(barcode, {
                 "?": "_",
                 "_": "?"
             })
