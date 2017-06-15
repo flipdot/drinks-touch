@@ -15,6 +15,7 @@ class ScanEvent(Base):
         self.barcode = barcode
         self.timestamp = timestamp
         self.user_id = user_id
+        self.uploaded_to_influx = False
 
     def __repr__(self):
         return '<Barcode %r, User %r>' % (self.barcode, self.user_id)
