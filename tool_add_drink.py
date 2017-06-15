@@ -18,7 +18,7 @@ args = parser.parse_args()
 
 session = get_session()
 ev = Drink(
-    'E'+args.ean,
+    args.ean,
     args.name,
     args.size
 )

@@ -133,7 +133,7 @@ class Users(object):
 
     @staticmethod
     def id_to_ean(id):
-        return "EFDT" + str(id)
+        return "FDT" + str(id)
 
     @staticmethod
     def create_temp_user():
