@@ -35,8 +35,6 @@ class Users(object):
                 newid = oldid
                 if newid:
                     newid = newid.upper()
-                    if newid.startswith('E'):
-                        newid = newid[1:]
                 if newid != oldid:
                     print("Correcting idcard for", user, "from", oldid, "to", newid)
                     Users.set_id_card(user, newid)
