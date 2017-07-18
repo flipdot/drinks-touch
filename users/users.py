@@ -25,12 +25,24 @@ class Users(object):
                 if prefix != '' and name.lower().startswith(prefix.lower()) == False:
                     continue
 
-                users.append({
+                user = {
                     "path": ldap_user['path'],
                     "name": name,
                     "id": ldap_user['uidNumber'][0],
                     "id_card": ldap_user['carLicense'][0],
-                })
+                }
+                oldid = user['id_card']
+                newid = oldid
+                if newid:
+                    newid = newid.upper()
+                    if newid.startswith('E'):
+                        newid = newid[1:]
+                if newid != oldid:
+                    print("Correcting idcard for", user, "from", oldid, "to", newid)
+                    Users.set_id_card(user, newid)
+                    user['idcard'] = newid
+                users.append(user)
+
             return users
         except Exception as e:
             if not is_pi():

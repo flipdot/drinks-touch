@@ -9,7 +9,7 @@ def run(worker):
         print "---------"
         print "Enter EAN here to simulate scanned barcode!"
         while True:
-            worker.on_barcode(sys.stdin.readline().strip())
+            worker.on_barcode(sys.stdin.readline().strip().upper())
 
     def replace_key_code(barcode, replacements):
 
@@ -45,4 +45,4 @@ def run(worker):
                 "_": "?"
             })
 
-            worker.on_barcode(barcode)
+            worker.on_barcode(barcode.upper())
