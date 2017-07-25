@@ -6,6 +6,7 @@ from elements.label import Label
 from elements.button import Button
 from elements.image import Image
 from elements.progress import Progress
+from notifications.notification import send_notification
 
 from drinks.drinks_manager import DrinksManager
 
@@ -16,7 +17,7 @@ from .screen import Screen
 from .screen_manager import ScreenManager
 
 class SuccessScreen(Screen):
-    def __init__(self, screen, user, session, **kwargs):
+    def __init__(self, screen, user, drink, session, **kwargs):
         super(SuccessScreen, self).__init__(screen)
 
         self.user = user
@@ -60,6 +61,16 @@ class SuccessScreen(Screen):
         else:
             sound = "smb_bowserfalls.wav"
         os.system("ssh -o StrictHostKeyChecking=no pi@pixelfun aplay sounds/%s >/dev/null 2>&1 &" % sound)
+
+        try:
+            user_email = user['email']
+            if user_email:
+                mail_msg = "Du hast das folgende Getränk getrunken {drink_name}"\
+                    .format(drink_name=drink['name'])
+                send_notification(user_email, "[fd-noti] Getränk getrunken", mail_msg)
+        except:
+            i = 5
+            pass
 
     def home(self):
         from .screen_manager import ScreenManager

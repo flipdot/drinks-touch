@@ -162,9 +162,11 @@ class ProfileScreen(Screen):
             session.commit()
             DrinksManager.get_instance().set_selected_drink(None)
             Users.delete_if_nomoney(self.user)
-        
+        else:
+            drink = {}
+
         screen_manager = ScreenManager.get_instance()
-        screen_manager.set_active(SuccessScreen(self.screen, self.user, session))
+        screen_manager.set_active(SuccessScreen(self.screen, self.user, drink, session))
 
     def on_barcode(self, barcode):
         if not barcode:
