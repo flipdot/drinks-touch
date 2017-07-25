@@ -30,7 +30,7 @@ class Users(object):
                     "name": name,
                     "id": ldap_user['uidNumber'][0],
                     "id_card": ldap_user['carLicense'][0],
-                    "email": (ldap_user['email'] or [None])[0]
+                    "email": (ldap_user['mail'] or [None])[0]
                 }
                 oldid = user['id_card']
                 newid = oldid
