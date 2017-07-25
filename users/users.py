@@ -72,7 +72,7 @@ class Users(object):
     def read_all_users_ldap(filters=[], include_temp=False):
         base_dn = 'ou=members,dc=flipdot,dc=org'
         temp_dn = 'ou=temp_members,dc=flipdot,dc=org'
-        attrs = ['uid', 'uidNumber', 'carLicense']
+        attrs = ['uid', 'uidNumber', 'carLicense', 'mail']
         filters.append("objectclass=person")
 
         filter_str = "".join(['(' + f.replace(')', '_') + ')' for f in filters])
