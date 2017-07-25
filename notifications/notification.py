@@ -15,7 +15,7 @@ def send_notification_newthread(to_address, subject, message):
     send_thread.start()
 
 def send_notification(to_address, subject, message):
-    msg = MIMEText(message)
+    msg = MIMEText(message,_charset='utf-8')
 
     fromMail = "flipdot-noti@vega.uberspace.de"
 
