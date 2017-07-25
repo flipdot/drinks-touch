@@ -1,9 +1,18 @@
 import smtplib
+import threading
 from email.mime.text import MIMEText
 
 
 with open('mail_pw', 'r') as pw:
     mail_pw = pw.read().replace('\n', '')
+
+def send_notification_newthread(to_address, subject, message):
+    send_thread = threading.Thread(
+        target=send_notification,
+        args=(to_address, subject, message)
+    )
+    send_thread.daemon = True
+    send_thread.start()
 
 def send_notification(to_address, subject, message):
     msg = MIMEText(message)

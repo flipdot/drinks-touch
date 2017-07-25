@@ -7,7 +7,7 @@ from elements.label import Label
 from elements.button import Button
 from elements.image import Image
 from elements.progress import Progress
-from notifications.notification import send_notification
+from notifications.notification import send_notification_newthread
 
 from drinks.drinks_manager import DrinksManager
 
@@ -68,7 +68,7 @@ class SuccessScreen(Screen):
             if user_email:
                 mail_msg = "Du hast das folgende Getränk getrunken {drink_name}"\
                     .format(drink_name=drink['name'])
-                send_notification(user_email, "[fd-noti] Getränk getrunken", mail_msg)
+                send_notification_newthread(user_email, "[fd-noti] Getränk getrunken", mail_msg)
         except Exception as e:
             logging.error(e)
             pass
