@@ -1,4 +1,5 @@
 # coding=utf-8
+import logging
 import pygame
 import os
 
@@ -68,8 +69,8 @@ class SuccessScreen(Screen):
                 mail_msg = "Du hast das folgende Getränk getrunken {drink_name}"\
                     .format(drink_name=drink['name'])
                 send_notification(user_email, "[fd-noti] Getränk getrunken", mail_msg)
-        except:
-            i = 5
+        except Exception as e:
+            logging.error(e)
             pass
 
     def home(self):
