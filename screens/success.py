@@ -66,8 +66,8 @@ class SuccessScreen(Screen):
         try:
             user_email = user['email']
             if user_email:
-                mail_msg = "Du hast das folgende Getränk getrunken {drink_name}"\
-                    .format(drink_name=drink['name'])
+                mail_msg = "Du hast das folgende Getränk getrunken {drink_name}\n\nVerbleibendes Guthaben: {balance}"\
+                    .format(drink_name=drink['name'],balance=balance)
                 send_notification_newthread(user_email, "[fd-noti] Getränk getrunken", mail_msg)
         except Exception as e:
             logging.error(e)
