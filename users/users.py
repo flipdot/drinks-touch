@@ -126,13 +126,18 @@ class Users(object):
         return credit - cost
 
     @staticmethod
-    def set_id_card(user, ean):
+    def set_value(user, field, ean, create_field=False):
         con = Users.get_ldap_instance()
         if ean:
-            add_pass = [(ldap.MOD_REPLACE, 'carLicense', [ean])]
+            add_pass = [(ldap.MOD_ADD if create_field else ldap.MOD_REPLACE,
+                         field, [ean])]
         else:
-            add_pass = [(ldap.MOD_DELETE, 'carLicense', [])]
+            add_pass = [(ldap.MOD_DELETE, field, [])]
         con.modify_s(user['path'], add_pass)
+
+    @staticmethod
+    def set_id_card(user, ean):
+        return Users.set_value(user, 'carLicense', ean)
 
     @staticmethod
     def get_by_id_card(ean):

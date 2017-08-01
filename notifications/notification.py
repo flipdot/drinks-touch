@@ -1,7 +1,11 @@
+# coding=utf-8
 import smtplib
 import threading
 from email.mime.text import MIMEText
 
+from datetime import datetime
+
+from users.users import Users
 
 with open('mail_pw', 'r') as pw:
     mail_pw = pw.read().replace('\n', '')
@@ -30,3 +34,15 @@ def send_notification(to_address, subject, message):
     s.login(user=fromMail, password=mail_pw)
     s.sendmail(fromMail, [to_address], msg.as_string())
     s.quit()
+
+def send_drink(user, drink, balance):
+    try:
+        user_email = user['email']
+        if user_email:
+            mail_msg = "Du hast das folgende Getränk getrunken {drink_name}\n\nVerbleibendes Guthaben: {balance}" \
+                .format(drink_name=drink['name'], balance=balance)
+            send_notification_newthread(user_email,
+                                        "[fd-noti] Getränk getrunken", mail_msg)
+    except Exception as e:
+        logging.error(e)
+        pass

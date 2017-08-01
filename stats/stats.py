@@ -132,11 +132,6 @@ def run():
     socket = create_socket()
     send_frame(socket, image)
 
-def run_loop():
-    while True:
-        run()
-        time.sleep(60)
-
 def main(argv):
     run()
 

@@ -8,6 +8,7 @@ import Queue
 import traceback
 import sys
 import os
+import time
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -19,7 +20,7 @@ from screens.screen_manager import ScreenManager
 from drinks.drinks_manager import DrinksManager
 
 from webserver.webserver import run as run_webserver
-from stats.stats import run as stats_send, run_loop as stats_loop
+from stats.stats import run as stats_send
 from barcode.barcode_reader import run as run_barcode_reader
 from barcode.barcode_worker import Worker as BarcodeWorker
 
@@ -46,12 +47,18 @@ def handle_events():
             print e
             pass
 
+def stats_loop():
+    while True:
+        stats_send()
+        time.sleep(60)
+
 ##### Rendering #####
 def main(argv):
+
     if "--webserver" in argv:
         run_webserver()
         return 0
-    
+
     if "--stats" in argv:
         stats_send()
         return 0
@@ -107,7 +114,7 @@ def main(argv):
         current_screen.render(t, dt)
 
         pygame.display.flip()
-        
+
         events = pygame.event.get()
         for e in events:
             e.t = t

@@ -7,3 +7,4 @@ huBarcode # sudo apt-get install python-pil
 flask-compress
 influxdb
 keyboard
+email

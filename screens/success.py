@@ -7,7 +7,7 @@ from elements.label import Label
 from elements.button import Button
 from elements.image import Image
 from elements.progress import Progress
-from notifications.notification import send_notification_newthread
+from notifications.notification import send_drink
 
 from drinks.drinks_manager import DrinksManager
 
@@ -57,7 +57,7 @@ class SuccessScreen(Screen):
         self.objects.append(self.progress)
         self.progress.start()
         balance = Users.get_balance(user['id'])
-        if balance > 0:
+        if balance >= 0:
             sound = "smb_coin.wav"
         elif balance < -10:
             sound = "alarm.wav"
@@ -65,15 +65,7 @@ class SuccessScreen(Screen):
             sound = "smb_bowserfalls.wav"
         os.system("ssh -o StrictHostKeyChecking=no pi@pixelfun aplay sounds/%s >/dev/null 2>&1 &" % sound)
 
-        try:
-            user_email = user['email']
-            if user_email:
-                mail_msg = "Du hast das folgende Getränk getrunken {drink_name}\n\nVerbleibendes Guthaben: {balance}"\
-                    .format(drink_name=drink['name'],balance=balance)
-                send_notification_newthread(user_email, "[fd-noti] Getränk getrunken", mail_msg)
-        except Exception as e:
-            logging.error(e)
-            pass
+        send_drink(user, drink, balance)
 
     def home(self):
         from .screen_manager import ScreenManager
