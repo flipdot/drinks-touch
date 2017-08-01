@@ -3,6 +3,8 @@ import ldap.modlist as modlist
 import traceback
 import random
 
+from datetime import datetime
+
 from database.storage import get_session
 from sqlalchemy.sql import text
 from env import is_pi
@@ -25,12 +27,20 @@ class Users(object):
                 if prefix != '' and name.lower().startswith(prefix.lower()) == False:
                     continue
 
+                last_emailed = 0.0
+                if ldap_user.get('telexNumber'):
+                    try:
+                        last_emailed = float(ldap_user.get('telexNumber')[0])
+                    except Exception:
+                        pass
+
                 user = {
                     "path": ldap_user['path'],
                     "name": name,
                     "id": ldap_user['uidNumber'][0],
                     "id_card": ldap_user['carLicense'][0],
-                    "email": (ldap_user.get('mail') or [None])[0]
+                    "email": (ldap_user.get('mail') or [None])[0],
+                    "last_emailed": last_emailed,
                 }
                 oldid = user['id_card']
                 newid = oldid
@@ -72,7 +82,7 @@ class Users(object):
     def read_all_users_ldap(filters=[], include_temp=False):
         base_dn = 'ou=members,dc=flipdot,dc=org'
         temp_dn = 'ou=temp_members,dc=flipdot,dc=org'
-        attrs = ['uid', 'uidNumber', 'carLicense', 'mail']
+        attrs = ['uid', 'uidNumber', 'carLicense', 'mail', 'telexNumber']
         filters.append("objectclass=person")
 
         filter_str = "".join(['(' + f.replace(')', '_') + ')' for f in filters])
@@ -126,11 +136,11 @@ class Users(object):
         return credit - cost
 
     @staticmethod
-    def set_value(user, field, ean, create_field=False):
+    def set_value(user, field, value, create_field=False):
         con = Users.get_ldap_instance()
-        if ean:
+        if value:
             add_pass = [(ldap.MOD_ADD if create_field else ldap.MOD_REPLACE,
-                         field, [ean])]
+                         field, [value])]
         else:
             add_pass = [(ldap.MOD_DELETE, field, [])]
         con.modify_s(user['path'], add_pass)
