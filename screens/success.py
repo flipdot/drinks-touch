@@ -59,6 +59,8 @@ class SuccessScreen(Screen):
         balance = Users.get_balance(user['id'])
         if balance > 0:
             sound = "smb_coin.wav"
+        elif balance < -10:
+            sound = "alarm.wav"
         else:
             sound = "smb_bowserfalls.wav"
         os.system("ssh -o StrictHostKeyChecking=no pi@pixelfun aplay sounds/%s >/dev/null 2>&1 &" % sound)
