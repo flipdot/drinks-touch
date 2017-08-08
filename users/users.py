@@ -1,3 +1,5 @@
+import json
+
 import ldap
 import ldap.modlist as modlist
 import traceback
@@ -15,6 +17,48 @@ class Users(object):
     def __init__(self):
         pass
 
+    # Keys: Us, Values: LDAP
+    fields = {
+        "path": {
+            "ldap_field": "path",
+        },
+        "name": {
+            "ldap_field": "uid",
+            "index": 0,
+        },
+        "id": {
+            "ldap_field": "uidNumber",
+            "index": 0,
+        },
+        "id_card": {
+            "ldap_field": "carLicense",
+            "index": 0,
+            "default": None,
+        },
+        "email": {
+            "ldap_field": "mail",
+            "index": 0,
+            "default": None,
+        },
+        "meta": {
+            "ldap_field": "seeAlso",
+            "index": 0,
+            "default": {
+                "drink_notification": "instant", # instant, daily, weekly, never
+                "last_drink_notification": 0,
+            },
+            "load": json.loads,
+            "save": json.dumps,
+        },
+        "lastEmailed": {
+            "ldap_field": "telexNumber",
+            "index": 0,
+            "default": 0.0,
+            "load": float,
+            "save": str,
+        },
+    }
+
     @staticmethod
     def get_all(prefix='', filters=[], include_temp=False):
         try:
@@ -27,29 +71,34 @@ class Users(object):
                 if prefix != '' and name.lower().startswith(prefix.lower()) == False:
                     continue
 
-                last_emailed = 0.0
-                if ldap_user.get('telexNumber'):
+                user = {}
+                for key, meta in Users.fields.iteritems():
                     try:
-                        last_emailed = float(ldap_user.get('telexNumber')[0])
-                    except Exception:
-                        pass
+                        value = ldap_user[meta['ldap_field']]
+                        if "index" in meta:
+                            value = value[meta["index"]]
+                        if "load" in meta:
+                            value = meta['load'](value)
+                        if value == None and "default" in meta:
+                            value = meta["default"]
+                        user[key] = value
+                    except:
+                        if 'default' in meta:
+                            user[key] = meta['default']
+                        else:
+                            raise
 
-                user = {
-                    "path": ldap_user['path'],
-                    "name": name,
-                    "id": ldap_user['uidNumber'][0],
-                    "id_card": ldap_user['carLicense'][0],
-                    "email": (ldap_user.get('mail') or [None])[0],
-                    "last_emailed": last_emailed,
-                }
-                oldid = user['id_card']
-                newid = oldid
-                if newid:
-                    newid = newid.upper()
-                if newid != oldid:
-                    print("Correcting idcard for", user, "from", oldid, "to", newid)
-                    Users.set_id_card(user, newid)
-                    user['idcard'] = newid
+                user["_reference"] = {}
+                for key, meta in Users.fields.iteritems():
+                    value = user[key]
+                    if "save" in meta:
+                        value = meta["save"](value)
+                    user["_reference"][key] = value
+
+                if user['id_card']:
+                    user['id_card'] = user['id_card'].upper()
+                Users.save(user)
+
                 users.append(user)
 
             return users
@@ -82,7 +131,7 @@ class Users(object):
     def read_all_users_ldap(filters=[], include_temp=False):
         base_dn = 'ou=members,dc=flipdot,dc=org'
         temp_dn = 'ou=temp_members,dc=flipdot,dc=org'
-        attrs = ['uid', 'uidNumber', 'carLicense', 'mail', 'telexNumber']
+        attrs = [k["ldap_field"] for k in Users.fields.values()]
         filters.append("objectclass=person")
 
         filter_str = "".join(['(' + f.replace(')', '_') + ')' for f in filters])
@@ -146,10 +195,6 @@ class Users(object):
         con.modify_s(user['path'], add_pass)
 
     @staticmethod
-    def set_id_card(user, ean):
-        return Users.set_value(user, 'carLicense', ean)
-
-    @staticmethod
     def get_by_id_card(ean):
         all = Users.get_all(filters=['carLicense='+ean], include_temp=True)
         by_card = dict([ (u['id_card'], u) for u in all if u['id_card'] ])
@@ -197,3 +242,25 @@ class Users(object):
         except Exception as e:
             print "Error: " + str(e)
             traceback.print_tb(limit=4)
+
+    @staticmethod
+    def save(user):
+        changes = {}
+        for key, meta in Users.fields.iteritems():
+            new_value = user[key]
+            if "save" in meta:
+                new_value = meta["save"](new_value)
+            if new_value != user["_reference"][key]:
+                changes[key] = (user["_reference"][key], new_value)
+
+        if changes:
+            for key, change in changes.iteritems():
+                old, new = change
+                meta = Users.fields[key]
+                print("User %s %s: changing %s from '%s' to '%s'" % (
+                    user["id"], user['name'], key, str(old), str(new)))
+                try:
+                    Users.set_value(user, meta["ldap_field"], new)
+                    user["_reference"][key] = new
+                except Exception as e:
+                    print "LDAP error:", e

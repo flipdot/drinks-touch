@@ -52,7 +52,8 @@ class ProfileScreen(Screen):
             self.screen,
             text =self.user["name"],
             pos=(30, 120),
-            size=70
+            size=70,
+            max_width=335 - 30 - 10,  # balance.x - self.x - margin
         ))
 
         self.objects.append(Label(

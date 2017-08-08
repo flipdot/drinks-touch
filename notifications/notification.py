@@ -45,6 +45,7 @@ def send_notification(to_address, subject, message):
 def send_drink(user, drink, balance):
     try:
         user_email = user['email']
+
         if user_email:
             mail_msg = "Du hast das folgende Getränk getrunken {drink_name}\n\nVerbleibendes Guthaben: EUR {balance}" \
                 .format(drink_name=drink['name'], balance=balance)
@@ -67,7 +68,8 @@ def send_lowbalances():
             balance = Users.get_balance(user['id'])
             if balance >= minimum_balance:
                 # set time to okay
-                Users.set_value(user, 'telexNumber', str(time.time()))
+                user["last_emailed"] = time.time()
+                Users.save(user)
                 continue
             diff = now - user['last_emailed']
             last_emailed_hours = diff / 60 / 60
@@ -83,7 +85,14 @@ def send_lowbalances():
                                    limit=minimum_balance, balance=balance)
                 send_notification(user_email, "[fd-noti] Negatives Guthaben",
                                   mail_msg)
-                Users.set_value(user, 'telexNumber', str(time.time()))
+                user["last_emailed"] = time.time()
+                Users.save(user)
         except Exception as e:
             logging.error(e)
             continue
+
+def send_summaries():
+    if not is_pi():
+        return
+    now = time.time()
+    #TODO
