@@ -52,7 +52,9 @@ def send_drink(user, drink, balance):
         user_email = user['email']
 
         if user_email:
-            mail_msg = "Du hast das folgende Getränk getrunken {drink_name}\n\nVerbleibendes Guthaben: EUR {balance}" \
+            mail_msg = "Du hast das folgende Getränk getrunken {drink_name}" \
+                       "\n\nVerbleibendes Guthaben: EUR {balance}\n\n" \
+                       "Maileinstellungen: http://ldapapp.fd/" \
                 .format(drink_name=drink['name'], balance=balance)
             send_notification_newthread(user_email,
                                         "[fd-noti] Getränk getrunken", mail_msg)
@@ -92,6 +94,7 @@ def send_lowbalance(user, email):
                    "Guthaben unter EUR {limit}!\n\n" \
                    "Dein Guthaben betraegt: EUR {balance}\n\n" \
                    "Zum aufladen geh (im Space-Netz) auf http://drinks-touch.fd/" \
+                   "\n\nMaileinstellungen: http://ldapapp.fd/" \
             .format(limit_days=remind_mail_every_x_hours / 24,
                     limit=minimum_balance, balance=balance)
         send_notification(email, "[fd-noti] Negatives Guthaben",
@@ -122,7 +125,6 @@ frequencies = {
 
 def send_summary(session, user, email):
     now = time.time()
-    print user
     frequency_str = user['meta']['drink_notification']
     if frequency_str not in frequencies.keys():
         return
@@ -161,7 +163,8 @@ WHERE user_id = :userid
             mail_msg += "  % 3d % 20s % 15s % 5s l\n" % (
                 i, date, str(name), str(size) if size else "?"
             )
-        mail_msg += "\nBesuchen Sie uns bald wieder!\n"
+        mail_msg += "\nBesuchen Sie uns bald wieder!\n\n" \
+                    "Maileinstellungen: http://ldapapp.fd/"
         print "got %d rows. mailing." % (len(rows))
         send_notification(email, "[fd-noti] Getränkeübersicht für %s" % user['name'],
                           mail_msg)
