@@ -41,7 +41,7 @@ class Users(object):
             "default": None,
         },
         "meta": {
-            "ldap_field": "seeAlso",
+            "ldap_field": "postOfficeBox",
             "index": 0,
             "default": {
                 "drink_notification": "instant", # instant, daily, weekly, never
@@ -175,7 +175,7 @@ class Users(object):
                 WHERE user_id = :user_id
                 GROUP BY user_id
             """)
-        print sql, user_id
+        #print sql, user_id
         row = session.connection().execute(sql, user_id=user_id).fetchone()
         if not row:
             credit = 0
@@ -257,8 +257,8 @@ class Users(object):
             for key, change in changes.iteritems():
                 old, new = change
                 meta = Users.fields[key]
-                print("User %s %s: changing %s from '%s' to '%s'" % (
-                    user["id"], user['name'], key, str(old), str(new)))
+                print("User %s %s: changing %s (%s) from '%s' to '%s'" % (
+                    user["id"], user['name'], key, meta['ldap_field'], str(old), str(new)))
                 try:
                     Users.set_value(user, meta["ldap_field"], new)
                     user["_reference"][key] = new

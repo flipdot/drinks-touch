@@ -6,6 +6,7 @@ import time
 
 from PIL import Image, ImageDraw, ImageFont, ImageChops, ImageMath
 
+from env import is_pi
 from flipdot import create_socket, send_frame, w, h
 
 from database.storage import get_session
@@ -125,6 +126,8 @@ def draw_char(text_draw, pos, char):
         text_draw.text(pos, char, 1, font=font)
 
 def run():
+    if not is_pi():
+        return
     scan_list = scans(limit=1000, hours=24)
     image = create_image(scan_list)
     if not image:
