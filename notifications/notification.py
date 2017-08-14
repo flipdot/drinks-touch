@@ -51,7 +51,7 @@ def send_drink(user, drink, balance):
     try:
         user_email = user['email']
 
-        if user_email:
+        if user_email and user['meta']['drink_notification'] == 'instant':
             mail_msg = "Du hast das folgende Getränk getrunken {drink_name}" \
                        "\n\nVerbleibendes Guthaben: EUR {balance}\n\n" \
                        "Maileinstellungen: http://ldapapp.fd/" \
