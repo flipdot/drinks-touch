@@ -150,6 +150,7 @@ FROM scanevent se
     LEFT OUTER JOIN drink d ON d.ean = se.barcode
 WHERE user_id = :userid
     AND se.timestamp > NOW() - INTERVAL '%d seconds'
+ORDER BY se.timestamp
         """ % (freq_secs))
         rows = session.connection().execute(sql, userid=user['id']).fetchall()
         if len(rows) == 0:
