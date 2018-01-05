@@ -50,7 +50,7 @@ def recharge_doit():
     user_id = request.form['user_user']
     helper_id = request.form['helper_user']
     amount = request.form['amount']
-    if not user_id or not helper_id or amount <= 0:
+    if not user_id or not helper_id:
         return 'Please enter valid data!'
 
     if not uid_pattern.match(user_id):
