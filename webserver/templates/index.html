@@ -1,14 +1,17 @@
 {% extends "layout.html" %}
 {% block title %}Start{% endblock %}
 {% block body %}
-<h1>Getränkescanner</h1>
-<hr>
-<div class="row">
-  <div class="col-sm-8 col-md-6">
-    {% include "recharge.html" %}
-  </div>
-  <div class="col-sm-4 col-md-6">
-    {# include "stats.html" #}
-  </div>
-</div>
+    <h1>Getränkescanner</h1>
+    <hr>
+    <div class="row">
+        <div class="col-md-6">
+            {% include "recharge.html" %}
+        </div>
+        <div class="col-md-6">
+            {# include "stats.html" #}
+            <div class="scancode">
+                <img id="qrcode"/>
+            </div>
+        </div>
+    </div>
 {% endblock %}

@@ -8,3 +8,4 @@ flask-compress
 influxdb
 keyboard
 email
+qrcode
