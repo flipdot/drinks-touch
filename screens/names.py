@@ -1,19 +1,16 @@
 # coding=utf-8
-import pygame
 
-from elements.label import Label
+import math
+
 from elements.button import Button
+from elements.label import Label
 from elements.progress import Progress
-
-from users.users import Users
-
-from .screen import Screen
-from screens.enter_pin import EnterPinScreen
+from env import monospace
 from screens.profile import ProfileScreen
-
+from users.users import Users
+from .screen import Screen
 from .screen_manager import ScreenManager
 
-from env import monospace
 
 class NamesScreen(Screen):
     def __init__(self, screen, char, **kwargs):
@@ -42,20 +39,28 @@ class NamesScreen(Screen):
         self.objects.append(Label(
             self.screen,
             text ='Wer bist du?',
-            pos=(20, 130),
+            pos=(20, 110),
         ))
 
         users = Users.get_all(self.char)
 
-        i = 0
-        for user in users:
+        btns_y = 7
+        num_cols = int(math.ceil(len(users) / float(btns_y)))
+        for i, user in enumerate(users):
+            padding = 20
+            xoff, yoff = 30, 190
+            btn_ypos = 90
+            i_y = i % btns_y
+            i_x = i // btns_y
+            x = i_x * (screen.get_width() / num_cols)
+            y = i_y * btn_ypos
             self.objects.append(Button(
                 self.screen,
                 text = user["name"],
-                pos=(30,190 + (i * 80)),
+                pos=(xoff + x, y + yoff),
                 click=self.switch_to_screen,
                 click_param=user,
-                padding=20
+                padding=padding
             ))
             i += 1
 
