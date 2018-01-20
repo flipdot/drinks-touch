@@ -1,4 +1,6 @@
 # coding=utf-8
+from decimal import getcontext
+
 import pygame
 import datetime
 
@@ -35,8 +37,7 @@ class ProfileScreen(Screen):
             text = "BACK",
             pos=(30,30),
             font = monospace,
-            click=self.back,
-            size=30
+            click=self.back
         ))
 
         self.objects.append(Button(
@@ -44,8 +45,7 @@ class ProfileScreen(Screen):
             text = "ID card",
             pos=(340,30),
             font = monospace,
-            click=self.id_card,
-            size=30
+            click=self.id_card
         ))
 
         self.objects.append(Label(
@@ -63,12 +63,18 @@ class ProfileScreen(Screen):
             size=30
         ))
 
-        self.objects.append(Label(
+        self.label_verbrauch = Label(
             self.screen,
             text='Bisheriger Verbrauch:',
-            pos=(30, 170),
+            pos=(30, 180),
             size=30
-        ))
+        )
+        self.label_aufladungen = Label(
+            self.screen,
+            text='Aufladungen:',
+            pos=(30, 180),
+            size=30
+        )
 
         self.processing = Label(
             self.screen,
@@ -82,7 +88,7 @@ class ProfileScreen(Screen):
         self.timeout = Progress(
             self.screen,
             pos=(200, 50),
-            speed=1/15.0,
+            speed=1/30.0,
             on_elapsed=self.time_elapsed,
         )
         self.objects.append(self.timeout)
@@ -103,8 +109,24 @@ class ProfileScreen(Screen):
             size=50,
             click=self.save_drink
         )
+        self.btn_aufladungen = Button(
+            self.screen,
+            text='Aufladungen',
+            pos=(30, 700),
+            click=self.show_aufladungen
+        )
+        self.btn_drinks = Button(
+            self.screen,
+            text='Buchungen',
+            pos=(30, 700),
+            click=self.show_drinks
+        )
+        self.elements_aufladungen = [self.btn_drinks, self.label_aufladungen]
+        self.elements_drinks = [self.label_verbrauch]
         if drink:
-            self.objects.extend([self.zuordnen, self.drink_info])
+            self.elements_drinks.extend([self.zuordnen, self.drink_info])
+        else:
+            self.elements_drinks.append(self.btn_aufladungen)
 
         self.objects.append(Button(
             self.screen,
@@ -114,9 +136,10 @@ class ProfileScreen(Screen):
             click=self.btn_home,
         ))
 
+        balance = Users.get_balance(self.user['id'])
         self.objects.append(Label(
             self.screen,
-            text = str(Users.get_balance(self.user['id']))+' EUR',
+            text = str(balance),
             pos=(335, 145),
             size=40
         ))
@@ -125,7 +148,7 @@ class ProfileScreen(Screen):
         for i, drinks in enumerate(drinks):
             x = 30
             if i == 11:
-                self.objects.append(Label(
+                self.elements_drinks.append(Label(
                     self.screen,
                     text = "...",
                     pos=(x, 210 + (i * 35))
@@ -136,19 +159,62 @@ class ProfileScreen(Screen):
             text = get_by_ean(drinks["name"])['name']
             count_width = 80
             margin_right = 10
-            self.objects.append(Label(
+            self.elements_drinks.append(Label(
                 self.screen,
                 text = text,
                 pos=(x, 210 + (i * 35)),
                 max_width=480-x-margin_right-count_width
             ))
-            self.objects.append(Label(
+            self.elements_drinks.append(Label(
                 self.screen,
                 text = str(drinks["count"]),
                 align_right=True,
                 pos=(480-margin_right, 210 + (i * 35)),
                 max_width=count_width
             ))
+
+        self.objects.extend(self.elements_drinks)
+
+        aufladungen = Users.get_recharges(self.user['id'], limit=12)
+        y = 210
+        prev_date = None
+        for i, aufladung in enumerate(aufladungen):
+            x = 30
+            if y + 45*2 >= self.btn_drinks.pos[1]:
+                self.elements_aufladungen.append(Label(self.screen,
+                    text = "...",
+                    pos=(x, y)
+                ))
+                break
+            date = aufladung.timestamp.strftime("%a, %-d.%-m.%Y")
+            time = aufladung.timestamp.strftime("%H:%M")
+            text = time
+            helper = Users.get_by_id(
+                aufladung.helper_user_id) if aufladung.helper_user_id else None
+            if helper:
+                text += " mit " + helper['name']
+            if date != prev_date:
+                prev_date = date
+                self.elements_aufladungen.append(Label(self.screen,
+                    text=date, size=35,
+                    pos=(x, y+15)
+                ))
+                y += 45
+            count_width = 120
+            margin_right = 10
+            self.elements_aufladungen.append(Label(self.screen,
+                text=text,
+                pos=(x + 10, y), size=45,
+                max_width=480 - x - margin_right - count_width
+            ))
+            self.elements_aufladungen.append(Label(
+                self.screen,
+                text = str(aufladung.amount),
+                align_right=True,
+                pos=(480-margin_right, y-5),
+                max_width=count_width
+            ))
+            y += 35
 
     def save_drink(self, args, pos):
         session = get_session()
@@ -206,6 +272,18 @@ class ProfileScreen(Screen):
 
     def time_elapsed(self):
         self.home()
+
+    def show_aufladungen(self, param, pos):
+        for d in self.elements_drinks:
+            self.objects.remove(d)
+        self.objects.extend(self.elements_aufladungen)
+        self.timeout.start()
+
+    def show_drinks(self, param, pos):
+        for d in self.elements_aufladungen:
+            self.objects.remove(d)
+        self.objects.extend(self.elements_drinks)
+        self.timeout.start()
 
     def get_stats(self):
         session = get_session()
