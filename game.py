@@ -1,11 +1,12 @@
 #!/usr/bin/env python2
 # coding=utf-8
+import locale
+
 import pygame
 import logging
 import threading
 import subprocess
 import Queue
-import traceback
 import sys
 import os
 import time
@@ -49,14 +50,19 @@ def handle_events():
             pass
 
 def stats_loop():
+    i = 0
     while True:
         stats_send()
         send_lowbalances()
-        send_summaries()
+        if i % 60*12 == 0:
+            send_summaries()
         time.sleep(60)
+        i += 1
+        i %= 60*12
 
 ##### Rendering #####
 def main(argv):
+    locale.setlocale(locale.LC_ALL, 'de_DE.UTF-8')
 
     if "--webserver" in argv:
         run_webserver()
