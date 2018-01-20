@@ -7,9 +7,33 @@ import random
 
 from datetime import datetime
 
+from database.models.recharge_event import RechargeEvent
 from database.storage import get_session
 from sqlalchemy.sql import text
 from env import is_pi
+
+test_data = [{"name": "foo", "id": "1", "id_card": None},
+             {"name": "bar", "id": "2", "id_card": "idcard2"},
+             {"name": "Baz", "id": "3", "id_card": "idcard"},
+             {"name": "Baz", "id": "3", "id_card": "idcard"},
+             {"name": "Baz1", "id": "31", "id_card": "idcard"},
+             {"name": "Baz2", "id": "32", "id_card": "idcard"},
+             {"name": "Baz3", "id": "33", "id_card": "idcard"},
+             {"name": "Baz4", "id": "34", "id_card": "idcard"},
+             {"name": "Baz5", "id": "35", "id_card": "idcard"},
+             {"name": "Baz6", "id": "36", "id_card": "idcard"},
+             {"name": "Baz7", "id": "37", "id_card": "idcard"},
+             {"name": "Baz8", "id": "38", "id_card": "idcard"},
+             {"name": "Baz9", "id": "39", "id_card": "idcard"},
+             {"name": "Baz10", "id": "40", "id_card": "idcard"},
+             {"name": "Baz11", "id": "41", "id_card": "idcard"},
+             {"name": "Baz12", "id": "42", "id_card": "idcard"},
+             {"name": "Baz13", "id": "43", "id_card": "idcard"},
+             {"name": "Baz14", "id": "44", "id_card": "idcard"},
+             {"name": "Daz", "id": "3", "id_card": "idcard"},
+             {"name": "Choo", "id": "10004", "id_card": "choo"},
+             ]
+
 
 class Users(object):
     active_user = None
@@ -44,7 +68,8 @@ class Users(object):
             "ldap_field": "postOfficeBox",
             "index": 0,
             "default": {
-                "drink_notification": "instant", # instant, daily, weekly, never
+                "drink_notification": "instant",
+            # instant, daily, weekly, never
                 "last_drink_notification": 0,
             },
             "load": json.loads,
@@ -68,37 +93,11 @@ class Users(object):
             for ldap_user in ldap_users:
                 name = ldap_user['uid'][0]
 
-                if prefix != '' and name.lower().startswith(prefix.lower()) == False:
+                if prefix != '' and name.lower().startswith(
+                        prefix.lower()) == False:
                     continue
 
-                user = {}
-                for key, meta in Users.fields.iteritems():
-                    try:
-                        value = ldap_user[meta['ldap_field']]
-                        if "index" in meta:
-                            value = value[meta["index"]]
-                        if "load" in meta:
-                            value = meta['load'](value)
-                        if value == None and "default" in meta:
-                            value = meta["default"]
-                        user[key] = value
-                    except:
-                        if 'default' in meta:
-                            user[key] = meta['default']
-                        else:
-                            raise
-
-                user["_reference"] = {}
-                for key, meta in Users.fields.iteritems():
-                    value = user[key]
-                    if "save" in meta:
-                        value = meta["save"](value)
-                    user["_reference"][key] = value
-
-                if user['id_card']:
-                    user['id_card'] = user['id_card'].upper()
-                Users.save(user)
-
+                user = Users.user_from_ldap(ldap_user)
                 users.append(user)
 
             return users
@@ -107,14 +106,40 @@ class Users(object):
                 print("ldap fail: ", e)
                 print(traceback.format_exc())
                 print("falling back to test data")
-                return filter(lambda u: prefix == '' or
-                    u['name'].lower().startswith(prefix.lower()),
-                    [{"name": "foo", "id":"1", "id_card": None},
-                    {"name": "bar", "id":"2", "id_card": "idcard2"},
-                    {"name": "Baz", "id":"3", "id_card": "idcard"},
-                    {"name": "Daz", "id":"3", "id_card": "idcard"}])
+                return filter(
+                    lambda u: prefix == '' or u['name'].lower().startswith(
+                        prefix.lower()), test_data)
             else:
                 raise
+
+    @staticmethod
+    def user_from_ldap(ldap_user):
+        user = {}
+        for key, meta in Users.fields.iteritems():
+            try:
+                value = ldap_user[meta['ldap_field']]
+                if "index" in meta:
+                    value = value[meta["index"]]
+                if "load" in meta:
+                    value = meta['load'](value)
+                if value == None and "default" in meta:
+                    value = meta["default"]
+                user[key] = value
+            except:
+                if 'default' in meta:
+                    user[key] = meta['default']
+                else:
+                    raise
+        user["_reference"] = {}
+        for key, meta in Users.fields.iteritems():
+            value = user[key]
+            if "save" in meta:
+                value = meta["save"](value)
+            user["_reference"][key] = value
+        if user['id_card']:
+            user['id_card'] = user['id_card'].upper()
+        Users.save(user)
+        return user
 
     @staticmethod
     def get_ldap_instance():
@@ -122,9 +147,9 @@ class Users(object):
         pw = ''
         with  open('ldap_pw', 'r') as ldap_pw:
             pw = ldap_pw.read().replace('\n', '')
-        
+
         con = ldap.initialize('ldap://rail.fd')
-        con.simple_bind_s( dn, pw )
+        con.simple_bind_s(dn, pw)
         return con
 
     @staticmethod
@@ -141,7 +166,8 @@ class Users(object):
         con = Users.get_ldap_instance()
         ldap_res = con.search_s(base_dn, ldap.SCOPE_SUBTREE, filter_str, attrs)
         if include_temp:
-            ldap_res.extend(con.search_s(temp_dn, ldap.SCOPE_SUBTREE, filter_str, attrs))
+            ldap_res.extend(
+                con.search_s(temp_dn, ldap.SCOPE_SUBTREE, filter_str, attrs))
 
         users = []
         for path, user in ldap_res:
@@ -154,11 +180,11 @@ class Users(object):
 
         con.unbind()
         return users
-        
+
     @staticmethod
     def get_balance(user_id, session=get_session()):
         sql = text("""
-                SELECT user_id, count(*) as amount
+                SELECT user_id, count(*) AS amount
                 FROM scanevent
                 WHERE user_id = :user_id
                 GROUP BY user_id
@@ -170,12 +196,12 @@ class Users(object):
             cost = row.amount
 
         sql = text("""
-                SELECT user_id, sum(amount) as amount
+                SELECT user_id, sum(amount) AS amount
                 FROM rechargeevent
                 WHERE user_id = :user_id
                 GROUP BY user_id
             """)
-        #print sql, user_id
+        # print sql, user_id
         row = session.connection().execute(sql, user_id=user_id).fetchone()
         if not row:
             credit = 0
@@ -183,6 +209,16 @@ class Users(object):
             credit = row.amount
 
         return credit - cost
+
+    @staticmethod
+    def get_recharges(user_id, session=get_session(), limit=None):
+        # type: (str, session) -> RechargeEvent
+        q = session.query(RechargeEvent).filter(
+            RechargeEvent.user_id == user_id).order_by(
+            RechargeEvent.timestamp.desc())
+        if limit:
+            q = q.limit(limit)
+        return q.all()
 
     @staticmethod
     def set_value(user, field, value, create_field=False):
@@ -195,9 +231,17 @@ class Users(object):
         con.modify_s(user['path'], add_pass)
 
     @staticmethod
+    def get_by_id(id):
+        all = Users.get_all(filters=['id=' + id], include_temp=True)
+        by_id = {u['id']: u for u in all if u['id']}
+        if id in by_id:
+            return by_id[id]
+        return None
+
+    @staticmethod
     def get_by_id_card(ean):
-        all = Users.get_all(filters=['carLicense='+ean], include_temp=True)
-        by_card = dict([ (u['id_card'], u) for u in all if u['id_card'] ])
+        all = Users.get_all(filters=['carLicense=' + ean], include_temp=True)
+        by_card = dict([(u['id_card'], u) for u in all if u['id_card']])
         if ean in by_card:
             return by_card[ean]
         return None
@@ -208,18 +252,18 @@ class Users(object):
 
     @staticmethod
     def create_temp_user():
-        id = 30000 + random.randint(1,2000)
+        id = 30000 + random.randint(1, 2000)
         while Users.get_by_id_card(Users.id_to_ean(id)):
             id += 1
-        
+
         barcode = Users.id_to_ean(id)
         dn = "cn=" + str(id) + ",ou=temp_members,dc=flipdot,dc=org"
         mods = {
-            'objectClass':  ["inetOrgPerson", "organizationalPerson", "person"],
-            'carLicense':   barcode,
-            'cn':           str(id),
-            'uid':          "geld-"+str(id),
-            'sn':           str(id),
+            'objectClass': ["inetOrgPerson", "organizationalPerson", "person"],
+            'carLicense': barcode,
+            'cn': str(id),
+            'uid': "geld-" + str(id),
+            'sn': str(id),
         }
         con = Users.get_ldap_instance()
         con.add_s(dn, modlist.addModlist(mods))
@@ -233,7 +277,7 @@ class Users(object):
         if balance <= 0:
             print "deleting user " + str(user['id']) + " because they are broke"
             Users.delete(user)
-    
+
     @staticmethod
     def delete(user):
         try:
@@ -258,7 +302,8 @@ class Users(object):
                 old, new = change
                 meta = Users.fields[key]
                 print("User %s %s: changing %s (%s) from '%s' to '%s'" % (
-                    user["id"], user['name'], key, meta['ldap_field'], str(old), str(new)))
+                    user["id"], user['name'], key, meta['ldap_field'], str(old),
+                    str(new)))
                 try:
                     Users.set_value(user, meta["ldap_field"], new)
                     user["_reference"][key] = new
