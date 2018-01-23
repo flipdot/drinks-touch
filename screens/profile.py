@@ -251,6 +251,10 @@ class ProfileScreen(Screen):
         self.drink_info.text = drink['name']
         if self.zuordnen not in self.objects:
             self.objects.extend([self.zuordnen, self.drink_info])
+        if self.btn_aufladungen in self.objects:
+            self.objects.remove(self.btn_aufladungen)
+        if self.btn_drinks in self.objects:
+            self.objects.remove(self.btn_drinks)
         self.processing.is_visible = False
         self.timeout.start()
 
