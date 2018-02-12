@@ -1,5 +1,6 @@
 import sys
 import keyboard
+import logging
 
 from env import is_pi
 
@@ -9,7 +10,10 @@ def run(worker):
         print "---------"
         print "Enter EAN here to simulate scanned barcode!"
         while True:
-            worker.on_barcode(sys.stdin.readline().strip().upper())
+            try:
+                worker.on_barcode(sys.stdin.readline().strip().upper())
+            except Exception:
+                logging.exception("Caught exception in barcode handler...")
 
     def replace_key_code(barcode, replacements):
 

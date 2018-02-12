@@ -157,7 +157,7 @@ class IDCardScreen(Screen):
         if not barcode:
             return
         drink = get_by_ean(barcode)
-        if drink and not 'unknown' in drink['tags']:
+        if drink and ('tags' not in drink or 'unknown' not in drink['tags']):
             from .profile import ProfileScreen
             DrinksManager.get_instance().set_selected_drink(drink)
             ScreenManager.get_instance().set_active(
