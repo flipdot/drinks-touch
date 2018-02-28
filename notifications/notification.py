@@ -2,6 +2,7 @@
 import smtplib
 import threading
 from email.mime.text import MIMEText
+from email.utils import formatdate, make_msgid
 
 import time
 
@@ -38,6 +39,8 @@ def send_notification(to_address, subject, message):
     msg['Subject'] = subject
     msg['From'] = fromMail
     msg['To'] = to_address
+    msg['Date'] = formatdate(time.time(), localtime=True)
+    msg['Message-id'] = make_msgid()
 
     s = smtplib.SMTP()
     s.connect(host='vega.uberspace.de', port=587)
