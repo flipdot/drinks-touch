@@ -1,14 +1,13 @@
 # -*- coding:utf-8 -*-
+import logging
 import smtplib
 import threading
 from email.mime.text import MIMEText
 from email.utils import formatdate, make_msgid
 
 import time
-
-import logging
-
 from datetime import datetime
+from email.mime.text import MIMEText
 
 from sqlalchemy import text
 
@@ -19,6 +18,8 @@ from users.users import Users
 # lower and we send mails every x days!
 minimum_balance = -5
 remind_mail_every_x_hours = 24 * 7
+
+FOOTER = "\n\nBesuchen Sie uns bald wieder!\nEinstellungen: http://ldap.fd/"
 
 with open('mail_pw', 'r') as pw:
     mail_pw = pw.read().replace('\n', '')
@@ -56,8 +57,8 @@ def send_drink(user, drink, balance):
 
         if user_email and user['meta']['drink_notification'] == 'instant':
             mail_msg = "Du hast das folgende Getränk getrunken {drink_name}" \
-                       "\n\nVerbleibendes Guthaben: EUR {balance}\n\n" \
-                       "Maileinstellungen: http://ldapapp.fd/" \
+                       "\n\nVerbleibendes Guthaben: EUR {balance}"+ \
+                       FOOTER \
                 .format(drink_name=drink['name'], balance=balance)
             send_notification_newthread(user_email,
                                         "[fd-noti] Getränk getrunken", mail_msg)
@@ -167,8 +168,7 @@ ORDER BY se.timestamp
             mail_msg += "  % 3d % 20s % 15s % 5s l\n" % (
                 i, date, str(name), str(size) if size else "?"
             )
-        mail_msg += "\nBesuchen Sie uns bald wieder!\n\n" \
-                    "Maileinstellungen: http://ldapapp.fd/"
+        mail_msg += FOOTER
         print "got %d rows. mailing." % (len(rows))
         send_notification(email, "[fd-noti] Getränkeübersicht für %s" % user['name'],
                           mail_msg)
