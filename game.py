@@ -1,15 +1,15 @@
 #!/usr/bin/env python2
 # coding=utf-8
+import Queue
 import locale
+import logging
+import os
+import subprocess
+import sys
+import threading
+import time
 
 import pygame
-import logging
-import threading
-import subprocess
-import Queue
-import sys
-import os
-import time
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -25,6 +25,7 @@ from stats.stats import run as stats_send
 from notifications.notification import send_lowbalances, send_summaries
 from barcode.barcode_reader import run as run_barcode_reader
 from barcode.barcode_worker import Worker as BarcodeWorker
+from users.sync import sync_recharges
 
 import debug
 debug.listen()
@@ -54,6 +55,7 @@ def stats_loop():
     while True:
         stats_send()
         send_lowbalances()
+        sync_recharges()
         if i % 60*12 == 0:
             send_summaries()
         time.sleep(60)

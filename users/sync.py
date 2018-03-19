@@ -1,0 +1,67 @@
+import logging
+from datetime import datetime
+from decimal import Decimal
+
+import requests
+from requests.auth import HTTPBasicAuth
+
+import config
+from database.models.recharge_event import RechargeEvent
+from database.storage import get_session
+
+#logging.basicConfig(level=logging.INFO)
+log = logging.getLogger(__name__)
+
+helper_user = "SEPA"
+
+def get_existing(session):
+    rechargeevents = session.query(RechargeEvent) \
+        .filter(RechargeEvent.helper_user_id == str(helper_user)).all()
+    got_by_user = {}
+    for ev in rechargeevents:
+        if ev.user_id not in got_by_user:
+            got_by_user[ev.user_id] = []
+        got_by_user[ev.user_id].append(ev)
+    return got_by_user
+
+def sync_recharges():
+    try:
+        sync_recharges_real()
+    except Exception as e:
+        log.exception("Syncing recharges:", e)
+
+def sync_recharges_real():
+    data = requests.get(config.money_url,
+        auth=HTTPBasicAuth(config.money_user, config.money_password))
+    recharges = data.json()
+    session = get_session()
+    got_by_user = get_existing(session)
+
+    for uid, charges in recharges.iteritems():
+        log.info("Syncing recharges for user %s", uid)
+        if uid not in got_by_user:
+            log.info("First recharge for user %s!", uid)
+            got_by_user[uid] = []
+        got = got_by_user[uid]
+        for charge in charges:
+            charge_date = datetime.strptime(charge['date'], "%Y-%m-%d")
+            charge_amount = Decimal(charge['amount'])
+            log.debug("charge: %s, %s", charge, charge_date)
+            found = False
+            for exist in got:
+                if exist.timestamp != charge_date: continue
+                if exist.amount != charge_amount: continue
+                # found a matching one
+                found = True
+                break
+            if found: continue
+            log.info("User %s transferred %s on %s: %s",
+                uid, charge_amount, charge_date, charge)
+            ev = RechargeEvent(uid, helper_user, charge_amount, charge_date)
+            got.append(ev)
+            session.add(ev)
+            session.commit()
+            #TODO send email
+
+if __name__ == "__main__":
+    sync_recharges()
