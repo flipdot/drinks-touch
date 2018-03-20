@@ -1,15 +1,13 @@
 import json
+import random
+import traceback
 
 import ldap
 import ldap.modlist as modlist
-import traceback
-import random
-
-from datetime import datetime
+from sqlalchemy.sql import text
 
 from database.models.recharge_event import RechargeEvent
 from database.storage import get_session
-from sqlalchemy.sql import text
 from env import is_pi
 
 test_data = [{"name": "foo", "id": "1", "id_card": None},
@@ -232,7 +230,7 @@ class Users(object):
 
     @staticmethod
     def get_by_id(id):
-        all = Users.get_all(filters=['id=' + id], include_temp=True)
+        all = Users.get_all(filters=['uidNumber=' + str(id)], include_temp=True)
         by_id = {u['id']: u for u in all if u['id']}
         if id in by_id:
             return by_id[id]

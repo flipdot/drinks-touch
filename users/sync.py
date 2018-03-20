@@ -8,8 +8,9 @@ from requests.auth import HTTPBasicAuth
 import config
 from database.models.recharge_event import RechargeEvent
 from database.storage import get_session
+from notifications.notification import send_summary_now
+from users import Users
 
-#logging.basicConfig(level=logging.INFO)
 log = logging.getLogger(__name__)
 
 helper_user = "SEPA"
@@ -28,7 +29,7 @@ def sync_recharges():
     try:
         sync_recharges_real()
     except Exception as e:
-        log.exception("Syncing recharges:", e)
+        log.exception("Syncing recharges:")
 
 def sync_recharges_real():
     data = requests.get(config.money_url,
@@ -55,13 +56,31 @@ def sync_recharges_real():
                 found = True
                 break
             if found: continue
-            log.info("User %s transferred %s on %s: %s",
-                uid, charge_amount, charge_date, charge)
-            ev = RechargeEvent(uid, helper_user, charge_amount, charge_date)
-            got.append(ev)
-            session.add(ev)
-            session.commit()
-            #TODO send email
+
+            handle_transferred(charge, charge_amount, charge_date, got, session,
+                uid)
+
+
+def handle_transferred(charge, charge_amount, charge_date, got, session, uid):
+    log.info("User %s transferred %s on %s: %s",
+        uid, charge_amount, charge_date, charge)
+    ev = RechargeEvent(uid, helper_user, charge_amount, charge_date)
+    got.append(ev)
+    session.add(ev)
+    session.commit()
+    try:
+        user = Users.get_by_id(uid)
+        if not user:
+            log.error("could not find user %s to send email", uid)
+        else:
+            send_summary_now(user['email'], 3600 * 24 * 14, "2 Wochen",
+                session, user, force=True,
+                addltext="Deine Aufladung ueber %s am %s mit Text '%s' war erfolgreich." % (
+                    charge_amount, charge_date, charge['info']
+                ))
+    except:
+        log.exception("sending notification mail:")
+
 
 if __name__ == "__main__":
     sync_recharges()

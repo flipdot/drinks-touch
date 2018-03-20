@@ -2,15 +2,14 @@
 import logging
 import smtplib
 import threading
+import time
+from datetime import datetime, timedelta
 from email.mime.text import MIMEText
 from email.utils import formatdate, make_msgid
 
-import time
-from datetime import datetime
-from email.mime.text import MIMEText
-
 from sqlalchemy import text
 
+from database.models.recharge_event import RechargeEvent
 from database.storage import get_session
 from env import is_pi
 from users.users import Users
@@ -141,10 +140,14 @@ def send_summary(session, user, email):
     if diff > freq_secs:
         print user['name'], "summary last emailed", last_emailed_days, "days (", \
             last_emailed_hours, "hours) ago. Mailing now."
-        mail_msg = "Hier ist deine Getränkeübersicht seit {since}:\n" \
-                   "Dein aktuelles Guthaben beträgt EUR {balance}.\n" \
-            .format(since=last_emailed_str, balance=Users.get_balance(user['id']))
-        sql = text("""
+        send_summary_now(email, freq_secs, last_emailed_str, session, user)
+
+
+def send_summary_now(email, since_secs, since_text, session, user, force=False, addltext=""):
+    mail_msg = "Hier ist deine Getränkeübersicht seit {since}:\n" \
+               "Dein aktuelles Guthaben beträgt EUR {balance}.\n" \
+        .format(since=since_text, balance=Users.get_balance(user['id']))
+    sql = text("""
 SELECT
     se.barcode,
     se.timestamp,
@@ -155,22 +158,47 @@ FROM scanevent se
 WHERE user_id = :userid
     AND se.timestamp > NOW() - INTERVAL '%d seconds'
 ORDER BY se.timestamp
-        """ % (freq_secs))
-        rows = session.connection().execute(sql, userid=user['id']).fetchall()
-        if len(rows) == 0:
-            print "got no rows. skipping."
-            return
-        mail_msg += "    #      datum                     drink  groesse\n"
-        for i, event in enumerate(rows):
-            date = event['timestamp'].strftime("%F %T Z")
-            name = event['name']
-            size = event['size']
-            mail_msg += "  % 3d % 20s % 15s % 5s l\n" % (
-                i, date, str(name), str(size) if size else "?"
-            )
-        mail_msg += FOOTER
-        print "got %d rows. mailing." % (len(rows))
-        send_notification(email, "[fd-noti] Getränkeübersicht für %s" % user['name'],
-                          mail_msg)
-        user['meta']["last_drink_notification"] = time.time()
-        Users.save(user)
+        """ % (since_secs))
+    rows = session.connection().execute(sql, userid=user['id']).fetchall()
+
+    recharges = session.query(RechargeEvent) \
+        .filter(RechargeEvent.user_id == user['id'])\
+        .filter(RechargeEvent.timestamp >= datetime.utcnow()-timedelta(weeks=2))\
+        .order_by(RechargeEvent.timestamp)\
+        .all()
+
+    if len(rows) == 0 and len(recharges) == 0 and not force:
+        print "got no rows. skipping."
+        return
+
+    if addltext:
+        mail_msg += str(addltext) + "\n"
+
+    mail_msg += "    #      datum                     drink  groesse\n"
+    for i, event in enumerate(rows):
+        date = event['timestamp'].strftime("%F %T Z")
+        name = event['name']
+        size = event['size']
+        mail_msg += "  % 3d % 20s % 15s % 5s l\n" % (
+            i, date, str(name), str(size) if size else "?"
+        )
+
+    mail_msg += "\n\nAufladungen in den letzten 2 Wochen:\n" \
+                "datum                mit             aufgeladen\n"
+    for event in recharges:
+        date = event.timestamp.strftime("%F %T Z")
+        mit = event.helper_user_id
+        try:
+            mit = Users.get_by_id(mit)['name']
+        except:
+            pass
+        amount = event.amount
+        mail_msg += "% 20s %15s %s" % (date, mit, amount)
+
+    mail_msg += FOOTER
+    print "got %d drinks and %d recharges. mailing." % (len(rows), len(recharges))
+    send_notification(email,
+        "[fd-noti] Getränkeübersicht für %s" % user['name'],
+        mail_msg)
+    user['meta']["last_drink_notification"] = time.time()
+    Users.save(user)
