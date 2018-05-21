@@ -73,11 +73,12 @@ def handle_transferred(charge, charge_amount, charge_date, got, session, uid):
         if not user:
             log.error("could not find user %s to send email", uid)
         else:
-            send_summary_now(user['email'], 3600 * 24 * 14, "2 Wochen",
-                session, user, force=True,
-                addltext="Deine Aufladung ueber %s am %s mit Text '%s' war erfolgreich." % (
-                    charge_amount, charge_date, charge['info']
-                ))
+            subject = "Aufladung EUR %s für %s" % (charge_amount, user['name'])
+            text = "Deine Aufladung über %s € am %s mit Text '%s' war erfolgreich." % (
+            charge_amount, charge_date, charge['info'])
+            send_summary_now(3600 * 24 * 14, "2 Wochen",
+                session, user, force=True, subject=subject,
+                addltext=text)
     except:
         log.exception("sending notification mail:")
 

@@ -11,11 +11,12 @@ import time
 
 import pygame
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.DEBUG,
+    format="[%(asctime)s][%(levelname)s][%(filename)s:%(lineno)d] %(message)s")
+logging.Formatter.converter = time.gmtime
 
 from database.storage import init_db
 
-from pygame.locals import *
 from screen import get_screen
 from screens.screen_manager import ScreenManager
 from drinks.drinks_manager import DrinksManager
