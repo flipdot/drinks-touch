@@ -1,30 +1,23 @@
 # coding=utf-8
-from decimal import getcontext
 
-import pygame
 import datetime
 
-from elements.label import Label
-from elements.button import Button
-from elements.image import Image
-from elements.progress import Progress
-
-from drinks.drinks_manager import DrinksManager
-from drinks.drinks import get_by_ean
-
-from users.users import Users
-
-from .screen import Screen
-from .success import SuccessScreen
-from .id_card_screen import IDCardScreen
-
-from database.storage import get_session
-from database.models.scan_event import ScanEvent
 from sqlalchemy.sql import text
 
-from .screen_manager import ScreenManager
-
+from database.models.scan_event import ScanEvent
+from database.storage import get_session
+from drinks.drinks import get_by_ean
+from drinks.drinks_manager import DrinksManager
+from elements.button import Button
+from elements.label import Label
+from elements.progress import Progress
 from env import monospace
+from users.users import Users
+from .id_card_screen import IDCardScreen
+from .screen import Screen
+from .screen_manager import ScreenManager
+from .success import SuccessScreen
+
 
 class ProfileScreen(Screen):
     def __init__(self, screen, user, **kwargs):
@@ -189,9 +182,11 @@ class ProfileScreen(Screen):
             date = aufladung.timestamp.strftime("%a, %-d.%-m.%Y")
             time = aufladung.timestamp.strftime("%H:%M")
             text = time
-            helper = Users.get_by_id(
-                aufladung.helper_user_id) if aufladung.helper_user_id else None
+            helper = aufladung.helper_user_id
             if helper:
+                name = Users.get_by_id(aufladung.helper_user_id)
+                if name:
+                    helper = name
                 text += " mit " + helper['name']
             if date != prev_date:
                 prev_date = date
