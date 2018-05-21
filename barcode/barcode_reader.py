@@ -1,8 +1,10 @@
-import sys
-import keyboard
 import logging
+import sys
+
+import keyboard
 
 from env import is_pi
+
 
 def run(worker):
     global last_barcode
@@ -43,7 +45,10 @@ def run(worker):
         return barcode
 
     while True:
-        for barcode in keyboard.get_typed_strings(keyboard.record(until="tab")):
+        input = keyboard.record(until="tab")
+        if input == None:
+            continue
+        for barcode in keyboard.get_typed_strings(input):
             barcode = replace_key_code(barcode, {
                 "?": "_",
                 "_": "?"

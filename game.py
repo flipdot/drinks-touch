@@ -1,5 +1,9 @@
 #!/usr/bin/env python2
 # coding=utf-8
+import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
+
 import Queue
 import locale
 import logging

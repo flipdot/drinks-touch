@@ -1,7 +1,7 @@
 import json
+import logging
 import random
 import traceback
-import logging
 
 import ldap
 import ldap.modlist as modlist
@@ -122,7 +122,7 @@ class Users(object):
                     value = value[meta["index"]]
                 if "load" in meta:
                     value = meta['load'](value)
-                if value == None and "default" in meta:
+                if value is None and "default" in meta:
                     value = meta["default"]
                 user[key] = value
             except:
