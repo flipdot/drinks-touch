@@ -204,7 +204,7 @@ def format_recharges(recharges):
         except:
             pass
         amount = event.amount
-        recharges_fmt += "% 20s %15s %s" % (date, mit, amount)
+        recharges_fmt += "% 20s %15s %s\n" % (date, mit, amount)
     return recharges_fmt
 
 
