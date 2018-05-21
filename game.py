@@ -131,7 +131,7 @@ def main(argv):
         for e in events:
             e.t = t
             e.dt = dt
-            if e.type == QUIT or (e.type == KEYDOWN and e.key == K_ESCAPE):
+            if e.type == pygame.QUIT or (e.type == pygame.KEYDOWN and e.key == pygame.K_ESCAPE):
                 done = True
                 break
             event_queue.put(e, True)
