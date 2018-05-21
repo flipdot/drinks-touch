@@ -80,7 +80,7 @@ def send_lowbalances():
         try:
             send_lowbalance(session, user)
         except Exception as e:
-            logging.error(e)
+            logging.exception("while sending lowbalances:")
             continue
 
 def send_lowbalance(session, user):
@@ -123,7 +123,7 @@ def send_summaries():
         try:
             send_summary(session, user)
         except Exception as e:
-            logging.error(e)
+            logging.exception("While sending summary for %s", user)
             continue
 
 frequencies = {
@@ -159,7 +159,7 @@ def send_summary_now(since_secs, since_text, session, user, subject=None, force=
         subject = "Getränkeübersicht für %s" % user['name']
     if num_drinks == 0 and num_recharges == 0 and not force:
         print "got no rows. skipping."
-        mail_msg = None
+        return
 
     print "got %d drinks and %d recharges. mailing." % (num_drinks, num_recharges)
     send_notification(email, SUBJECT_PREFIX + subject, mail_msg)

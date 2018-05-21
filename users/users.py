@@ -1,6 +1,7 @@
 import json
 import random
 import traceback
+import logging
 
 import ldap
 import ldap.modlist as modlist
@@ -69,6 +70,7 @@ class Users(object):
                 "drink_notification": "instant",
             # instant, daily, weekly, never
                 "last_drink_notification": 0,
+                "last_emailed": 0,
             },
             "load": json.loads,
             "save": json.dumps,
@@ -299,7 +301,7 @@ class Users(object):
             for key, change in changes.iteritems():
                 old, new = change
                 meta = Users.fields[key]
-                print("User %s %s: changing %s (%s) from '%s' to '%s'" % (
+                logging.debug("User %s %s: changing %s (%s) from '%s' to '%s'" % (
                     user["id"], user['name'], key, meta['ldap_field'], str(old),
                     str(new)))
                 try:
