@@ -70,10 +70,10 @@ def send_drink(user, drink, balance):
 
 def send_drink_with_summary(user, subject, addltext):
     try:
-        with get_session() as session:
-            send_summary_now(3600 * 24 * 14, "2 Wochen",
-                session, user, force=True, subject=subject,
-                addltext=addltext)
+        session = get_session()
+        send_summary_now(3600 * 24 * 14, "2 Wochen",
+            session, user, force=True, subject=subject,
+            addltext=addltext)
     except Exception:
         logging.exception("while sending drink noti with summary")
         pass
