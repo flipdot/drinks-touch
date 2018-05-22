@@ -39,7 +39,7 @@ class RechargeScreen(Screen):
         self.timeout.start()
 
         qr_file = make_sepa_qr(20, self.user['name'], self.user['id'],
-            pixel_width=7, border=0, color="black", bg="yellow")
+            pixel_width=7, border=4, color="yellow", bg="black")
         self.select_objects = [
             Button(
                 self.screen,
@@ -84,7 +84,7 @@ class RechargeScreen(Screen):
                 self.screen,
                 src=qr_file,
                 pos=(30, 470),
-                size=(300,330)
+                size=(350,380)
             )
         ]
         self.objects.extend(self.select_objects)
