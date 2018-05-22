@@ -301,9 +301,9 @@ class Users(object):
             for key, change in changes.iteritems():
                 old, new = change
                 meta = Users.fields[key]
-                logging.debug("User %s %s: changing %s (%s) from '%s' to '%s'" % (
-                    user["id"], user['name'], key, meta['ldap_field'], str(old),
-                    str(new)))
+                #logging.debug("User %s %s: changing %s (%s) from '%s' to '%s'" % (
+                #    user["id"], user['name'], key, meta['ldap_field'], str(old),
+                #    str(new)))
                 try:
                     Users.set_value(user, meta["ldap_field"], new)
                     user["_reference"][key] = new
