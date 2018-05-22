@@ -51,8 +51,8 @@ def handle_events():
         current_screen = screen_manager.get_active()
         try:
             current_screen.events(events)
-        except Exception as e:
-            print e
+        except Exception:
+            logging.exception("handling events:")
             pass
 
 def stats_loop():
