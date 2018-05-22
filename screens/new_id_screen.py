@@ -1,36 +1,22 @@
 # coding=utf-8
-import pygame
-import datetime
 import subprocess
-import time
-
-from elements.label import Label
-from elements.button import Button
-from elements.image import Image
-from elements.progress import Progress
-
-from users.users import Users
-
-from drinks.drinks import get_by_ean
-from drinks.drinks_manager import DrinksManager
-
-from .screen import Screen
-from .success import SuccessScreen
-
-from .profile import ProfileScreen
-
-from database.storage import get_session
-from sqlalchemy.sql import text
-from database.models.recharge_event import RechargeEvent
-
-from .screen_manager import ScreenManager
-
-from env import monospace
+from StringIO import StringIO
 from functools import partial
 
-from hubarcode.code128 import Code128Encoder
 from PIL import Image, ImageDraw, ImageFont
-from StringIO import StringIO
+from hubarcode.code128 import Code128Encoder
+
+from database.models.recharge_event import RechargeEvent
+from database.storage import get_session
+from elements.button import Button
+from elements.label import Label
+from elements.progress import Progress
+from env import monospace
+from users.users import Users
+from .profile import ProfileScreen
+from .screen import Screen
+from .screen_manager import ScreenManager
+
 
 class NewIDScreen(Screen):
     def __init__(self, screen, **kwargs):

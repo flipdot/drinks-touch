@@ -12,6 +12,7 @@ from elements.button import Button
 from elements.label import Label
 from elements.progress import Progress
 from env import monospace
+from screens.recharge_screen import RechargeScreen
 from users.users import Users
 from .id_card_screen import IDCardScreen
 from .screen import Screen
@@ -83,6 +84,7 @@ class ProfileScreen(Screen):
             pos=(200, 50),
             speed=1/30.0,
             on_elapsed=self.time_elapsed,
+            click=self.btn_home,
         )
         self.objects.append(self.timeout)
         self.timeout.start()
@@ -111,23 +113,32 @@ class ProfileScreen(Screen):
         self.btn_drinks = Button(
             self.screen,
             text='Buchungen',
-            pos=(30, 700),
+            pos=(20, 700),
             click=self.show_drinks
         )
-        self.elements_aufladungen = [self.btn_drinks, self.label_aufladungen]
-        self.elements_drinks = [self.label_verbrauch]
-        if drink:
-            self.elements_drinks.extend([self.zuordnen, self.drink_info])
-        else:
-            self.elements_drinks.append(self.btn_aufladungen)
-
-        self.objects.append(Button(
+        self.btn_abbrechen = Button(
             self.screen,
             text='Abbrechen',
             pos=(290, 700),
             size=30,
             click=self.btn_home,
-        ))
+        )
+        self.btn_aufladen = Button(
+            self.screen,
+            text='Jetzt Aufladen',
+            pos=(210, 700),
+            size=30,
+            click=self.recharge,
+        )
+
+        self.elements_aufladungen = [self.btn_drinks, self.label_aufladungen,
+            self.btn_aufladen]
+        self.elements_drinks = [self.label_verbrauch, self.btn_abbrechen]
+        if drink:
+            self.elements_drinks.extend([self.zuordnen, self.drink_info])
+        else:
+            self.elements_drinks.append(self.btn_aufladungen)
+
 
         balance = Users.get_balance(self.user['id'])
         self.objects.append(Label(
@@ -168,14 +179,17 @@ class ProfileScreen(Screen):
 
         self.objects.extend(self.elements_drinks)
 
+        self.render_aufladungen()
+
+    def render_aufladungen(self):
         aufladungen = Users.get_recharges(self.user['id'], limit=12)
         y = 210
         prev_date = None
         for i, aufladung in enumerate(aufladungen):
             x = 30
-            if y + 45*2 >= self.btn_drinks.pos[1]:
+            if y + 45 * 2 >= self.btn_drinks.pos[1]:
                 self.elements_aufladungen.append(Label(self.screen,
-                    text = "...",
+                    text="...",
                     pos=(x, y)
                 ))
                 break
@@ -187,11 +201,12 @@ class ProfileScreen(Screen):
                 user = Users.get_by_id(aufladung.helper_user_id)
                 if user:
                     helper = user['name']
+                text += " mit " + helper
             if date != prev_date:
                 prev_date = date
                 self.elements_aufladungen.append(Label(self.screen,
                     text=date, size=35,
-                    pos=(x, y+15)
+                    pos=(x, y + 15)
                 ))
                 y += 45
             count_width = 120
@@ -203,9 +218,9 @@ class ProfileScreen(Screen):
             ))
             self.elements_aufladungen.append(Label(
                 self.screen,
-                text = str(aufladung.amount),
+                text=str(aufladung.amount),
                 align_right=True,
-                pos=(480-margin_right, y-5),
+                pos=(480 - margin_right, y - 5),
                 max_width=count_width
             ))
             y += 35
@@ -213,21 +228,21 @@ class ProfileScreen(Screen):
     def save_drink(self, args, pos):
         session = get_session()
         drink = DrinksManager.get_instance().get_selected_drink()
-        if drink:
-            ev = ScanEvent(
-                drink['ean'],
-                self.user['id'],
-                datetime.datetime.now()
-            )
-            session.add(ev)
-            session.commit()
-            DrinksManager.get_instance().set_selected_drink(None)
-            Users.delete_if_nomoney(self.user)
-        else:
-            drink = {}
+        if not drink:
+            return
+        ev = ScanEvent(
+            drink['ean'],
+            self.user['id'],
+            datetime.datetime.now()
+        )
+        session.add(ev)
+        session.commit()
+        DrinksManager.get_instance().set_selected_drink(None)
+        Users.delete_if_nomoney(self.user)
 
         screen_manager = ScreenManager.get_instance()
-        screen_manager.set_active(SuccessScreen(self.screen, self.user, drink, session))
+        screen_manager.set_active(SuccessScreen(self.screen, self.user, drink,
+            "getrunken: %s" % drink['name'], session))
 
     def on_barcode(self, barcode):
         if not barcode:
@@ -270,6 +285,10 @@ class ProfileScreen(Screen):
 
     def time_elapsed(self):
         self.home()
+
+    def recharge(self, params, pos):
+        screen_manager = ScreenManager.get_instance()
+        screen_manager.set_active(RechargeScreen(self.screen, self.user))
 
     def show_aufladungen(self, param, pos):
         for d in self.elements_drinks:

@@ -1,43 +1,48 @@
 # coding=utf-8
-import logging
-import pygame
 import os
 
-from elements.label import Label
 from elements.button import Button
-from elements.image import Image
+from elements.label import Label
 from elements.progress import Progress
 from notifications.notification import send_drink
-
-from drinks.drinks_manager import DrinksManager
-
 from users.users import Users
-
 from .screen import Screen
 
-from .screen_manager import ScreenManager
 
 class SuccessScreen(Screen):
-    def __init__(self, screen, user, drink, session, **kwargs):
+    def __init__(self, screen, user, drink, text, session, **kwargs):
         super(SuccessScreen, self).__init__(screen)
 
         self.user = user
 
         self.objects.append(Label(
             self.screen,
-            text='Erfolgeich erfasst!',
+            text='Danke,',
             pos=(30, 120),
             size=70
         ))
         self.objects.append(Label(
             self.screen,
+            text=user['name'] + "!",
+            pos=(30, 170),
+            size=70
+        ))
+        self.objects.append(Label(
+            self.screen,
+            text=text,
+            size=45,
+            pos=(30, 250)
+        ))
+
+        self.objects.append(Label(
+            self.screen,
             text='Verbleibendes Guthaben: ',
-            pos=(30, 190)
+            pos=(30, 350)
         ))
         self.objects.append(Label(
             self.screen,
             text=str(Users.get_balance(self.user['id'], session=session))+' EUR',
-            pos=(50, 250)
+            pos=(50, 400)
         ))
 
         self.objects.append(Button(
@@ -65,7 +70,8 @@ class SuccessScreen(Screen):
             sound = "smb_bowserfalls.wav"
         os.system("ssh -o StrictHostKeyChecking=no pi@pixelfun aplay sounds/%s >/dev/null 2>&1 &" % sound)
 
-        send_drink(user, drink, balance)
+        if drink:
+            send_drink(user, drink, balance)
 
     def home(self):
         from .screen_manager import ScreenManager
