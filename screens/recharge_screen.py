@@ -83,8 +83,8 @@ class RechargeScreen(Screen):
             ), Image(
                 self.screen,
                 src=qr_file,
-                pos=(30, 470),
-                size=(350,380)
+                pos=(70, 470),
+                size=(300,330)
             )
         ]
         self.objects.extend(self.select_objects)
