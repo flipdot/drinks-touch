@@ -1,6 +1,7 @@
 import json
 import random
 import traceback
+import config
 
 import ldap
 import ldap.modlist as modlist
@@ -147,7 +148,7 @@ class Users(object):
         with  open('ldap_pw', 'r') as ldap_pw:
             pw = ldap_pw.read().replace('\n', '')
 
-        con = ldap.initialize('ldap://rail.fd')
+        con = ldap.initialize(config.LDAP_HOST)
         con.simple_bind_s(dn, pw)
         return con
 
