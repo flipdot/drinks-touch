@@ -10,6 +10,8 @@ Strichlisten-Ersatz mit Touchscreen, Usermanagement und Barcodescanner
 TODO
 
 ## Development
+
+    sudo apt-get install libsasl2-dev python-dev libldap2-dev libssl-dev
     pip2 install -r requirements.txt
     systemctl start postgresql
     ./game.py
