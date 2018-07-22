@@ -15,6 +15,7 @@ TODO
 
     sudo apt-get install libsasl2-dev python-dev libldap2-dev libssl-dev
     pip2 install -r requirements.txt
+    echo "password" > mail_pw
     systemctl start postgresql
     ./game.py
 
