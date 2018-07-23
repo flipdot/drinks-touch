@@ -9,3 +9,4 @@ influxdb
 keyboard
 email
 qrcode
+Pillow==5.2.0
