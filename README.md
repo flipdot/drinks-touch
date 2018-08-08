@@ -2,8 +2,8 @@
 Strichlisten-Ersatz mit Touchscreen, Usermanagement und Barcodescanner
 
 ## Dependencies
-- LDAP server, erreichbar unter `ldap://rail/` (siehe [users.py](users/users.py))
-- PostgreSQL @localhost (siehe [storage.py](database/storage.py))
+- LDAP server, erreichbar unter `ldap://rail/` (siehe [users.py](src/users/users.py))
+- PostgreSQL @localhost (siehe [storage.py](src/database/storage.py))
 - Touchdisplay mit mind. 480x800
 
 ## Datenbankschema
