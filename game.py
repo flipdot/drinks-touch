@@ -25,12 +25,12 @@ from screen import get_screen
 from screens.screen_manager import ScreenManager
 from drinks.drinks_manager import DrinksManager
 
-from webserver import run as run_webserver
+from webserver.webserver import run as run_webserver
 from stats.stats import run as stats_send
-from notifications import send_lowbalances, send_summaries
+from notifications.notification import send_lowbalances, send_summaries
 from barcode.barcode_reader import run as run_barcode_reader
 from barcode.barcode_worker import Worker as BarcodeWorker
-from users import sync_recharges
+from users.sync import sync_recharges
 
 import debug
 debug.listen()
