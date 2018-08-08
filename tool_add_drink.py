@@ -5,7 +5,7 @@ import argparse
 
 from database.storage import init_db
 from database.storage import get_session
-from database.models.drink import Drink
+from database.models import Drink
 
 init_db()
 
