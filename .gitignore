@@ -1,4 +1,5 @@
 *.pyc
 .ideaconfig.py
+config.py
 ldap_pw
 venv
