@@ -12,7 +12,7 @@ from flipdot import create_socket, send_frame, w, h
 from database.storage import get_session
 from database.storage import init_db
 
-font = ImageFont.truetype("stats/slkscr.ttf", 7)
+font = ImageFont.truetype("fonts/slkscr.ttf", 7)
 
 max_drinks = 6
 
