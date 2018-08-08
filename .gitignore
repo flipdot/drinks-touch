@@ -1,3 +1,4 @@
 *.pyc
-ldap_pw
 .ideaconfig.py
+ldap_pw
+venv
