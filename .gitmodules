@@ -1,0 +1,9 @@
+[submodule "submodules/door"]
+	path = submodules/door
+	url = https://github.com/flipdot/door
+[submodule "submodules/ldap-user"]
+	path = submodules/ldap-user
+	url = https://github.com/flipdot/ldap-user
+[submodule "submodules/money-utils"]
+	path = submodules/money-utils
+	url = https://github.com/flipdot/money-utils
