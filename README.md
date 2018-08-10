@@ -1,27 +1,30 @@
-# drinks-scanner-display
-Strichlisten-Ersatz mit Touchscreen, Usermanagement und Barcodescanner
+# Drinks Scanner Display
+Digital replacement for the drinks tally list featuring a touchscreen, user management and a barcode scanner.
 
 ## Dependencies
-- LDAP server, erreichbar unter `ldap://rail/` (siehe [users.py](users/users.py))
-- PostgreSQL @localhost (siehe [storage.py](database/storage.py))
-- Touchdisplay mit mind. 480x800
+- LDAP server, reachable via `ldap://rail/` (see [users.py](users/users.py))
+- PostgreSQL @localhost (see [storage.py](database/storage.py))
+- touch display with a minimum of 480x800 px.
 
-## Datenbankschema
+## Database Schema
 TODO
 
 ## Development
 
-`config.example.py` nach `config.py` kopieren und ggf. Inhalt anpassen.
+Copy `config.example.py` to `config.py`, customizing the contents.
 
-    sudo apt-get install libsasl2-dev python-dev libldap2-dev libssl-dev
-    pip2 install -r requirements.txt
-    echo "password" > mail_pw
-    systemctl start postgresql
-    ./game.py
+```bash
+sudo apt-get install libsasl2-dev python-dev libldap2-dev libssl-dev
+pip2 install -r requirements.txt
+echo "password" > mail_pw
+systemctl start postgresql
+./game.py
+```
 
 ## Deployment
-Fuer "embedded"-Systeme empfiehlt sich, die `runGame.sh` in einen crontab mit `@reboot` zu schreiben.
-Sie startet einen X server, setzt verschiedene Displayeinstellungen, und die Applikation selbst in einer Schleife.
+
+For embedded systems it is recommended to use `@reboot runGame.sh` inside a cron tab.
+This starts an X server, sets various display properties and puts the application itself in a loop.
 
 ## License
 TODO
