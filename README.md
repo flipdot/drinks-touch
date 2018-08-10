@@ -6,7 +6,7 @@ Digital replacement for the drinks tally list featuring a touchscreen, user mana
 - PostgreSQL @localhost (see [storage.py](database/storage.py))
 - touch display with a minimum of 480x800 px.
 
-## Database Scheme
+## Database Schema
 TODO
 
 ## Development
