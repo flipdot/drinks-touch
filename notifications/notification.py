@@ -1,12 +1,12 @@
 # -*- coding:utf-8 -*-
+import time
+from datetime import datetime, timedelta
+
 import logging
 import smtplib
 import threading
-import time
-from datetime import datetime, timedelta
 from email.mime.text import MIMEText
 from email.utils import formatdate, make_msgid
-
 from sqlalchemy import text
 
 from database.models.recharge_event import RechargeEvent
@@ -30,8 +30,9 @@ Aufladen: http://drinks-touch.fd/
 with open('mail_pw', 'r') as pw:
     mail_pw = pw.read().replace('\n', '')
 
+
 def send_notification(to_address, subject, message):
-    msg = MIMEText(message,_charset='utf-8')
+    msg = MIMEText(message, _charset='utf-8')
 
     msg['Subject'] = subject
     msg['From'] = MAIL_FROM
@@ -49,14 +50,15 @@ def send_notification(to_address, subject, message):
     s.sendmail(MAIL_FROM, [to_address], msg.as_string())
     s.quit()
 
+
 def send_drink(user, drink, balance):
     try:
         user_email = user['email']
 
         if user_email and user['meta']['drink_notification'] == 'instant':
-            mail_msg = ("Du hast das folgende Getränk getrunken {drink_name}" \
-                       "\n\nVerbleibendes Guthaben: EUR {balance}"+ \
-                       FOOTER).format(
+            mail_msg = ("Du hast das folgende Getränk getrunken {drink_name}" +
+                        "\n\nVerbleibendes Guthaben: EUR {balance}" +
+                        FOOTER).format(
                 drink_name=drink['name'], balance=balance)
             send_thread = threading.Thread(
                 target=send_drink_with_summary,
@@ -68,12 +70,13 @@ def send_drink(user, drink, balance):
         logging.exception("while sending drink noti")
         pass
 
+
 def send_drink_with_summary(user, subject, addltext):
     try:
         session = get_session()
         send_summary_now(3600 * 24 * 14, "2 Wochen",
-            session, user, force=True, subject=subject,
-            addltext=addltext)
+                         session, user, force=True, subject=subject,
+                         addltext=addltext)
     except Exception:
         logging.exception("while sending drink noti with summary")
         pass
@@ -86,9 +89,10 @@ def send_lowbalances():
     for user in Users.get_all():
         try:
             send_lowbalance(session, user)
-        except Exception as e:
+        except Exception:
             logging.exception("while sending lowbalances:")
             continue
+
 
 def send_lowbalance(session, user):
     now = time.time()
@@ -104,38 +108,42 @@ def send_lowbalance(session, user):
     last_emailed_days = last_emailed_hours / 24
     if last_emailed_hours > remind_mail_every_x_hours:
         logging.info("%s low balance last emailed %.2f days ( %.2f hours) ago. Mailing now.",
-            user['name'], last_emailed_days, last_emailed_hours)
+                     user['name'], last_emailed_days, last_emailed_hours)
 
-        text = ("Du hast seit mehr als {limit_days} Stunden ein "
+        low_credit_text = (
+            "Du hast seit mehr als {limit_days} Stunden ein "
             "Guthaben unter EUR {limit}!\n\n"
             "Dein Guthaben betraegt: EUR {balance:.2f}\n\n"
             "Zum aufladen geh (im Space-Netz) auf http://drinks-touch.fd/"
         ).format(
             limit_days=remind_mail_every_x_hours / 24,
             limit=minimum_balance, balance=balance)
-        send_summary_now(14*24*3600, "2 Wochen", session, user,
-            subject="Negatives Guthaben",
-            force=True, addltext=text)
+        send_summary_now(14 * 24 * 3600, "2 Wochen", session, user,
+                         subject="Negatives Guthaben",
+                         force=True, addltext=low_credit_text)
         user['meta']['last_emailed'] = time.time()
         Users.save(user)
+
 
 def send_summaries():
     session = get_session()
     if not is_pi():
-        #u = Users.get_all('cfstras')[0]
-        #send_summary(session, u, u['email'])
+        # u = Users.get_all('cfstras')[0]
+        # send_summary(session, u, u['email'])
         return
     for user in Users.get_all():
         try:
             send_summary(session, user)
-        except Exception as e:
+        except Exception:
             logging.exception("While sending summary for %s", user)
             continue
+
 
 frequencies = {
     "daily": 60 * 60 * 24,
     "weekly": 60 * 60 * 24 * 7,
 }
+
 
 def send_summary(session, user):
     now = time.time()
@@ -150,13 +158,13 @@ def send_summary(session, user):
     last_emailed_days = last_emailed_hours / 24
     if diff > freq_secs:
         logging.info("%s summary last emailed %.2f days (%.2f hours) ago. Mailing now.",
-            user['name'], last_emailed_days, last_emailed_hours)
+                     user['name'], last_emailed_days, last_emailed_hours)
         send_summary_now(freq_secs, last_emailed_str, session, user)
 
 
 def send_summary_now(since_secs, since_text, session, user, subject=None, force=False, addltext=""):
     mail_msg, num_recharges, num_drinks = format_mail(session, user,
-        since_secs, since_text, addltext)
+                                                      since_secs, since_text, addltext)
     email = user['email']
     if not email:
         logging.warn("User %s has no email. skipping.", user)
@@ -180,7 +188,7 @@ def format_mail(session, user, since_secs, since_text, addltext=""):
         mail_msg += str(addltext) + "\n==========\n"
 
     mail_msg += "Hier ist deine Getränkeübersicht seit {since}:\n" \
-               "Dein aktuelles Guthaben beträgt EUR {balance:.2f}.\n" \
+                "Dein aktuelles Guthaben beträgt EUR {balance:.2f}.\n" \
         .format(since=since_text, balance=Users.get_balance(user['id']))
     drinks_consumed = get_drinks_consumed(session, user, since_secs)
     recharges = get_recharges(session, user)
@@ -201,7 +209,7 @@ def format_recharges(recharges):
         mit = event.helper_user_id
         try:
             mit = Users.get_by_id(mit)['name']
-        except:
+        except Exception:
             pass
         amount = event.amount
         recharges_fmt += "% 20s %15s %s\n" % (date, mit, amount)
@@ -241,7 +249,7 @@ FROM scanevent se
 WHERE user_id = :userid
     AND se.timestamp > NOW() - INTERVAL '%d seconds'
 ORDER BY se.timestamp
-        """ % (since_secs))
+        """ % since_secs)
     drinks_consumed = session.connection().execute(sql,
-        userid=user['id']).fetchall()
+                                                   userid=user['id']).fetchall()
     return drinks_consumed

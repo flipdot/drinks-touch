@@ -1,16 +1,13 @@
 # coding=utf-8
-import pygame
 
-from elements.label import Label
 from elements.button import Button
 from elements.image import Image
+from elements.label import Label
 from elements.progress import Progress
-
-from .names import NamesScreen
-
 from users.users import Users
-
+from .names import NamesScreen
 from .screen import Screen
+
 
 class MainScreen(Screen):
     def __init__(self, screen, **kwargs):
@@ -23,14 +20,14 @@ class MainScreen(Screen):
 
         self.objects.append(Label(
             self.screen,
-            text = u'member auswählen',
+            text=u'member auswählen',
             pos=(65, 250),
             size=50
         ))
 
         all_users = Users.get_all()
         i = 0
-        for c in range(97, 97+26):
+        for c in range(97, 97 + 26):
             text = str(chr(c))
             users = filter(lambda u: u["name"].lower().startswith(text), all_users)
             if len(users) == 0:
@@ -57,7 +54,7 @@ class MainScreen(Screen):
         self.timeout = Progress(
             self.screen,
             pos=(380, 715),
-            speed=1/15.0,
+            speed=1 / 15.0,
             on_elapsed=self.time_elapsed,
         )
         self.objects.append(self.timeout)
@@ -70,7 +67,8 @@ class MainScreen(Screen):
             NamesScreen(self.screen, param)
         )
 
-    def home(self, param, pos):
+    @staticmethod
+    def home(param, pos):
         from .screen_manager import ScreenManager
         screen_manager = ScreenManager.get_instance().set_default()
 
@@ -88,9 +86,10 @@ class MainScreen(Screen):
                 ProfileScreen(self.screen, user)
             )
 
-    def __get_pos(self, i):
+    @staticmethod
+    def __get_pos(i):
 
         row = int(i / 6)
         col = int(i % 6)
 
-        return (col * 80 + 30, row * 80 + 350)
+        return col * 80 + 30, row * 80 + 350

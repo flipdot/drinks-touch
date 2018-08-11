@@ -1,11 +1,10 @@
 # coding=utf-8
 import io
+import qrcode
 import random
 import re
 import string
 import urllib
-
-import qrcode
 
 
 def make_sepa_qr(amount, name, uid, pixel_width=10, border=4, color="black", bg="white"):
@@ -31,7 +30,7 @@ def tx_url(uid, name, info, amount=0.01):
     info = re.sub(r'[^a-zA-Z0-9 ]', '_', info)
     recipient = "flipdot e.V."
     iban = "DE07520503530001147713"
-    #bic = "HELADEF1KAS"
+    # bic = "HELADEF1KAS"
     amount = "{:2,}".format(amount)
     reason = "drinks {uid} {name} {info}".format(uid=uid, name=name, info=info)
     return "bank://singlepaymentsepa?" + urllib.urlencode({

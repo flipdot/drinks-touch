@@ -1,26 +1,19 @@
 # coding=utf-8
-import pygame
 import datetime
-from env import is_pi
 
-from elements.label import Label
-from elements.button import Button
-from elements.image import Image
-from elements.progress import Progress
-
-from users.users import Users
-
+from database.models.scan_event import ScanEvent
+from database.storage import get_session
 from drinks.drinks import get_by_ean
 from drinks.drinks_manager import DrinksManager
-
-from screens.profile import ProfileScreen
+from elements.button import Button
+from elements.image import Image
+from elements.label import Label
+from elements.progress import Progress
 from screens.new_id_screen import NewIDScreen
-
-from database.storage import get_session
-from database.models.scan_event import ScanEvent
-
-from .screen import Screen
+from screens.profile import ProfileScreen
+from users.users import Users
 from .main import MainScreen
+from .screen import Screen
 from .screen_manager import ScreenManager
 
 
@@ -77,12 +70,12 @@ class WaitScanScreen(Screen):
 
         self.objects.append(Label(
             self.screen,
-            text = u"Scanne dein Getränk",
+            text=u"Scanne dein Getränk",
             pos=(60, 240),
         ))
         self.objects.append(Label(
             self.screen,
-            text = u"oder deine ID-Card :)",
+            text=u"oder deine ID-Card :)",
             pos=(70, 280),
         ))
 
@@ -99,7 +92,7 @@ class WaitScanScreen(Screen):
             self.screen,
             pos=(400, 500),
             size=100,
-            speed=1/10.0,
+            speed=1 / 10.0,
             on_elapsed=self.time_elapsed,
         )
         self.objects.append(self.timeout)

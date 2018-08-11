@@ -1,7 +1,9 @@
 import datetime
 
 from sqlalchemy import Column, Integer, String, DateTime, Boolean
+
 from database.storage import Base
+
 
 class ScanEvent(Base):
     __tablename__ = 'scanevent'

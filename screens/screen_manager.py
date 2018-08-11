@@ -6,6 +6,7 @@ class ScreenManager(object):
         self.current_screen = None
         self.reset_history()
         self.set_default()
+        self.screen_history = None
 
     def set_default(self):
         from screens.wait_scan import WaitScanScreen
@@ -20,13 +21,12 @@ class ScreenManager(object):
         return self.current_screen
 
     def go_back(self):
-        self.screen_history.pop() # remove yourself
+        self.screen_history.pop()  # remove yourself
         last = self.screen_history.pop()
         return self.set_active(last)
 
     def reset_history(self):
-        self.screen_history = [] # reset history
-
+        self.screen_history = []  # reset history
 
     @staticmethod
     def get_instance():

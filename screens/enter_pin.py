@@ -1,16 +1,12 @@
 # coding=utf-8
-import pygame
 
-from elements.label import Label
 from elements.button import Button
+from elements.label import Label
 from elements.progress import Progress
-
-from users.users import Users
-
-from .screen import Screen
-from screens.profile import ProfileScreen
-
 from env import monospace
+from screens.profile import ProfileScreen
+from .screen import Screen
+
 
 class EnterPinScreen(Screen):
     def __init__(self, screen, user, **kwargs):
@@ -19,17 +15,17 @@ class EnterPinScreen(Screen):
 
         self.objects.append(Button(
             self.screen,
-            text = "BACK",
-            pos=(30,30),
+            text="BACK",
+            pos=(30, 30),
             click=self.back,
-            font = monospace,
+            font=monospace,
             size=30
         ))
 
         self.timeout = Progress(
             self.screen,
             pos=(200, 50),
-            speed=1/15.0,
+            speed=1 / 15.0,
             on_elapsed=self.time_elapsed,
         )
         self.objects.append(self.timeout)
@@ -37,31 +33,31 @@ class EnterPinScreen(Screen):
 
         self.objects.append(Button(
             self.screen,
-            text = "UNLOCK!",
+            text="UNLOCK!",
             pos=(100, 680),
             click=self.btn_ok,
-            font = monospace,
+            font=monospace,
             size=70
         ))
 
         self.objects.append(Label(
             self.screen,
-            text ='/s Barcode oder /e PIN:',
+            text='/s Barcode oder /e PIN:',
             pos=(40, 110),
         ))
 
         self.input = Label(
             self.screen,
-            text = '_',
+            text='_',
             pos=(100, 180),
         )
         self.objects.append(self.input)
 
         keys = [
-            [ '1', '2', '3' ],
-            [ '4', '5', '6' ],
-            [ '7', '8', '9' ],
-            [ '#', '0', '*' ]
+            ['1', '2', '3'],
+            ['4', '5', '6'],
+            ['7', '8', '9'],
+            ['#', '0', '*']
         ]
 
         x = 0
@@ -75,24 +71,24 @@ class EnterPinScreen(Screen):
 
         self.objects.append(Button(
             self.screen,
-            text = 'DEL',
+            text='DEL',
             pos=(200, 580),
-            font = monospace,
+            font=monospace,
             click=self.del_char,
             size=50
         ))
 
     def render_digit_btn(self, label, x, y):
         width = 480 / 6
-        cord_x = width*1.8 + x  * width
-        cord_y = 250 + y  * width
+        cord_x = width * 1.8 + x * width
+        cord_y = 250 + y * width
         self.objects.append(Button(
             self.screen,
-            text = label,
+            text=label,
             pos=(cord_x, cord_y),
             click=self.add_char,
             click_param=label,
-            font = monospace,
+            font=monospace,
             size=50,
             force_width=width,
             force_height=width,
@@ -103,8 +99,8 @@ class EnterPinScreen(Screen):
         self.input.text += '_'
 
     def del_char(self, param, pos):
-        self.input.text = self.input.text[:len(self.input.text)-2]
-        self.input.text += '_'        
+        self.input.text = self.input.text[:len(self.input.text) - 2]
+        self.input.text += '_'
 
     def btn_ok(self, param, pos):
         # TODO check the pin using
@@ -116,7 +112,7 @@ class EnterPinScreen(Screen):
         )
 
     def get_pin(self):
-        return self.input.text[:len(self.input.text)-1]
+        return self.input.text[:len(self.input.text) - 1]
 
     def back(self, param, pos):
         from .screen_manager import ScreenManager
@@ -134,9 +130,10 @@ class EnterPinScreen(Screen):
         for c in barcode:
             self.add_char(c, None)
 
-    def home(self):
+    @staticmethod
+    def home():
         from .screen_manager import ScreenManager
-        screen_manager = ScreenManager.get_instance().set_default()
+        ScreenManager.get_instance().set_default()
 
     def time_elapsed(self):
         self.home()

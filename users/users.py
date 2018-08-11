@@ -1,12 +1,13 @@
-import json
-import random
-import traceback
-import config
+import sys
 
+import json
 import ldap
 import ldap.modlist as modlist
+import random
+import traceback
 from sqlalchemy.sql import text
 
+import config
 from database.models.recharge_event import RechargeEvent
 from database.storage import get_session
 from env import is_pi
@@ -68,7 +69,7 @@ class Users(object):
             "index": 0,
             "default": {
                 "drink_notification": "instant",
-            # instant, daily, weekly, never
+                # instant, daily, weekly, never
                 "last_drink_notification": 0,
                 "last_emailed": 0,
             },
@@ -85,7 +86,10 @@ class Users(object):
     }
 
     @staticmethod
-    def get_all(prefix='', filters=[], include_temp=False):
+    def get_all(prefix='', filters=None, include_temp=False):
+        if filters is None:
+            filters = []
+
         try:
             users = []
             ldap_users = Users.read_all_users_ldap(filters, include_temp)
@@ -94,7 +98,7 @@ class Users(object):
                 name = ldap_user['uid'][0]
 
                 if prefix != '' and name.lower().startswith(
-                        prefix.lower()) == False:
+                        prefix.lower()) is False:
                     continue
 
                 user = Users.user_from_ldap(ldap_user)
@@ -121,11 +125,11 @@ class Users(object):
                 if "index" in meta:
                     value = value[meta["index"]]
                 if "load" in meta:
-                    value = meta['load'](value)
+                    value = meta['load'][value]
                 if value is None and "default" in meta:
                     value = meta["default"]
                 user[key] = value
-            except:
+            except Exception:
                 if 'default' in meta:
                     user[key] = meta['default']
                 else:
@@ -134,7 +138,7 @@ class Users(object):
         for key, meta in Users.fields.iteritems():
             value = user[key]
             if "save" in meta:
-                value = meta["save"](value)
+                value = meta["save"][value]
             user["_reference"][key] = value
         if user['id_card']:
             user['id_card'] = user['id_card'].upper()
@@ -144,8 +148,8 @@ class Users(object):
     @staticmethod
     def get_ldap_instance():
         dn = "cn=admin,dc=flipdot,dc=org"
-        pw = ''
-        with  open('ldap_pw', 'r') as ldap_pw:
+
+        with open('ldap_pw', 'r') as ldap_pw:
             pw = ldap_pw.read().replace('\n', '')
 
         con = ldap.initialize(config.LDAP_HOST)
@@ -153,7 +157,10 @@ class Users(object):
         return con
 
     @staticmethod
-    def read_all_users_ldap(filters=[], include_temp=False):
+    def read_all_users_ldap(filters=None, include_temp=False):
+        if filters is None:
+            filters = []
+
         base_dn = 'ou=members,dc=flipdot,dc=org'
         temp_dn = 'ou=temp_members,dc=flipdot,dc=org'
         attrs = [k["ldap_field"] for k in Users.fields.values()]
@@ -171,9 +178,9 @@ class Users(object):
 
         users = []
         for path, user in ldap_res:
-            if not 'uidNumber' in user:
+            if 'uidNumber' not in user:
                 user['uidNumber'] = user['uid']
-            if not 'carLicense' in user:
+            if 'carLicense' not in user:
                 user['carLicense'] = [None]
             user['path'] = path
             users.append(user)
@@ -212,7 +219,7 @@ class Users(object):
 
     @staticmethod
     def get_recharges(user_id, session=get_session(), limit=None):
-        # type: (str, session) -> RechargeEvent
+        # type: # (str, session) -> RechargeEvent
         q = session.query(RechargeEvent).filter(
             RechargeEvent.user_id == user_id).order_by(
             RechargeEvent.timestamp.desc())
@@ -231,39 +238,39 @@ class Users(object):
         con.modify_s(user['path'], add_pass)
 
     @staticmethod
-    def get_by_id(id):
-        all = Users.get_all(filters=['uidNumber=' + str(id)], include_temp=True)
-        by_id = {u['id']: u for u in all if u['id']}
-        if id in by_id:
-            return by_id[id]
+    def get_by_id(user_id):
+        all_users = Users.get_all(filters=['uidNumber=' + str(user_id)], include_temp=True)
+        by_id = {u['id']: u for u in all_users if u['id']}
+        if user_id in by_id:
+            return by_id[user_id]
         return None
 
     @staticmethod
     def get_by_id_card(ean):
-        all = Users.get_all(filters=['carLicense=' + ean], include_temp=True)
-        by_card = dict([(u['id_card'], u) for u in all if u['id_card']])
+        all_users = Users.get_all(filters=['carLicense=' + ean], include_temp=True)
+        by_card = dict([(u['id_card'], u) for u in all_users if u['id_card']])
         if ean in by_card:
             return by_card[ean]
         return None
 
     @staticmethod
-    def id_to_ean(id):
-        return "FDT" + str(id)
+    def id_to_ean(ean_id):
+        return "FDT" + str(ean_id)
 
     @staticmethod
     def create_temp_user():
-        id = 30000 + random.randint(1, 2000)
-        while Users.get_by_id_card(Users.id_to_ean(id)):
-            id += 1
+        random_id = 30000 + random.randint(1, 2000)
+        while Users.get_by_id_card(Users.id_to_ean(random_id)):
+            random_id += 1
 
-        barcode = Users.id_to_ean(id)
-        dn = "cn=" + str(id) + ",ou=temp_members,dc=flipdot,dc=org"
+        barcode = Users.id_to_ean(random_id)
+        dn = "cn=" + str(random_id) + ",ou=temp_members,dc=flipdot,dc=org"
         mods = {
             'objectClass': ["inetOrgPerson", "organizationalPerson", "person"],
             'carLicense': barcode,
-            'cn': str(id),
-            'uid': "geld-" + str(id),
-            'sn': str(id),
+            'cn': str(random_id),
+            'uid': "geld-" + str(random_id),
+            'sn': str(random_id),
         }
         con = Users.get_ldap_instance()
         con.add_s(dn, modlist.addModlist(mods))
@@ -285,7 +292,8 @@ class Users(object):
             con.delete_s(user['path'])
         except Exception as e:
             print "Error: " + str(e)
-            traceback.print_tb(limit=4)
+            exc_traceback = sys.exc_info()
+            traceback.print_tb(exc_traceback, limit=4)
 
     @staticmethod
     def save(user):
@@ -293,7 +301,7 @@ class Users(object):
         for key, meta in Users.fields.iteritems():
             new_value = user[key]
             if "save" in meta:
-                new_value = meta["save"](new_value)
+                new_value = meta["save"][new_value]
             if new_value != user["_reference"][key]:
                 changes[key] = (user["_reference"][key], new_value)
 
@@ -301,7 +309,7 @@ class Users(object):
             for key, change in changes.iteritems():
                 old, new = change
                 meta = Users.fields[key]
-                #logging.debug("User %s %s: changing %s (%s) from '%s' to '%s'" % (
+                # logging.debug("User %s %s: changing %s (%s) from '%s' to '%s'" % (
                 #    user["id"], user['name'], key, meta['ldap_field'], str(old),
                 #    str(new)))
                 try:

@@ -1,4 +1,5 @@
 # coding=utf-8
+
 from functools import partial
 
 from database.models.recharge_event import RechargeEvent
@@ -15,16 +16,17 @@ from .success import SuccessScreen
 
 
 class RechargeScreen(Screen):
-    def __init__(self, screen, user, **kwargs):
+    def __init__(self, screen, user):
         super(RechargeScreen, self).__init__(screen)
 
         self.user = user
+        self.payment_amount = 0
 
         self.objects.append(Button(
             self.screen,
-            text = "BACK",
-            pos=(30,30),
-            font = monospace,
+            text="BACK",
+            pos=(30, 30),
+            font=monospace,
             click=self.back,
             size=30
         ))
@@ -32,14 +34,14 @@ class RechargeScreen(Screen):
         self.timeout = Progress(
             self.screen,
             pos=(200, 50),
-            speed=1/30.0,
+            speed=1 / 30.0,
             on_elapsed=self.time_elapsed,
         )
         self.objects.append(self.timeout)
         self.timeout.start()
 
         qr_file = make_sepa_qr(20, self.user['name'], self.user['id'],
-            pixel_width=7, border=4, color="yellow", bg="black")
+                               pixel_width=7, border=4, color="yellow", bg="black")
         self.select_objects = [
             Button(
                 self.screen,
@@ -67,12 +69,12 @@ class RechargeScreen(Screen):
                 click=partial(self.verify_payment, 50)
             ), Label(
                 self.screen,
-                text = "Wirf Geld in die Kasse,",
+                text="Wirf Geld in die Kasse,",
                 pos=(30, 100),
                 size=50
             ), Label(
                 self.screen,
-                text = u"und drück den passenden",
+                text=u"und drück den passenden",
                 pos=(30, 150),
                 size=50
             ), Label(
@@ -84,7 +86,7 @@ class RechargeScreen(Screen):
                 self.screen,
                 src=qr_file,
                 pos=(70, 470),
-                size=(300,330)
+                size=(300, 330)
             )
         ]
         self.objects.extend(self.select_objects)
@@ -111,13 +113,13 @@ class RechargeScreen(Screen):
         ]
         self.verify_amount = Label(
             self.screen,
-            text = "EUR X",
+            text="EUR X",
             pos=(30, 200),
             size=60
         )
         self.verify_objects.append(self.verify_amount)
 
-    def back(self, param, pos):
+    def back(self):
         if self.verify_amount in self.objects:
             for o in self.verify_objects:
                 if o in self.objects:
@@ -127,7 +129,8 @@ class RechargeScreen(Screen):
             screen_manager = ScreenManager.get_instance()
             screen_manager.go_back()
 
-    def home(self):
+    @staticmethod
+    def home():
         from .screen_manager import ScreenManager
         screen_manager = ScreenManager.get_instance()
         screen_manager.set_default()
@@ -135,10 +138,10 @@ class RechargeScreen(Screen):
     def time_elapsed(self):
         self.home()
 
-    def btn_home(self, param, pos):
+    def btn_home(self):
         self.home()
 
-    def verify_payment(self, amount, param, pos):
+    def verify_payment(self, amount):
         amount = int(amount)
         self.payment_amount = amount
         for o in self.select_objects:
@@ -147,7 +150,7 @@ class RechargeScreen(Screen):
         self.objects.extend(self.verify_objects)
         self.verify_amount.text = "EUR " + str(amount)
 
-    def save_payment(self, param, pos):
+    def save_payment(self):
         session = get_session()
         ev = RechargeEvent(
             self.user['id'],
@@ -160,5 +163,5 @@ class RechargeScreen(Screen):
         screen_manager = ScreenManager.get_instance()
         screen_manager.set_active(
             SuccessScreen(self.screen, self.user, None,
-                "EUR %s aufgeladen" % self.payment_amount, session))
+                          "EUR %s aufgeladen" % self.payment_amount, session))
         self.payment_amount = None

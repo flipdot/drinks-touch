@@ -1,6 +1,7 @@
 #!/usr/bin/env python2
 # coding=utf-8
 import sys
+
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
@@ -16,7 +17,7 @@ import time
 import pygame
 
 logging.basicConfig(level=logging.DEBUG,
-    format="[%(asctime)s][%(levelname)s][%(filename)s:%(lineno)d] %(message)s")
+                    format="[%(asctime)s][%(levelname)s][%(filename)s:%(lineno)d] %(message)s")
 logging.Formatter.converter = time.gmtime
 
 from database.storage import init_db
@@ -33,10 +34,12 @@ from barcode.barcode_worker import Worker as BarcodeWorker
 from users.sync import sync_recharges
 
 import debug
+
 debug.listen()
 
 event_queue = Queue.Queue()
 screen_manager = None
+
 
 #### Events ####
 def handle_events():
@@ -55,17 +58,19 @@ def handle_events():
             logging.exception("handling events:")
             pass
 
+
 def stats_loop():
     i = 0
     while True:
         stats_send()
         send_lowbalances()
         sync_recharges()
-        if i % 60*12 == 0:
+        if i % 60 * 12 == 0:
             send_summaries()
         time.sleep(60)
         i += 1
-        i %= 60*12
+        i %= 60 * 12
+
 
 ##### Rendering #####
 def main(argv):
@@ -142,6 +147,7 @@ def main(argv):
     web_thread.terminate()
     web_thread.wait()
     return 0
+
 
 if __name__ == "__main__":
     sys.exit(main(sys.argv))
