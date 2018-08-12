@@ -19,6 +19,7 @@ from env import is_pi
 from flask import Flask, make_response
 from flask import request
 from flask import render_template
+from flask import send_file
 from flask_compress import Compress
 
 from users.users import Users
@@ -31,6 +32,10 @@ app = Flask(__name__)
 Compress(app)
 
 uid_pattern = re.compile("^\d+$")
+
+@app.route('/favicon.png')
+def favicon():
+    return send_file('../img/favicon.png', mimetype='image/png')
 
 @app.route('/')
 @app.route('/recharge')
