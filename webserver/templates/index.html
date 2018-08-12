@@ -7,11 +7,10 @@
         <div class="col-md-6">
             {% include "recharge.html" %}
         </div>
-        <div class="col-md-6">
-            {# include "stats.html" #}
-            <div class="scancode">
-                <img id="qrcode"/>
-            </div>
+        <div class="col-md-6 d-flex justify-content-center align-items-center">
+            <img class="d-none" id="qrcode"/>
+            <span class="d-none" id="qrcode_hint">Aus den angegebenen Daten kann kein QR-Code erzeugt werden.</span>
         </div>
     </div>
+    {# include "stats.html" #}
 {% endblock %}

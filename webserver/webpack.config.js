@@ -1,4 +1,4 @@
-var path = require('path');
+const path = require('path');
 const webpack = require('webpack'); //to access built-in plugins
 
 module.exports = {
@@ -11,15 +11,15 @@ module.exports = {
         path: path.resolve(__dirname, 'static/')
     },
     module: {
-        loaders: [
-            {test: /\.css$/, loaders: ["style-loader", "css-loader"] },
+        rules: [
+            { test: /\.css$/, loaders: ['style-loader', 'postcss-loader'] },
             { test: /\.(woff2?|svg)$/, loader: 'url-loader?limit=10000&emitFile=false' },
             { test: /\.(ttf|eot)$/, loader: 'file-loader?emitFile=false' },
             { test: /bootstrap-sass\/assets\/javascripts\//, loader: 'imports-loader?jQuery=jquery' },
-            {test: /\.(js|jsx)$/, use: 'babel-loader'},
+            { test: /\.(js|jsx)$/, use: 'babel-loader' },
         ],
     },
-    plugins: [
-        //new webpack.optimize.UglifyJsPlugin(),
-    ],
+    optimization: {
+        minimize: true
+    }
 };

@@ -11,7 +11,7 @@
   <div class="form-group">
     <label for="user_user" class="col-sm-3 control-label">Aufladen für:</label>
     <div class="col-sm-9">
-      <select class="form-control" name="user_user" id="user_user">
+      <select class="form-control custom-select" name="user_user" id="user_user">
         {% for u in users %}
         <option value="{{ u.id }}">{{ u.name }}</option>
         {% endfor %}
@@ -21,7 +21,7 @@
   <div class="form-group">
     <label for="helper_user" class="col-sm-3 control-label">4-Augen-Person:</label>
     <div class="col-sm-9">
-      <select class="form-control" name="helper_user" id="helper_user">
+      <select class="form-control custom-select" name="helper_user" id="helper_user">
         {% for u in users %}
         <option value="{{ u.id }}">{{ u.name }}</option>
         {% endfor %}
@@ -32,7 +32,9 @@
     <label for="amount" class="col-sm-3 control-label">Betrag:</label>
     <div class="col-sm-9">
       <div class="input-group">
-        <div class="input-group-addon">€</div>
+        <div class="input-group-prepend">
+          <span class="input-group-text">€</span>
+        </div>
         <input type="number" class="form-control" name="amount" step="0.01" id="amount" placeholder="wieviel?">
       </div>
     </div>
