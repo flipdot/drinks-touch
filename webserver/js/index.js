@@ -2,12 +2,14 @@ let user_select;
 let value_input;
 let qrcode;
 let qrcode_hint;
+let uid_text;
 
 document.addEventListener('DOMContentLoaded', function() {
     user_select = document.querySelector('#user_user');
     value_input = document.querySelector('#amount');
     qrcode = document.querySelector('#qrcode');
     qrcode_hint = document.querySelector('#qrcode_hint');
+    uid_text = document.querySelector('#uid');
 
     user_select.addEventListener('change', update_qr);
     value_input.addEventListener('change', update_qr);
@@ -22,14 +24,19 @@ let urlNext = '';
 let lastUpdate = null;
 
 function update_qr() {
+    const uid = user_select.value;
+    const name = user_select.options[user_select.selectedIndex].text;
+    const amount = value_input.value;
+
+    if (uid) {
+        uid_text.textContent = uid;
+    } else {
+        uid_text.textContent = "??";
+    }
     if (lastUpdate) {
         clearTimeout(lastUpdate);
         lastUpdate = null;
     }
-
-    const name = user_select.options[user_select.selectedIndex].text;
-    const uid = user_select.value;
-    const amount = value_input.value;
     const url = '/tx.png?uid=' + encodeURIComponent(uid) +
         '&name=' + encodeURIComponent(name) +
         '&amount=' + encodeURIComponent(amount);

@@ -8,6 +8,9 @@ import urllib
 import qrcode
 from decimal import Decimal
 
+recipient = "flipdot e.V."
+iban = "DE07520503530001147713"
+#bic = "HELADEF1KAS"
 
 def make_sepa_qr(amount, name, uid, pixel_width=10, border=4, color="black", bg="white"):
     info = "".join(random.choice(string.ascii_lowercase) for x in range(12))
@@ -30,10 +33,9 @@ def make_sepa_qr(amount, name, uid, pixel_width=10, border=4, color="black", bg=
 def tx_url(uid, name, info, amount):
     name = re.sub(r'[^a-zA-Z0-9 ]', '_', name)
     info = re.sub(r'[^a-zA-Z0-9 ]', '_', info)
-    recipient = "flipdot e.V."
-    iban = "DE07520503530001147713"
-    #bic = "HELADEF1KAS"
-    amount = str(round(Decimal(amount), 2)).replace(",", "").replace(".", ",")
+
+    # make int
+    amount = "{:.0f}".format(Decimal(amount))
     reason = "drinks {uid} {name} {info}".format(uid=uid, name=name, info=info)
     return "bank://singlepaymentsepa?" + urllib.urlencode({
         'name': recipient,

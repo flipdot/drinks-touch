@@ -23,8 +23,14 @@ remind_mail_every_x_hours = 24 * 7
 
 FOOTER = """\n
 Besuchen Sie uns bald wieder!
+
 Einstellungen: http://ldap.fd/
 Aufladen: http://drinks-touch.fd/
+Oder per SEPA:
+  Kontoinhaber: flipdot e.V.
+  IBAN: DE07 5205 0353 0001 1477 13
+  Verwendungszweck: "drinks {uid} hinweistext"
+  Der Hinweistext ist frei wählbar.
 """
 
 with open('mail_pw', 'r') as pw:
@@ -57,7 +63,7 @@ def send_drink(user, drink, balance):
             mail_msg = ("Du hast das folgende Getränk getrunken {drink_name}" \
                        "\n\nVerbleibendes Guthaben: EUR {balance}"+ \
                        FOOTER).format(
-                drink_name=drink['name'], balance=balance)
+                drink_name=drink['name'], balance=balance, uid=user['id'])
             send_thread = threading.Thread(
                 target=send_drink_with_summary,
                 args=(user, "Getränk getrunken", mail_msg)
@@ -134,7 +140,9 @@ def send_summaries():
 
 frequencies = {
     "daily": 60 * 60 * 24,
+    "instant and daily": 60 * 60 * 24,
     "weekly": 60 * 60 * 24 * 7,
+    "instant and weekly": 60 * 60 * 24 * 7,
 }
 
 def send_summary(session, user):
@@ -189,7 +197,7 @@ def format_mail(session, user, since_secs, since_text, addltext=""):
         mail_msg += format_drinks(drinks_consumed, since_text)
     if recharges:
         mail_msg += format_recharges(recharges)
-    mail_msg += FOOTER
+    mail_msg += FOOTER.format(uid=user['id'])
     return mail_msg, len(recharges), len(drinks_consumed)
 
 
