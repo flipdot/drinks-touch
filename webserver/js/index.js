@@ -1,3 +1,7 @@
+import $ from 'jquery';
+import 'select2';
+import 'select2/dist/css/select2.css';
+
 let user_select;
 let value_input;
 let qrcode;
@@ -5,6 +9,8 @@ let qrcode_hint;
 let uid_text;
 
 document.addEventListener('DOMContentLoaded', function() {
+    $('select').select2();
+
     user_select = document.querySelector('#user_user');
     value_input = document.querySelector('#amount');
     qrcode = document.querySelector('#qrcode');
