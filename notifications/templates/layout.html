@@ -1,0 +1,86 @@
+<div id="body">
+    {% block body %}
+        <h1>Body block did not load!</h1>
+    {% endblock %}
+</div>
+<style>
+    a {
+        text-decoration: none;
+    }
+
+    a:visited {
+        color: rgb(0, 0, 238);
+    }
+
+    button {
+        align-items: center;
+        background-color: #ffc107;
+        border: 1px solid transparent;
+        border-radius: .25rem;
+        color: #212529;
+        cursor: pointer;
+        display: inline-block;
+        font-size: 1rem;
+        line-height: 1.5;
+        margin: 0 10px;
+        padding: .375rem .75rem;
+    }
+
+    button span {
+        align-items: center;
+        display: flex;
+    }
+
+    h1 {
+        text-align: center;
+    }
+
+    hr {
+        margin: 20px;
+        opacity: 0;
+    }
+
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    table th {
+        border-bottom: 2px solid #dee2e6;
+    }
+
+    table td, table th {
+        padding: .5rem;
+        border-top: 1px solid #dee2e6;
+        text-align: center;
+    }
+
+    #body {
+        margin: 0 auto;
+        width: 85vw;
+    }
+
+    #buttons {
+        display: flex;
+        justify-content: center;
+    }
+
+    #heading {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .logo {
+        height: 40px;
+        margin-top: 20px;
+    }
+
+    .open-in-new {
+        filter: contrast(70%);
+        margin-left: 4px;
+    }
+
+    .text-centered {
+        text-align: center;
+    }
+</style>
