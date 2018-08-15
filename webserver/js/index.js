@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
     uid_text = document.querySelector('#uid');
 
     $('select').on('select2:select', update_qr);
-    value_input.addEventListener('onchange', update_qr);
+    value_input.addEventListener('change', update_qr);
     value_input.addEventListener('keyup', update_qr);
 
     update_qr();
