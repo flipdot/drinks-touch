@@ -105,8 +105,8 @@ class Users(object):
             return users
         except Exception as e:
             if not is_pi():
-                print("ldap fail: ", e)
-                print(traceback.format_exc())
+                # print("ldap fail: ", e)
+                # print(traceback.format_exc())
                 print("falling back to test data")
                 return filter(
                     lambda u: prefix == '' or u['name'].lower().startswith(
@@ -185,6 +185,9 @@ class Users(object):
 
     @staticmethod
     def get_balance(user_id, session=get_session()):
+        if not is_pi():
+            return -50
+
         sql = text("""
                 SELECT user_id, count(*) AS amount
                 FROM scanevent
@@ -291,6 +294,9 @@ class Users(object):
 
     @staticmethod
     def save(user):
+        if not is_pi():
+            return
+
         changes = {}
         for key, meta in Users.fields.iteritems():
             new_value = user[key]

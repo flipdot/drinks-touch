@@ -238,6 +238,22 @@ def get_recharges(session, user):
 
 
 def get_drinks_consumed(session, user, since_secs):
+    if not is_pi():
+        return [
+            {
+                "barcode": "123",
+                "timestamp": datetime.now(),
+                "name": "Testgetraenk",
+                "size": "1"
+            },
+            {
+                "barcode": "321",
+                "timestamp": datetime.now(),
+                "name": "Getraenketest",
+                "size": "2"
+            }
+        ]
+
     sql = text("""SELECT
     se.barcode,
     se.timestamp,
@@ -247,8 +263,30 @@ FROM scanevent se
     LEFT OUTER JOIN drink d ON d.ean = se.barcode
 WHERE user_id = :userid
     AND se.timestamp > NOW() - INTERVAL '%d seconds'
-ORDER BY se.timestamp
-        """ % (since_secs))
-    drinks_consumed = session.connection().execute(sql,
-        userid=user['id']).fetchall()
+ORDER BY se.timestamp""" % since_secs)
+    drinks_consumed = session.connection().execute(sql, userid=user['id']).fetchall()
     return drinks_consumed
+
+
+def get_recharges(session, user, since_secs):
+    if not is_pi():
+        return [
+            {
+                "user_id": "888",
+                "helper_user_id": "777",
+                "amount": "10",
+                "timestamp": datetime.now()
+            },
+            {
+                "user_id": "888",
+                "helper_user_id": "777",
+                "amount": "1",
+                "timestamp": datetime.now()
+            }
+        ]
+
+    return session.query(RechargeEvent) \
+        .filter(RechargeEvent.user_id == user['id']) \
+        .filter(RechargeEvent.timestamp >= datetime.utcnow() - timedelta(seconds=since_secs)) \
+        .order_by(RechargeEvent.timestamp) \
+        .all()
