@@ -6,16 +6,16 @@ import time
 from datetime import datetime, timedelta
 from email.mime.text import MIMEText
 from email.utils import formatdate, make_msgid
-
 from sqlalchemy import text
 
+import config
 from database.models.recharge_event import RechargeEvent
 from database.storage import get_session
 from env import is_pi
 from users.users import Users
 
 SUBJECT_PREFIX = "[fd-noti] "
-MAIL_FROM = "flipdot-noti@vega.uberspace.de"
+MINIMUM_BALANCE = -5
 
 # lower and we send mails every x days!
 minimum_balance = -5
@@ -33,14 +33,13 @@ Oder per SEPA:
   Der Hinweistext ist frei wählbar.
 """
 
-with open('mail_pw', 'r') as pw:
-    mail_pw = pw.read().replace('\n', '')
 
 def send_notification(to_address, subject, message):
     msg = MIMEText(message,_charset='utf-8')
 
     msg['Subject'] = subject
     msg['From'] = MAIL_FROM
+    msg['From'] = config.MAIL_FROM
     msg['To'] = to_address
     msg['Date'] = formatdate(time.time(), localtime=True)
     msg['Message-id'] = make_msgid()
@@ -48,11 +47,11 @@ def send_notification(to_address, subject, message):
     logging.info("Mailing %s: '%s'", to_address, subject)
     logging.debug("Content: ---\n%s\n---", message)
     s = smtplib.SMTP()
-    s.connect(host='vega.uberspace.de', port=587)
+    s.connect(host=config.MAIL_HOST, port=config.MAIL_PORT)
     s.ehlo()
     s.starttls()
-    s.login(user=MAIL_FROM, password=mail_pw)
-    s.sendmail(MAIL_FROM, [to_address], msg.as_string())
+    s.login(user=config.MAIL_FROM, password=config.MAIL_PW)
+    s.sendmail(config.MAIL_FROM, [to_address], msg.as_string())
     s.quit()
 
 def send_drink(user, drink, balance):
