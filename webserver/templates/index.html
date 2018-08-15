@@ -8,15 +8,20 @@
             {% include "recharge.html" %}
         </div>
         <div class="col-md-6">
-            <div class="d-flex justify-content-center align-items-center">
-                <img class="d-none" id="qrcode"/>
-                <h4 class="d-none text-primary" id="qrcode_hint">Bitte wähle einen Benutzer und gib einen Betrag ein.</h4>
-            </div>
+            <p>
+                Du kannst per SEPA-Überweisung aufladen:<br>
+            </p>
             <ul>
                 <li><b>Kontoinhaber:</b> flipdot e.V.</li>
-                <li><b>IBAN: </b>DE07 5205 0353 0001 1477 13</li>
-                <li><b>Verwendungszweck:</b> <code>drinks <span id="uid">??</span> <abbr title="Der Hinweistext ist frei wählbar">hinweistext</abbr></code></li>
+                <li><b>IBAN:</b> DE07 5205 0353 0001 1477 13</li>
+                <li><b>Verwendungszweck:</b> <code>drinks <span id="uid">&lacute;uid&racute;</span> <abbr title="Der Hinweistext ist frei wählbar">hinweistext</abbr></code></li>
             </ul>
+            <div class="d-flex justify-content-center align-items-center">
+                <img class="d-none w-50" id="qrcode"/>
+                <p class="d-none" id="qrcode_hint">
+                    Bitte wähle einen Benutzer und gib einen Betrag ein, damit der SEPA-QR-Code angezeigt werden kann.
+                </p>
+            </div>
         </div>
     </div>
     {# include "stats.html" #}
