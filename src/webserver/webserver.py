@@ -19,6 +19,7 @@ from env import is_pi
 from flask import Flask, make_response
 from flask import request
 from flask import render_template
+from flask import send_file
 from flask_compress import Compress
 
 from users.users import Users
@@ -31,6 +32,10 @@ app = Flask(__name__)
 Compress(app)
 
 uid_pattern = re.compile("^\d+$")
+
+@app.route('/favicon.png')
+def favicon():
+    return send_file('../img/favicon.png', mimetype='image/png')
 
 @app.route('/')
 @app.route('/recharge')
@@ -88,18 +93,20 @@ def scans_json():
 def tx_png():
     uid = request.args.get('uid')
     name = request.args.get('name')
-    amount = request.args.get('amount', "0.01")
-    if not uid or not name:
+    amount = request.args.get('amount')
+
+    if not uid or not name or not amount:
         return "Please add parameters 'uid', 'name', and 'amount'!"
+
+    if Decimal(amount) <= 0:
+        return "Please use an amount greater than 0!"
+
     uid = int(uid)
-    if amount and len(amount) > 0:
-        amount = Decimal(amount)
-    else:
-        amount = Decimal(0.01)
 
     img_data = make_sepa_qr(amount, name, uid)
     response = make_response(img_data.getvalue())
     response.headers['Content-Type'] = 'image/png'
+
     return response
 
 
