@@ -9,9 +9,9 @@
     <br>
     Dein aktuelles Guthaben beträgt
     {% if balance > 0 %}
-    +{{ balance }}€.
+    +{{ balance }}&thinsp;€.
     {% else %}
-    {{ balance }}€.
+    {{ balance }}&thinsp;€.
     {% endif %}
 </p>
 <h2>
@@ -47,7 +47,7 @@
                 {{ drink.name }}
             </td>
             <td>
-                {{ drink.size }} l
+                {{ drink.size }}&thinsp;l
             </td>
         </tr>
         {% endfor %}
@@ -86,7 +86,7 @@
                 {{ recharge.helper_user_id }}
             </td>
             <td>
-                {{ recharge.amount }}€
+                {{ recharge.amount }}&thinsp;€
             </td>
         </tr>
         {% endfor %}
