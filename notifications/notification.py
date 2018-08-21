@@ -23,7 +23,9 @@ REMIND_MAIL_EVERY_X_HOURS = 24 * 7
 FREQUENCIES = {
     "instant": 0,
     "daily": 60 * 60 * 24,
+    "instant and daily": 60 * 60 * 24,
     "weekly": 60 * 60 * 24 * 7,
+    "instant and weekly": 60 * 60 * 24 * 7
 }
 FOOTER = u"""
 Besuchen Sie uns bald wieder!
@@ -66,7 +68,7 @@ def send_notification(to_address, subject, content_text, content_html):
 
 def send_drink(user, drink, with_summary=False):
     try:
-        if user['meta']['drink_notification'] == 'instant':
+        if user['email'] and 'instant' in user['meta']['drink_notification']:
             content_text = u"Du hast das folgende Getränk getrunken: {drink_name}.".format(drink_name=drink['name'])
             content_html = render_jinja_html('instant.html', drink_name=drink['name'])
 
@@ -131,7 +133,8 @@ def send_low_balance(session, user, with_summary=False):
         content_html = render_jinja_html('low_balance.html',
                                          diff_days=diff_days,
                                          minimum_balance=MINIMUM_BALANCE,
-                                         balance=balance)
+                                         balance=balance,
+                                         uid=user['id'])
 
         if not with_summary:
             content_text += FOOTER.format(uid=user['id'])
@@ -169,7 +172,7 @@ def send_summary(session, user, subject, prepend_text=None, prepend_html=None, f
     frequency_str = user['meta']['drink_notification']
     balance = Users.get_balance(user['id'])
 
-    if frequency_str not in FREQUENCIES.keys():
+    if not force and frequency_str not in FREQUENCIES.keys():
         return
 
     freq_secs = FREQUENCIES[frequency_str]
@@ -215,7 +218,8 @@ def send_summary(session, user, subject, prepend_text=None, prepend_html=None, f
                                      recharges=recharges,
                                      prepend_html=prepend_html,
                                      limit_days=REMIND_MAIL_EVERY_X_HOURS / 24,
-                                     minimum_balance=MINIMUM_BALANCE)
+                                     minimum_balance=MINIMUM_BALANCE,
+                                     uid=user['id'])
 
     email = user['email']
 
