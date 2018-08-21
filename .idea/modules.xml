@@ -2,10 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/../door/.idea/door.iml" filepath="$PROJECT_DIR$/../door/.idea/door.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/drinks-scanner-display.iml" filepath="$PROJECT_DIR$/.idea/drinks-scanner-display.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../ldap-user/.idea/ldap-user.iml" filepath="$PROJECT_DIR$/../ldap-user/.idea/ldap-user.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../money-utils/.idea/money-utils.iml" filepath="$PROJECT_DIR$/../money-utils/.idea/money-utils.iml" />
     </modules>
   </component>
 </project>

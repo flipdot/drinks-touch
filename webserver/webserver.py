@@ -4,7 +4,10 @@ from datetime import datetime
 import json
 import re
 from decimal import Decimal
-from flask import Flask, make_response, render_template, request, send_file
+from flask import Flask, make_response
+from flask import render_template
+from flask import request
+from flask import send_file
 from flask_compress import Compress
 
 from database.models.recharge_event import RechargeEvent
@@ -15,33 +18,18 @@ from users.qr import make_sepa_qr
 from users.users import Users
 
 
+app = Flask(__name__)
+Compress(app)
+
+uid_pattern = re.compile("^\d+$")
+
+
 class DateTimeEncoder(json.JSONEncoder):
     def default(self, o):
         if isinstance(o, datetime):
             return o.isoformat()
 
         return json.JSONEncoder.default(self, o)
-
-
-<<<<<<<
-from flask import Flask, make_response
-from flask import request
-from flask import render_template
-from flask_compress import Compress
-
-from users.users import Users
-from database.storage import get_session
-from database.models.recharge_event import RechargeEvent
-
-from stats.stats import scans
-
-=======
-
->>>>>>>
-app = Flask(__name__)
-Compress(app)
-
-uid_pattern = re.compile("^\d+$")
 
 
 @app.route('/favicon.png')
@@ -109,18 +97,20 @@ def scans_json():
 def tx_png():
     uid = request.args.get('uid')
     name = request.args.get('name')
-    amount = request.args.get('amount', "0.01")
-    if not uid or not name:
+    amount = request.args.get('amount')
+
+    if not uid or not name or not amount:
         return "Please add parameters 'uid', 'name', and 'amount'!"
+
+    if Decimal(amount) <= 0:
+        return "Please use an amount greater than 0!"
+
     uid = int(uid)
-    if amount and len(amount) > 0:
-        amount = Decimal(amount)
-    else:
-        amount = Decimal(0.01)
 
     img_data = make_sepa_qr(amount, name, uid)
     response = make_response(img_data.getvalue())
     response.headers['Content-Type'] = 'image/png'
+
     return response
 
 

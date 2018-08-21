@@ -41,7 +41,7 @@ class RechargeScreen(Screen):
         self.timeout.start()
 
         qr_file = make_sepa_qr(20, self.user['name'], self.user['id'],
-                               pixel_width=7, border=4, color="yellow", bg="black")
+                               pixel_width=7, border=4, color="black", bg="yellow")
         self.select_objects = [
             Button(
                 self.screen,
