@@ -6,7 +6,7 @@ from .base_elm import BaseElm
 class Image(BaseElm):
     def __init__(self, screen, **kwargs):
         self.pos = kwargs.get('pos', (0, 0))
-        self.src = kwargs.get('src', 'img/test.jpg')
+        self.src = kwargs.get('src', 'drinks_scanner_display/resources/img/test.jpg')
         self.size = kwargs.get('size', None)
 
         self.__load_img()

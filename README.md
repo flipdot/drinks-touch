@@ -2,8 +2,8 @@
 Digital replacement for the drinks tally list featuring a touchscreen, user management and a barcode scanner.
 
 ## Dependencies
-- LDAP server, reachable via `ldap://rail/` (see [users.py](src/users/users.py))
-- PostgreSQL @localhost (see [storage.py](src/database/storage.py))
+- LDAP server, reachable via `ldap://rail/` (see [users.py](drinks_scanner_display/users/users.py))
+- PostgreSQL @localhost (see [storage.py](drinks_scanner_display/database/storage.py))
 - touch display with a minimum of 480x800 px.
 
 ## Database Schema
