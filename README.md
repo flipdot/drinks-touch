@@ -3,6 +3,16 @@ Digital replacement for the drinks tally list featuring a touchscreen, user mana
 
 ## Dependencies
 - LDAP server, reachable via `ldap://rail/` (see [users.py](users/users.py))
+
+  > OpenLDAP in Docker:
+  > ```
+  > docker run --name openldap -d -p 389:389 -e LDAP_DOMAIN="flipdot.org" osixia/openldap
+  > ```
+  >
+  > PHPLDAPAdmin in Docker:
+  > ```
+  > docker run --name phpldapadmin -d -p 6443:443 --link openldap:ldap -e PHPLDAPADMIN_LDAP_HOSTS=ldap osixia/phpldapadmin
+  > ```
 - PostgreSQL @localhost (see [storage.py](database/storage.py))
 
   > PostgreSQL in Docker:
@@ -12,7 +22,7 @@ Digital replacement for the drinks tally list featuring a touchscreen, user mana
   >
   > Adminer in Docker:
   > ```
-  > docker run -d --link postgres:db -p 8080:8080 adminer
+  > docker run --name adminer -d -p 8080:8080 --link postgres:db adminer
   > ```
 - touch display with a minimum of 480x800 px.
 
