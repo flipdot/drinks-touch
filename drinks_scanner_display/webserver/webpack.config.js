@@ -1,25 +1,45 @@
 const path = require('path');
-const webpack = require('webpack'); //to access built-in plugins
+const webpack = require('webpack');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
+const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
+const devMode = process.env.NODE_ENV !== 'production'
+
+if (devMode) {
+    console.log('Running in development.');
+} else {
+    console.log('Running in production.');
+}
 
 module.exports = {
     entry: [
         'bootstrap-loader',
         './js/index.js',
     ],
+    plugins: [
+        new MiniCssExtractPlugin({
+            //filename: devMode ? '[name].css' : '[name].[hash].css',
+            filename: '[name].css',
+            chunkFilename: devMode ? '[id].css' : '[id].[hash].css',
+        })
+    ],
     output: {
-        filename: 'dist/bundle.js',
-        path: path.resolve(__dirname, 'static/')
+        filename: '[name].bundle.js',
+        path: path.resolve(__dirname, 'static/dist/')
     },
     module: {
         rules: [
-            { test: /\.css$/, loaders: ['style-loader', 'postcss-loader'] },
-            { test: /\.(woff2?|svg)$/, loader: 'url-loader?limit=10000&emitFile=false' },
-            { test: /\.(ttf|eot)$/, loader: 'file-loader?emitFile=false' },
-            { test: /bootstrap-sass\/assets\/javascripts\//, loader: 'imports-loader?jQuery=jquery' },
-            { test: /\.(js|jsx)$/, use: 'babel-loader' },
+            { test: /\.(sa|sc|c)ss$/, use: [ devMode ? 'style-loader' : MiniCssExtractPlugin.loader, 'css-loader', 'postcss-loader', 'sass-loader']}
         ],
     },
     optimization: {
-        minimize: true
-    }
+        minimizer: [
+            new UglifyJsPlugin({
+                cache: true,
+                parallel: true,
+                sourceMap: true
+            }),
+            new OptimizeCSSAssetsPlugin({})
+        ]
+    },
 };
