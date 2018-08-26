@@ -1,3 +1,7 @@
+import $ from 'jquery';
+import 'select2';
+import 'select2/dist/css/select2.css';
+
 let user_select;
 let value_input;
 let qrcode;
@@ -5,16 +9,17 @@ let qrcode_hint;
 let uid_text;
 
 document.addEventListener('DOMContentLoaded', function() {
-    user_select = document.querySelector('#user_user');
+    $('select').select2();
+
+    user_select = $('#user_user');
     value_input = document.querySelector('#amount');
     qrcode = document.querySelector('#qrcode');
     qrcode_hint = document.querySelector('#qrcode_hint');
     uid_text = document.querySelector('#uid');
 
-    user_select.addEventListener('change', update_qr);
+    $('select').on('select2:select', update_qr);
     value_input.addEventListener('change', update_qr);
     value_input.addEventListener('keyup', update_qr);
-    user_select.addEventListener('keyup', update_qr);
 
     update_qr();
 });
@@ -24,19 +29,21 @@ let urlNext = '';
 let lastUpdate = null;
 
 function update_qr() {
-    const uid = user_select.value;
-    const name = user_select.options[user_select.selectedIndex].text;
+    const uid = user_select.val();
+    const name = user_select.find(':selected').text();
     const amount = value_input.value;
 
     if (uid) {
         uid_text.textContent = uid;
     } else {
-        uid_text.textContent = "??";
+        uid_text.textContent = "<uid>";
     }
+
     if (lastUpdate) {
         clearTimeout(lastUpdate);
         lastUpdate = null;
     }
+
     const url = '/tx.png?uid=' + encodeURIComponent(uid) +
         '&name=' + encodeURIComponent(name) +
         '&amount=' + encodeURIComponent(amount);
