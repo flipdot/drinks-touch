@@ -47,7 +47,7 @@ class NewIDScreen(Screen):
         ))
         self.objects.append(Label(
             self.screen,
-            text="wieviel hast du reingeworfen?",
+            text="Wie viel hast du eingeworfen?",
             pos=(30, 220),
             size=40
         ))
