@@ -185,9 +185,6 @@ class Users(object):
 
     @staticmethod
     def get_balance(user_id, session=get_session()):
-        if not is_pi():
-            return -50
-
         sql = text("""
                 SELECT user_id, count(*) AS amount
                 FROM scanevent
@@ -294,9 +291,6 @@ class Users(object):
 
     @staticmethod
     def save(user):
-        if not is_pi():
-            return
-
         changes = {}
         for key, meta in Users.fields.iteritems():
             new_value = user[key]
