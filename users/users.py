@@ -7,6 +7,7 @@ import ldap
 import ldap.modlist as modlist
 from sqlalchemy.sql import text
 
+import config
 from database.models.recharge_event import RechargeEvent
 from database.storage import get_session
 from env import is_pi
@@ -31,6 +32,7 @@ test_data = [{"name": "foo", "id": "1", "id_card": None},
              {"name": "Baz14", "id": "44", "id_card": "idcard"},
              {"name": "Daz", "id": "3", "id_card": "idcard"},
              {"name": "Choo", "id": "10004", "id_card": "choo"},
+             {"name": config.DEBUG_USERNAME, "email": config.MAIL_FROM, "meta": {"drink_notification": "instant", "last_drink_notification": 0, "last_emailed": 0}, "id": "12345", "id_card": "idcard_dm"},
              ]
 
 
@@ -103,8 +105,8 @@ class Users(object):
             return users
         except Exception as e:
             if not is_pi():
-                print("ldap fail: ", e)
-                print(traceback.format_exc())
+                # print("ldap fail: ", e)
+                # print(traceback.format_exc())
                 print("falling back to test data")
                 return filter(
                     lambda u: prefix == '' or u['name'].lower().startswith(

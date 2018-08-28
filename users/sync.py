@@ -10,7 +10,7 @@ from requests.auth import HTTPBasicAuth
 import config
 from database.models.recharge_event import RechargeEvent
 from database.storage import get_session
-from notifications.notification import send_summary_now
+from notifications.notification import send_summary
 from users import Users
 
 log = logging.getLogger(__name__)
@@ -78,9 +78,7 @@ def handle_transferred(charge, charge_amount, charge_date, got, session, uid):
             subject = "Aufladung EUR %s für %s" % (charge_amount, user['name'])
             text = "Deine Aufladung über %s € am %s mit Text '%s' war erfolgreich." % (
             charge_amount, charge_date, charge['info'])
-            send_summary_now(3600 * 24 * 14, "2 Wochen",
-                session, user, force=True, subject=subject,
-                addltext=text)
+            send_summary(session, user, subject=subject, force=True, prepend_text=text)
     except:
         log.exception("sending notification mail:")
 
