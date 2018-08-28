@@ -2,11 +2,13 @@ import json
 import random
 import traceback
 import config
+import logging
 
 import ldap
 import ldap.modlist as modlist
 from sqlalchemy.sql import text
 
+import config
 from database.models.recharge_event import RechargeEvent
 from database.storage import get_session
 from env import is_pi
@@ -31,6 +33,7 @@ test_data = [{"name": "foo", "id": "1", "id_card": None},
              {"name": "Baz14", "id": "44", "id_card": "idcard"},
              {"name": "Daz", "id": "3", "id_card": "idcard"},
              {"name": "Choo", "id": "10004", "id_card": "choo"},
+             {"name": "user_mit_email", "email": "root@localhost", "meta": {"drink_notification": "instant", "last_drink_notification": 0, "last_emailed": 0}, "id": "12345", "id_card": "idcard_dm"},
              ]
 
 
@@ -103,8 +106,8 @@ class Users(object):
             return users
         except Exception as e:
             if not is_pi():
-                print("ldap fail: ", e)
-                print(traceback.format_exc())
+                # print("ldap fail: ", e)
+                # print(traceback.format_exc())
                 print("falling back to test data")
                 return filter(
                     lambda u: prefix == '' or u['name'].lower().startswith(
@@ -297,15 +300,20 @@ class Users(object):
             if new_value != user["_reference"][key]:
                 changes[key] = (user["_reference"][key], new_value)
 
-        if changes:
-            for key, change in changes.iteritems():
-                old, new = change
-                meta = Users.fields[key]
-                #logging.debug("User %s %s: changing %s (%s) from '%s' to '%s'" % (
-                #    user["id"], user['name'], key, meta['ldap_field'], str(old),
-                #    str(new)))
-                try:
-                    Users.set_value(user, meta["ldap_field"], new)
-                    user["_reference"][key] = new
-                except Exception as e:
-                    print "LDAP error:", e
+        if not changes:
+            return
+        logging.info("LDAP change %s: %s", user["name"], changes)
+        if config.NO_CHANGES:
+            logging.info("Ignoring because config.NO_CHANGES")
+            return
+        for key, change in changes.iteritems():
+            old, new = change
+            meta = Users.fields[key]
+            #logging.debug("User %s %s: changing %s (%s) from '%s' to '%s'" % (
+            #    user["id"], user['name'], key, meta['ldap_field'], str(old),
+            #    str(new)))
+            try:
+                Users.set_value(user, meta["ldap_field"], new)
+                user["_reference"][key] = new
+            except Exception as e:
+                print "LDAP error:", e
