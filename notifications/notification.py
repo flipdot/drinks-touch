@@ -20,8 +20,9 @@ from users.users import Users
 SUBJECT_PREFIX = "[fd-noti]"
 MINIMUM_BALANCE = -5
 REMIND_MAIL_EVERY_X_HOURS = 24 * 7
+
+# THese entries describe when to send a summary
 FREQUENCIES = {
-    "instant": 0,
     "daily": 60 * 60 * 24,
     "instant and daily": 60 * 60 * 24,
     "weekly": 60 * 60 * 24 * 7,
@@ -40,7 +41,7 @@ Oder per SEPA:
 """
 
 
-def send_notification(to_address, subject, content_text, content_html):
+def send_notification(to_address, subject, content_text, content_html, uid):
     msg = MIMEMultipart('alternative')
 
     plain = MIMEText(content_text, 'plain', _charset='utf-8')
@@ -54,9 +55,15 @@ def send_notification(to_address, subject, content_text, content_html):
     msg['To'] = to_address
     msg['Date'] = formatdate(time.time(), localtime=True)
     msg['Message-id'] = make_msgid()
+    msg['X-LDAP-ID'] = uid
 
     logging.info("Mailing %s: '%s'", to_address, subject)
     logging.debug("Content: ---\n%s\n---", content_text)
+    if config.NO_MAILS:
+        if str(config.FORCE_MAIL_TO) != str(uid):
+            logging.info("skipping mail, because config.NO_MAILS")
+            return
+
     s = smtplib.SMTP()
     s.connect(host=config.MAIL_HOST, port=config.MAIL_PORT)
     s.ehlo()
@@ -76,7 +83,7 @@ def send_drink(user, drink, with_summary=False):
                 content_text += FOOTER.format(uid=user['id'])
                 content_html = render_jinja_html('main.html', prepend_html=content_html)
 
-                send_notification(user['email'], "Getränk getrunken", content_text, content_html)
+                send_notification(user['email'], "Getränk getrunken", content_text, content_html, user['id'])
                 return
 
             session = get_session()
@@ -90,12 +97,11 @@ def send_drink(user, drink, with_summary=False):
         pass
 
 
-def send_low_balances(with_summary=False):
+def send_low_balances(with_summary=True):
     session = get_session()
 
-    if not is_pi():
-        user = Users.get_all(config.DEBUG_USERNAME)[0]
-        send_low_balance(session, user, with_summary)
+    if config.FORCE_MAIL_TO:
+        send_low_balance(session, Users.get_by_id(config.FORCE_MAIL_TO), with_summary, force=True)
         return
 
     for user in Users.get_all():
@@ -106,10 +112,10 @@ def send_low_balances(with_summary=False):
             continue
 
 
-def send_low_balance(session, user, with_summary=False):
+def send_low_balance(session, user, with_summary=False, force=False):
     balance = Users.get_balance(user['id'])
 
-    if balance >= MINIMUM_BALANCE:
+    if not force and balance >= MINIMUM_BALANCE:
         # reset time
         user['meta']['last_emailed'] = time.time()
         Users.save(user)
@@ -120,44 +126,45 @@ def send_low_balance(session, user, with_summary=False):
     diff_hours = diff / 60 / 60
     diff_days = diff_hours / 24
 
-    if diff_hours > REMIND_MAIL_EVERY_X_HOURS:
-        logging.info("%s's low balance last emailed %.2f days (%.2f hours) ago. Mailing now.",
-                     user['name'], diff_days, diff_hours)
-        content_text = (u"Du hast seit mehr als {diff_days} Tagen "
-                        u"ein Guthaben von unter {minimum_balance}€!\n"
-                        u"Aktueller Kontostand: {balance:.2f}€.\n"
-                        u"Zum Aufladen im Space-Netz http://drinks-touch.fd/ besuchen.").format(
-            diff_days=diff_days,
-            minimum_balance=MINIMUM_BALANCE,
-            balance=balance)
-        content_html = render_jinja_html('low_balance.html',
-                                         diff_days=diff_days,
-                                         minimum_balance=MINIMUM_BALANCE,
-                                         balance=balance,
-                                         uid=user['id'])
+    if not force and diff_hours <= REMIND_MAIL_EVERY_X_HOURS:
+        return
 
-        if not with_summary:
-            content_text += FOOTER.format(uid=user['id'])
-            content_html = render_jinja_html('main.html', prepend_html=content_html)
+    logging.info("%s's low balance last emailed %.2f days (%.2f hours) ago. Mailing now.",
+                 user['name'], diff_days, diff_hours)
+    content_text = (u"Du hast seit mehr als {diff_days} Tagen "
+                    u"ein Guthaben von unter {minimum_balance}€!\n"
+                    u"Aktueller Kontostand: {balance:.2f}€.\n"
+                    u"Zum Aufladen im Space-Netz http://drinks-touch.fd/ besuchen.").format(
+        diff_days=diff_days,
+        minimum_balance=MINIMUM_BALANCE,
+        balance=balance)
+    content_html = render_jinja_html('low_balance.html',
+                                     diff_days=diff_days,
+                                     minimum_balance=MINIMUM_BALANCE,
+                                     balance=balance,
+                                     uid=user['id'])
 
-            send_notification(user['email'], "Negatives Guthaben", content_text, content_html)
-            return
+    if not with_summary:
+        content_text += FOOTER.format(uid=user['id'])
+        content_html = render_jinja_html('main.html', prepend_html=content_html)
 
-        send_summary(session, user,
-                     subject="Negatives Guthaben",
-                     prepend_text=content_text,
-                     prepend_html=content_html,
-                     force=True)
-        user['meta']['last_emailed'] = time.time()
-        Users.save(user)
+        send_notification(user['email'], "Negatives Guthaben", content_text, content_html, user['id'])
+        return
+
+    send_summary(session, user,
+                 subject="Negatives Guthaben",
+                 prepend_text=content_text,
+                 prepend_html=content_html,
+                 force=True)
+    user['meta']['last_emailed'] = time.time()
+    Users.save(user)
 
 
 def send_summaries():
     session = get_session()
 
-    if not is_pi():
-        user = Users.get_all(config.DEBUG_USERNAME)[0]
-        send_summary(session, user, "Getränkeübersicht")
+    if config.FORCE_MAIL_TO:
+        send_summary(session, Users.get_by_id(config.FORCE_MAIL_TO), "Getränkeübersicht", force=True)
         return
 
     for user in Users.get_all():
@@ -174,9 +181,15 @@ def send_summary(session, user, subject, prepend_text=None, prepend_html=None, f
 
     if not force and frequency_str not in FREQUENCIES.keys():
         return
+    elif force:
+        freq_secs = 0
+    else:
+        freq_secs = FREQUENCIES[frequency_str]
 
-    freq_secs = FREQUENCIES[frequency_str]
     last_emailed = user['meta']['last_drink_notification']
+    if type(last_emailed) not in [int, float]:
+        last_emailed = 0
+
     last_emailed_str = datetime.fromtimestamp(last_emailed).strftime("%d.%m.%Y %H:%M:%S")
     diff = time.time() - last_emailed
     diff_hours = diff / 60 / 60
@@ -232,7 +245,7 @@ def send_summary(session, user, subject, prepend_text=None, prepend_html=None, f
         return
 
     logging.info("Got %d drinks and %d recharges. Mailing.", len(drinks_consumed), len(recharges))
-    send_notification(email, subject, content_text, content_html)
+    send_notification(email, subject, content_text, content_html, user['id'])
     user['meta']['last_drink_notification'] = time.time()
     Users.save(user)
 
@@ -271,23 +284,7 @@ def format_recharges(recharges):
     return recharges_fmt
 
 
-def get_drinks_consumed(session, user, since_secs):
-    if not is_pi():
-        return [
-            {
-                "barcode": "123",
-                "timestamp": datetime.now(),
-                "name": "Testgetraenk",
-                "size": "1"
-            },
-            {
-                "barcode": "321",
-                "timestamp": datetime.now(),
-                "name": "Getraenketest",
-                "size": "2"
-            }
-        ]
-
+def get_drinks_consumed(session, user, since_timestamp):
     sql = text("""SELECT
     se.barcode,
     se.timestamp,
@@ -296,32 +293,16 @@ def get_drinks_consumed(session, user, since_secs):
 FROM scanevent se
     LEFT OUTER JOIN drink d ON d.ean = se.barcode
 WHERE user_id = :userid
-    AND se.timestamp > NOW() - INTERVAL '%d seconds'
-ORDER BY se.timestamp""" % since_secs)
+    AND se.timestamp >= TO_TIMESTAMP('%d')
+ORDER BY se.timestamp""" % since_timestamp)
     drinks_consumed = session.connection().execute(sql, userid=user['id']).fetchall()
     return drinks_consumed
 
 
-def get_recharges(session, user, since_secs):
-    if not is_pi():
-        return [
-            {
-                "user_id": "888",
-                "helper_user_id": "777",
-                "amount": "10",
-                "timestamp": datetime.now()
-            },
-            {
-                "user_id": "888",
-                "helper_user_id": "777",
-                "amount": "1",
-                "timestamp": datetime.now()
-            }
-        ]
-
+def get_recharges(session, user, since_timestamp):
     return session.query(RechargeEvent) \
         .filter(RechargeEvent.user_id == user['id']) \
-        .filter(RechargeEvent.timestamp >= datetime.utcnow() - timedelta(seconds=since_secs)) \
+        .filter(RechargeEvent.timestamp >= datetime.utcfromtimestamp(since_timestamp)) \
         .order_by(RechargeEvent.timestamp) \
         .all()
 
