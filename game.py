@@ -15,6 +15,8 @@ import time
 
 import pygame
 
+import config
+
 logging.basicConfig(level=logging.DEBUG,
     format="[%(asctime)s][%(levelname)s][%(filename)s:%(lineno)d] %(message)s")
 logging.Formatter.converter = time.gmtime
@@ -121,7 +123,7 @@ def main(argv):
     dt = 0
     done = False
     while not done:
-        dt = clock.tick(30) / 1000.0
+        dt = clock.tick(config.FPS) / 1000.0
         t += dt
 
         current_screen = screen_manager.get_active()
