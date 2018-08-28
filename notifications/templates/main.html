@@ -1,0 +1,10 @@
+{% extends "layout.html" %}
+{% block body %}
+    {% if prepend_html %}
+        {{ prepend_html }}
+    {% endif %}
+    {% if with_report %}
+        {% include "report.html" %}
+    {% endif %}
+    {% include "sepa.html" %}
+{% endblock %}

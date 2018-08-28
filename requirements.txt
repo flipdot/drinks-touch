@@ -1,12 +1,13 @@
-flask
-sqlalchemy
-pygame
-psycopg2-binary
-python-ldap # sudo apt-get install python-dev libldap2-dev libsasl2-dev libssl-dev
-huBarcode # sudo apt-get install python-pil
-flask-compress
-influxdb
-keyboard
 email
-qrcode
+flask
+flask-compress
+huBarcode # sudo apt-get install python-pil
+influxdb
+jinja2
+keyboard
 Pillow==5.2.0
+psycopg2-binary
+pygame
+python-ldap # sudo apt-get install python-dev libldap2-dev libsasl2-dev libssl-dev
+qrcode
+sqlalchemy
