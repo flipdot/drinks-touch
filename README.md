@@ -19,26 +19,24 @@ pip2 install -r requirements.txt
 ```
 Then copy `config.example.py` to `config.py`, customizing the contents.
 
-Start PostgreSQL and OpenLDAP either with `systemctl start` or with Docker:
-  > PostgreSQL in Docker:
-  > ```
-  > docker run --name postgres -d -p 5432:5432 -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=drinks postgres
-  > ```
-  >
-  > Adminer in Docker:
-  > ```
-  > docker run --name adminer -d -p 8080:8080 --link postgres:db adminer
-  > ```
+Now, start PostgreSQL and OpenLDAP either with `systemctl start` or with Docker:
 
-  > OpenLDAP in Docker:
-  > ```
-  > docker run --name openldap -d -p 389:389 -e LDAP_DOMAIN="flipdot.org" osixia/openldap
-  > ```
-  >
-  > PHPLDAPAdmin in Docker:
-  > ```
-  > docker run --name phpldapadmin -d -p 6443:443 --link openldap:ldap -e PHPLDAPADMIN_LDAP_HOSTS=ldap osixia/phpldapadmin
-  > ```
+```bash
+# PostgreSQL
+docker run --name postgres -d -p 5432:5432 -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=drinks postgres
+
+# Adminer
+docker run --name adminer -d -p 8080:8080 --link postgres:db adminer
+```
+
+
+```bash
+# OpenLDAP
+docker run --name openldap -d -p 389:389 -e LDAP_DOMAIN="flipdot.org" osixia/openldap
+
+# PHPLDAPAdmin
+docker run --name phpldapadmin -d -p 6443:443 --link openldap:ldap -e PHPLDAPADMIN_LDAP_HOSTS=ldap osixia/phpldapadmin
+```
 
 And finally, run the entrypoint script `game.py`.
 
