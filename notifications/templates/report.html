@@ -17,6 +17,9 @@
 <h2>
     Abbuchungen
 </h2>
+{% if not drinks %}
+Keine neuen Abbuchungen.
+{% else %}
 <table>
     <thead>
         <tr>
@@ -53,9 +56,13 @@
         {% endfor %}
     </tbody>
 </table>
+{% endif %}
 <h2>
     Aufladungen
 </h2>
+{% if not recharges %}
+Keine neuen Aufladungen.
+{% else %}
 <table>
     <thead>
         <tr>
@@ -92,6 +99,7 @@
         {% endfor %}
     </tbody>
 </table>
+{% endif %}
 <hr>
 <p class="text-centered">
     Besuchen Sie uns bald wieder!
