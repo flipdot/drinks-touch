@@ -14,5 +14,9 @@ done &
 
 while [ 1 ];
 do
-    cd /home/pi/drinks-scanner-display && ENV=PI ./game.py &>> /var/log/drinks/log.log
+    (
+        set -e
+        cd /home/pi/drinks-scanner-display
+        ENV=PI systemd-cat -t"drinks" ./game.py
+    )
 done
