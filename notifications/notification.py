@@ -135,11 +135,11 @@ def send_low_balance(session, user, with_summary=False, force=False):
                     u"ein Guthaben von unter {minimum_balance}€!\n"
                     u"Aktueller Kontostand: {balance:.2f}€.\n"
                     u"Zum Aufladen im Space-Netz http://drinks-touch.fd/ besuchen.").format(
-        diff_days=diff_days,
+        diff_days=REMIND_MAIL_EVERY_X_HOURS / 24,
         minimum_balance=MINIMUM_BALANCE,
         balance=balance)
     content_html = render_jinja_html('low_balance.html',
-                                     diff_days=diff_days,
+                                     diff_days=REMIND_MAIL_EVERY_X_HOURS / 24,
                                      minimum_balance=MINIMUM_BALANCE,
                                      balance=balance,
                                      uid=user['id'])
