@@ -4,6 +4,7 @@ import re
 from datetime import datetime
 from decimal import Decimal
 
+from acme import acme
 from users.qr import make_sepa_qr
 
 
@@ -117,6 +118,7 @@ def to_json(dict_arr):
     return json.dumps(dict_arr, cls=DateTimeEncoder)
 
 def run():
+    acme.ACME(app, not is_pi())
     port = 5002
     if is_pi():
         port = 80
