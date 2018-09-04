@@ -195,7 +195,7 @@ def send_summary(session, user, subject, prepend_text=None, prepend_html=None, f
     diff_hours = diff / 60 / 60
     diff_days = diff_hours / 24
 
-    if force is True:
+    if force:
         logging.info("Forcing mail.")
     else:
         if diff <= freq_secs:
@@ -266,19 +266,23 @@ def format_drinks(drinks_consumed):
 
 
 def format_recharges(recharges):
+    """
+
+    :type recharges: list[RechargeEvent]
+    """
     recharges_fmt = "\nAufladungen:\n" \
                     "    #                 datum     mit aufgeladen\n"
 
     for i, event in enumerate(recharges):
-        date = event['timestamp'].strftime("%F %T Z")
-        mit = event['helper_user_id']
+        date = event.timestamp.strftime("%F %T Z")
+        mit = event.helper_user_id
 
         try:
             mit = Users.get_by_id(mit)['name']
         except Exception:
             pass
 
-        amount = event['amount']
+        amount = event.amount
         recharges_fmt += "  % 3d % 15s %7s %10s\n" % (i, date, mit, amount)
 
     return recharges_fmt

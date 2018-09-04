@@ -71,7 +71,7 @@ class SuccessScreen(Screen):
         os.system("ssh -o StrictHostKeyChecking=no pi@pixelfun aplay sounds/%s >/dev/null 2>&1 &" % sound)
 
         if drink:
-            send_drink(user, drink, balance)
+            send_drink(user, drink, True)
 
     def home(self):
         from .screen_manager import ScreenManager
