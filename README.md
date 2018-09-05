@@ -23,19 +23,18 @@ Now, start PostgreSQL and OpenLDAP either with `systemctl start` or with Docker:
 
 ```bash
 # PostgreSQL
-docker run --name postgres -d -p 5432:5432 -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=drinks postgres
+docker run --name dsd_postgres -d -p 5432:5432 -v dsd_postgres-data:/var/lib/postgresql/data -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=drinks postgres
 
 # Adminer
-docker run --name adminer -d -p 8080:8080 --link postgres:db adminer
+docker run --name dsd_adminer -d -p 8080:8080 --link dsd_postgres:db adminer
 ```
-
 
 ```bash
 # OpenLDAP
-docker run --name openldap -d -p 389:389 -e LDAP_DOMAIN="flipdot.org" osixia/openldap
+docker run --name dsd_ldap -d -p 389:389 -e LDAP_DOMAIN="flipdot.org" osixia/openldap
 
 # PHPLDAPAdmin
-docker run --name phpldapadmin -d -p 6443:443 --link openldap:ldap -e PHPLDAPADMIN_LDAP_HOSTS=ldap osixia/phpldapadmin
+docker run --name dsd_phpldapadmin -d -p 6443:443 -v dsd_phpldapadmin-data:/var/www/phpldapadmin --link dsd_ldap:ldap -e PHPLDAPADMIN_LDAP_HOSTS=ldap osixia/phpldapadmin
 ```
 
 And finally, run the entrypoint script `game.py`.
