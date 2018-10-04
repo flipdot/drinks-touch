@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 import jinja2
 import logging
 import smtplib
+from email.header import Header
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.utils import formatdate, make_msgid
@@ -50,7 +51,7 @@ def send_notification(to_address, subject, content_text, content_html, uid):
     msg.attach(plain)
     msg.attach(html)
 
-    msg['Subject'] = SUBJECT_PREFIX + " " + subject
+    msg['Subject'] = Header(SUBJECT_PREFIX + " " + subject, 'utf-8')
     msg['From'] = config.MAIL_FROM
     msg['To'] = to_address
     msg['Date'] = formatdate(time.time(), localtime=True)
