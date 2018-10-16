@@ -33,7 +33,7 @@ test_data = [{"name": "foo", "id": "1", "id_card": None},
              {"name": "Baz14", "id": "44", "id_card": "idcard"},
              {"name": "Daz", "id": "3", "id_card": "idcard"},
              {"name": "Choo", "id": "10004", "id_card": "choo"},
-             {"name": "user_mit_email", "email": "root@localhost", "meta": {"drink_notification": "instant", "last_drink_notification": 0, "last_emailed": 0}, "id": "12345", "id_card": "idcard_dm"},
+             {"name": "user_mit_email", "email": config.MAIL_FROM, "meta": {"drink_notification": "instant", "last_drink_notification": 0, "last_emailed": 0}, "id": "12345", "id_card": "idcard_dm"},
              ]
 
 
