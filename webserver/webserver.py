@@ -4,6 +4,20 @@ from datetime import datetime
 import json
 import re
 from decimal import Decimal
+
+from acme import acme
+from users.qr import make_sepa_qr
+
+
+class DateTimeEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, datetime):
+            return o.isoformat()
+
+        return json.JSONEncoder.default(self, o)
+
+from env import is_pi
+
 from flask import Flask, make_response
 from flask import render_template
 from flask import request
@@ -122,6 +136,7 @@ def to_json(dict_arr):
 
 
 def run():
+    acme.ACME(app, not is_pi())
     port = 5002
     if is_pi():
         port = 80

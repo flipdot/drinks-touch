@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 import jinja2
 import logging
 import smtplib
+from email.header import Header
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.utils import formatdate, make_msgid
@@ -50,7 +51,7 @@ def send_notification(to_address, subject, content_text, content_html, uid):
     msg.attach(plain)
     msg.attach(html)
 
-    msg['Subject'] = SUBJECT_PREFIX + " " + subject
+    msg['Subject'] = Header(SUBJECT_PREFIX + " " + subject, 'utf-8')
     msg['From'] = config.MAIL_FROM
     msg['To'] = to_address
     msg['Date'] = formatdate(time.time(), localtime=True)
@@ -135,11 +136,11 @@ def send_low_balance(session, user, with_summary=False, force=False):
                     u"ein Guthaben von unter {minimum_balance}€!\n"
                     u"Aktueller Kontostand: {balance:.2f}€.\n"
                     u"Zum Aufladen im Space-Netz http://drinks-touch.fd/ besuchen.").format(
-        diff_days=diff_days,
+        diff_days=REMIND_MAIL_EVERY_X_HOURS / 24,
         minimum_balance=MINIMUM_BALANCE,
         balance=balance)
     content_html = render_jinja_html('low_balance.html',
-                                     diff_days=diff_days,
+                                     diff_days=REMIND_MAIL_EVERY_X_HOURS / 24,
                                      minimum_balance=MINIMUM_BALANCE,
                                      balance=balance,
                                      uid=user['id'])
@@ -195,7 +196,7 @@ def send_summary(session, user, subject, prepend_text=None, prepend_html=None, f
     diff_hours = diff / 60 / 60
     diff_days = diff_hours / 24
 
-    if force is True:
+    if force:
         logging.info("Forcing mail.")
     else:
         if diff <= freq_secs:
@@ -266,19 +267,23 @@ def format_drinks(drinks_consumed):
 
 
 def format_recharges(recharges):
+    """
+
+    :type recharges: list[RechargeEvent]
+    """
     recharges_fmt = "\nAufladungen:\n" \
                     "    #                 datum     mit aufgeladen\n"
 
     for i, event in enumerate(recharges):
-        date = event['timestamp'].strftime("%F %T Z")
-        mit = event['helper_user_id']
+        date = event.timestamp.strftime("%F %T Z")
+        mit = event.helper_user_id
 
         try:
             mit = Users.get_by_id(mit)['name']
         except Exception:
             pass
 
-        amount = event['amount']
+        amount = event.amount
         recharges_fmt += "  % 3d % 15s %7s %10s\n" % (i, date, mit, amount)
 
     return recharges_fmt
