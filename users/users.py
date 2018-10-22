@@ -1,7 +1,6 @@
 import json
 import random
 import traceback
-import config
 import logging
 
 import ldap
@@ -12,6 +11,8 @@ import config
 from database.models.recharge_event import RechargeEvent
 from database.storage import get_session
 from env import is_pi
+
+logger = logging.getLogger(__name__)
 
 test_data = [{"name": "foo", "id": "1", "id_card": None},
              {"name": "bar", "id": "2", "id_card": "idcard2"},
@@ -302,14 +303,14 @@ class Users(object):
 
         if not changes:
             return
-        logging.info("LDAP change %s: %s", user["name"], changes)
+        logger.info("LDAP change %s: %s", user["name"], changes)
         if config.NO_CHANGES:
-            logging.info("Ignoring because config.NO_CHANGES")
+            logger.info("Ignoring because config.NO_CHANGES")
             return
         for key, change in changes.iteritems():
             old, new = change
             meta = Users.fields[key]
-            #logging.debug("User %s %s: changing %s (%s) from '%s' to '%s'" % (
+            #logger.debug("User %s %s: changing %s (%s) from '%s' to '%s'" % (
             #    user["id"], user['name'], key, meta['ldap_field'], str(old),
             #    str(new)))
             try:

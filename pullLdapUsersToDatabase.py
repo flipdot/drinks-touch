@@ -1,12 +1,8 @@
 from pprint import pprint
 
-import logging
-
 from database.models.ldapUser import LdapUser
 from users.users import Users
 from database.storage import get_session, init_db
-
-logging.basicConfig(level=logging.DEBUG)
 
 
 def main():

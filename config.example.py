@@ -12,6 +12,8 @@ MAIL_PORT = 587
 
 FPS = 30
 
+LOGLEVEL = "DEBUG"
+
 # For development
 NO_MAILS = True
 NO_CHANGES = True

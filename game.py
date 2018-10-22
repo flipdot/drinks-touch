@@ -17,8 +17,7 @@ import pygame
 
 import config
 
-logging.basicConfig(level=logging.DEBUG,
-    format="[%(asctime)s][%(levelname)s][%(filename)s:%(lineno)d] %(message)s")
+logging.basicConfig(level=getattr(logging, config.LOGLEVEL), format="[%(asctime)s][%(levelname)s][%(filename)s:%(lineno)d] %(message)s")
 logging.Formatter.converter = time.gmtime
 
 from database.storage import init_db
