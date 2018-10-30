@@ -1,9 +1,6 @@
-import logging
 from influxdb import InfluxDBClient
 
 from database.storage import get_session, init_db
-
-logging.basicConfig(level=logging.DEBUG)
 
 
 influx_client = InfluxDBClient('172.18.0.2', 8086, 'admin', 'admin', 'drinks')

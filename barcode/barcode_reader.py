@@ -5,6 +5,8 @@ import keyboard
 
 from env import is_pi
 
+logger = logging.getLogger(__name__)
+
 
 def run(worker):
     global last_barcode
@@ -15,7 +17,7 @@ def run(worker):
             try:
                 worker.on_barcode(sys.stdin.readline().strip().upper())
             except Exception:
-                logging.exception("Caught exception in barcode handler...")
+                logger.exception("Caught exception in barcode handler...")
 
     def replace_key_code(barcode, replacements):
 
