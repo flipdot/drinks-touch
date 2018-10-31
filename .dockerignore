@@ -1,0 +1,7 @@
+node_modules/
+venv-*/
+*.pyc
+.ideaconfig.py
+config.py
+ldap_pw
+mail_pw
