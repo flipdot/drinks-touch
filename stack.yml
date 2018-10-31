@@ -4,6 +4,13 @@ services:
     image: "adminer"
     ports:
     - "8080:8080"
+  drinks-scanner-display:
+    image: "flipdot/drinks-scanner-display"
+    volumes:
+    - "./config.py:/app/config.py"
+    - "/tmp/.X11-unix:/tmp/.X11-unix"
+    environment:
+      DISPLAY: "unix${DISPLAY}"
   ldap:
     image: "osixia/openldap"
     environment:
