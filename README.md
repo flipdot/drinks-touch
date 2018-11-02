@@ -22,7 +22,7 @@ Then copy `config.example.py` to `config.py`, customizing the contents.
 Now, start PostgreSQL and OpenLDAP either with `systemctl start` or with Docker:
 
 ```bash
-docker stack deploy -c stack.yml drinks-scanner-display
+xhost local:docker && docker stack deploy -c stack.yml drinks-scanner-display
 ```
 
 <details>
