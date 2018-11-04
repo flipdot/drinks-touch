@@ -1,32 +1,49 @@
 # Drinks Scanner Display
 Digital replacement for the drinks tally list featuring a touchscreen, user management and a barcode scanner.
 
-## Dependencies
-- LDAP server, reachable via `ldap://rail/` (see [users.py](users/users.py))
-- PostgreSQL @localhost (see [storage.py](database/storage.py))
-- touch display with a minimum of 480x800 px.
+## Deployment
 
-## Database Schema
-PostgreSQL dumps can be found inside the `sql` folder along with scripts to im- and export.
+### Docker
+For usage with Docker you need a running X server. See below for details.
 
-## Development
+- Linux
 
-Install dependencies like this:
+  First, allow connections from Docker to X:
+  ```bash
+  xhost local:docker
+  ```
+  Then execute the stack:xhost local:docker
+  ```bash
+  docker stack deploy -c ./stack.yml drinks-scanner-display
+  ```
 
-```bash
-sudo apt-get install libsasl2-dev python-dev libldap2-dev libssl-dev
-pip2 install -r requirements.txt
-```
-Then copy `config.example.py` to `config.py`, customizing the contents.
+  <details>
+    <summary>individual DSD container instructions</summary>
 
-Now, start PostgreSQL and OpenLDAP either with `systemctl start` or with Docker:
+    ```bash
+    docker run --name dsd_drinks-scanner-display -d -v ./config.py:/app/config.py -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=unix${DISPLAY} flipdot/drinks-scanner-display
+    ```
+  </details>
 
-```bash
-xhost local:docker && docker stack deploy -c stack.yml drinks-scanner-display
-```
+- Windows
+
+  As X server for Windows you can use [VcXsrv](https://sourceforge.net/projects/vcxsrv/). Be sure to check "disable access control" in the XLaunch dialog.
+
+  ```bash
+  docker stack deploy -c .\stack-windows.yml drinks-scanner-display
+  ```
+
+  <details>
+    <summary>individual DSD container instructions</summary>
+
+    ```powershell
+    docker run --name dsd_drinks-scanner-display -d -v ./config.py:/app/config.py -e DISPLAY=${env:DISPLAY} flipdot/drinks-scanner-display
+    ```
+  </details>
+
 
 <details>
-  <summary>individual container instructions</summary>
+  <summary>individual general container instructions</summary>
 
   ```bash
   # PostgreSQL
@@ -46,15 +63,38 @@ xhost local:docker && docker stack deploy -c stack.yml drinks-scanner-display
   ```
 </details>
 
-Login to [Adminer](http://localhost:8080) with **database system**, **username** and **password** `postgres`, **server** `dsd_postgres` and **database** `drinks`.
-Login to [phpLDAPadmin](https://localhost:6443) with **login dn** `cn=admin,dc=flipdot,dc=org` and **password** `admin`.
 
-And finally, run the entrypoint script `game.py`.
+### Embedded
 
-## Deployment
+#### Dependencies
+- LDAP server, reachable via `ldap://rail/` (see [users.py](users/users.py))
+- PostgreSQL @localhost (see [storage.py](database/storage.py))
+- touch display with a minimum of 480x800 px.
+
+Install dependencies like this:
+
+```bash
+sudo apt-get install libsasl2-dev python-dev libldap2-dev libssl-dev
+pip2 install -r requirements.txt
+```
+Then copy `config.example.py` to `config.py`, customizing the contents.
+
+Now, start PostgreSQL and OpenLDAP with `systemctl start`. And finally, run the entrypoint script `game.py`.
 
 For embedded systems it is recommended to use `@reboot runGame.sh` inside a cron tab.
 This starts an X server, sets various display properties and puts the application itself in a loop.
+
+
+## Dashboards
+
+Login to [Adminer](http://localhost:8080) with **database system**, **username** and **password** `postgres`, **server** `dsd_postgres` and **database** `drinks`.
+
+Login to [phpLDAPadmin](https://localhost:6443) with **login dn** `cn=admin,dc=flipdot,dc=org` and **password** `admin`.
+
+
+## Database Schema
+PostgreSQL dumps can be found inside the `sql` folder along with scripts to im- and export.
+
 
 ## License
 TODO
