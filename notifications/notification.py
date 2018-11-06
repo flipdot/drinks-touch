@@ -62,10 +62,10 @@ def send_notification(to_address, subject, content_text, content_html, uid):
 
     logger.info("Mailing %s: '%s'", to_address, subject)
     logger.debug("Content: ---\n%s\n---", content_text)
+
     if config.NO_MAILS:
-        if str(config.FORCE_MAIL_TO) != str(uid):
-            logger.info("skipping mail, because config.NO_MAILS")
-            return
+        logger.info("skipping mail, because config.NO_MAILS")
+        return
 
     s = smtplib.SMTP()
     s.connect(host=config.MAIL_HOST, port=config.MAIL_PORT)
