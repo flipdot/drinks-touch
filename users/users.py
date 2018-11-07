@@ -295,10 +295,18 @@ class Users(object):
     def save(user):
         changes = {}
         for key, meta in Users.fields.iteritems():
-            new_value = user[key]
+            new_value = None
+
+            if key in user:
+                new_value = user[key]
+
             if "save" in meta:
-                new_value = meta["save"](new_value)
-            if new_value != user["_reference"][key]:
+                save_function = meta["save"]
+
+                if callable(save_function):
+                    new_value = save_function(new_value)
+
+            if "_reference" in user and new_value != user["_reference"][key]:
                 changes[key] = (user["_reference"][key], new_value)
 
         if not changes:
