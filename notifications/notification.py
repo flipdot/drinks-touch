@@ -10,6 +10,7 @@ from email.header import Header
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.utils import formatdate, make_msgid
+from premailer import transform
 from sqlalchemy import text
 
 import config
@@ -48,7 +49,7 @@ def send_notification(to_address, subject, content_text, content_html, uid):
     msg = MIMEMultipart('alternative')
 
     plain = MIMEText(content_text, 'plain', _charset='utf-8')
-    html = MIMEText(content_html, 'html', _charset='utf-8')
+    html = MIMEText(transform(content_html), 'html', _charset='utf-8')
 
     msg.attach(plain)
     msg.attach(html)
@@ -116,6 +117,9 @@ def send_low_balances(with_summary=True):
 
 
 def send_low_balance(session, user, with_summary=False, force=False):
+    if "email" not in user:
+        return
+    
     balance = Users.get_balance(user['id'])
 
     if not force and balance >= MINIMUM_BALANCE:
@@ -179,6 +183,9 @@ def send_summaries():
 
 
 def send_summary(session, user, subject, prepend_text=None, prepend_html=None, force=False):
+    if 'email' not in user:
+        return
+
     frequency_str = user['meta']['drink_notification']
     balance = Users.get_balance(user['id'])
 
