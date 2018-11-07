@@ -6,6 +6,7 @@ influxdb
 jinja2
 keyboard
 Pillow==5.2.0
+premailer
 psycopg2-binary
 pygame
 python-ldap # sudo apt-get install python-dev libldap2-dev libsasl2-dev libssl-dev
