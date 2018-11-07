@@ -117,6 +117,9 @@ def send_low_balances(with_summary=True):
 
 
 def send_low_balance(session, user, with_summary=False, force=False):
+    if "email" not in user:
+        return
+    
     balance = Users.get_balance(user['id'])
 
     if not force and balance >= MINIMUM_BALANCE:
@@ -180,6 +183,9 @@ def send_summaries():
 
 
 def send_summary(session, user, subject, prepend_text=None, prepend_html=None, force=False):
+    if 'email' not in user:
+        return
+
     frequency_str = user['meta']['drink_notification']
     balance = Users.get_balance(user['id'])
 
