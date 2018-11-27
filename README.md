@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/flipdot/drinks-scanner-display.svg?branch=master)](https://travis-ci.org/flipdot/drinks-scanner-display)
 # Drinks Scanner Display
 Digital replacement for the drinks tally list featuring a touchscreen, user management and a barcode scanner.
 
