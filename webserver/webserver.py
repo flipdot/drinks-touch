@@ -6,7 +6,6 @@ import re
 from decimal import Decimal
 
 from acme import acme
-from users.qr import make_sepa_qr
 
 
 class DateTimeEncoder(json.JSONEncoder):
@@ -16,7 +15,6 @@ class DateTimeEncoder(json.JSONEncoder):
 
         return json.JSONEncoder.default(self, o)
 
-from env import is_pi
 
 from flask import Flask, make_response
 from flask import render_template
@@ -30,7 +28,6 @@ from env import is_pi
 from stats.stats import scans
 from users.qr import make_sepa_qr
 from users.users import Users
-
 
 app = Flask(__name__)
 Compress(app)

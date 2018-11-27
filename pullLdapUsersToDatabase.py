@@ -1,5 +1,3 @@
-import logging
-
 from database.models.ldapUser import LdapUser
 from database.storage import get_session, init_db
 from users.users import Users

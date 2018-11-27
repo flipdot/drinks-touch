@@ -2,7 +2,6 @@ from influxdb import InfluxDBClient
 
 from database.storage import get_session, init_db
 
-
 influx_client = InfluxDBClient('172.18.0.2', 8086, 'admin', 'admin', 'drinks')
 influx_client.create_database('drinks')
 

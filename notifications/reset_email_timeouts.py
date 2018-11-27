@@ -1,8 +1,8 @@
 #!/usr/bin/env python2
 # coding=utf8
-import os
 
 from users.users import Users
+
 
 def main(args):
     for user in Users.get_all():
