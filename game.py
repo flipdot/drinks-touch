@@ -36,6 +36,7 @@ from barcode.barcode_worker import Worker as BarcodeWorker
 from users.sync import sync_recharges
 
 import debug
+import env
 
 debug.listen()
 
@@ -122,11 +123,12 @@ def main(argv):
     stats_thread.daemon = True
     stats_thread.start()
 
-    os.system("rsync -a sounds/ pi@pixelfun:sounds/ &")
+    if env.is_pi():
+        os.system("rsync -a sounds/ pi@pixelfun:sounds/ &")
 
     t = 0
-    dt = 0
     done = False
+
     while not done:
         dt = clock.tick(config.FPS) / 1000.0
         t += dt
@@ -146,8 +148,10 @@ def main(argv):
                 done = True
                 break
             event_queue.put(e, True)
+
     web_thread.terminate()
     web_thread.wait()
+
     return 0
 
 

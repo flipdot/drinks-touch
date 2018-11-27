@@ -13,32 +13,29 @@ from database.models.recharge_event import RechargeEvent
 from database.storage import get_session
 from env import is_pi
 
-logger = logging.getLogger(__name__)
-
-test_data = [{"name": "foo", "id": "1", "id_card": None},
-             {"name": "bar", "id": "2", "id_card": "idcard2"},
-             {"name": "Baz", "id": "3", "id_card": "idcard"},
-             {"name": "Baz", "id": "3", "id_card": "idcard"},
-             {"name": "Baz1", "id": "31", "id_card": "idcard"},
-             {"name": "Baz2", "id": "32", "id_card": "idcard"},
-             {"name": "Baz3", "id": "33", "id_card": "idcard"},
-             {"name": "Baz4", "id": "34", "id_card": "idcard"},
-             {"name": "Baz5", "id": "35", "id_card": "idcard"},
-             {"name": "Baz6", "id": "36", "id_card": "idcard"},
-             {"name": "Baz7", "id": "37", "id_card": "idcard"},
-             {"name": "Baz8", "id": "38", "id_card": "idcard"},
-             {"name": "Baz9", "id": "39", "id_card": "idcard"},
-             {"name": "Baz10", "id": "40", "id_card": "idcard"},
-             {"name": "Baz11", "id": "41", "id_card": "idcard"},
-             {"name": "Baz12", "id": "42", "id_card": "idcard"},
-             {"name": "Baz13", "id": "43", "id_card": "idcard"},
-             {"name": "Baz14", "id": "44", "id_card": "idcard"},
-             {"name": "Daz", "id": "3", "id_card": "idcard"},
-             {"name": "Choo", "id": "10004", "id_card": "choo"},
-             {"name": "user_mit_email", "email": config.MAIL_FROM,
-              "meta": {"drink_notification": "instant", "last_drink_notification": 0, "last_emailed": 0}, "id": "12345",
-              "id_card": "idcard_dm"},
-             ]
+test_data = [
+    {
+        "id": "1",
+        "id_card": None,
+        "name": "foo"
+    },
+    {
+        "id": "2",
+        "id_card": "idcard",
+        "name": "bar"
+    },
+    {
+        "id": "3",
+        "id_card": "idcard_dm",
+        "email": config.MAIL_FROM,
+        "meta": {
+            "drink_notification": "instant",
+            "last_drink_notification": 0,
+            "last_emailed": 0
+        },
+        "name": "debug_user"
+    }
+]
 
 
 class Users(object):
@@ -304,14 +301,14 @@ class Users(object):
     @staticmethod
     def save(user):
         changes = {}
-        for key, meta in Users.fields.iteritems():
+        for key, ldap_mapping in Users.fields.iteritems():
             new_value = None
 
             if key in user:
                 new_value = user[key]
 
-            if "save" in meta:
-                save_function = meta["save"]
+            if new_value is not None and "save" in ldap_mapping:
+                save_function = ldap_mapping["save"]
 
                 if callable(save_function):
                     new_value = save_function(new_value)
@@ -327,12 +324,12 @@ class Users(object):
             return
         for key, change in changes.iteritems():
             old, new = change
-            meta = Users.fields[key]
             # logger.debug("User %s %s: changing %s (%s) from '%s' to '%s'" % (
+            ldap_mapping = Users.fields[key]
             #    user["id"], user['name'], key, meta['ldap_field'], str(old),
             #    str(new)))
             try:
-                Users.set_value(user, meta["ldap_field"], new)
+                Users.set_value(user, ldap_mapping["ldap_field"], new)
                 user["_reference"][key] = new
             except Exception as e:
                 print "LDAP error:", e

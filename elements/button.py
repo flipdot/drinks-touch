@@ -36,7 +36,7 @@ class Button(BaseElm):
     def post_click(self):
         self.clicking = False
 
-    def render(self, t, dt):
+    def render(self):
         if self.clicking:
             self.screen.fill(tuple(c * 0.7 for c in self.color), self.box)
 
@@ -78,9 +78,9 @@ class Button(BaseElm):
                 if self.box is not None and \
                         self.visible() and \
                         pygame.Rect(self.box).collidepoint(pos):
-                    self.pre_click(event)
+                    self.pre_click()
                     try:
                         self.clicked(self.click_param, pos)
                     finally:
-                        self.post_click(event)
+                        self.post_click()
                     event.consumed = True

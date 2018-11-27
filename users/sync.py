@@ -37,8 +37,14 @@ def sync_recharges():
 
 
 def sync_recharges_real():
-    data = requests.get(config.money_url,
-                        auth=HTTPBasicAuth(config.money_user, config.money_password))
+    data = None
+
+    try:
+        data = requests.get(config.money_url, auth=HTTPBasicAuth(config.money_user, config.money_password))
+    except requests.exceptions.ConnectionError:
+        logger.exception("Cannot connect to sync recharges:")
+        return
+
     recharges = data.json()
     session = get_session()
     got_by_user = get_existing(session)

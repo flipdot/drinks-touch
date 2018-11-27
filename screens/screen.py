@@ -1,3 +1,6 @@
+from elements.progress import Progress
+
+
 class Screen(object):
     def __init__(self, screen):
         self.screen = screen
@@ -6,7 +9,10 @@ class Screen(object):
     def render(self, t, dt):
         for o in self.objects:
             if o.visible():
-                o.render(t, dt)
+                if isinstance(o, Progress):
+                    o.render(t, dt)
+                else:
+                    o.render()
 
     def events(self, events):
         for o in self.objects:
