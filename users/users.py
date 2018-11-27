@@ -6,12 +6,18 @@ import ldap.modlist as modlist
 import logging
 import random
 import traceback
+import logging
+
+import ldap
+import ldap.modlist as modlist
 from sqlalchemy.sql import text
 
 import config
 from database.models.recharge_event import RechargeEvent
 from database.storage import get_session
 from env import is_pi
+
+logger = logging.getLogger(__name__)
 
 test_data = [{"name": "foo", "id": "1", "id_card": None},
              {"name": "bar", "id": "2", "id_card": "idcard2"},
@@ -301,22 +307,30 @@ class Users(object):
     def save(user):
         changes = {}
         for key, meta in Users.fields.iteritems():
-            new_value = user[key]
+            new_value = None
+
+            if key in user:
+                new_value = user[key]
+
             if "save" in meta:
-                new_value = meta["save"][new_value]
-            if new_value != user["_reference"][key]:
+                save_function = meta["save"]
+
+                if callable(save_function):
+                    new_value = save_function(new_value)
+
+            if "_reference" in user and new_value != user["_reference"][key]:
                 changes[key] = (user["_reference"][key], new_value)
 
         if not changes:
             return
-        logging.info("LDAP change %s: %s", user["name"], changes)
+        logger.info("LDAP change %s: %s", user["name"], changes)
         if config.NO_CHANGES:
-            logging.info("Ignoring because config.NO_CHANGES")
+            logger.info("Ignoring because config.NO_CHANGES")
             return
         for key, change in changes.iteritems():
             old, new = change
             meta = Users.fields[key]
-            # logging.debug("User %s %s: changing %s (%s) from '%s' to '%s'" % (
+            #logger.debug("User %s %s: changing %s (%s) from '%s' to '%s'" % (
             #    user["id"], user['name'], key, meta['ldap_field'], str(old),
             #    str(new)))
             try:

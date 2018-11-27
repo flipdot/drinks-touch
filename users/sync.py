@@ -13,7 +13,7 @@ from database.storage import get_session
 from notifications.notification import send_summary
 from users import Users
 
-log = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 helper_user = "SEPA"
 
@@ -32,8 +32,8 @@ def get_existing(session):
 def sync_recharges():
     try:
         sync_recharges_real()
-    except Exception:
-        log.exception("Syncing recharges:")
+    except Exception as e:
+        logger.exception("Syncing recharges:")
 
 
 def sync_recharges_real():
@@ -44,15 +44,15 @@ def sync_recharges_real():
     got_by_user = get_existing(session)
 
     for uid, charges in recharges.iteritems():
-        log.info("Syncing recharges for user %s", uid)
+        logger.info("Syncing recharges for user %s", uid)
         if uid not in got_by_user:
-            log.info("First recharge for user %s!", uid)
+            logger.info("First recharge for user %s!", uid)
             got_by_user[uid] = []
         got = got_by_user[uid]
         for charge in charges:
             charge_date = datetime.strptime(charge['date'], "%Y-%m-%d")
             charge_amount = Decimal(charge['amount'])
-            log.debug("charge: %s, %s", charge, charge_date)
+            logger.debug("charge: %s, %s", charge, charge_date)
             found = False
             for exist in got:
                 if exist.timestamp != charge_date:
@@ -69,8 +69,8 @@ def sync_recharges_real():
 
 
 def handle_transferred(charge, charge_amount, charge_date, got, session, uid):
-    log.info("User %s transferred %s on %s: %s",
-             uid, charge_amount, charge_date, charge)
+    logger.info("User %s transferred %s on %s: %s",
+                uid, charge_amount, charge_date, charge)
     ev = RechargeEvent(uid, helper_user, charge_amount, charge_date)
     got.append(ev)
     session.add(ev)
@@ -78,14 +78,14 @@ def handle_transferred(charge, charge_amount, charge_date, got, session, uid):
     try:
         user = Users.get_by_id(uid)
         if not user:
-            log.error("could not find user %s to send email", uid)
+            logger.error("could not find user %s to send email", uid)
         else:
             subject = "Aufladung EUR %s für %s" % (charge_amount, user['name'])
             text = "Deine Aufladung über %s € am %s mit Text '%s' war erfolgreich." % (
                 charge_amount, charge_date, charge['info'])
             send_summary(session, user, subject=subject, force=True, prepend_text=text)
-    except Exception:
-        log.exception("sending notification mail:")
+    except:
+        logger.exception("sending notification mail:")
 
 
 if __name__ == "__main__":

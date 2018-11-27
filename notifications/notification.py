@@ -10,6 +10,7 @@ from email.header import Header
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.utils import formatdate, make_msgid
+from premailer import transform
 from sqlalchemy import text
 
 import config
@@ -17,6 +18,8 @@ from database.models.recharge_event import RechargeEvent
 from database.storage import get_session
 from env import is_pi
 from users.users import Users
+
+logger = logging.getLogger(__name__)
 
 SUBJECT_PREFIX = "[fd-noti]"
 MINIMUM_BALANCE = -5
@@ -46,7 +49,7 @@ def send_notification(to_address, subject, content_text, content_html, uid):
     msg = MIMEMultipart('alternative')
 
     plain = MIMEText(content_text, 'plain', _charset='utf-8')
-    html = MIMEText(content_html, 'html', _charset='utf-8')
+    html = MIMEText(transform(content_html), 'html', _charset='utf-8')
 
     msg.attach(plain)
     msg.attach(html)
@@ -58,12 +61,12 @@ def send_notification(to_address, subject, content_text, content_html, uid):
     msg['Message-id'] = make_msgid()
     msg['X-LDAP-ID'] = uid
 
-    logging.info("Mailing %s: '%s'", to_address, subject)
-    logging.debug("Content: ---\n%s\n---", content_text)
+    logger.info("Mailing %s: '%s'", to_address, subject)
+    logger.debug("Content: ---\n%s\n---", content_text)
+
     if config.NO_MAILS:
-        if str(config.FORCE_MAIL_TO) != str(uid):
-            logging.info("skipping mail, because config.NO_MAILS")
-            return
+        logger.info("skipping mail, because config.NO_MAILS")
+        return
 
     s = smtplib.SMTP()
     s.connect(host=config.MAIL_HOST, port=config.MAIL_PORT)
@@ -94,7 +97,7 @@ def send_drink(user, drink, with_summary=False):
                          prepend_html=content_html,
                          force=True)
     except Exception:
-        logging.exception("while sending drink noti")
+        logger.exception("while sending drink noti")
         pass
 
 
@@ -109,11 +112,14 @@ def send_low_balances(with_summary=True):
         try:
             send_low_balance(session, user, with_summary)
         except Exception:
-            logging.exception("while sending lowbalances:")
+            logger.exception("while sending lowbalances:")
             continue
 
 
 def send_low_balance(session, user, with_summary=False, force=False):
+    if "email" not in user:
+        return
+    
     balance = Users.get_balance(user['id'])
 
     if not force and balance >= MINIMUM_BALANCE:
@@ -130,7 +136,7 @@ def send_low_balance(session, user, with_summary=False, force=False):
     if not force and diff_hours <= REMIND_MAIL_EVERY_X_HOURS:
         return
 
-    logging.info("%s's low balance last emailed %.2f days (%.2f hours) ago. Mailing now.",
+    logger.info("%s's low balance last emailed %.2f days (%.2f hours) ago. Mailing now.",
                  user['name'], diff_days, diff_hours)
     content_text = (u"Du hast seit mehr als {diff_days} Tagen "
                     u"ein Guthaben von unter {minimum_balance}€!\n"
@@ -172,11 +178,14 @@ def send_summaries():
         try:
             send_summary(session, user, "Getränkeübersicht")
         except Exception:
-            logging.exception("While sending summary for %s", user)
+            logger.exception("While sending summary for %s", user)
             continue
 
 
 def send_summary(session, user, subject, prepend_text=None, prepend_html=None, force=False):
+    if 'email' not in user:
+        return
+
     frequency_str = user['meta']['drink_notification']
     balance = Users.get_balance(user['id'])
 
@@ -197,12 +206,12 @@ def send_summary(session, user, subject, prepend_text=None, prepend_html=None, f
     diff_days = diff_hours / 24
 
     if force:
-        logging.info("Forcing mail.")
+        logger.info("Forcing mail.")
     else:
         if diff <= freq_secs:
             return
 
-    logging.info("%s's summary last emailed %.2f days (%.2f hours) ago. Mailing now.",
+    logger.info("%s's summary last emailed %.2f days (%.2f hours) ago. Mailing now.",
                  user['name'], diff_days, diff_hours)
 
     content_text = u""
@@ -238,14 +247,14 @@ def send_summary(session, user, subject, prepend_text=None, prepend_html=None, f
     email = user['email']
 
     if not email:
-        logging.warn("User %s has no email. skipping.", user)
+        logger.warn("User %s has no email. skipping.", user)
         return
 
     if len(drinks_consumed) == 0 and len(recharges) == 0 and not force:
-        logging.debug("got no rows. skipping.")
+        logger.debug("got no rows. skipping.")
         return
 
-    logging.info("Got %d drinks and %d recharges. Mailing.", len(drinks_consumed), len(recharges))
+    logger.info("Got %d drinks and %d recharges. Mailing.", len(drinks_consumed), len(recharges))
     send_notification(email, subject, content_text, content_html, user['id'])
     user['meta']['last_drink_notification'] = time.time()
     Users.save(user)

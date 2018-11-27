@@ -1,0 +1,42 @@
+version: "3.7"
+services:
+  adminer:
+    image: "adminer"
+    ports:
+    - "8080:8080"
+  drinks-scanner-display:
+    image: "flipdot/drinks-scanner-display"
+    volumes:
+    - "./config.py:/app/config.py"
+    - "/tmp/.X11-unix:/tmp/.X11-unix"
+    environment:
+      DISPLAY: "unix${DISPLAY}"
+  ldap:
+    image: "osixia/openldap"
+    environment:
+      LDAP_DOMAIN: "flipdot.org"
+      LDAP_LOGIN_DN: "dc=flipdot,dc=org"
+      LDAP_ADMIN_PASSWORD: "admin"
+    ports:
+    - "389:389"
+    - "639:639"
+  phpldapadmin:
+    environment:
+      PHPLDAPADMIN_HTTPS: "true"
+    image: "osixia/phpldapadmin"
+    ports:
+    - "6443:443"
+    volumes:
+    - "phpldapadmin-data:/var/www/phpldapadmin"
+  postgres:
+    image: "postgres"
+    environment:
+      POSTGRES_DB: "drinks"
+      POSTGRES_PASSWORD: "postgres"
+    volumes:
+    - "postgres-data:/var/lib/postgresql/data"
+    - "./sql/01-schema.sql:/docker-entrypoint-initdb.d/01-schema.sql"
+    - "./sql/02-drinks.sql:/docker-entrypoint-initdb.d/02-drinks.sql"
+volumes:
+  phpldapadmin-data: {}
+  postgres-data: {}

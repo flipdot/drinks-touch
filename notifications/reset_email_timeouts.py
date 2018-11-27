@@ -1,17 +1,8 @@
 #!/usr/bin/env python2
 # coding=utf8
-
-import sys
-
-import logging
 import os
 
 from users.users import Users
-
-sys.path.append(os.path.dirname(__file__) + "/../")
-
-logging.basicConfig()
-
 
 def main(args):
     for user in Users.get_all():

@@ -4,8 +4,6 @@ from database.models.ldapUser import LdapUser
 from database.storage import get_session, init_db
 from users.users import Users
 
-logging.basicConfig(level=logging.DEBUG)
-
 
 def main():
     users = Users.get_all(include_temp=True)
