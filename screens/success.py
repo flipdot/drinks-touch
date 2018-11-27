@@ -10,7 +10,7 @@ from .screen import Screen
 
 
 class SuccessScreen(Screen):
-    def __init__(self, screen, user, drink, text, session, **kwargs):
+    def __init__(self, screen, user, drink, text, session):
         super(SuccessScreen, self).__init__(screen)
 
         self.user = user
@@ -41,7 +41,7 @@ class SuccessScreen(Screen):
         ))
         self.objects.append(Label(
             self.screen,
-            text=str(Users.get_balance(self.user['id'], session=session))+' EUR',
+            text=str(Users.get_balance(self.user['id'], session=session)) + ' EUR',
             pos=(50, 400)
         ))
 
@@ -73,10 +73,11 @@ class SuccessScreen(Screen):
         if drink:
             send_drink(user, drink, True)
 
-    def home(self):
+    @staticmethod
+    def home():
         from .screen_manager import ScreenManager
         screen_manager = ScreenManager.get_instance()
         screen_manager.set_default()
 
-    def btn_home(self, param, pos):
+    def btn_home(self):
         self.home()

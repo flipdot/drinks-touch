@@ -1,5 +1,6 @@
 import pygame
 
+
 def get_screen():
     try:
         screen = __get_screen_framebuffer()
@@ -8,12 +9,14 @@ def get_screen():
 
     return screen
 
+
 def __get_screen_xserver():
     SIZE = 480, 800
-    #SIZE = 656, 1216
+    # SIZE = 656, 1216
     pygame.init()
     screen = pygame.display.set_mode(SIZE)
     return screen
+
 
 def __get_screen_framebuffer():
     "Ininitializes a new pygame screen using the framebuffer"

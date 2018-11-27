@@ -1,7 +1,9 @@
 import datetime
 
 from sqlalchemy import Column, Integer, String, DateTime, Numeric
+
 from database.storage import Base
+
 
 class Drink(Base):
     __tablename__ = 'drink'

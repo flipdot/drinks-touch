@@ -1,5 +1,7 @@
-from sqlalchemy import Column, Integer, String, DateTime, Numeric, Boolean
+from sqlalchemy import Column, Integer, String, Boolean
+
 from database.storage import Base
+
 
 class LdapUser(Base):
     __tablename__ = 'ldapUsers'

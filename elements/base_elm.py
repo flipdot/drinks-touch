@@ -1,5 +1,3 @@
-import pygame
-
 class BaseElm(object):
     def __init__(self, screen, pos, height, width):
         self.screen = screen

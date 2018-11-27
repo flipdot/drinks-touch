@@ -1,18 +1,21 @@
 #!/usr/bin/env python2
 
-import socket
 import sys
+
+import socket
 from PIL import Image
 
 host = '192.168.3.36'
-#host='127.0.0.1'
-port = 2323;
+# host='127.0.0.1'
+port = 2323
 
 w = 48
 h = 20
 
+
 def usage():
     print('flipdots.py IMAGEFILE')
+
 
 def create_socket():
     try:
@@ -22,18 +25,21 @@ def create_socket():
         print('Failed to create socket')
         sys.exit(1)
 
-def send_bytes(socket, msg):
+
+def send_bytes(byte_socket, msg):
     try:
-        socket.sendto(msg, (host, port))
-    except socket.error:
+        byte_socket.sendto(msg, (host, port))
+    except byte_socket.error:
         print('Socket Error Code: ' + str(msg[0]) + ' Message ' + msg[1])
         sys.exit(2)
 
+
 def send_frame(s, i):
-    i.thumbnail((w,h))
+    i.thumbnail((w, h))
     i = i.convert('1').transpose(Image.ROTATE_90)
     send_bytes(s, i.tobytes())
-    #i.show()
+    # i.show()
+
 
 def main(argv):
     if len(argv) != 1:
@@ -54,5 +60,6 @@ def main(argv):
             # print("No more frames to send")
             break
 
+
 if __name__ == "__main__":
-       main(sys.argv[1:])
+    main(sys.argv[1:])

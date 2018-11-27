@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import time
-from datetime import datetime, timedelta
+from datetime import datetime
 
 import jinja2
 import logging
@@ -16,7 +16,6 @@ from sqlalchemy import text
 import config
 from database.models.recharge_event import RechargeEvent
 from database.storage import get_session
-from env import is_pi
 from users.users import Users
 
 logger = logging.getLogger(__name__)
@@ -119,7 +118,7 @@ def send_low_balances(with_summary=True):
 def send_low_balance(session, user, with_summary=False, force=False):
     if "email" not in user:
         return
-    
+
     balance = Users.get_balance(user['id'])
 
     if not force and balance >= MINIMUM_BALANCE:
@@ -137,7 +136,7 @@ def send_low_balance(session, user, with_summary=False, force=False):
         return
 
     logger.info("%s's low balance last emailed %.2f days (%.2f hours) ago. Mailing now.",
-                 user['name'], diff_days, diff_hours)
+                user['name'], diff_days, diff_hours)
     content_text = (u"Du hast seit mehr als {diff_days} Tagen "
                     u"ein Guthaben von unter {minimum_balance}€!\n"
                     u"Aktueller Kontostand: {balance:.2f}€.\n"
@@ -212,7 +211,7 @@ def send_summary(session, user, subject, prepend_text=None, prepend_html=None, f
             return
 
     logger.info("%s's summary last emailed %.2f days (%.2f hours) ago. Mailing now.",
-                 user['name'], diff_days, diff_hours)
+                user['name'], diff_days, diff_hours)
 
     content_text = u""
 

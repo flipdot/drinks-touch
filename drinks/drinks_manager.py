@@ -16,4 +16,4 @@ class DrinksManager:
         self.selected_drink = drink
 
     def get_selected_drink(self):
-        return self.selected_drink        
+        return self.selected_drink

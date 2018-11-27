@@ -1,16 +1,17 @@
 # coding=utf-8
 import io
+import qrcode
 import random
 import re
 import string
 import urllib
-
-import qrcode
 from decimal import Decimal
 
 recipient = "flipdot e.V."
 iban = "DE07520503530001147713"
-#bic = "HELADEF1KAS"
+
+
+# bic = "HELADEF1KAS"
 
 def make_sepa_qr(amount, name, uid, pixel_width=10, border=4, color="black", bg="white"):
     info = "".join(random.choice(string.ascii_lowercase) for x in range(12))

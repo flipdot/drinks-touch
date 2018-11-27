@@ -1,8 +1,6 @@
-from pprint import pprint
-
 from database.models.ldapUser import LdapUser
-from users.users import Users
 from database.storage import get_session, init_db
+from users.users import Users
 
 
 def main():
@@ -24,5 +22,6 @@ def main():
         session.add(ldapUser)
 
     session.commit()
+
 
 main()

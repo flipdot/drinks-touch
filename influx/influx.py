@@ -2,18 +2,19 @@ from influxdb import InfluxDBClient
 
 from database.storage import get_session, init_db
 
-
 influx_client = InfluxDBClient('172.18.0.2', 8086, 'admin', 'admin', 'drinks')
 influx_client.create_database('drinks')
+
 
 def init_influx():
     pass
 
+
 def clear_scanevents():
     influx_client.query("delete from drink_scans")
 
-def upload_scanevents():
 
+def upload_scanevents():
     session = get_session()
 
     result = session.execute("""
@@ -24,12 +25,12 @@ def upload_scanevents():
     """)
 
     for scanevent in result:
-        id = scanevent['id']
-        time = scanevent['time']
-        name = scanevent['name']
-        type = scanevent['type']
+        scan_id = scanevent['id']
+        scan_time = scanevent['time']
+        scan_name = scanevent['name']
+        scan_type = scanevent['type']
 
-        if name is None:
+        if scan_name is None:
             continue
 
         json_body = [
@@ -37,13 +38,13 @@ def upload_scanevents():
                 "measurement": "drink_scans",
                 "tags": {
                     "region": "kassel",
-                    "type": type,
-                    "name": name
+                    "type": scan_type,
+                    "name": scan_name
                 },
-                "time": time,
+                "time": scan_time,
                 "fields": {
-                    "name": name,
-                    "type": type,
+                    "name": scan_name,
+                    "type": scan_type,
                     "value": 1
                 }
             }
@@ -54,10 +55,11 @@ def upload_scanevents():
             UPDATE scanevent
             SET uploaded_to_influx = TRUE
             WHERE id = :id
-        """, {"id": id})
+        """, {"id": scan_id})
         session.commit()
+
 
 if __name__ == '__main__':
     init_db()
     upload_scanevents()
-    #clear_scanevents()
+    # clear_scanevents()

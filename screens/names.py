@@ -20,17 +20,17 @@ class NamesScreen(Screen):
 
         self.objects.append(Button(
             self.screen,
-            text = "BACK",
-            pos=(30,30),
+            text="BACK",
+            pos=(30, 30),
             click=self.back,
-            font = monospace,
+            font=monospace,
             size=30
         ))
 
         self.timeout = Progress(
             self.screen,
             pos=(200, 50),
-            speed=1/15.0,
+            speed=1 / 15.0,
             on_elapsed=self.time_elapsed,
         )
         self.objects.append(self.timeout)
@@ -38,7 +38,7 @@ class NamesScreen(Screen):
 
         self.objects.append(Label(
             self.screen,
-            text ='Wer bist du?',
+            text='Wer bist du?',
             pos=(20, 110),
         ))
 
@@ -56,7 +56,7 @@ class NamesScreen(Screen):
             y = i_y * btn_ypos
             self.objects.append(Button(
                 self.screen,
-                text = user["name"],
+                text=user["name"],
                 pos=(xoff + x, y + yoff),
                 click=self.switch_to_screen,
                 click_param=user,
@@ -64,7 +64,8 @@ class NamesScreen(Screen):
             ))
             i += 1
 
-    def back(self, param, pos):
+    @staticmethod
+    def back(param, pos):
         ScreenManager.get_instance().go_back()
 
     def switch_to_screen(self, param, pos):
@@ -72,7 +73,8 @@ class NamesScreen(Screen):
             ProfileScreen(self.screen, param)
         )
 
-    def home(self):
+    @staticmethod
+    def home():
         ScreenManager.get_instance().set_default()
 
     def time_elapsed(self):

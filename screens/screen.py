@@ -1,5 +1,3 @@
-import pygame
-
 class Screen(object):
     def __init__(self, screen):
         self.screen = screen

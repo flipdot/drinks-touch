@@ -3,6 +3,7 @@ import pygame
 from env import monospace
 from .base_elm import BaseElm
 
+
 class Button(BaseElm):
     def __init__(self, screen, **kwargs):
         self.font = kwargs.get('font', monospace)
@@ -25,26 +26,27 @@ class Button(BaseElm):
     def __load_font(self):
         self.font = pygame.font.SysFont(self.font, self.size)
 
-    def __clicked(self, param, pos):
+    @staticmethod
+    def __clicked():
         print "Clicked on button without handler"
 
-    def pre_click(self, event):
+    def pre_click(self):
         self.clicking = True
-    
-    def post_click(self, event):
+
+    def post_click(self):
         self.clicking = False
 
     def render(self, t, dt):
         if self.clicking:
-            self.screen.fill(tuple(c*0.7 for c in self.color), self.box)
+            self.screen.fill(tuple(c * 0.7 for c in self.color), self.box)
 
         elm = self.font.render(self.text, 1, self.color)
         self.screen.blit(elm, self.pos)
 
         top = self.pos[0] - self.padding
         left = self.pos[1] - self.padding
-        width = elm.get_width() + self.padding*2
-        height = elm.get_height() + self.padding*2
+        width = elm.get_width() + self.padding * 2
+        height = elm.get_height() + self.padding * 2
 
         if self.force_width is not None:
             width = self.force_width
@@ -69,9 +71,11 @@ class Button(BaseElm):
         for event in events:
             if 'consumed' in event.dict and event.consumed:
                 continue
+
             if event.type == pygame.MOUSEBUTTONUP:
                 pos = event.pos
-                if self.box != None and \
+
+                if self.box is not None and \
                         self.visible() and \
                         pygame.Rect(self.box).collidepoint(pos):
                     self.pre_click(event)
