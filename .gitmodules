@@ -1,3 +1,3 @@
 [submodule "acme"]
 	path = acme
-	url = git@github.com:flipdot/acme_python.git
+	url = https://github.com/flipdot/acme_python.git
