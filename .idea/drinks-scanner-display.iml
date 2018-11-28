@@ -2,9 +2,9 @@
 <module type="PYTHON_MODULE" version="4">
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
-      <excludeFolder url="file://$MODULE_DIR$/venv-linux-p2" />
+      <excludeFolder url="file://$MODULE_DIR$/venv-linux-p3" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 2.7 (drinks-scanner-display)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 3.7 (drinks-scanner-display)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="ldap-user" />
     <orderEntry type="module" module-name="money-utils" />
