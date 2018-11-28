@@ -3,7 +3,7 @@
 import time
 
 import subprocess
-from hubarcode.code128 import Code128Encoder
+from pystrich.code128 import Code128Encoder
 
 from drinks.drinks import get_by_ean
 from drinks.drinks_manager import DrinksManager

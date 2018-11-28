@@ -3,7 +3,7 @@ import subprocess
 from PIL import Image, ImageDraw, ImageFont
 from io import StringIO
 from functools import partial
-from hubarcode.code128 import Code128Encoder
+from pystrich.code128 import Code128Encoder
 
 from database.models.recharge_event import RechargeEvent
 from database.storage import get_session

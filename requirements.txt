@@ -1,6 +1,6 @@
 flask
 flask-compress
-huBarcode # sudo apt-get install python-pil
+pyStrich # sudo apt-get install python-pil
 influxdb
 jinja2
 keyboard
