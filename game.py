@@ -2,10 +2,11 @@
 # coding=utf-8
 import sys
 
-reload(sys)
-sys.setdefaultencoding('utf-8')
+from importlib import reload
 
-import Queue
+reload(sys)
+
+import queue
 import locale
 import logging
 import os
@@ -40,7 +41,7 @@ import env
 
 debug.listen()
 
-event_queue = Queue.Queue()
+event_queue = queue.Queue()
 screen_manager = None
 
 
@@ -52,7 +53,7 @@ def handle_events():
             block = len(events) == 0
             try:
                 events.append(event_queue.get(block))
-            except Queue.Empty:
+            except queue.Empty:
                 break
         current_screen = screen_manager.get_active()
         try:

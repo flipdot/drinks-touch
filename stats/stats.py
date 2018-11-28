@@ -7,7 +7,7 @@ from PIL import Image, ImageDraw, ImageFont, ImageMath
 
 from database.storage import get_session
 from env import is_pi
-from flipdot import create_socket, send_frame, w, h
+from stats.flipdot import create_socket, send_frame, w, h
 
 font = ImageFont.truetype("stats/slkscr.ttf", 7)
 

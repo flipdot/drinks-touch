@@ -13,6 +13,8 @@ from database.models.recharge_event import RechargeEvent
 from database.storage import get_session
 from env import is_pi
 
+logger = logging.getLogger(__name__)
+
 test_data = [
     {
         "id": "1",
@@ -211,7 +213,7 @@ class Users(object):
                 WHERE user_id = :user_id
                 GROUP BY user_id
             """)
-        # print sql, user_id
+        # print(sql, user_id)
         row = session.connection().execute(sql, user_id=user_id).fetchone()
         if not row:
             credit = 0
@@ -285,7 +287,7 @@ class Users(object):
             return
         balance = Users.get_balance(user['id'], session=session)
         if balance <= 0:
-            print "deleting user " + str(user['id']) + " because they are broke"
+            print("deleting user " + str(user['id']) + " because they are broke")
             Users.delete(user)
 
     @staticmethod
@@ -294,7 +296,7 @@ class Users(object):
             con = Users.get_ldap_instance()
             con.delete_s(user['path'])
         except Exception as e:
-            print "Error: " + str(e)
+            print("Error: " + str(e))
             exc_traceback = sys.exc_info()
             traceback.print_tb(exc_traceback, limit=4)
 
@@ -332,4 +334,4 @@ class Users(object):
                 Users.set_value(user, ldap_mapping["ldap_field"], new)
                 user["_reference"][key] = new
             except Exception as e:
-                print "LDAP error:", e
+                print("LDAP error:", e)

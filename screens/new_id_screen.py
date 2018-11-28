@@ -1,7 +1,7 @@
 # coding=utf-8
 import subprocess
 from PIL import Image, ImageDraw, ImageFont
-from StringIO import StringIO
+from io import StringIO
 from functools import partial
 from hubarcode.code128 import Code128Encoder
 
@@ -100,7 +100,7 @@ class NewIDScreen(Screen):
             self.progress.on_elapsed = None
             self.progress.value = 0
             user = Users.create_temp_user()
-            print "Created temp %s with EUR %d" % (user['id_card'], euro)
+            print("Created temp %s with EUR %d" % (user['id_card'], euro))
             self.progress.value = 0.2
             self.message.text = "Guthaben wird gespeichert..."
             self.aufladen(user, euro)
@@ -182,4 +182,4 @@ class NewIDScreen(Screen):
         p.communicate(input=img)
         # with open("print.png", "w") as f:
         #    f.write(img)
-        # print "image written to print.png"
+        # print("image written to print.png")

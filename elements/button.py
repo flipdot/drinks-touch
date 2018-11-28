@@ -28,7 +28,7 @@ class Button(BaseElm):
 
     @staticmethod
     def __clicked():
-        print "Clicked on button without handler"
+        print("Clicked on button without handler")
 
     def pre_click(self):
         self.clicking = True

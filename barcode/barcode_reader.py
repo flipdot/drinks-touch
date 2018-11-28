@@ -10,8 +10,8 @@ logger = logging.getLogger(__name__)
 
 def run(worker):
     if not is_pi():
-        print "---------"
-        print "Enter EAN here to simulate scanned barcode!"
+        print("---------")
+        print("Enter EAN here to simulate scanned barcode!")
 
         while True:
             try:

@@ -27,4 +27,4 @@ ev = Drink(
 session.add(ev)
 session.commit()
 
-print 'OK, done!'
+print('OK, done!')
