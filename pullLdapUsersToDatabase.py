@@ -4,22 +4,22 @@ from users.users import Users
 
 
 def main():
-    users = Users.get_all(include_temp=True)
+    users = list(Users.get_all(include_temp=True))
 
     init_db()
     session = get_session()
 
     for user in users:
-        ldapName = user["name"]
-        ldapUser = LdapUser(
-            ldapId=user["id"],
-            name=ldapName,
+        ldap_name = user["name"]
+        ldap_user = LdapUser(
+            ldap_id=user["id"],
+            name=ldap_name,
             id_card=user["id_card"],
             path=user["path"],
-            is_card=ldapName.startswith("geld")
+            is_card=ldap_name.startswith("geld")
         )
 
-        session.add(ldapUser)
+        session.add(ldap_user)
 
     session.commit()
 

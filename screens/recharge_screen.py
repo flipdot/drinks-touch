@@ -1,5 +1,3 @@
-# coding=utf-8
-
 from functools import partial
 
 from database.models.recharge_event import RechargeEvent
@@ -27,7 +25,7 @@ class RechargeScreen(Screen):
             text="BACK",
             pos=(30, 30),
             font=monospace,
-            click=self.back,
+            click_func=self.back,
             size=30
         ))
 
@@ -48,25 +46,25 @@ class RechargeScreen(Screen):
                 text='EUR 5',
                 pos=(30, 300),
                 size=30,
-                click=partial(self.verify_payment, 5)
+                click_func=partial(self.verify_payment, 5)
             ), Button(
                 self.screen,
                 text='EUR 10',
                 pos=(250, 300),
                 size=30,
-                click=partial(self.verify_payment, 10)
+                click_func=partial(self.verify_payment, 10)
             ), Button(
                 self.screen,
                 text='EUR 20',
                 pos=(30, 400),
                 size=30,
-                click=partial(self.verify_payment, 20)
+                click_func=partial(self.verify_payment, 20)
             ), Button(
                 self.screen,
                 text='EUR 50',
                 pos=(250, 400),
                 size=30,
-                click=partial(self.verify_payment, 50)
+                click_func=partial(self.verify_payment, 50)
             ), Label(
                 self.screen,
                 text="Wirf Geld in die Kasse,",
@@ -108,7 +106,7 @@ class RechargeScreen(Screen):
                 text='Ja',
                 pos=(250, 400),
                 size=30,
-                click=self.save_payment
+                click_func=self.save_payment
             )
         ]
         self.verify_amount = Label(

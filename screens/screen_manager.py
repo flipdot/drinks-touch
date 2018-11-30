@@ -4,9 +4,9 @@ class ScreenManager(object):
     def __init__(self, screen):
         self.screen = screen
         self.current_screen = None
+        self.screen_history = []
         self.reset_history()
         self.set_default()
-        self.screen_history = None
 
     def set_default(self):
         from screens.wait_scan import WaitScanScreen

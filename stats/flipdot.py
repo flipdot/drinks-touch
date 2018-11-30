@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
 import sys
 
@@ -27,11 +27,7 @@ def create_socket():
 
 
 def send_bytes(byte_socket, msg):
-    try:
-        byte_socket.sendto(msg, (host, port))
-    except byte_socket.error:
-        print('Socket Error Code: ' + str(msg[0]) + ' Message ' + msg[1])
-        sys.exit(2)
+    byte_socket.sendto(msg, (host, port))
 
 
 def send_frame(s, i):

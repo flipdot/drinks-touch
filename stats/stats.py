@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
 import sys
 
@@ -141,9 +141,9 @@ def run():
     send_frame(socket, image)
 
 
-def main(argv):
+def main():
     run()
 
 
 if __name__ == "__main__":
-    sys.exit(main(sys.argv))
+    sys.exit(main())

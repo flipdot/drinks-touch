@@ -1,5 +1,3 @@
-# coding=utf-8
-
 from elements.button import Button
 from elements.label import Label
 from elements.progress import Progress
@@ -9,7 +7,7 @@ from .screen import Screen
 
 
 class EnterPinScreen(Screen):
-    def __init__(self, screen, user, **kwargs):
+    def __init__(self, screen, user):
         super(EnterPinScreen, self).__init__(screen)
         self.user = user
 
@@ -17,7 +15,7 @@ class EnterPinScreen(Screen):
             self.screen,
             text="BACK",
             pos=(30, 30),
-            click=self.back,
+            click_func=self.back,
             font=monospace,
             size=30
         ))
@@ -35,7 +33,7 @@ class EnterPinScreen(Screen):
             self.screen,
             text="UNLOCK!",
             pos=(100, 680),
-            click=self.btn_ok,
+            click_func=self.btn_ok,
             font=monospace,
             size=70
         ))
@@ -74,7 +72,7 @@ class EnterPinScreen(Screen):
             text='DEL',
             pos=(200, 580),
             font=monospace,
-            click=self.del_char,
+            click_func=self.del_char,
             size=50
         ))
 
@@ -86,7 +84,7 @@ class EnterPinScreen(Screen):
             self.screen,
             text=label,
             pos=(cord_x, cord_y),
-            click=self.add_char,
+            click_func_param=self.add_char,
             click_param=label,
             font=monospace,
             size=50,
@@ -94,15 +92,15 @@ class EnterPinScreen(Screen):
             force_height=width,
         ))
 
-    def add_char(self, param, pos):
+    def add_char(self, param):
         self.input.text = self.input.text.split('_')[0] + param
         self.input.text += '_'
 
-    def del_char(self, param, pos):
+    def del_char(self):
         self.input.text = self.input.text[:len(self.input.text) - 2]
         self.input.text += '_'
 
-    def btn_ok(self, param, pos):
+    def btn_ok(self):
         # TODO check the pin using
         # self.get_pin() and self.user
 
@@ -114,12 +112,13 @@ class EnterPinScreen(Screen):
     def get_pin(self):
         return self.input.text[:len(self.input.text) - 1]
 
-    def back(self, param, pos):
+    @staticmethod
+    def back():
         from .screen_manager import ScreenManager
         screen_manager = ScreenManager.get_instance()
         screen_manager.go_back()
 
-    def switch_to_screen(self, param, pos):
+    def switch_to_screen(self, param):
         from .screen_manager import ScreenManager
         screen_manager = ScreenManager.get_instance()
         screen_manager.set_active(
@@ -128,7 +127,7 @@ class EnterPinScreen(Screen):
 
     def on_barcode(self, barcode):
         for c in barcode:
-            self.add_char(c, None)
+            self.add_char(c)
 
     @staticmethod
     def home():

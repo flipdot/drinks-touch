@@ -27,5 +27,5 @@ def init_db():
 
 
 def get_session():
-    db_session.rollback()
+    db_session.remove()
     return db_session

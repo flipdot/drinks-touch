@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import time
 from datetime import datetime
 
@@ -67,7 +65,7 @@ def send_notification(to_address, subject, content_text, content_html, uid):
         logger.info("skipping mail, because config.NO_MAILS")
         return
 
-    s = smtplib.SMTP()
+    s = smtplib.SMTP(config.MAIL_HOST)
     s.connect(host=config.MAIL_HOST, port=config.MAIL_PORT)
     s.ehlo()
     s.starttls()
@@ -246,7 +244,7 @@ def send_summary(session, user, subject, prepend_text=None, prepend_html=None, f
     email = user['email']
 
     if not email:
-        logger.warn("User %s has no email. skipping.", user)
+        logger.warning("User %s has no email. skipping.", user)
         return
 
     if len(drinks_consumed) == 0 and len(recharges) == 0 and not force:

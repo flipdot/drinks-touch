@@ -1,5 +1,3 @@
-# coding=utf-8
-
 import datetime
 
 from sqlalchemy.sql import text
@@ -31,7 +29,7 @@ class ProfileScreen(Screen):
             text="BACK",
             pos=(30, 30),
             font=monospace,
-            click=self.back
+            click_func=self.back
         ))
 
         self.objects.append(Button(
@@ -39,7 +37,7 @@ class ProfileScreen(Screen):
             text="ID card",
             pos=(340, 30),
             font=monospace,
-            click=self.id_card
+            click_func=self.id_card
         ))
 
         self.objects.append(Label(
@@ -84,7 +82,7 @@ class ProfileScreen(Screen):
             pos=(200, 50),
             speed=1 / 30.0,
             on_elapsed=self.time_elapsed,
-            click=self.btn_home,
+            click_func=self.btn_home,
         )
         self.objects.append(self.timeout)
         self.timeout.start()
@@ -102,33 +100,33 @@ class ProfileScreen(Screen):
             text='Trinken',
             pos=(30, 690),
             size=50,
-            click=self.save_drink
+            click_func=self.save_drink
         )
         self.btn_aufladungen = Button(
             self.screen,
             text='Aufladungen',
             pos=(30, 700),
-            click=self.show_aufladungen
+            click_func=self.show_aufladungen
         )
         self.btn_drinks = Button(
             self.screen,
             text='Buchungen',
             pos=(20, 700),
-            click=self.show_drinks
+            click_func=self.show_drinks
         )
         self.btn_abbrechen = Button(
             self.screen,
             text='Abbrechen',
             pos=(290, 700),
             size=30,
-            click=self.btn_home,
+            click_func=self.btn_home,
         )
         self.btn_aufladen = Button(
             self.screen,
             text='Jetzt Aufladen',
             pos=(210, 700),
             size=30,
-            click=self.recharge,
+            click_func=self.recharge,
         )
 
         self.elements_aufladungen = [self.btn_drinks, self.label_aufladungen,

@@ -1,20 +1,8 @@
 import datetime
-from datetime import datetime
-
 import json
 import re
+from datetime import datetime
 from decimal import Decimal
-
-from acme import acme
-
-
-class DateTimeEncoder(json.JSONEncoder):
-    def default(self, o):
-        if isinstance(o, datetime):
-            return o.isoformat()
-
-        return json.JSONEncoder.default(self, o)
-
 
 from flask import Flask, make_response
 from flask import render_template
@@ -22,12 +10,14 @@ from flask import request
 from flask import send_file
 from flask_compress import Compress
 
+from acme import acme
 from database.models.recharge_event import RechargeEvent
 from database.storage import get_session
 from env import is_pi
 from stats.stats import scans
 from users.qr import make_sepa_qr
 from users.users import Users
+
 
 app = Flask(__name__)
 Compress(app)

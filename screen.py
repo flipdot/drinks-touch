@@ -1,12 +1,17 @@
+import logging
 import os
 
-import pygame
+import contextlib
+with contextlib.redirect_stdout(None):
+    import pygame
+
+logger = logging.getLogger(__name__)
 
 
 def get_screen():
     try:
         screen = __get_screen_framebuffer()
-    except:
+    except Exception:
         screen = __get_screen_xserver()
 
     return screen
@@ -20,12 +25,12 @@ def __get_screen_xserver():
 
 
 def __get_screen_framebuffer():
-    "Ininitializes a new pygame screen using the framebuffer"
+    # Ininitializes a new pygame screen using the framebuffer
     # Based on "Python GUI in Linux frame buffer"
     # http://www.karoltomala.com/blog/?p=679
     disp_no = os.getenv("DISPLAY")
     if disp_no:
-        print("I'm running under X display = {0}".format(disp_no))
+        logger.info("I'm running under X display = {0}".format(disp_no))
 
     # Check which frame buffer drivers are available
     # Start with fbcon since directfb hangs with composite output
@@ -39,7 +44,7 @@ def __get_screen_framebuffer():
             pygame.display.init()
         except pygame.error:
             del os.environ['SDL_VIDEODRIVER']
-            print('Driver: {0} failed.'.format(driver))
+            logger.warning('Driver: {0} failed.'.format(driver))
             continue
         found = True
         break
@@ -50,9 +55,9 @@ def __get_screen_framebuffer():
     size = (pygame.display.Info().current_w, pygame.display.Info().current_h)
     print("Framebuffer size: %d x %d" % (size[0], size[1]))
     return pygame.display.set_mode(size, pygame.FULLSCREEN)
-    # Clear the screen to start
-    self.screen.fill((0, 0, 0))
-    # Initialise font support
-    pygame.font.init()
-    # Render the screen
-    pygame.display.update()
+    # # Clear the screen to start
+    # self.screen.fill((0, 0, 0))
+    # # Initialise font support
+    # pygame.font.init()
+    # # Render the screen
+    # pygame.display.update()

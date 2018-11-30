@@ -110,11 +110,9 @@ class Users(object):
                 users.append(user)
 
             return users
-        except Exception as e:
+        except Exception:
             if not is_pi():
-                print("ldap fail: ", e)
-                # print(traceback.format_exc())
-                print("falling back to test data")
+                logger.warning("ldap fail, falling back to test data.")
                 return filter(
                     lambda u: prefix == '' or u['name'].lower().startswith(
                         prefix.lower()), test_data)
@@ -124,7 +122,7 @@ class Users(object):
     @staticmethod
     def user_from_ldap(ldap_user):
         user = {}
-        for key, meta in Users.fields.iteritems():
+        for key, meta in Users.fields.items():
             try:
                 value = ldap_user[meta['ldap_field']]
                 if "index" in meta:
@@ -140,7 +138,7 @@ class Users(object):
                 else:
                     raise
         user["_reference"] = {}
-        for key, meta in Users.fields.iteritems():
+        for key, meta in Users.fields.items():
             value = user[key]
             if "save" in meta:
                 value = meta["save"][value]
@@ -303,7 +301,7 @@ class Users(object):
     @staticmethod
     def save(user):
         changes = {}
-        for key, ldap_mapping in Users.fields.iteritems():
+        for key, ldap_mapping in Users.fields.items():
             new_value = None
 
             if key in user:
@@ -324,7 +322,7 @@ class Users(object):
         if config.NO_CHANGES:
             logger.info("Ignoring because config.NO_CHANGES")
             return
-        for key, change in changes.iteritems():
+        for key, change in changes.items():
             old, new = change
             # logger.debug("User %s %s: changing %s (%s) from '%s' to '%s'" % (
             ldap_mapping = Users.fields[key]

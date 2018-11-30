@@ -12,8 +12,8 @@ class LdapUser(Base):
     id_card = Column(String(50), unique=False)
     is_card = Column(Boolean(), unique=False)
 
-    def __init__(self, ldapId, name, path, id_card, is_card):
-        self.ldapId = ldapId
+    def __init__(self, ldap_id, name, path, id_card, is_card):
+        self.ldapId = ldap_id
         self.name = name
         self.path = path
         self.id_card = id_card

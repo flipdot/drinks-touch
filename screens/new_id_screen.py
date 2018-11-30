@@ -1,4 +1,3 @@
-# coding=utf-8
 import subprocess
 from PIL import Image, ImageDraw, ImageFont
 from io import StringIO
@@ -26,7 +25,7 @@ class NewIDScreen(Screen):
             text="BACK",
             pos=(30, 30),
             font=monospace,
-            click=self.back,
+            click_func=self.back,
             size=30
         ))
 
@@ -65,7 +64,7 @@ class NewIDScreen(Screen):
                 text="EUR " + str(euro),
                 pos=((i % 2) * 200 + 30, 600 + (i / 2 * 80)),
                 size=30,
-                click=partial(self.btn_euro, euro)
+                click_func=partial(self.btn_euro, euro)
             ))
 
         self.progress = Progress(

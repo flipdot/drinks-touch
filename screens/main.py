@@ -1,5 +1,3 @@
-# coding=utf-8
-
 from elements.button import Button
 from elements.image import Image
 from elements.label import Label
@@ -10,7 +8,7 @@ from .screen import Screen
 
 
 class MainScreen(Screen):
-    def __init__(self, screen, **kwargs):
+    def __init__(self, screen):
         super(MainScreen, self).__init__(screen)
 
         self.objects.append(Image(
@@ -25,18 +23,19 @@ class MainScreen(Screen):
             size=50
         ))
 
-        all_users = Users.get_all()
+        all_users = list(Users.get_all())
         i = 0
+
         for c in range(97, 97 + 26):
             text = str(chr(c))
-            users = filter(lambda u: u["name"].lower().startswith(text), all_users)
+            users = list(filter(lambda u: u["name"].lower().startswith(text), all_users))
             if len(users) == 0:
                 continue
             self.objects.append(Button(
                 self.screen,
                 text=text,
                 pos=self.__get_pos(i),
-                click=self.switch_to_screen,
+                click_func_param=self.switch_to_screen,
                 click_param=text,
                 force_width=440 / 6,
                 force_height=440 / 6,
@@ -49,7 +48,7 @@ class MainScreen(Screen):
             text='Abbrechen',
             pos=(150, 700),
             size=30,
-            click=self.home,
+            click_func=self.home,
         ))
         self.timeout = Progress(
             self.screen,
@@ -60,7 +59,7 @@ class MainScreen(Screen):
         self.objects.append(self.timeout)
         self.timeout.start()
 
-    def switch_to_screen(self, param, pos):
+    def switch_to_screen(self, param):
         from .screen_manager import ScreenManager
         screen_manager = ScreenManager.get_instance()
         screen_manager.set_active(
@@ -68,12 +67,12 @@ class MainScreen(Screen):
         )
 
     @staticmethod
-    def home(param, pos):
+    def home():
         from .screen_manager import ScreenManager
-        screen_manager = ScreenManager.get_instance().set_default()
+        ScreenManager.get_instance().set_default()
 
     def time_elapsed(self):
-        self.home(None, None)
+        self.home()
 
     def on_barcode(self, barcode):
         from .screen_manager import ScreenManager

@@ -1,6 +1,8 @@
-import pygame
-
 from .base_elm import BaseElm
+
+import contextlib
+with contextlib.redirect_stdout(None):
+    import pygame
 
 
 class Label(BaseElm):
