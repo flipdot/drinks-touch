@@ -1,7 +1,9 @@
-import pygame
-
 from env import monospace
 from .base_elm import BaseElm
+
+import contextlib
+with contextlib.redirect_stdout(None):
+    import pygame
 
 
 class Button(BaseElm):
@@ -10,7 +12,8 @@ class Button(BaseElm):
         self.size = kwargs.get('size', 30)
         self.text = kwargs.get('text', '<Label>')
         self.color = kwargs.get('color', (246, 198, 0))
-        self.clicked = kwargs.get('click', self.__clicked)
+        self.clicked = kwargs.get('click_func', self.__clicked)
+        self.clicked_param = kwargs.get('click_func_param', self.__clicked)
         self.click_param = kwargs.get('click_param', None)
         self.padding = kwargs.get('padding', 10)
         self.force_width = kwargs.get('force_width', None)
@@ -28,7 +31,7 @@ class Button(BaseElm):
 
     @staticmethod
     def __clicked():
-        print "Clicked on button without handler"
+        print("Clicked on button without handler")
 
     def pre_click(self):
         self.clicking = True
@@ -77,10 +80,13 @@ class Button(BaseElm):
 
                 if self.box is not None and \
                         self.visible() and \
-                        pygame.Rect(self.box).collidepoint(pos):
+                        pygame.Rect(self.box).collidepoint(pos[0], pos[1]):
                     self.pre_click()
                     try:
-                        self.clicked(self.click_param, pos)
+                        if self.click_param:
+                            self.clicked_param(self.click_param)
+                        else:
+                            self.clicked()
                     finally:
                         self.post_click()
                     event.consumed = True

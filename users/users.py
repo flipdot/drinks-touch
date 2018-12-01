@@ -13,6 +13,8 @@ from database.models.recharge_event import RechargeEvent
 from database.storage import get_session
 from env import is_pi
 
+logger = logging.getLogger(__name__)
+
 test_data = [
     {
         "id": "1",
@@ -108,11 +110,9 @@ class Users(object):
                 users.append(user)
 
             return users
-        except Exception as e:
+        except Exception:
             if not is_pi():
-                print("ldap fail: ", e)
-                # print(traceback.format_exc())
-                print("falling back to test data")
+                logger.warning("ldap fail, falling back to test data.")
                 return filter(
                     lambda u: prefix == '' or u['name'].lower().startswith(
                         prefix.lower()), test_data)
@@ -122,7 +122,7 @@ class Users(object):
     @staticmethod
     def user_from_ldap(ldap_user):
         user = {}
-        for key, meta in Users.fields.iteritems():
+        for key, meta in Users.fields.items():
             try:
                 value = ldap_user[meta['ldap_field']]
                 if "index" in meta:
@@ -138,7 +138,7 @@ class Users(object):
                 else:
                     raise
         user["_reference"] = {}
-        for key, meta in Users.fields.iteritems():
+        for key, meta in Users.fields.items():
             value = user[key]
             if "save" in meta:
                 value = meta["save"][value]
@@ -211,7 +211,7 @@ class Users(object):
                 WHERE user_id = :user_id
                 GROUP BY user_id
             """)
-        # print sql, user_id
+        # print(sql, user_id)
         row = session.connection().execute(sql, user_id=user_id).fetchone()
         if not row:
             credit = 0
@@ -285,7 +285,7 @@ class Users(object):
             return
         balance = Users.get_balance(user['id'], session=session)
         if balance <= 0:
-            print "deleting user " + str(user['id']) + " because they are broke"
+            print("deleting user " + str(user['id']) + " because they are broke")
             Users.delete(user)
 
     @staticmethod
@@ -294,14 +294,14 @@ class Users(object):
             con = Users.get_ldap_instance()
             con.delete_s(user['path'])
         except Exception as e:
-            print "Error: " + str(e)
+            print("Error: " + str(e))
             exc_traceback = sys.exc_info()
             traceback.print_tb(exc_traceback, limit=4)
 
     @staticmethod
     def save(user):
         changes = {}
-        for key, ldap_mapping in Users.fields.iteritems():
+        for key, ldap_mapping in Users.fields.items():
             new_value = None
 
             if key in user:
@@ -322,7 +322,7 @@ class Users(object):
         if config.NO_CHANGES:
             logger.info("Ignoring because config.NO_CHANGES")
             return
-        for key, change in changes.iteritems():
+        for key, change in changes.items():
             old, new = change
             # logger.debug("User %s %s: changing %s (%s) from '%s' to '%s'" % (
             ldap_mapping = Users.fields[key]
@@ -332,4 +332,4 @@ class Users(object):
                 Users.set_value(user, ldap_mapping["ldap_field"], new)
                 user["_reference"][key] = new
             except Exception as e:
-                print "LDAP error:", e
+                print("LDAP error:", e)

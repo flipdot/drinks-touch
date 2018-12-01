@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
 import sys
 
@@ -7,7 +7,7 @@ from PIL import Image, ImageDraw, ImageFont, ImageMath
 
 from database.storage import get_session
 from env import is_pi
-from flipdot import create_socket, send_frame, w, h
+from stats.flipdot import create_socket, send_frame, w, h
 
 font = ImageFont.truetype("stats/slkscr.ttf", 7)
 
@@ -141,9 +141,9 @@ def run():
     send_frame(socket, image)
 
 
-def main(argv):
+def main():
     run()
 
 
 if __name__ == "__main__":
-    sys.exit(main(sys.argv))
+    sys.exit(main())

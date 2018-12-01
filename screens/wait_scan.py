@@ -1,4 +1,3 @@
-# coding=utf-8
 import datetime
 
 from database.models.scan_event import ScanEvent
@@ -18,7 +17,7 @@ from .screen_manager import ScreenManager
 
 
 class WaitScanScreen(Screen):
-    def __init__(self, screen, **kwargs):
+    def __init__(self, screen):
         super(WaitScanScreen, self).__init__(screen)
 
         self.barcode_label = Label(
@@ -33,19 +32,19 @@ class WaitScanScreen(Screen):
                 pos=(50, 600),
                 text="drink buchen",
                 size=52,
-                click=self.set_member
+                click_func=self.set_member
             ),
             Button(
                 self.screen,
                 pos=(50, 700),
                 text="Nur Statistik",
-                click=self.stat_drink
+                click_func=self.stat_drink
             ),
             Button(
                 self.screen,
                 pos=(350, 700),
                 text="nope",
-                click=self.btn_reset
+                click_func=self.btn_reset
             )
         ]
         self.empty_info = [
@@ -53,13 +52,13 @@ class WaitScanScreen(Screen):
                 self.screen,
                 pos=(30, 700),
                 text="Benutzer",
-                click=self.set_member
+                click_func=self.set_member
             ),
             Button(
                 self.screen,
                 pos=(210, 700),
                 text="Geld einwerfen",
-                click=self.btn_new_id
+                click_func=self.btn_new_id
             )
         ]
 
@@ -129,12 +128,12 @@ class WaitScanScreen(Screen):
         self.processing.is_visible = False
         self.timeout.start()
 
-    def set_member(self, args, pos):
+    def set_member(self):
         main = MainScreen(self.screen)
         ScreenManager.get_instance().set_active(main)
         self.reset(False)
 
-    def stat_drink(self, args, pos):
+    def stat_drink(self):
         drink = DrinksManager.get_instance().get_selected_drink()
         if drink:
             session = get_session()
@@ -148,10 +147,10 @@ class WaitScanScreen(Screen):
             DrinksManager.get_instance().set_selected_drink(None)
         self.reset()
 
-    def btn_reset(self, args, pos):
+    def btn_reset(self):
         self.reset()
 
-    def btn_new_id(self, args, pos):
+    def btn_new_id(self):
         new_id = NewIDScreen(self.screen)
         ScreenManager.get_instance().set_active(new_id)
 
@@ -163,7 +162,8 @@ class WaitScanScreen(Screen):
         self.barcode_label.text = None
         self.show_scanned_info(False)
 
-    def back(self, param, pos):
+    @staticmethod
+    def back():
         from .screen_manager import ScreenManager
         screen_manager = ScreenManager.get_instance()
         screen_manager.set_default()

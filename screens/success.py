@@ -1,4 +1,3 @@
-# coding=utf-8
 import os
 
 from elements.button import Button
@@ -50,7 +49,7 @@ class SuccessScreen(Screen):
             text='OK',
             pos=(50, 600),
             size=50,
-            click=self.btn_home
+            click_func=self.btn_home
         ))
 
         self.progress = Progress(

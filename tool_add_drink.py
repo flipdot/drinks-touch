@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 import argparse
 
@@ -27,4 +26,4 @@ ev = Drink(
 session.add(ev)
 session.commit()
 
-print 'OK, done!'
+print('OK, done!')

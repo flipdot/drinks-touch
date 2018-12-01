@@ -1,8 +1,8 @@
-# coding=utf-8
-
 from datetime import datetime
 
 import logging
+from json import JSONDecodeError
+
 import requests
 from decimal import Decimal
 from requests.auth import HTTPBasicAuth
@@ -11,7 +11,7 @@ import config
 from database.models.recharge_event import RechargeEvent
 from database.storage import get_session
 from notifications.notification import send_summary
-from users import Users
+from users.users import Users
 
 logger = logging.getLogger(__name__)
 
@@ -32,24 +32,26 @@ def get_existing(session):
 def sync_recharges():
     try:
         sync_recharges_real()
-    except Exception as e:
+    except Exception:
         logger.exception("Syncing recharges:")
 
 
 def sync_recharges_real():
-    data = None
-
     try:
         data = requests.get(config.money_url, auth=HTTPBasicAuth(config.money_user, config.money_password))
+        recharges = data.json()
     except requests.exceptions.ConnectionError:
         logger.exception("Cannot connect to sync recharges:")
         return
+    except JSONDecodeError:
+        logger.exception("Cannot decode sync recharge json:")
+        return
 
-    recharges = data.json()
+
     session = get_session()
     got_by_user = get_existing(session)
 
-    for uid, charges in recharges.iteritems():
+    for uid, charges in recharges.items():
         logger.info("Syncing recharges for user %s", uid)
         if uid not in got_by_user:
             logger.info("First recharge for user %s!", uid)
@@ -90,7 +92,7 @@ def handle_transferred(charge, charge_amount, charge_date, got, session, uid):
             text = "Deine Aufladung über %s € am %s mit Text '%s' war erfolgreich." % (
                 charge_amount, charge_date, charge['info'])
             send_summary(session, user, subject=subject, force=True, prepend_text=text)
-    except:
+    except Exception:
         logger.exception("sending notification mail:")
 
 

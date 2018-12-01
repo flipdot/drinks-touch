@@ -22,7 +22,7 @@ For usage with Docker you need a running X server. See below for details.
     <summary>individual DSD container instructions</summary>
 
     ```bash
-    docker run --name dsd_drinks-scanner-display -d -v ./config.py:/app/config.py -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=unix${DISPLAY} flipdot/drinks-scanner-display
+    docker run --name dsd_drinks-scanner-display -d -v ${PWD}/config.py:/app/config.py -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=unix${DISPLAY} flipdot/drinks-scanner-display
     ```
   </details>
 

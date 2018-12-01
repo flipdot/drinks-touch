@@ -1,8 +1,10 @@
 import math
 
-import pygame
-
 from .base_elm import BaseElm
+
+import contextlib
+with contextlib.redirect_stdout(None):
+    import pygame
 
 
 class Progress(BaseElm):
@@ -36,7 +38,7 @@ class Progress(BaseElm):
     def stop(self):
         self.is_running = False
 
-    def __default_tick(self, old_value, t, dt):
+    def __default_tick(self, old_value, dt):
         if self.is_running and old_value >= 1:
             self.stop()
             if self.on_elapsed:
@@ -47,9 +49,9 @@ class Progress(BaseElm):
         else:
             return old_value
 
-    def render(self, t, dt):
+    def render(self, dt):
         if self.tick is not None:
-            self.value = self.tick(self.value, t, dt)
+            self.value = self.tick(self.value, dt)
 
         if self.is_running:
             extra_rounds = 0.75

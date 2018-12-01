@@ -1,9 +1,7 @@
-# coding=utf-8
-
 import time
 
 import subprocess
-from hubarcode.code128 import Code128Encoder
+from pystrich.code128 import Code128Encoder
 
 from drinks.drinks import get_by_ean
 from drinks.drinks_manager import DrinksManager
@@ -17,7 +15,7 @@ from .screen_manager import ScreenManager
 
 
 class IDCardScreen(Screen):
-    def __init__(self, screen, user, **kwargs):
+    def __init__(self, screen, user):
         super(IDCardScreen, self).__init__(screen)
 
         self.user = user
@@ -27,7 +25,7 @@ class IDCardScreen(Screen):
             text="BACK",
             pos=(30, 30),
             font=monospace,
-            click=self.back,
+            click_func=self.back,
             size=30
         ))
 
@@ -45,7 +43,7 @@ class IDCardScreen(Screen):
             text='Reset',
             pos=(350, 30),
             size=30,
-            click=self.reset_id
+            click_func=self.reset_id
         ))
 
         self.objects.append(Label(
@@ -88,7 +86,7 @@ class IDCardScreen(Screen):
             text='OK bye',
             pos=(330, 700),
             size=30,
-            click=self.btn_home
+            click_func=self.btn_home
         ))
 
         self.objects.append(Button(
@@ -96,7 +94,7 @@ class IDCardScreen(Screen):
             text='Drucken',
             pos=(30, 700),
             size=30,
-            click=self.print_id
+            click_func=self.print_id
         ))
         self.progress = Progress(
             self.screen,
@@ -107,7 +105,7 @@ class IDCardScreen(Screen):
         self.objects.append(self.progress)
 
     @staticmethod
-    def back(param, pos):
+    def back():
         screen_manager = ScreenManager.get_instance()
         screen_manager.go_back()
 
@@ -120,7 +118,7 @@ class IDCardScreen(Screen):
     def time_elapsed(self):
         self.home()
 
-    def btn_home(self, param, pos):
+    def btn_home(self):
         self.home()
 
     def set_id(self, ean):
@@ -129,10 +127,10 @@ class IDCardScreen(Screen):
         Users.save(self.user)
         self.id_label.text = self.user['id_card']
 
-    def reset_id(self, param, pos):
+    def reset_id(self):
         self.set_id(None)
 
-    def print_id(self, param, pos):
+    def print_id(self):
         self.progress.start()
         if not self.user['id_card']:
             self.set_id("fd_" + self.user['name'])

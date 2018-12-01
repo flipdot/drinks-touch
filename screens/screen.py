@@ -6,11 +6,11 @@ class Screen(object):
         self.screen = screen
         self.objects = []
 
-    def render(self, t, dt):
+    def render(self, dt):
         for o in self.objects:
             if o.visible():
                 if isinstance(o, Progress):
-                    o.render(t, dt)
+                    o.render(dt)
                 else:
                     o.render()
 

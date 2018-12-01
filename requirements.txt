@@ -1,7 +1,6 @@
-email
 flask
 flask-compress
-huBarcode # sudo apt-get install python-pil
+pyStrich # sudo apt-get install python-pil
 influxdb
 jinja2
 keyboard
@@ -11,4 +10,6 @@ psycopg2-binary
 pygame
 python-ldap # sudo apt-get install python-dev libldap2-dev libsasl2-dev libssl-dev
 qrcode
+requests
 sqlalchemy
+werkzeug

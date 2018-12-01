@@ -1,5 +1,3 @@
-# coding=utf-8
-
 import math
 
 from elements.button import Button
@@ -13,7 +11,7 @@ from .screen_manager import ScreenManager
 
 
 class NamesScreen(Screen):
-    def __init__(self, screen, char, **kwargs):
+    def __init__(self, screen, char):
         super(NamesScreen, self).__init__(screen)
 
         self.char = char
@@ -22,7 +20,7 @@ class NamesScreen(Screen):
             self.screen,
             text="BACK",
             pos=(30, 30),
-            click=self.back,
+            click_func=self.back,
             font=monospace,
             size=30
         ))
@@ -42,7 +40,7 @@ class NamesScreen(Screen):
             pos=(20, 110),
         ))
 
-        users = Users.get_all(self.char)
+        users = list(Users.get_all(self.char))
 
         btns_y = 7
         num_cols = int(math.ceil(len(users) / float(btns_y)))
@@ -58,17 +56,17 @@ class NamesScreen(Screen):
                 self.screen,
                 text=user["name"],
                 pos=(xoff + x, y + yoff),
-                click=self.switch_to_screen,
+                click_func_param=self.switch_to_screen,
                 click_param=user,
                 padding=padding
             ))
             i += 1
 
     @staticmethod
-    def back(param, pos):
+    def back():
         ScreenManager.get_instance().go_back()
 
-    def switch_to_screen(self, param, pos):
+    def switch_to_screen(self, param):
         ScreenManager.get_instance().set_active(
             ProfileScreen(self.screen, param)
         )
