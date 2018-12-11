@@ -8,7 +8,7 @@ with contextlib.redirect_stdout(None):
 class Image(BaseElm):
     def __init__(self, screen, **kwargs):
         self.pos = kwargs.get('pos', (0, 0))
-        self.src = kwargs.get('src', 'img/test.jpg')
+        self.src = kwargs.get('src', 'resources/images/test.jpg')
         self.size = kwargs.get('size', None)
 
         self.__load_img()

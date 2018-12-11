@@ -68,8 +68,8 @@ For usage with Docker you need a running X server. See below for details.
 ### Embedded
 
 #### Dependencies
-- LDAP server, reachable via `ldap://rail/` (see [users.py](users/users.py))
-- PostgreSQL @localhost (see [storage.py](database/storage.py))
+- LDAP server, reachable via `ldap://rail/` (see [users.py](drinks_scanner_display/users/users.py))
+- PostgreSQL @localhost (see [storage.py](drinks_scanner_display/database/storage.py))
 - touch display with a minimum of 480x800 px.
 
 Install dependencies like this:
@@ -87,15 +87,28 @@ This starts an X server, sets various display properties and puts the applicatio
 
 
 ## Dashboards
-
 Login to [Adminer](http://localhost:8080) with **database system**, **username** and **password** `postgres`, **server** `dsd_postgres` and **database** `drinks`.
-
 Login to [phpLDAPadmin](https://localhost:6443) with **login dn** `cn=admin,dc=flipdot,dc=org` and **password** `admin`.
 
 
 ## Database Schema
 PostgreSQL dumps can be found inside the `sql` folder along with scripts to im- and export.
 
+
+## Profiling
+To profile the time individual lines of code take to execute install *line_profiler*.
+
+    pip install line_profiler
+
+Then add @profile to the methods you are interested in.
+
+Run with
+
+    kernprof -l game.py
+
+And analyze results with
+
+    python -m line_profiler game.py.lprof | less
 
 ## License
 TODO
