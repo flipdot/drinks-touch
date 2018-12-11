@@ -152,11 +152,8 @@ class Users(object):
     def get_ldap_instance():
         dn = "cn=admin,dc=flipdot,dc=org"
 
-        with open('ldap_pw', 'r') as ldap_pw:
-            pw = ldap_pw.read().replace('\n', '')
-
         con = ldap.initialize(config.LDAP_HOST)
-        con.simple_bind_s(dn, pw)
+        con.simple_bind_s(dn, config.LDAP_PW)
         return con
 
     @staticmethod

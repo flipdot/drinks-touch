@@ -9,7 +9,7 @@ from database.storage import get_session
 from env import is_pi
 from stats.flipdot import create_socket, send_frame, w, h
 
-font = ImageFont.truetype("stats/slkscr.ttf", 7)
+font = ImageFont.truetype("resources/fonts/slkscr.ttf", 7)
 
 max_drinks = 6
 
