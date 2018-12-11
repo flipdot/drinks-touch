@@ -13,7 +13,7 @@ For usage with Docker you need a running X server. See below for details.
   ```bash
   xhost local:docker
   ```
-  Then execute the stack:xhost local:docker
+  Then execute the stack:
   ```bash
   docker stack deploy -c ./stack.yml drinks-scanner-display
   ```
