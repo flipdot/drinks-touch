@@ -22,7 +22,7 @@ For usage with Docker you need a running X server. See below for details.
     <summary>individual DSD container instructions</summary>
 
     ```bash
-    docker run --name dsd_drinks-scanner-display -d -v ${PWD}/config.py:/app/config.py -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=unix${DISPLAY} flipdot/drinks-scanner-display
+    docker run --name dsd_drinks-scanner-display -d -v ${PWD}/drinks_scanner_display/config.py:/app/config.py -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=unix${DISPLAY} flipdot/drinks-scanner-display
     ```
   </details>
 
@@ -38,7 +38,7 @@ For usage with Docker you need a running X server. See below for details.
     <summary>individual DSD container instructions</summary>
 
     ```powershell
-    docker run --name dsd_drinks-scanner-display -d -v ./config.py:/app/config.py -e DISPLAY=${env:DISPLAY} flipdot/drinks-scanner-display
+    docker run --name dsd_drinks-scanner-display -d -v ./drinks_scanner_display/config.py:/app/config.py -e DISPLAY=${env:DISPLAY} flipdot/drinks-scanner-display
     ```
   </details>
 
@@ -78,9 +78,9 @@ Install dependencies like this:
 sudo apt-get install libsasl2-dev python-dev libldap2-dev libssl-dev
 pip2 install -r requirements.txt
 ```
-Then copy `config.example.py` to `config.py`, customizing the contents.
+Then copy `drinks_scanner_display/config.example.py` to `drinks_scanner_display/config.py`, customizing the contents.
 
-Now, start PostgreSQL and OpenLDAP with `systemctl start`. And finally, run the entrypoint script `game.py`.
+Now, start PostgreSQL and OpenLDAP with `systemctl start`. And finally, run the entrypoint script `drinks_scanner_display/game.py`.
 
 For embedded systems it is recommended to use `@reboot runGame.sh` inside a cron tab.
 This starts an X server, sets various display properties and puts the application itself in a loop.
@@ -102,7 +102,7 @@ To profile the time individual lines of code take to execute install *line_profi
 
 Then add @profile to the methods you are interested in.
 
-Run with
+Inside `drinks_scanner_display`, run with
 
     kernprof -l game.py
 
