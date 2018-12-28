@@ -1,0 +1,25 @@
+version: "3.7"
+services:
+  adminer:
+    image: "adminer"
+    ports:
+    - "8080:8080"
+  drinks-scanner-display:
+    image: "flipdot/drinks-scanner-display"
+    volumes:
+    - "./config.py:/app/config.py"
+    - "/tmp/.X11-unix:/tmp/.X11-unix"
+    environment:
+      DISPLAY: "unix${DISPLAY}"
+  postgres:
+    image: "postgres"
+    environment:
+      POSTGRES_DB: "drinks"
+      POSTGRES_PASSWORD: "postgres"
+    volumes:
+    - "postgres-data:/var/lib/postgresql/data"
+    - "../sql/01-schema.sql:/docker-entrypoint-initdb.d/01-schema.sql"
+    - "../sql/02-drinks.sql:/docker-entrypoint-initdb.d/02-drinks.sql"
+volumes:
+  phpldapadmin-data: {}
+  postgres-data: {}
