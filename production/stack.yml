@@ -7,7 +7,7 @@ services:
   drinks-scanner-display:
     image: "flipdot/drinks-scanner-display"
     volumes:
-    - "./config.py:/app/config.py"
+    - "./flipdot/drinks-scanner-display/config.py:/app/config.py"
     - "/tmp/.X11-unix:/tmp/.X11-unix"
     environment:
       DISPLAY: "unix${DISPLAY}"
