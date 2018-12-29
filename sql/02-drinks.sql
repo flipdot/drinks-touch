@@ -68,10 +68,12 @@ COPY public.drink (id, ean, name, size, "timestamp", type) FROM stdin;
 33	4014964111555	Köstritzer	0.5	\N	bier
 34	4009401560300	Caldener Medium	0.5	\N	wasser
 35	/02524813	Zwanzig Zilberlinge	0.5	\N	wasser
-36	4003892013512	Jacobinus Bierspezialität	0.5	2017-08-08 23:27:41.935014	\N
-37	4306376050370	Waldecker Sport	0.7	2018-05-22 20:12:11.488533	\N
-38	4306376870046	Waldecker Sport	1.0	2018-06-05 17:40:55.113301	\N
-39	4104640020124	Apfelschorle	0.75	2018-06-05 17:41:28.21306	\N
+36	4003892013512	Jacobinus Bierspezialität	0.5	2017-08-08 23:27:41.935014	bier
+37	4306376050370	Waldecker Sport	0.7	2018-05-22 20:12:11.488533	saft
+38	4306376870046	Waldecker Sport	1.0	2018-06-05 17:40:55.113301	saft
+39	4104640020124	Apfelschorle	0.75	2018-06-05 17:41:28.21306	saft
+15	4008948194016	Jever Fun Alkoholfrei	0.5	2016-12-07 00:06:25.114132	saft
+40	619659137915	Zehntel SD-Karte	0.1	\N	hardware
 2	4029764001807	Club-Mate	0.5	2016-08-28 20:24:59.423597	mate
 3	41001318	BECKS	0.5	2016-08-28 20:25:00.24342	bier
 4	4069800005871	Nörten-Hardenberger	0.33	2016-08-28 20:25:01.098931	bier
@@ -79,10 +81,8 @@ COPY public.drink (id, ean, name, size, "timestamp", type) FROM stdin;
 7	4002846034504	MIO-MIO-MATE	0.5	2016-08-28 20:25:03.657011	mate
 8	4260031874278	flora power	0.33	2016-08-28 20:25:04.497183	mate
 10	4002846034306	Mio Mio Cola	0.5	2016-08-28 20:40:07.374024	cola
-11	E87126853	Coca-Cola	0.33	2016-12-06 23:02:35.436537	cola
 13	4029764001401	Club-Mate Granat	0.5	2016-12-06 23:03:48.08653	mate
 14	87126853	Coca-Cola	0.33	2016-12-06 23:05:41.377041	cola
-15	4008948194016	Jever Fun Alkoholfrei	0.5	2016-12-07 00:06:25.114132	bier
 16	4008287072129	Krombacher Radler	0.5	2016-12-07 00:07:02.883156	bier
 17	4009401560409	Caldener Sanft	1.0	2016-12-07 00:07:57.957231	wasser
 18	4311596435968	Edeka Mineralwasser	1.5	2016-12-07 00:08:45.349772	wasser
@@ -106,7 +106,7 @@ COPY public.drink (id, ean, name, size, "timestamp", type) FROM stdin;
 -- Name: drink_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.drink_id_seq', 39, true);
+SELECT pg_catalog.setval('public.drink_id_seq', 40, true);
 
 
 --
