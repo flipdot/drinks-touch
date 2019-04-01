@@ -19,7 +19,7 @@ do
         export ENV=PI
         export PYTHONUNBUFFERED=1
 
-        cd /home/pi/drinks-scanner-display
+        cd /home/pi/drinks-touch
         systemd-cat -t"drinks" ./game.py
     )
 done

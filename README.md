@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/flipdot/drinks-scanner-display.svg?branch=master)](https://travis-ci.org/flipdot/drinks-scanner-display)
+[![Build Status](https://travis-ci.org/flipdot/drinks-touch.svg?branch=master)](https://travis-ci.org/flipdot/drinks-touch)
 # Drinks Scanner Display
 Digital replacement for the drinks tally list featuring a touchscreen, user management and a barcode scanner.
 
@@ -15,14 +15,14 @@ For usage with Docker you need a running X server. See below for details.
   ```
   Then execute the stack:
   ```bash
-  docker stack deploy -c ./stack.yml drinks-scanner-display
+  docker stack deploy -c ./stack.yml drinks-touch
   ```
 
   <details>
     <summary>individual DSD container instructions</summary>
 
     ```bash
-    docker run --name dsd_drinks-scanner-display -d -v ${PWD}/drinks_scanner_display/config.py:/app/config.py -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=unix${DISPLAY} flipdot/drinks-scanner-display
+    docker run --name dsd_drinks-touch -d -v ${PWD}/drinks_touch/config.py:/app/config.py -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=unix${DISPLAY} flipdot/drinks-touch
     ```
   </details>
 
@@ -31,14 +31,14 @@ For usage with Docker you need a running X server. See below for details.
   As X server for Windows you can use [VcXsrv](https://sourceforge.net/projects/vcxsrv/). Be sure to check "disable access control" in the XLaunch dialog.
 
   ```bash
-  docker stack deploy -c .\stack-windows.yml drinks-scanner-display
+  docker stack deploy -c .\stack-windows.yml drinks-touch
   ```
 
   <details>
     <summary>individual DSD container instructions</summary>
 
     ```powershell
-    docker run --name dsd_drinks-scanner-display -d -v ./drinks_scanner_display/config.py:/app/config.py -e DISPLAY=${env:DISPLAY} flipdot/drinks-scanner-display
+    docker run --name dsd_drinks-touch -d -v ./drinks_touch/config.py:/app/config.py -e DISPLAY=${env:DISPLAY} flipdot/drinks-touch
     ```
   </details>
 
@@ -68,8 +68,8 @@ For usage with Docker you need a running X server. See below for details.
 ### Embedded
 
 #### Dependencies
-- LDAP server, reachable via `ldap://rail/` (see [users.py](drinks_scanner_display/users/users.py))
-- PostgreSQL @localhost (see [storage.py](drinks_scanner_display/database/storage.py))
+- LDAP server, reachable via `ldap://rail/` (see [users.py](drinks_touch/users/users.py))
+- PostgreSQL @localhost (see [storage.py](drinks_touch/database/storage.py))
 - touch display with a minimum of 480x800 px.
 
 Install dependencies like this:
@@ -78,9 +78,9 @@ Install dependencies like this:
 sudo apt-get install libsasl2-dev python-dev libldap2-dev libssl-dev
 pip2 install -r requirements.txt
 ```
-Then copy `drinks_scanner_display/config.example.py` to `drinks_scanner_display/config.py`, customizing the contents.
+Then copy `drinks_touch/config.example.py` to `drinks_touch/config.py`, customizing the contents.
 
-Now, start PostgreSQL and OpenLDAP with `systemctl start`. And finally, run the entrypoint script `drinks_scanner_display/game.py`.
+Now, start PostgreSQL and OpenLDAP with `systemctl start`. And finally, run the entrypoint script `drinks_touch/game.py`.
 
 For embedded systems it is recommended to use `@reboot runGame.sh` inside a cron tab.
 This starts an X server, sets various display properties and puts the application itself in a loop.
@@ -102,7 +102,7 @@ To profile the time individual lines of code take to execute install *line_profi
 
 Then add @profile to the methods you are interested in.
 
-Inside `drinks_scanner_display`, run with
+Inside `drinks_touch`, run with
 
     kernprof -l game.py
 

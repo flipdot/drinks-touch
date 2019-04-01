@@ -4,10 +4,10 @@ services:
     image: "adminer"
     ports:
     - "8080:8080"
-  drinks-scanner-display:
-    image: "flipdot/drinks-scanner-display"
+  drinks-touch:
+    image: "flipdot/drinks-touch"
     volumes:
-    - "./flipdot/drinks-scanner-display/config.py:/app/config.py"
+    - "./flipdot/drinks-touch/config.py:/app/config.py"
     - "/tmp/.X11-unix:/tmp/.X11-unix"
     environment:
       DISPLAY: "unix${DISPLAY}"
