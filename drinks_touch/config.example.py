@@ -1,6 +1,6 @@
-money_url = "https://somewhere/x.json"
-money_user = "my_user"
-money_password = "my_basicauth_passwd"
+MONEY_URL = "https://somewhere/x.json"
+MONEY_USER = "my_user"
+MONEY_PASSWORD = "my_basicauth_passwd"
 
 LDAP_HOST = "ldaps://ldap.example.com"
 LDAP_PW = ""
