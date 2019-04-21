@@ -6,6 +6,7 @@ Digital replacement for the drinks tally list featuring a touchscreen, user mana
 ## Table of Contents
 1. **[Development](#development)**
     - **[Build](#build)**
+    - **[Configuration](#configuration)**
     - **[Deployment](#deployment)**
 1. **[Profiling](#profiling)**
 1. **[License](#license)**
@@ -24,6 +25,12 @@ The following information is therefore only useful if you decide to deploy this 
 ### Build
 This project does not require any build procedure.
 
+### Configuration
+The following configuration files are evaluated at execution time and must be derived from their respective examples, which can be found in the same directories.
+
+- `drinks_touch/config.py`
+- `drinks_touch/acme/config.py`
+
 ### Deployment
 
 #### Dependencies
@@ -37,9 +44,8 @@ Install dependencies like this:
 sudo apt-get install libsasl2-dev python-dev libldap2-dev libssl-dev
 pip2 install -r requirements.txt
 ```
-Then copy `drinks_touch/config.example.py` to `drinks_touch/config.py`, customizing the contents.
 
-Now, start PostgreSQL and OpenLDAP with `systemctl start`. And finally, run the entrypoint script `drinks_touch/game.py`.
+Then, start PostgreSQL and OpenLDAP with `systemctl start`. And finally, run the entrypoint script `drinks_touch/game.py`.
 
 For embedded systems it is recommended to use `@reboot runGame.sh` inside a cron tab.
 This starts an X server, sets various display properties and puts the application itself in a loop.
