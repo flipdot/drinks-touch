@@ -1,0 +1,4 @@
+ARCH,HUB_U,VARIANT
+amd64,amd64,
+arm,arm32v7,v7
+arm64,arm64v8,v8

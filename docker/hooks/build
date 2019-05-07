@@ -1,0 +1,58 @@
+#!/bin/bash
+
+# get this script's directory and the multiarch Dockerfile (template) path
+THIS=$(dirname $(readlink -f "$0"))
+MULTIARCH_DOCKERFILE_TEMPLATE_PATH="${DOCKERFILE_PATH/Dockerfile/Dockerfile-multiarch.template}"
+MULTIARCH_DOCKERFILE_PATH="${MULTIARCH_DOCKERFILE_TEMPLATE_PATH/Dockerfile-multiarch.template/build\/Dockerfile}"
+
+# create build directory, navigate from Dockerfile folder to project root and disable git filemode change detection
+mkdir build
+cd ..
+git config core.filemode false
+
+###   temporary hack that upgrades DockerHub's build machine Docker version to 18 (supports manifests)   ###
+# display current Docker version
+docker --version
+
+if [[ $(docker --version) == "Docker version 17"* ]]
+then
+  # upgrade Docker and install jq
+  apt-get update && apt-get dist-upgrade docker -y && apt-get install jq -y
+
+  # display new Docker version
+  docker --version
+
+  # migrate authentication configuration from .dockercfg to .docker/config.json
+  mkdir ~/.docker
+  AUTHTOKEN=$(cat ~/.dockercfg | jq '.["https://index.docker.io/v1/"] .auth')
+  echo "{\"auths\":{\"https://index.docker.io/v1/\":{\"auth\": $AUTHTOKEN}},\"experimental\": \"enabled\"}" \
+    > ~/.docker/config.json
+fi
+### ---------------------------------------------------------------------------------------------------- ###
+
+# load build variable combinations
+archs=()
+readarray -t archs < "$THIS/archs.csv"
+
+# push individual tags
+for arch in "${archs[@]:1}"
+do
+  # skip empty lines that someone will surely commit one day
+  if [ "$arch" == "" ]
+  then
+    break
+  fi
+
+  parts=( ${arch//,/ } )
+
+  ARCH="${parts[0]}"
+  HUB_U="${parts[1]}"
+  VARIANT="${parts[2]}"
+
+  # build it!
+  docker build \
+    --build-arg HUB_U="$HUB_U" \
+    -f "$MULTIARCH_DOCKERFILE_PATH" \
+    -t "${IMAGE_NAME/:/:$ARCH-}" \
+    .
+done
