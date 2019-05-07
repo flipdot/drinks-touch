@@ -2,11 +2,8 @@
 
 # get this script's directory and the multiarch Dockerfile (template) path
 THIS=$(dirname $(readlink -f "$0"))
-MULTIARCH_DOCKERFILE_TEMPLATE_PATH="${DOCKERFILE_PATH/Dockerfile/Dockerfile-multiarch.template}"
-MULTIARCH_DOCKERFILE_PATH="${MULTIARCH_DOCKERFILE_TEMPLATE_PATH/Dockerfile-multiarch.template/build\/Dockerfile}"
 
 # create build directory, navigate from Dockerfile folder to project root and disable git filemode change detection
-mkdir build
 cd ..
 git config core.filemode false
 
@@ -52,7 +49,7 @@ do
   # build it!
   docker build \
     --build-arg HUB_U="$HUB_U" \
-    -f "$MULTIARCH_DOCKERFILE_PATH" \
+    -f "$DOCKERFILE_PATH" \
     -t "${IMAGE_NAME/:/:$ARCH-}" \
     .
 done

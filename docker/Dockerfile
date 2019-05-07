@@ -1,4 +1,6 @@
-FROM python
+ARG HUB_U=amd64
+
+FROM $HUB_U/python
 
 RUN apt-get update && \
     apt-get install -y libsasl2-dev libldap2-dev locales && \
