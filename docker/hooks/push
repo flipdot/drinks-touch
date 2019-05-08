@@ -21,9 +21,10 @@ do
 
   ARCH="${parts[0]}"
   HUB_U="${parts[1]}"
-  VARIANT="${parts[2]}"
+  QEMUARCH="${parts[2]}"
+  VARIANT="${parts[3]}"
 
-  image_name_full="${IMAGE_NAME/:/:$ARCH-}"
+  image_name_full="${IMAGE_NAME/:/:$QEMUARCH-}"
   all_manifests+=("$image_name_full")
   annotate_parameters=("--os linux --arch $ARCH")
 
