@@ -5,9 +5,8 @@ env:
   - secure: XVzSPpQrZTUy8Z7cHd3J2bBc4ZGM3reFNGXhJ7kdDVRmXTieJVpLPJu2oQvd1UTR19q0ocBzba+8BLKDs7l+AdJ1SkOhgJyVC5VFc9EWhq0tTKsolvT244Wd3FNQYMJwSoR2OtWWXWKatdsQJCHf4o7zAmk7OJfw/cZ1m9bQZ6e+oGXYOR+K8V7tZ1+us3C4VcMqZe3CtHWojGko1X+GPFPS5h+7I3ubWj4oKuv4IVebniEDByQKEpGbdpcTs82IaUNliBLoX+5UeSFytcYmL3QnwQa3yREHCwnNF/H2SgwwpoNTeuq/ITkIdw3KJTP1F6E1rKstZZLFYH/Y8D0nuutAQgQGsz4IL7AvIWM7Qe5njoD7zunaUrBzzk4/IS3onO8VG3IaVy4YLPRaksHyajYQ1Ue865Qpm9+fwSoQ5KFuV9ssD3mOuV2uAooyjI7wuRQm5Y2IsuyJJ3jdd/H9Joj3v/ixCa9NsCXcNdvKinSgFNIIkBohHGlrgU2JBqoRJWsTI1szIx9r02CppB/6+HUrhOTUCI/tlBUj/g4JtqxKuKyWv16muHQifFBVRejikeOoFTuCqudWhQTlsgvfIj6GdaMeYUVE5MI1kS3nSUJUGIwafGxSVJIHszMsi+3i8lPfynbcVhyV7lK1UHoYLvjI6nz+vghg5FxMS9OmdYQ= #DOCKER_USER
   - secure: d7BeeIKXVDudHRxZ5TGyJ59gC1HLbjWANe/XAlor+U0pnrhS3TJtp3zgDeG+VmL5WGJwmVUgBDpFDYA294wxTL9+rvcPtwMt1cfmjWsCwxUrgs+wIDMp9PZI792s1twalbYi9rm9FfWOWsNze+A7FVCazB8Lo7LcdstFYlsKTkMqEhHyr6h+lH+w8V6X4g0YIoZ0/BshEiyluYj+bc763GpJ2nT09fK70CPto4+BFMsov5xZldZ0faktQYu+dEyLOuoeFuiY4SmuPfd9UXswVr7fsQ+EmexFc40DSa16Ms3PGMwre9kXX3Qcr0nNhFgCZ6Jx2Hvfg+J++10o+osfgGZcRsbOBPjlKwKy9vtCE13zSEYAdwCXu9LLAjDG8bFvCPQHtIPXlVOWWD6zwOtpyNehoOT8xpcDutKLRZdVZdChtYTkBPI5iy9Z739THN4ODcrpXlsCuEVNFDNFY5v5G18BaCzF9vejwqj83xU41hb3e0hwNG9owoWq/T0jKTFd0H/LJzfHryn4A+bTRKpZRwAqmlNF3sgueSBq/V8No/nf81rp2IO7tkrhOm9jwJYDf9roQSNQMyom4h/IBhmlFsaGLDg10j+oe8UrKj/0VQxINRUhl/QlAidtPxkZtmDM8kY/pymH44TGBV4LJUVTZ9H7BGp4+yE/YYi2zN5Nh20= #DOCKER_PASS
   - COMMIT=${TRAVIS_COMMIT::8}
-  - REPO_USER=flipdot
-  - REPO_NAME=drinks-touch
   - DOCKER_BUILDKIT=1
+  - IMAGE_NAME=$TRAVIS_REPO_SLUG:$TRAVIS_BRANCH
 addons:
   apt:
     packages:
@@ -16,7 +15,9 @@ before_install:
 - echo '{"experimental":true}' | sudo tee /etc/docker/daemon.json
 - sudo service docker restart
 script: ./docker/hooks/build
-after_success: ./docker/hooks/push
+after_success:
+- echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+- ./docker/hooks/push
 notifications:
   email:
     on_success: change
