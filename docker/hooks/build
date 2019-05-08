@@ -51,5 +51,5 @@ do
     --platform $ARCH \
     --build-arg HUB_U="$HUB_U" \
     -t "${IMAGE_NAME/:/:$ARCH-}" \
-    "$THIS/../"
+    "$THIS/../../"
 done
