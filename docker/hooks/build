@@ -1,31 +1,31 @@
 #!/bin/bash
 
-# get this script's directory and the multiarch Dockerfile (template) path
+# get this script's directory
 THIS=$(dirname $(readlink -f "$0"))
 
-# create build directory, navigate from Dockerfile folder to project root and disable git filemode change detection
-cd ..
-git config core.filemode false
+# # create build directory, navigate from Dockerfile folder to project root and disable git filemode change detection
+# cd ..
+# git config core.filemode false
 
-###   temporary hack that upgrades DockerHub's build machine Docker version to 18 (supports manifests)   ###
-# display current Docker version
-docker --version
+# ###   temporary hack that upgrades DockerHub's build machine Docker version to 18 (supports manifests)   ###
+# # display current Docker version
+# docker --version
 
-if [[ $(docker --version) == "Docker version 17"* ]]
-then
-  # upgrade Docker and install jq
-  apt-get update && apt-get dist-upgrade docker -y && apt-get install jq -y
+# if [[ $(docker --version) == "Docker version 17"* ]]
+# then
+#   # upgrade Docker and install jq
+#   apt-get update && apt-get dist-upgrade docker -y && apt-get install jq -y
 
-  # display new Docker version
-  docker --version
+#   # display new Docker version
+#   docker --version
 
-  # migrate authentication configuration from .dockercfg to .docker/config.json
-  mkdir ~/.docker
-  AUTHTOKEN=$(cat ~/.dockercfg | jq '.["https://index.docker.io/v1/"] .auth')
-  echo "{\"auths\":{\"https://index.docker.io/v1/\":{\"auth\": $AUTHTOKEN}},\"experimental\": \"enabled\"}" \
-    > ~/.docker/config.json
-fi
-### ---------------------------------------------------------------------------------------------------- ###
+#   # migrate authentication configuration from .dockercfg to .docker/config.json
+#   mkdir ~/.docker
+#   AUTHTOKEN=$(cat ~/.dockercfg | jq '.["https://index.docker.io/v1/"] .auth')
+#   echo "{\"auths\":{\"https://index.docker.io/v1/\":{\"auth\": $AUTHTOKEN}},\"experimental\": \"enabled\"}" \
+#     > ~/.docker/config.json
+# fi
+# ### ---------------------------------------------------------------------------------------------------- ###
 
 # load build variable combinations
 archs=()
