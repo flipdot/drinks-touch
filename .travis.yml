@@ -15,15 +15,8 @@ addons:
 before_install:
 - echo '{"experimental":true}' | sudo tee /etc/docker/daemon.json
 - sudo service docker restart
-script:
-- docker build -t $REPO_USER/$REPO_NAME:$COMMIT .
-after_success:
-- echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
-- export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH;
-  fi`
-- docker tag $REPO_USER/$REPO_NAME:$COMMIT $REPO_USER/$REPO_NAME:$TAG
-- docker tag $REPO_USER/$REPO_NAME:$COMMIT $REPO_USER/$REPO_NAME:travis-$TRAVIS_BUILD_NUMBER
-- docker push $REPO_USER/$REPO_NAME
+script: ./docker/hooks/build
+after_success: ./docker/hooks/push
 notifications:
   email:
     on_success: change
