@@ -50,7 +50,6 @@ do
   docker build \
     --platform $ARCH \
     --build-arg HUB_U="$HUB_U" \
-    \ # -f "$DOCKERFILE_PATH" \
     -t "${IMAGE_NAME/:/:$ARCH-}" \
     "$THIS/../"
 done
