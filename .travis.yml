@@ -14,7 +14,7 @@ addons:
 before_install:
 - echo '{"experimental":true}' | sudo tee /etc/docker/daemon.json
 - sudo service docker restart
-script: ./docker/hooks/build
+script: travis_wait 60 ./docker/hooks/build
 after_success:
 - echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
 - ./docker/hooks/push
