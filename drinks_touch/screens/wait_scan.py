@@ -87,6 +87,13 @@ class WaitScanScreen(Screen):
         self.processing.is_visible = False
         self.objects.append(self.processing)
 
+        self.objects.append(Label(
+            self.screen,
+            text="Gesamtguthaben aller Member: -XXX,XX€",
+            size=25,
+            pos=(125, 755)
+        ))
+
         self.timeout = Progress(
             self.screen,
             pos=(400, 500),
