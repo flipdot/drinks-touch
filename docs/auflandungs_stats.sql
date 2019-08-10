@@ -1,13 +1,13 @@
 SELECT DISTINCT
-  lu."ldapId",
+  coalesce(x1.user_id, x2.user_id, lu."ldapId") as user_id,
   lu.name,
-  coalesce(x2.smm, 0) - x1.cnt AS kontostand,
-  x2.cnt as anzahl_aufladungen,
-  x2.avgAmount as durchschnittliche_aufladungssummer,
-  x2.sumAmount as auflandungssummer_insgesamt
+  round(coalesce(x2.smm, 0), 2) - x1.cnt AS kontostand,
+  x2.cnt as num_aufladung,
+  round(x2.avgAmount, 2) as avg_aufladungssumme,
+  round(x2.sumAmount, 2) as total_aufladung
 FROM "ldapUsers" lu
 
-  LEFT JOIN (
+  RIGHT OUTER JOIN (
               SELECT
                 user_id,
                 count(*) AS cnt
@@ -15,7 +15,7 @@ FROM "ldapUsers" lu
               GROUP BY user_id
             ) x1 ON x1.user_id = lu."ldapId"
 
-  LEFT JOIN (
+  RIGHT OUTER JOIN (
               SELECT
                 user_id,
                 sum(amount) AS smm,
