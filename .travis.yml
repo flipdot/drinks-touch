@@ -22,7 +22,7 @@ before_install:
     mv travis-wait-enhanced /home/travis/bin/
     travis-wait-enhanced --version
 script:
-- travis-wait-enhanced --timeout 60m build.sh
+- travis-wait-enhanced --timeout 60m $PWD/build.sh
 after_success:
 - docker tag $REPO_USER/$REPO_NAME:$COMMIT $REPO_USER/$REPO_NAME:$TAG
 - docker push $REPO_USER/$REPO_NAME
