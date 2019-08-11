@@ -3,6 +3,8 @@ FROM python
 RUN apt-get update && \
     apt-get install -y libldap2-dev libsasl2-dev locales \
     \
+    python3-lxml python3-pygame \
+    \
     libsdl1.2-dev libfreetype6-dev libsdl-mixer1.2-dev libsdl-image1.2-dev libsdl-ttf2.0-dev libportmidi-dev && \
     \
     rm -rf /var/lib/apt/lists/*
