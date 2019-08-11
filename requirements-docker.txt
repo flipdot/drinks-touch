@@ -4,6 +4,7 @@ pyStrich # sudo apt-get install python-pil
 influxdb
 jinja2
 keyboard
+premailer
 qrcode
 requests
 sqlalchemy

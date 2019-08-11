@@ -30,7 +30,6 @@ WORKDIR /app/
 
 COPY ./requirements-docker.txt ./
 RUN pip install -r requirements-docker.txt
-RUN pip install --no-deps premailer
 
 COPY ./drinks_touch/ ./
 
