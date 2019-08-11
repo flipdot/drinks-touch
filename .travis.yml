@@ -17,7 +17,7 @@ before_install:
 - docker buildx create --name travis-builder --use
 - docker buildx inspect --bootstrap
 script:
-- travis_wait 60 docker buildx build --cache-from=$REPO_USER/$REPO_NAME:cache --cache-to=$REPO_USER/$REPO_NAME:cache --platform linux/amd64,linux/arm/v7 --push -t $REPO_USER/$REPO_NAME:$COMMIT .
+- travis_wait 120 docker buildx build --cache-from=$REPO_USER/$REPO_NAME:cache --cache-to=$REPO_USER/$REPO_NAME:cache --platform linux/amd64,linux/arm/v7 --push -t $REPO_USER/$REPO_NAME:$COMMIT .
 after_success:
 - docker tag $REPO_USER/$REPO_NAME:$COMMIT $REPO_USER/$REPO_NAME:$TAG
 - docker push $REPO_USER/$REPO_NAME
