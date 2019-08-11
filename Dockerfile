@@ -1,5 +1,20 @@
 FROM python
 
+# old pygame dependency list
+#
+# git python3-dev python3-setuptools python3-numpy python3-opengl \
+# libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-ttf2.0-dev libsmpeg-dev \
+# libsdl1.2-dev libportmidi-dev libswscale-dev libavformat-dev libavcodec-dev \
+# libtiff5-dev libx11-6 libx11-dev fluid-soundfont-gm timgm6mb-soundfont \
+# xfonts-base xfonts-100dpi xfonts-75dpi xfonts-cyrillic fontconfig fonts-freefont-ttf libfreetype6-dev \
+
+#libxml2-dev libxslt1-dev
+
+# ignored pygame dependencies
+#
+# libjpeg-dev libpng-dev
+
+# dependecies for this app, pygame, sqlalchemy.
 RUN apt-get update && \
     apt-get install -y libldap2-dev libsasl2-dev locales \
     \
