@@ -5,6 +5,8 @@ influxdb
 jinja2
 keyboard
 premailer
+psycopg2-binary
+python-ldap # sudo apt-get install python-dev libldap2-dev libsasl2-dev libssl-dev
 qrcode
 requests
 sqlalchemy
