@@ -13,7 +13,7 @@ RUN mkdir /app/
 
 WORKDIR /app/
 
-COPY ./requirements.txt ./
+COPY ./requirements-docker.txt ./
 RUN pip install -r requirements-docker.txt
 
 COPY ./drinks_touch/ ./
