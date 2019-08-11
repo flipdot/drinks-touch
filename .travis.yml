@@ -22,7 +22,7 @@ before_install:
     mv travis-wait-enhanced /home/travis/bin/
     travis-wait-enhanced --version
 script:
-- travis-wait-enhanced --timeout 60m $PWD/build.sh
+- travis-wait-enhanced --timeout 60m "docker buildx build --cache-from=$REPO_USER/$REPO_NAME:cache --cache-to=$REPO_USER/$REPO_NAME:cache --platform linux/amd64,linux/arm/v7 --push -t $REPO_USER/$REPO_NAME:$COMMIT $PWD"
 after_success:
 - docker tag $REPO_USER/$REPO_NAME:$COMMIT $REPO_USER/$REPO_NAME:$TAG
 - docker push $REPO_USER/$REPO_NAME
