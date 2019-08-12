@@ -22,9 +22,5 @@ before_install:
     docker run --rm --privileged docker/binfmt:820fdd95a9972a5308930a2bdfb8573dd4447ad3
     docker buildx create --name travis-builder --use
     docker buildx inspect --bootstrap
-- |
-    wget -qO- "https://github.com/crazy-max/travis-wait-enhanced/releases/download/v0.1.1/travis-wait-enhanced_0.1.1_linux_x86_64.tar.gz" | tar -zxvf - travis-wait-enhanced
-    mv travis-wait-enhanced /home/travis/bin/
-    travis-wait-enhanced --version
 script:
-- travis-wait-enhanced --timeout 60m -- docker buildx build --cache-from=$REPO_USER/$REPO_NAME:cache --cache-to=$REPO_USER/$REPO_NAME:cache --platform linux/amd64,linux/arm/v7 --push -t $REPO_USER/$REPO_NAME:$COMMIT -t $REPO_USER/$REPO_NAME:$TAG $PWD
+- docker buildx build --cache-from=$REPO_USER/$REPO_NAME:cache --cache-to=$REPO_USER/$REPO_NAME:cache --platform linux/amd64,linux/arm/v7 --push -t $REPO_USER/$REPO_NAME:$COMMIT -t $REPO_USER/$REPO_NAME:$TAG $PWD
