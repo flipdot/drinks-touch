@@ -26,6 +26,7 @@ RUN mkdir /app/
 
 WORKDIR /app/
 
+COPY ./docker/pip_extra-index-piwheels.conf /etc/pip.conf
 COPY ./requirements.txt ./
 RUN pip install -r requirements.txt
 
