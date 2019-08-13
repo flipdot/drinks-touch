@@ -1,5 +1,7 @@
 FROM python
 
+ENV PYTHONUNBUFFERED 1
+
 # old pygame dependency list
 #
 # git python3-dev python3-setuptools python3-numpy python3-opengl \
