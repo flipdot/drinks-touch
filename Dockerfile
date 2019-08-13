@@ -16,7 +16,7 @@ FROM python
 
 # dependecies for this app, pygame, sqlalchemy.
 RUN apt-get update && \
-    apt-get install -y libldap2-dev libsasl2-dev locales \
+    apt-get install -y libldap2-dev libsasl2-dev locales xinput \
     \
     libsdl1.2-dev libfreetype6-dev libsdl-mixer1.2-dev libsdl-image1.2-dev libsdl-ttf2.0-dev libportmidi-dev && \
     \
