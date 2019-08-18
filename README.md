@@ -29,7 +29,6 @@ This project does not require any build procedure.
 The following configuration files are evaluated at execution time and must be derived from their respective examples, which can be found in the same directories.
 
 - `drinks_touch/config.py`
-- `drinks_touch/acme/config.py`
 
 ### Deployment
 
