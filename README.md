@@ -12,7 +12,7 @@ Digital replacement for the drinks tally list featuring a touchscreen, user mana
 1. **[License](#license)**
 
 ## Development
-This project is deployed within the [drinks-touch_stack](https://github.com/flipdot/drinks-touch_stack/) in accordance to the [DargStack template](https://github.com/Dargmuesli/dargstack-template/) to make deployment a breeze.
+This project is deployed within the [drinks-touch_stack](https://github.com/flipdot/drinks-touch_stack/) in accordance to the [DargStack template](https://github.com/dargmuesli/dargstack_template/) to make deployment a breeze.
 
 The provided `Dockerfile` lets you build a localized Python image. Build it with the following command:
 
