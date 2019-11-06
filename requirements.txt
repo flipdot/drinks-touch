@@ -4,7 +4,7 @@ pyStrich # sudo apt-get install python-pil
 influxdb
 jinja2
 keyboard
-Pillow==5.2.0
+Pillow==5.4.1
 premailer
 psycopg2-binary
 pygame
