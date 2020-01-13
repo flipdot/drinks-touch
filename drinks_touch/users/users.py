@@ -92,10 +92,10 @@ class Users(object):
 
     @staticmethod
     def get_all(prefix='', filters=None, include_temp=False):
-        if filters is None:
-            filters = []
+        if is_pi():
+            if filters is None:
+                filters = []
 
-        try:
             users = []
             ldap_users = Users.read_all_users_ldap(filters, include_temp)
 
@@ -110,14 +110,11 @@ class Users(object):
                 users.append(user)
 
             return users
-        except Exception:
-            if not is_pi():
-                logger.warning("ldap fail, falling back to test data.")
-                return filter(
-                    lambda u: prefix == '' or u['name'].lower().startswith(
-                        prefix.lower()), test_data)
-            else:
-                raise
+        else:
+            logger.warning("Not running in production: using test data for users.")
+            return filter(
+                lambda u: prefix == '' or u['name'].lower().startswith(
+                    prefix.lower()), test_data)
 
     @staticmethod
     def user_from_ldap(ldap_user):
