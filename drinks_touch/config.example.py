@@ -17,7 +17,7 @@ FPS = 30
 
 LOGLEVEL = "DEBUG"
 
-# development variables #
+# DEVELOPMENT VARIABLES #
 
 # Prevent any mail from being sent.
 NO_MAILS = True
@@ -25,6 +25,10 @@ NO_MAILS = True
 # Send any mail to the user with the given id.
 # Evaluates to MAIL_FROM by default.
 FORCE_MAIL_TO_UID = "3"
+
+# Do not fetch users from ldap.
+# Use debug users instead.
+USE_DEBUG_USERS = True
 
 # ldap: do not save changes to users.
 NO_USER_CHANGES = True

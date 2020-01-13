@@ -11,7 +11,6 @@ from sqlalchemy.sql import text
 import config
 from database.models.recharge_event import RechargeEvent
 from database.storage import get_session
-from env import is_pi
 
 logger = logging.getLogger(__name__)
 
@@ -92,7 +91,12 @@ class Users(object):
 
     @staticmethod
     def get_all(prefix='', filters=None, include_temp=False):
-        if is_pi():
+        if config.USE_DEBUG_USERS:
+            logger.warning("Not running in production: using test data for users.")
+            return filter(
+                lambda u: prefix == '' or u['name'].lower().startswith(
+                    prefix.lower()), test_data)
+        else:
             if filters is None:
                 filters = []
 
@@ -110,11 +114,6 @@ class Users(object):
                 users.append(user)
 
             return users
-        else:
-            logger.warning("Not running in production: using test data for users.")
-            return filter(
-                lambda u: prefix == '' or u['name'].lower().startswith(
-                    prefix.lower()), test_data)
 
     @staticmethod
     def user_from_ldap(ldap_user):
