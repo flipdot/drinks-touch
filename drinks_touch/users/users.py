@@ -316,8 +316,8 @@ class Users(object):
         if not changes:
             return
         logger.info("LDAP change %s: %s", user["name"], changes)
-        if config.NO_CHANGES:
-            logger.info("Ignoring because config.NO_CHANGES")
+        if config.NO_USER_CHANGES:
+            logger.info("Ignoring because config.NO_USER_CHANGES")
             return
         for key, change in changes.items():
             old, new = change
