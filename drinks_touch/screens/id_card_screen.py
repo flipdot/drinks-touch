@@ -133,8 +133,8 @@ class IDCardScreen(Screen):
     def print_id(self):
         self.progress.start()
         if not self.user['id_card']:
-            self.set_id("fd_" + self.user['name'])
-        enc = Code128Encoder(self.user['id_card'])
+            self.set_id("fd_" + bytes.decode(self.user['name']))
+        enc = Code128Encoder(str(self.user['id_card']))
         enc.height = 300
         png = enc.get_imagedata()
         p = subprocess.Popen(['lp', '-d', 'labeldrucker', '-'], stdin=subprocess.PIPE)

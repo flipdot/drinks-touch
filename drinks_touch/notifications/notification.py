@@ -101,8 +101,8 @@ def send_drink(user, drink, with_summary=False):
 def send_low_balances(with_summary=True):
     session = get_session()
 
-    if config.FORCE_MAIL_TO:
-        send_low_balance(session, Users.get_by_id(config.FORCE_MAIL_TO), with_summary, force=True)
+    if config.FORCE_MAIL_TO_UID:
+        send_low_balance(session, Users.get_by_id(config.FORCE_MAIL_TO_UID), with_summary, force=True)
         return
 
     for user in Users.get_all():
@@ -167,8 +167,8 @@ def send_low_balance(session, user, with_summary=False, force=False):
 def send_summaries():
     session = get_session()
 
-    if config.FORCE_MAIL_TO:
-        send_summary(session, Users.get_by_id(config.FORCE_MAIL_TO), "Getränkeübersicht", force=True)
+    if config.FORCE_MAIL_TO_UID:
+        send_summary(session, Users.get_by_id(config.FORCE_MAIL_TO_UID), "Getränkeübersicht", force=True)
         return
 
     for user in Users.get_all():
@@ -306,13 +306,13 @@ FROM scanevent se
 WHERE user_id = :userid
     AND se.timestamp >= TO_TIMESTAMP('%d')
 ORDER BY se.timestamp""" % since_timestamp)
-    drinks_consumed = session.connection().execute(sql, userid=user['id']).fetchall()
+    drinks_consumed = session.connection().execute(sql, userid=bytes.decode(user['id'])).fetchall()
     return drinks_consumed
 
 
 def get_recharges(session, user, since_timestamp):
     return session.query(RechargeEvent) \
-        .filter(RechargeEvent.user_id == user['id']) \
+        .filter(RechargeEvent.user_id == bytes.decode(user['id'])) \
         .filter(RechargeEvent.timestamp >= datetime.utcfromtimestamp(since_timestamp)) \
         .order_by(RechargeEvent.timestamp) \
         .all()

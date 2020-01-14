@@ -31,7 +31,7 @@ def make_sepa_qr(amount, name, uid, pixel_width=10, border=4, color="black", bg=
 
 
 def tx_url(uid, name, info, amount):
-    name = re.sub(r'[^a-zA-Z0-9 ]', '_', name)
+    name = re.sub(r'[^a-zA-Z0-9 ]', '_', str(name))
     info = re.sub(r'[^a-zA-Z0-9 ]', '_', info)
 
     # make int
