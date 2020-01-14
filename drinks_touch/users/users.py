@@ -126,7 +126,8 @@ class Users(object):
                 if "index" in meta:
                     value = value[meta["index"]]
                 if "load" in meta:
-                    value = meta['load'][value]
+                    meta: Dict[str, callable]
+                    value = meta['load'](value)
                 if value is None and "default" in meta:
                     value = meta["default"]
                 user[key] = value
@@ -139,7 +140,7 @@ class Users(object):
         for key, meta in Users.fields.items():
             value = user[key]
             if "save" in meta:
-                value = meta["save"][value]
+                value = meta["save"](value)
             user["_reference"][key] = value
         if user['id_card']:
             user['id_card'] = user['id_card'].upper()
