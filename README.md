@@ -64,6 +64,3 @@ Inside `drinks_touch`, run with
 And analyze results with
 
     python -m line_profiler game.py.lprof | less
-
-## License
-TODO
