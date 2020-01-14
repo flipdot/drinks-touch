@@ -22,7 +22,7 @@ class SuccessScreen(Screen):
         ))
         self.objects.append(Label(
             self.screen,
-            text=user['name'] + "!",
+            text=bytes.decode(user['name']) + "!",
             pos=(30, 170),
             size=70
         ))

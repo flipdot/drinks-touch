@@ -1,6 +1,8 @@
 import sys
 
 import json
+from typing import Dict
+
 import ldap
 import ldap.modlist as modlist
 import logging
@@ -16,25 +18,25 @@ logger = logging.getLogger(__name__)
 
 test_data = [
     {
-        "id": "1",
+        "id": b"1",
         "id_card": None,
-        "name": "foo"
+        "name": b"foo"
     },
     {
-        "id": "2",
-        "id_card": "idcard",
-        "name": "bar"
+        "id": b"2",
+        "id_card": b"idcard",
+        "name": b"bar"
     },
     {
-        "id": "3",
-        "id_card": "idcard_dm",
-        "email": config.MAIL_FROM,
+        "id": b"3",
+        "id_card": b"idcard_dm",
+        "email": str.encode(config.MAIL_FROM),
         "meta": {
             "drink_notification": "instant",
             "last_drink_notification": 0,
             "last_emailed": 0
         },
-        "name": "debug_user"
+        "name": b"debug_user"
     }
 ]
 
@@ -192,7 +194,7 @@ class Users(object):
                 WHERE user_id = :user_id
                 GROUP BY user_id
             """)
-        row = session.connection().execute(sql, user_id=user_id).fetchone()
+        row = session.connection().execute(sql, user_id=bytes.decode(user_id)).fetchone()
         if not row:
             cost = 0
         else:
@@ -204,8 +206,7 @@ class Users(object):
                 WHERE user_id = :user_id
                 GROUP BY user_id
             """)
-        # print(sql, user_id)
-        row = session.connection().execute(sql, user_id=user_id).fetchone()
+        row = session.connection().execute(sql, user_id=bytes.decode(user_id)).fetchone()
         if not row:
             credit = 0
         else:
@@ -217,7 +218,7 @@ class Users(object):
     def get_recharges(user_id, session=get_session(), limit=None):
         # type: # (str, session) -> RechargeEvent
         q = session.query(RechargeEvent).filter(
-            RechargeEvent.user_id == user_id).order_by(
+            RechargeEvent.user_id == bytes.decode(user_id)).order_by(
             RechargeEvent.timestamp.desc())
         if limit:
             q = q.limit(limit)
@@ -237,8 +238,8 @@ class Users(object):
     def get_by_id(user_id):
         all_users = Users.get_all(filters=['uidNumber=' + str(user_id)], include_temp=True)
         by_id = {u['id']: u for u in all_users if u['id']}
-        if user_id in by_id:
-            return by_id[user_id]
+        if str.encode(user_id) in by_id:
+            return by_id[str.encode(user_id)]
         return None
 
     @staticmethod

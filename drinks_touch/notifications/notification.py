@@ -306,13 +306,13 @@ FROM scanevent se
 WHERE user_id = :userid
     AND se.timestamp >= TO_TIMESTAMP('%d')
 ORDER BY se.timestamp""" % since_timestamp)
-    drinks_consumed = session.connection().execute(sql, userid=user['id']).fetchall()
+    drinks_consumed = session.connection().execute(sql, userid=bytes.decode(user['id'])).fetchall()
     return drinks_consumed
 
 
 def get_recharges(session, user, since_timestamp):
     return session.query(RechargeEvent) \
-        .filter(RechargeEvent.user_id == user['id']) \
+        .filter(RechargeEvent.user_id == bytes.decode(user['id'])) \
         .filter(RechargeEvent.timestamp >= datetime.utcfromtimestamp(since_timestamp)) \
         .order_by(RechargeEvent.timestamp) \
         .all()
