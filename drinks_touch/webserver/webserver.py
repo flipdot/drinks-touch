@@ -10,7 +10,6 @@ from flask import request
 from flask import send_file
 from flask_compress import Compress
 
-from acme import acme
 from database.models.recharge_event import RechargeEvent
 from database.storage import get_session
 from env import is_pi
@@ -123,7 +122,6 @@ def to_json(dict_arr):
 
 
 def run():
-    acme.ACME(app, not is_pi())
     port = 5002
     if is_pi():
         port = 80

@@ -1,6 +1,8 @@
 import sys
 
 import json
+from typing import Dict
+
 import ldap
 import ldap.modlist as modlist
 import logging
@@ -11,31 +13,30 @@ from sqlalchemy.sql import text
 import config
 from database.models.recharge_event import RechargeEvent
 from database.storage import get_session
-from env import is_pi
 
 logger = logging.getLogger(__name__)
 
 test_data = [
     {
-        "id": "1",
+        "id": b"1",
         "id_card": None,
-        "name": "foo"
+        "name": b"foo"
     },
     {
-        "id": "2",
-        "id_card": "idcard",
-        "name": "bar"
+        "id": b"2",
+        "id_card": b"idcard",
+        "name": b"bar"
     },
     {
-        "id": "3",
-        "id_card": "idcard_dm",
-        "email": config.MAIL_FROM,
+        "id": b"3",
+        "id_card": b"idcard_dm",
+        "email": str.encode(config.MAIL_FROM),
         "meta": {
             "drink_notification": "instant",
             "last_drink_notification": 0,
             "last_emailed": 0
         },
-        "name": "debug_user"
+        "name": b"debug_user"
     }
 ]
 
@@ -92,10 +93,15 @@ class Users(object):
 
     @staticmethod
     def get_all(prefix='', filters=None, include_temp=False):
-        if filters is None:
-            filters = []
+        if config.USE_DEBUG_USERS:
+            logger.warning("Not running in production: using test data for users.")
+            return filter(
+                lambda u: prefix == '' or u['name'].lower().startswith(
+                    prefix.lower()), test_data)
+        else:
+            if filters is None:
+                filters = []
 
-        try:
             users = []
             ldap_users = Users.read_all_users_ldap(filters, include_temp)
 
@@ -110,14 +116,6 @@ class Users(object):
                 users.append(user)
 
             return users
-        except Exception:
-            if not is_pi():
-                logger.warning("ldap fail, falling back to test data.")
-                return filter(
-                    lambda u: prefix == '' or u['name'].lower().startswith(
-                        prefix.lower()), test_data)
-            else:
-                raise
 
     @staticmethod
     def user_from_ldap(ldap_user):
@@ -128,7 +126,8 @@ class Users(object):
                 if "index" in meta:
                     value = value[meta["index"]]
                 if "load" in meta:
-                    value = meta['load'][value]
+                    meta: Dict[str, callable]
+                    value = meta['load'](value)
                 if value is None and "default" in meta:
                     value = meta["default"]
                 user[key] = value
@@ -141,7 +140,7 @@ class Users(object):
         for key, meta in Users.fields.items():
             value = user[key]
             if "save" in meta:
-                value = meta["save"][value]
+                value = meta["save"](value)
             user["_reference"][key] = value
         if user['id_card']:
             user['id_card'] = user['id_card'].upper()
@@ -196,7 +195,7 @@ class Users(object):
                 WHERE user_id = :user_id
                 GROUP BY user_id
             """)
-        row = session.connection().execute(sql, user_id=user_id).fetchone()
+        row = session.connection().execute(sql, user_id=bytes.decode(user_id)).fetchone()
         if not row:
             cost = 0
         else:
@@ -208,8 +207,7 @@ class Users(object):
                 WHERE user_id = :user_id
                 GROUP BY user_id
             """)
-        # print(sql, user_id)
-        row = session.connection().execute(sql, user_id=user_id).fetchone()
+        row = session.connection().execute(sql, user_id=bytes.decode(user_id)).fetchone()
         if not row:
             credit = 0
         else:
@@ -221,7 +219,7 @@ class Users(object):
     def get_recharges(user_id, session=get_session(), limit=None):
         # type: # (str, session) -> RechargeEvent
         q = session.query(RechargeEvent).filter(
-            RechargeEvent.user_id == user_id).order_by(
+            RechargeEvent.user_id == bytes.decode(user_id)).order_by(
             RechargeEvent.timestamp.desc())
         if limit:
             q = q.limit(limit)
@@ -241,8 +239,8 @@ class Users(object):
     def get_by_id(user_id):
         all_users = Users.get_all(filters=['uidNumber=' + str(user_id)], include_temp=True)
         by_id = {u['id']: u for u in all_users if u['id']}
-        if user_id in by_id:
-            return by_id[user_id]
+        if str.encode(user_id) in by_id:
+            return by_id[str.encode(user_id)]
         return None
 
     @staticmethod
@@ -316,8 +314,8 @@ class Users(object):
         if not changes:
             return
         logger.info("LDAP change %s: %s", user["name"], changes)
-        if config.NO_CHANGES:
-            logger.info("Ignoring because config.NO_CHANGES")
+        if config.NO_USER_CHANGES:
+            logger.info("Ignoring because config.NO_USER_CHANGES")
             return
         for key, change in changes.items():
             old, new = change
