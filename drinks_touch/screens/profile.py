@@ -198,7 +198,7 @@ class ProfileScreen(Screen):
                 user = Users.get_by_id(aufladung.helper_user_id)
                 if user:
                     helper = user['name']
-                    time_text += " mit " + helper
+                    time_text += " mit " + bytes.decode(helper)
             if date != prev_date:
                 prev_date = date
                 self.elements_aufladungen.append(Label(self.screen,
