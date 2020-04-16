@@ -2,9 +2,10 @@ from .base_elm import BaseElm
 
 
 class ElmList(BaseElm):
-    def __init__(self, screen, **kwargs):
+    def __init__(self, screen, height, width, pos=(0, 0), **kwargs):
+        super().__init__(screen, pos, height, width)
         self.screen = screen
-        self.pos = kwargs.get('pos', (0, 0))
+        self.pos = pos
         self.elm_margin = kwargs.get('elm_margin', 5)
         self.max_elm_count = kwargs.get('max_elm_count', 10)
         self.elm_size = kwargs.get('elm_size', 25)
