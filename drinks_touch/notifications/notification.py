@@ -95,7 +95,6 @@ def send_drink(user, drink, with_summary=False):
                          force=True)
     except Exception:
         logger.exception("while sending drink noti")
-        pass
 
 
 def send_low_balances(with_summary=True):

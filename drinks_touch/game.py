@@ -52,7 +52,6 @@ def handle_events():
             current_screen.events(events)
         except Exception:
             logging.exception("handling events:")
-            pass
 
 
 def stats_loop():
