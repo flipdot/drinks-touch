@@ -187,8 +187,6 @@ def send_summary(session, user, subject, prepend_text=None, prepend_html=None, f
 
     if not force and frequency_str not in FREQUENCIES.keys():
         return
-    elif force:
-        freq_secs = 0
     else:
         freq_secs = FREQUENCIES[frequency_str]
 
