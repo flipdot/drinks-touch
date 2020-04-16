@@ -20,8 +20,8 @@ def main():
         )
 
         old = LdapUser.query.filter_by(ldap_id=user["id"]).all()
-        for user in old:
-            session.delete(user)
+        for old_user in old:
+            session.delete(old_user)
         session.add(ldap_user)
 
     session.commit()
