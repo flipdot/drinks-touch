@@ -28,7 +28,17 @@ module.exports = {
     },
     module: {
         rules: [
-            { test: /\.(sa|sc|c)ss$/, use: [ devMode ? 'style-loader' : MiniCssExtractPlugin.loader, 'css-loader', 'postcss-loader', 'sass-loader']}
+            { test: /\.(sa|sc|c)ss$/, use: [devMode ? 'style-loader' : MiniCssExtractPlugin.loader, 'css-loader', 'postcss-loader', 'sass-loader'] },
+            {
+                test: /\.m?js$/,
+                exclude: /(node_modules|bower_components)/,
+                use: {
+                    loader: 'babel-loader',
+                    options: {
+                        presets: ['@babel/preset-env']
+                    }
+                }
+            }
         ],
     },
     optimization: {
