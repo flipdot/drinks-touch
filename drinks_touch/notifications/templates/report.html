@@ -1,0 +1,120 @@
+<h1>
+    Getränkebericht
+</h1>
+<p>
+    Hier ist deine Getränkeübersicht seit dem {{ since_text }}.
+    <br>
+    Dein aktuelles Guthaben beträgt
+    {% if balance > 0 %}
+    +{{ balance }}&thinsp;€.
+    {% else %}
+    {{ balance }}&thinsp;€.
+    {% endif %}
+</p>
+<h2>
+    Abbuchungen
+</h2>
+{% if not drinks %}
+Keine neuen Abbuchungen.
+{% else %}
+<table>
+    <thead>
+        <tr>
+            <th>
+                #
+            </th>
+            <th>
+                Datum
+            </th>
+            <th>
+                Getränk
+            </th>
+            <th>
+                Größe
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for drink in drinks %}
+        <tr>
+            <td>
+                {{ loop.index }}
+            </td>
+            <td>
+                {{ drink.timestamp.strftime("%F %T Z") }}
+            </td>
+            <td>
+                {{ drink.name }}
+            </td>
+            <td>
+                {{ drink.size }}&thinsp;l
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+<h2>
+    Aufladungen
+</h2>
+{% if not recharges %}
+Keine neuen Aufladungen.
+{% else %}
+<table>
+    <thead>
+        <tr>
+            <th>
+                #
+            </th>
+            <th>
+                Datum
+            </th>
+            <th>
+                4-Augen-Person
+            </th>
+            <th>
+                Wert
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for recharge in recharges %}
+        <tr>
+            <td>
+                {{ loop.index }}
+            </td>
+            <td>
+                {{ recharge.timestamp.strftime("%F %T Z") }}
+            </td>
+            <td>
+                {{ recharge.helper_user_id }}
+            </td>
+            <td>
+                {{ recharge.amount }}&thinsp;€
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+<hr>
+<p class="text-centered">
+    Besuchen Sie uns bald wieder!
+</p>
+<div class="text-centered" id="buttons">
+    <form action="http://ldap.fd/">
+        <button title="http://ldap.fd/" type="submit">
+            <span>
+                Einstellungen
+            </span>
+        </button>
+    </form>
+    <form action="http://drinks-touch.fd/">
+        <button title="http://drinks-touch.fd/" type="submit">
+            <span>
+                Aufladen
+            </span>
+        </button>
+    </form>
+</div>
+

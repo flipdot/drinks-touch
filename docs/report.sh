@@ -27,4 +27,3 @@ if ! python pullLdapUsersToDatabase.py > "$tmp.ldap" 2>&1; then
 fi
 
 sudo -u postgres psql drinks < docs/auflandungs_stats.sql |head -n10 >> "$tmp"
-
