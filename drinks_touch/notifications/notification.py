@@ -185,7 +185,7 @@ def send_summary(session, user, subject, prepend_text=None, prepend_html=None, f
     frequency_str = user['meta']['drink_notification']
     balance = Users.get_balance(user['id'])
 
-    if not force and frequency_str not in FREQUENCIES.keys():
+    if not force or frequency_str not in FREQUENCIES.keys():
         return
     else:
         freq_secs = FREQUENCIES[frequency_str]
