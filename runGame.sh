@@ -20,6 +20,7 @@ do
         export PYTHONUNBUFFERED=1
 
         cd /home/pi/drinks-touch
-        systemd-cat -t"drinks" ./game.py
+        echo "starting..."
+        systemd-cat -t"drinks" ./drinks_touch/game.py
     )
 done

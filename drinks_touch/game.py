@@ -23,6 +23,7 @@ from screens.screen_manager import ScreenManager
 from stats.stats import run as stats_send
 from users.sync import sync_recharges
 from webserver.webserver import run as run_webserver
+import os
 
 with contextlib.redirect_stdout(None):
     import pygame
@@ -35,7 +36,6 @@ debug.listen()
 
 event_queue = queue.Queue()
 screen_manager = None
-
 
 # Events #
 def handle_events():
