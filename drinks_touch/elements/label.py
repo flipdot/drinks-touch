@@ -4,6 +4,7 @@ import contextlib
 with contextlib.redirect_stdout(None):
     import pygame
 
+pygame.font.init()
 
 class Label(BaseElm):
     _font_cache = {}

@@ -3,8 +3,8 @@
 KEYS=(
     -r B04800CE
     -r 08B0AE86
-    -r 99CABD50
 )
+    # expired: -r 99CABD50
 MAIL=(
     vorstand@flipdot.org
     c+drinks@cfs.im
@@ -13,6 +13,7 @@ export FROM=flipdot-noti@vega.uberspace.de
 SUBJECT="Drinks Report"
 
 tmp=$(mktemp)
+exec > >(tee $tmp) 2>*1
 function send_cleanup() {
     gpg -ea "${KEYS[@]}" --always-trust -o - < "$tmp" \
         | mailx -r "$FROM" -s "$SUBJECT" "${MAIL[@]}"

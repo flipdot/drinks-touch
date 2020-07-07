@@ -126,7 +126,6 @@ class Users(object):
                 if "index" in meta:
                     value = value[meta["index"]]
                 if "load" in meta:
-                    meta: Dict[str, callable]
                     value = meta['load'](value)
                 if value is None and "default" in meta:
                     value = meta["default"]
