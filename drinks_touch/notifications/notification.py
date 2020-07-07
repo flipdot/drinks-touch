@@ -315,7 +315,7 @@ def get_recharges(session, user, since_timestamp):
         .all()
 
 
-def render_jinja_html(file_name, template_loc='notifications/templates', **context):
+def render_jinja_html(file_name, template_loc='drinks_touch/notifications/templates', **context):
     return jinja2.Environment(
         loader=jinja2.FileSystemLoader(template_loc)
     ).get_template(file_name).render(context)
