@@ -14,5 +14,5 @@ done &
 
 while [ 1 ];
 do
-    cd /home/pi/drinks-scanner-display && ENV=PI ./game.py &>> /var/log/drinks/log.log
+    cd /home/pi/drinks-touch && ENV=PI ./game.py &>> /var/log/drinks/log.log
 done
