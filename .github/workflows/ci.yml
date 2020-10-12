@@ -85,13 +85,13 @@ jobs:
             --load \
             .
           docker container create --name extract stage_build
-          docker container cp extract:/srv/app/dist/ .
+          docker container cp extract:/srv/app/ .
           docker container rm -f extract
 
       - name: Zip
         uses: montudor/action-zip@v0.1.0
         with:
-          args: zip -qq -r ./drinks-touch.zip ./dist/
+          args: zip -qq -r ./drinks-touch.zip ./app/
 
       - name: GitHub Release Asset
         uses: softprops/action-gh-release@v1

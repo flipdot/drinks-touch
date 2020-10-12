@@ -27,9 +27,9 @@ RUN apt-get update && \
     \
     rm -rf /var/lib/apt/lists/*
 RUN localedef -i de_DE -c -f UTF-8 -A /usr/share/locale/locale.alias de_DE.UTF-8
-RUN mkdir /app/
+RUN mkdir /srv/app/
 
-WORKDIR /app/
+WORKDIR /srv/app/
 
 COPY ./docker/asound.conf /etc/asound.conf
 COPY ./docker/pip_extra-index-piwheels.conf /etc/pip.conf
