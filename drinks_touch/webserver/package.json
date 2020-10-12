@@ -8,7 +8,6 @@
     "build-dev": "NODE_ENV='development' webpack --mode=development"
   },
   "author": "",
-  "license": "flipdot EULA",
   "dependencies": {
     "bootstrap": "4.5.2",
     "select2": "4.0.13"
