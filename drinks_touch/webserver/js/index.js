@@ -26,7 +26,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 let urlNow = '';
 let urlNext = '';
-let lastUpdate = null;
 
 function update_qr() {
     const uid = user_select.val();
@@ -37,11 +36,6 @@ function update_qr() {
         uid_text.textContent = uid;
     } else {
         uid_text.textContent = "<uid>";
-    }
-
-    if (lastUpdate) {
-        clearTimeout(lastUpdate);
-        lastUpdate = null;
     }
 
     const url = '/tx.png?uid=' + encodeURIComponent(uid) +

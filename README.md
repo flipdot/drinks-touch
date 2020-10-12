@@ -1,4 +1,6 @@
 [![Build Status](https://travis-ci.org/flipdot/drinks-touch.svg?branch=master)](https://travis-ci.org/flipdot/drinks-touch)
+[![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/flipdot/drinks-touch.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/flipdot/drinks-touch/context:python)
+[![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/flipdot/drinks-touch.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/flipdot/drinks-touch/context:javascript)
 
 # Drinks Touch
 Digital replacement for the drinks tally list featuring a touchscreen, user management and a barcode scanner.
@@ -64,6 +66,3 @@ Inside `drinks_touch`, run with
 And analyze results with
 
     python -m line_profiler game.py.lprof | less
-
-## License
-TODO

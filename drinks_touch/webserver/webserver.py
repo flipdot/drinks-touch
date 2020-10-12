@@ -1,9 +1,9 @@
-import datetime
 import json
 import re
 from datetime import datetime
 from decimal import Decimal
 
+from flask import escape
 from flask import Flask, make_response
 from flask import render_template
 from flask import request
@@ -71,9 +71,9 @@ def recharge_doit():
     helpers = Users.get_all(filters=['uidNumber=' + helper_id])
 
     if not users:
-        return "user %s not found" % user_id
+        return "user %s not found" % escape(user_id)
     if not helpers:
-        return "user %s not found" % helper_id
+        return "user %s not found" % escape(helper_id)
     user = users[0]
     helper = helpers[0]
 
@@ -126,7 +126,7 @@ def run():
     if is_pi():
         port = 80
 
-    app.run(
+    app.run(  # lgtm [py/flask-debug]
         host='0.0.0.0',
         debug=not is_pi(),
         port=port
