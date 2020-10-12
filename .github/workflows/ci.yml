@@ -81,7 +81,7 @@ jobs:
           docker buildx build \
             --cache-from=$IMAGE_ID:cache \
             -t stage_build \
-            --target build \
+            --target development \
             --load \
             .
           docker container create --name extract stage_build
