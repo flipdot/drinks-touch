@@ -1,3 +1,10 @@
+## [0.3.1](https://github.com/flipdot/drinks-touch/compare/0.3.0...0.3.1) (2020-10-12)
+
+
+### Bug Fixes
+
+* **ci:** correct build stage name ([1177dfe](https://github.com/flipdot/drinks-touch/commit/1177dfe47d870813fbe407bdfc529a524288f798))
+
 # [0.3.0](https://github.com/flipdot/drinks-touch/compare/0.2.0...0.3.0) (2020-10-12)
 
 
