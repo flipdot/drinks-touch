@@ -1,3 +1,10 @@
+## [0.3.2](https://github.com/flipdot/drinks-touch/compare/0.3.1...0.3.2) (2020-10-12)
+
+
+### Bug Fixes
+
+* **ci:** correct docker internal paths ([d39f330](https://github.com/flipdot/drinks-touch/commit/d39f330f821219a6853902dd84441a0e5d10ba2d))
+
 ## [0.3.1](https://github.com/flipdot/drinks-touch/compare/0.3.0...0.3.1) (2020-10-12)
 
 
