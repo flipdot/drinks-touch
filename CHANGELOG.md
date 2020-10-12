@@ -1,3 +1,10 @@
+## [0.3.3](https://github.com/flipdot/drinks-touch/compare/0.3.2...0.3.3) (2020-10-12)
+
+
+### Bug Fixes
+
+* **requirements:** pygame 2.0.0.dev14 ([b96c6a5](https://github.com/flipdot/drinks-touch/commit/b96c6a525593ee58cf8aff48cffe80387596ef2e))
+
 ## [0.3.2](https://github.com/flipdot/drinks-touch/compare/0.3.1...0.3.2) (2020-10-12)
 
 
