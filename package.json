@@ -1,0 +1,19 @@
+{
+  "name": "drinks-touch",
+  "private": true,
+  "version": "0.2.0",
+  "scheduleVersion": "0.2.0",
+  "repository": "https://github.com/flipdot/drinks-touch.git",
+  "dependencies": {},
+  "devDependencies": {
+    "@commitlint/cli": "11.0.0",
+    "@commitlint/config-conventional": "11.0.0",
+    "husky": "4.3.0"
+  },
+  "scripts": {},
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  }
+}
