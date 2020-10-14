@@ -1,3 +1,10 @@
+## [0.3.4](https://github.com/flipdot/drinks-touch/compare/0.3.3...0.3.4) (2020-10-14)
+
+
+### Bug Fixes
+
+* **webpack:** disable sourcemap for terser plugin ([8471c0e](https://github.com/flipdot/drinks-touch/commit/8471c0ea44cf5dbdb21ba02872c810df0f3dbaa9))
+
 ## [0.3.3](https://github.com/flipdot/drinks-touch/compare/0.3.2...0.3.3) (2020-10-12)
 
 
