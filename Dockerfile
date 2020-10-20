@@ -21,7 +21,7 @@ ENV PYTHONUNBUFFERED 1
 
 # dependecies for this app, pygame, sqlalchemy.
 RUN apt-get update && \
-    apt-get install -y libldap2-dev libsasl2-dev locales xinput \
+    apt-get install --no-install-recommends -y libldap2-dev libsasl2-dev locales xinput \
     \
     libsdl1.2-dev libfreetype6-dev libsdl-mixer1.2-dev libsdl-image1.2-dev libsdl-ttf2.0-dev libportmidi-dev && \
     \
@@ -38,4 +38,4 @@ RUN pip install -r requirements.txt
 
 COPY ./drinks_touch/ ./
 
-ENTRYPOINT ./game.py
+ENTRYPOINT ["./game.py"]
