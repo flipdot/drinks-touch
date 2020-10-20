@@ -1,3 +1,10 @@
+## [0.3.5](https://github.com/flipdot/drinks-touch/compare/0.3.4...0.3.5) (2020-10-20)
+
+
+### Performance Improvements
+
+* **docker:** apply hadolint suggestions ([cd01557](https://github.com/flipdot/drinks-touch/commit/cd0155727ce88e095bc3c9254b571d5d14843653))
+
 ## [0.3.4](https://github.com/flipdot/drinks-touch/compare/0.3.3...0.3.4) (2020-10-14)
 
 
