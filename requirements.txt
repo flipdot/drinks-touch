@@ -7,7 +7,7 @@ keyboard
 Pillow
 premailer
 psycopg2-binary
-pygame==2.0.0.dev22 # dev14 offers Python 3.9 support
+pygame==2.0.0.dev24 # dev14 offers Python 3.9 support
 python-ldap # sudo apt-get install python-dev libldap2-dev libsasl2-dev libssl-dev
 qrcode
 requests
