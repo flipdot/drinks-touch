@@ -19,7 +19,7 @@
     "babel-loader": "8.2.2",
     "bootstrap-loader": "3.0.4",
     "css-loader": "5.0.1",
-    "exports-loader": "1.1.1",
+    "exports-loader": "2.0.0",
     "file-loader": "6.2.0",
     "imports-loader": "1.2.0",
     "jquery": "3.5.1",
