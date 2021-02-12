@@ -1,3 +1,10 @@
+## [0.3.19](https://github.com/flipdot/drinks-touch/compare/0.3.18...0.3.19) (2021-02-12)
+
+
+### Bug Fixes
+
+* **ci:** trigger on create ([6d0c98a](https://github.com/flipdot/drinks-touch/commit/6d0c98ae4b5d78a41e37e550078981af2085a448))
+
 ## [0.3.18](https://github.com/flipdot/drinks-touch/compare/0.3.17...0.3.18) (2021-02-08)
 
 
