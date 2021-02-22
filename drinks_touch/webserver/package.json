@@ -13,8 +13,8 @@
     "select2": "4.0.13"
   },
   "devDependencies": {
-    "@babel/core": "7.12.17",
-    "@babel/preset-env": "7.12.17",
+    "@babel/core": "7.13.0",
+    "@babel/preset-env": "7.13.0",
     "autoprefixer": "10.2.4",
     "babel-loader": "8.2.2",
     "bootstrap-loader": "3.0.4",
