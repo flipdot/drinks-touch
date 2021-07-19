@@ -1,7 +1,7 @@
 {
   "name": "drinks-touch",
   "private": true,
-  "version": "0.3.33",
+  "version": "0.3.34",
   "scheduleVersion": "0.3.34",
   "repository": "https://github.com/flipdot/drinks-touch.git",
   "dependencies": {},
