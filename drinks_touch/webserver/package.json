@@ -9,7 +9,7 @@
   },
   "author": "",
   "dependencies": {
-    "bootstrap": "5.0.2",
+    "bootstrap": "5.1.0",
     "select2": "4.0.13"
   },
   "devDependencies": {
