@@ -9,6 +9,7 @@
   },
   "extends": [
     "config:base",
+    ":disableDependencyDashboard",
     ":semanticCommits",
     ":semanticCommitTypeAll(chore)"
   ],
