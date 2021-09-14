@@ -113,7 +113,7 @@ jobs:
           args: zip -qq -r ./drinks-touch.zip ./app/
 
       - name: GitHub Release Asset
-        uses: softprops/action-gh-release@2d72d869af3bf23602f9593a1e3fd739b80ac1eb # renovate: tag=v1
+        uses: softprops/action-gh-release@6034af24fba4e5a8e975aaa6056554efe4c794d0 # renovate: tag=v1
         with:
           files: drinks-touch.zip
         env:
