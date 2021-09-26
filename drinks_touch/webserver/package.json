@@ -15,7 +15,7 @@
   "devDependencies": {
     "@babel/core": "7.15.5",
     "@babel/preset-env": "7.15.6",
-    "autoprefixer": "10.3.5",
+    "autoprefixer": "10.3.6",
     "babel-loader": "8.2.2",
     "bootstrap-loader": "3.0.4",
     "css-loader": "5.2.7",
