@@ -16,7 +16,7 @@
     "@babel/core": "7.15.8",
     "@babel/preset-env": "7.15.8",
     "autoprefixer": "10.3.7",
-    "babel-loader": "8.2.2",
+    "babel-loader": "8.2.3",
     "bootstrap-loader": "3.0.4",
     "css-loader": "5.2.7",
     "exports-loader": "3.0.0",
