@@ -2633,10 +2633,10 @@ import-local@^3.0.2:
     pkg-dir "^4.2.0"
     resolve-cwd "^3.0.0"
 
-imports-loader@3.0.1:
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/imports-loader/-/imports-loader-3.0.1.tgz#aee598bbf3f038767051684ddeead103805649ce"
-  integrity sha512-AGi9Ttqj8AUX4CxGycO2X1dIfgLxfXsQMGQ39hqzsJ9eIqs5fqR23/qjVy1CZdWuyrDeHcb9Y+1AjmqfiHKwYQ==
+imports-loader@3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/imports-loader/-/imports-loader-3.1.0.tgz#d43449ac5948f7260226555ad8085896e012d5f6"
+  integrity sha512-W5hcDVhb7T2b2MsPOd9QcBIC36jS72ENAuOHWji8mWthuBDYpGoiAOtht6I/oWT+iyR4jP7LNZmgZJhe/Us1bg==
   dependencies:
     source-map "^0.6.1"
     strip-comments "^2.0.1"
