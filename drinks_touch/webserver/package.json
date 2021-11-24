@@ -27,7 +27,7 @@
     "node-sass": "6.0.1",
     "optimize-css-assets-webpack-plugin": "6.0.1",
     "popper.js": "1.16.1",
-    "postcss": "8.3.11",
+    "postcss": "8.4.0",
     "postcss-loader": "6.2.0",
     "resolve-url-loader": "4.0.0",
     "sass-loader": "12.3.0",
