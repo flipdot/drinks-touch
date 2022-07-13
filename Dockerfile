@@ -1,7 +1,7 @@
 ######################################################################
 # Stage name "development" is required for development with DargStack.
 # TODO: try if slim or alpine versions work.
-FROM python:3.10.5-buster@sha256:7ee3e75da4b2160255795346e5f86ad58859efc666101b8f11943a0d5a18fbc3 AS development
+FROM python:3.10.5-buster@sha256:0c312a84099351c57f24fc2dbb4bc5fb51b5c5677a2f2b185a4d23c3e24f63bd AS development
 
 ENV PYTHONUNBUFFERED 1
 
