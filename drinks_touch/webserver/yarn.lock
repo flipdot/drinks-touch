@@ -2628,10 +2628,10 @@ import-local@^3.0.2:
     pkg-dir "^4.2.0"
     resolve-cwd "^3.0.0"
 
-imports-loader@4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/imports-loader/-/imports-loader-4.0.0.tgz#c11574247beca48e6549db1eb603f8939884aca1"
-  integrity sha512-8PPbhk/9CEHd0WWKESw/oYTDhp3So9PWA9OfyIbH3kywIN4uxrWkQ8ux47xpk4yWUKX97Erbws9MFSaBlVvAjg==
+imports-loader@4.0.1:
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/imports-loader/-/imports-loader-4.0.1.tgz#a3d3067d0c369cd621e2b322b6b6bb2593756be5"
+  integrity sha512-ZiY+1xH5fqAJ1Qu1CFv+zw54rvPCC92DdYRDe0IIUboOhbJPLfOPbF/paA2iipelvMwjQUKWydcFOJ7f1+ZFcA==
   dependencies:
     source-map "^0.6.1"
     strip-comments "^2.0.1"
