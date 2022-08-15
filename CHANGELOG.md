@@ -1,3 +1,10 @@
+## [0.3.70](https://github.com/flipdot/drinks-touch/compare/0.3.69...0.3.70) (2022-08-15)
+
+
+### Bug Fixes
+
+* **release:** schedule release ([39c5a78](https://github.com/flipdot/drinks-touch/commit/39c5a781fab5f3ec506d82dec1b2b862f6e8b319))
+
 ## [0.3.69](https://github.com/flipdot/drinks-touch/compare/0.3.68...0.3.69) (2022-08-01)
 
 
