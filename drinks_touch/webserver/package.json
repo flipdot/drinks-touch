@@ -22,7 +22,7 @@
     "exports-loader": "4.0.0",
     "file-loader": "6.2.0",
     "imports-loader": "4.0.1",
-    "jquery": "3.6.0",
+    "jquery": "3.6.1",
     "mini-css-extract-plugin": "1.6.2",
     "node-sass": "7.0.1",
     "optimize-css-assets-webpack-plugin": "6.0.1",
