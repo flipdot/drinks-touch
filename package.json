@@ -12,6 +12,6 @@
     "shx": "0.3.4"
   },
   "scripts": {
-    "prepare": "if [[ -d '.git' && -d '.husky' ]]; then husky install && shx rm -rf .git/hooks && shx ln -s ../.husky .git/hooks; fi"
+    "prepare": "if [ -d '.git' ] && [ -d '.husky' ]; then husky install && shx rm -rf .git/hooks && shx ln -s ../.husky .git/hooks; fi"
   }
 }
