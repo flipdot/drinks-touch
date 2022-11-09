@@ -1765,10 +1765,10 @@ boolbase@^1.0.0:
   resolved "https://registry.yarnpkg.com/boolbase/-/boolbase-1.0.0.tgz#68dff5fbe60c51eb37725ea9e3ed310dcc1e776e"
   integrity sha1-aN/1++YMUes3cl6p4+0xDcwed24=
 
-bootstrap-loader@4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/bootstrap-loader/-/bootstrap-loader-4.0.0.tgz#ca8f9534f35ecb15a824ca60a6abc9cd5b70150d"
-  integrity sha512-LzeZySPqDcfRmNZcddwfLc83D1Szv0EI0U3z2oiupoBCmCKXPJ4sMqhMZwSV6IRLuX6eZjG38uuiWgCLlFZPXg==
+bootstrap-loader@4.0.1:
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/bootstrap-loader/-/bootstrap-loader-4.0.1.tgz#28219c8b2671d8846b75235f292bff006466a15b"
+  integrity sha512-a4OX2AzqMMVFgRtcYBIcKEp2axmLFC/cUccxaEgz7zharBsKiU8S6kKkNBSqhkOmgJRTvEB2Xix/+0xydymETQ==
   dependencies:
     chalk "2.4.2"
     escape-regexp "0.0.1"
