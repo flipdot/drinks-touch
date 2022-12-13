@@ -1,3 +1,11 @@
+## [0.3.79](https://github.com/flipdot/drinks-touch/compare/0.3.78...0.3.79) (2022-12-13)
+
+
+### Bug Fixes
+
+* **commitlint:** allow long body lines on ci ([2ebe430](https://github.com/flipdot/drinks-touch/commit/2ebe430bee9d74e0fb2cb3178b14dc29c7eaac48))
+* **release:** schedule release ([8f84cac](https://github.com/flipdot/drinks-touch/commit/8f84caca6d482aa6ba3b1e9576258a96537b733b))
+
 ## [0.3.78](https://github.com/flipdot/drinks-touch/compare/0.3.77...0.3.78) (2022-11-28)
 
 
