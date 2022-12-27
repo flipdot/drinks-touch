@@ -4,7 +4,11 @@
   "version": "0.3.79",
   "scheduleVersion": "0.3.80",
   "repository": "https://github.com/flipdot/drinks-touch.git",
-  "dependencies": {},
+  "type": "module",
+  "engines": {
+    "node": "19"
+  },
+  "packageManager": "pnpm@7.20.0",
   "devDependencies": {
     "@commitlint/cli": "17.3.0",
     "@commitlint/config-conventional": "17.3.0",
