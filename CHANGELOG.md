@@ -1,3 +1,15 @@
+# [0.4.0](https://github.com/flipdot/drinks-touch/compare/0.3.79...0.4.0) (2022-12-27)
+
+
+### Bug Fixes
+
+* **release:** schedule release ([b8128bf](https://github.com/flipdot/drinks-touch/commit/b8128bf665ade042206490bd7c372a3162b631ea))
+
+
+### Features
+
+* **package:** migrate to pnpm ([838811b](https://github.com/flipdot/drinks-touch/commit/838811bd58ac99b163bc727d5c2f937b6bccf80d))
+
 ## [0.3.79](https://github.com/flipdot/drinks-touch/compare/0.3.78...0.3.79) (2022-12-13)
 
 
