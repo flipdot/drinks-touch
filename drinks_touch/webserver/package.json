@@ -18,7 +18,7 @@
     "@popperjs/core": "2.11.6",
     "autoprefixer": "10.4.13",
     "babel-loader": "9.1.0",
-    "bootstrap-loader": "4.0.1",
+    "bootstrap-loader": "4.0.2",
     "bootstrap-sass": "3.4.3",
     "css-loader": "6.7.3",
     "css-minimizer-webpack-plugin": "4.2.2",
