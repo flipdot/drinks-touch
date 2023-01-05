@@ -5,7 +5,7 @@ specifiers:
   '@babel/preset-env': 7.20.2
   '@popperjs/core': 2.11.6
   autoprefixer: 10.4.13
-  babel-loader: 9.1.0
+  babel-loader: 9.1.2
   bootstrap: 5.2.3
   bootstrap-loader: 4.0.2
   bootstrap-sass: 3.4.3
@@ -38,7 +38,7 @@ devDependencies:
   '@babel/preset-env': 7.20.2_@babel+core@7.20.12
   '@popperjs/core': 2.11.6
   autoprefixer: 10.4.13_postcss@8.4.20
-  babel-loader: 9.1.0_la66t7xldg4uecmyawueag5wkm
+  babel-loader: 9.1.2_la66t7xldg4uecmyawueag5wkm
   bootstrap-loader: 4.0.2_3gdqziw2xpzjesyvon5caq2ise
   bootstrap-sass: 3.4.3
   css-loader: 6.7.3_webpack@5.75.0
@@ -1721,8 +1721,8 @@ packages:
       postcss-value-parser: 4.2.0
     dev: true
 
-  /babel-loader/9.1.0_la66t7xldg4uecmyawueag5wkm:
-    resolution: {integrity: sha512-Antt61KJPinUMwHwIIz9T5zfMgevnfZkEVWYDWlG888fgdvRRGD0JTuf/fFozQnfT+uq64sk1bmdHDy/mOEWnA==}
+  /babel-loader/9.1.2_la66t7xldg4uecmyawueag5wkm:
+    resolution: {integrity: sha512-mN14niXW43tddohGl8HPu5yfQq70iUThvFL/4QzESA7GcZoC0eVOhvWdQ8+3UlSjaDE9MVtsW9mxDY07W7VpVA==}
     engines: {node: '>= 14.15.0'}
     peerDependencies:
       '@babel/core': ^7.12.0
