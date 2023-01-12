@@ -10,8 +10,8 @@
   },
   "packageManager": "pnpm@7.24.3",
   "devDependencies": {
-    "@commitlint/cli": "17.4.1",
-    "@commitlint/config-conventional": "17.4.0",
+    "@commitlint/cli": "17.4.2",
+    "@commitlint/config-conventional": "17.4.2",
     "husky": "8.0.3",
     "shx": "0.3.4"
   },
