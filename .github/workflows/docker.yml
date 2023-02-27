@@ -19,9 +19,3 @@ jobs:
     uses: dargmuesli/github-actions/.github/workflows/release-semantic.yml@0.28.8
     secrets:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
-  release-assets:
-    needs: release-semantic
-    name: Release Assets
-    uses: dargmuesli/github-actions/.github/workflows/release-assets.yml@0.28.8
-    with:
-      TARGET: development
