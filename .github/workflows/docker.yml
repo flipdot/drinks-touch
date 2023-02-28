@@ -18,6 +18,6 @@ jobs:
   release-semantic:
     needs: build
     name: Semantic Release
-    uses: dargmuesli/github-actions/.github/workflows/release-semantic.yml@0.28.8
+    uses: dargmuesli/github-actions/.github/workflows/release-semantic.yml@0.29.0
     secrets:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
