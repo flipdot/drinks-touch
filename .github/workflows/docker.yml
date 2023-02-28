@@ -13,6 +13,8 @@ jobs:
     secrets:
       DOCKER_HUB_ACCESS_TOKEN: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
       DOCKER_HUB_USER_NAME: ${{ secrets.DOCKER_HUB_USER_NAME }}
+    with:
+      BUILD_TARGET: development
   release-semantic:
     needs: build
     name: Semantic Release
