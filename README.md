@@ -1,6 +1,4 @@
-[![build status](https://github.com/flipdot/drinks-touch/workflows/CI/badge.svg)](https://github.com/flipdot/drinks-touch/actions?query=workflow%3ACI "build status")
-[![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/flipdot/drinks-touch.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/flipdot/drinks-touch/context:python)
-[![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/flipdot/drinks-touch.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/flipdot/drinks-touch/context:javascript)
+[![CI](https://github.com/flipdot/drinks-touch/actions/workflows/ci.yml/badge.svg)](https://github.com/flipdot/drinks-touch/actions/workflows/ci.yml)
 
 # Drinks Touch
 Digital replacement for the drinks tally list featuring a touchscreen, user management and a barcode scanner.
