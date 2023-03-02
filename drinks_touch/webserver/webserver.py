@@ -126,7 +126,7 @@ def run():
     if is_pi():
         port = 80
 
-    app.run(  # lgtm [py/flask-debug]
+    app.run(
         host='0.0.0.0',
         debug=not is_pi(),
         port=port
