@@ -121,15 +121,15 @@ packages:
       '@commitlint/execute-rule': 17.4.0
       '@commitlint/resolve-extends': 17.4.4
       '@commitlint/types': 17.4.4
-      '@types/node': 18.14.2
+      '@types/node': 18.14.6
       chalk: 4.1.2
       cosmiconfig: 8.1.0
-      cosmiconfig-typescript-loader: 4.3.0_r66scxackjdo2gfsj5qbvkw6ay
+      cosmiconfig-typescript-loader: 4.3.0_y2okb5cfqgxv537umje5rj3w6m
       lodash.isplainobject: 4.0.6
       lodash.merge: 4.6.2
       lodash.uniq: 4.5.0
       resolve-from: 5.0.0
-      ts-node: 10.9.1_ellgaeuoqnti3hful2ny2iugba
+      ts-node: 10.9.1_alpjt73dvgv6kni625hu7f2l4m
       typescript: 4.9.5
     transitivePeerDependencies:
       - '@swc/core'
@@ -246,8 +246,8 @@ packages:
     resolution: {integrity: sha512-jhuKLIRrhvCPLqwPcx6INqmKeiA5EWrsCOPhrlFSrbrmU4ZMPjj5Ul/oLCMDO98XRUIwVm78xICz4EPCektzeQ==}
     dev: true
 
-  /@types/node/18.14.2:
-    resolution: {integrity: sha512-1uEQxww3DaghA0RxqHx0O0ppVlo43pJhepY51OxuQIKHpjbnYLA7vcdwioNPzIqmC2u3I/dmylcqjlh0e7AyUA==}
+  /@types/node/18.14.6:
+    resolution: {integrity: sha512-93+VvleD3mXwlLI/xASjw0FzKcwzl3OdTCzm1LaRfqgS21gfFtK3zDXM5Op9TeeMsJVOaJ2VRDpT9q4Y3d0AvA==}
     dev: true
 
   /@types/normalize-package-data/2.4.1:
@@ -436,7 +436,7 @@ packages:
       through2: 4.0.2
     dev: true
 
-  /cosmiconfig-typescript-loader/4.3.0_r66scxackjdo2gfsj5qbvkw6ay:
+  /cosmiconfig-typescript-loader/4.3.0_y2okb5cfqgxv537umje5rj3w6m:
     resolution: {integrity: sha512-NTxV1MFfZDLPiBMjxbHRwSh5LaLcPMwNdCutmnHJCKoVnlvldPWlllonKwrsRJ5pYZBIBGRWWU2tfvzxgeSW5Q==}
     engines: {node: '>=12', npm: '>=6'}
     peerDependencies:
@@ -445,9 +445,9 @@ packages:
       ts-node: '>=10'
       typescript: '>=3'
     dependencies:
-      '@types/node': 18.14.2
+      '@types/node': 18.14.6
       cosmiconfig: 8.1.0
-      ts-node: 10.9.1_ellgaeuoqnti3hful2ny2iugba
+      ts-node: 10.9.1_alpjt73dvgv6kni625hu7f2l4m
       typescript: 4.9.5
     dev: true
 
@@ -1268,7 +1268,7 @@ packages:
     engines: {node: '>=8'}
     dev: true
 
-  /ts-node/10.9.1_ellgaeuoqnti3hful2ny2iugba:
+  /ts-node/10.9.1_alpjt73dvgv6kni625hu7f2l4m:
     resolution: {integrity: sha512-NtVysVPkxxrwFGUUxGYhfux8k78pQB3JqYBXlLRZgdGUqTO5wU/UyHop5p70iEbGhB7q5KmiZiU0Y3KlJrScEw==}
     hasBin: true
     peerDependencies:
@@ -1287,7 +1287,7 @@ packages:
       '@tsconfig/node12': 1.0.11
       '@tsconfig/node14': 1.0.3
       '@tsconfig/node16': 1.0.3
-      '@types/node': 18.14.2
+      '@types/node': 18.14.6
       acorn: 8.8.2
       acorn-walk: 8.2.0
       arg: 4.1.3
