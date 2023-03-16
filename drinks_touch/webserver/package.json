@@ -26,7 +26,7 @@
     "file-loader": "6.2.0",
     "imports-loader": "4.0.1",
     "jquery": "3.6.4",
-    "mini-css-extract-plugin": "2.7.3",
+    "mini-css-extract-plugin": "2.7.4",
     "node-sass": "8.0.0",
     "postcss": "8.4.21",
     "postcss-loader": "7.0.2",
