@@ -3,7 +3,7 @@ lockfileVersion: 5.4
 specifiers:
   '@babel/core': 7.21.3
   '@babel/preset-env': 7.20.2
-  '@popperjs/core': 2.11.6
+  '@popperjs/core': 2.11.7
   autoprefixer: 10.4.14
   babel-loader: 9.1.2
   bootstrap: 5.2.3
@@ -30,13 +30,13 @@ specifiers:
   webpack-cli: 5.0.1
 
 dependencies:
-  bootstrap: 5.2.3_@popperjs+core@2.11.6
+  bootstrap: 5.2.3_@popperjs+core@2.11.7
   select2: 4.1.0-rc.0
 
 devDependencies:
   '@babel/core': 7.21.3
   '@babel/preset-env': 7.20.2_@babel+core@7.21.3
-  '@popperjs/core': 2.11.6
+  '@popperjs/core': 2.11.7
   autoprefixer: 10.4.14_postcss@8.4.21
   babel-loader: 9.1.2_qtovpurzjlo3biun26ymnwui7i
   bootstrap-loader: 4.0.4_ynhaubc3nvxotqusromecrvhve
@@ -1331,8 +1331,8 @@ packages:
       rimraf: 3.0.2
     dev: true
 
-  /@popperjs/core/2.11.6:
-    resolution: {integrity: sha512-50/17A98tWUfQ176raKiOGXuYpLyyVMkxxG6oylzL3BPOlA6ADGdK7EYunSa4I064xerltq9TGXs8HmOk5E+vw==}
+  /@popperjs/core/2.11.7:
+    resolution: {integrity: sha512-Cr4OjIkipTtcXKjAsm8agyleBuDHvxzeBoa1v543lbv1YaIwQjESsVcmjiWiPEbC1FIeHOG/Op9kdCmAmiS3Kw==}
 
   /@sinclair/typebox/0.25.24:
     resolution: {integrity: sha512-XJfwUVUKDHF5ugKwIcxEgc9k8b7HbznCp6eUfWgu710hMPNIO4aw4/zB5RogDQz8nd6gyCDpU9O/m6qYEWY6yQ==}
@@ -1836,12 +1836,12 @@ packages:
     resolution: {integrity: sha512-vPgFnGMp1jWZZupOND65WS6mkR8rxhJxndT/AcMbqcq1hHMdkcH4sMPhznLzzoHOHkSCrd6J9F8pWBriPCKP2Q==}
     dev: true
 
-  /bootstrap/5.2.3_@popperjs+core@2.11.6:
+  /bootstrap/5.2.3_@popperjs+core@2.11.7:
     resolution: {integrity: sha512-cEKPM+fwb3cT8NzQZYEu4HilJ3anCrWqh3CHAok1p9jXqMPsPTBhU25fBckEJHJ/p+tTxTFTsFQGM+gaHpi3QQ==}
     peerDependencies:
       '@popperjs/core': ^2.11.6
     dependencies:
-      '@popperjs/core': 2.11.6
+      '@popperjs/core': 2.11.7
     dev: false
 
   /brace-expansion/1.1.11:
