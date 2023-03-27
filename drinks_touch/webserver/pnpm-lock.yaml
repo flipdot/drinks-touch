@@ -21,7 +21,7 @@ specifiers:
   postcss-loader: 7.1.0
   resolve-url-loader: 5.0.0
   sass: 1.60.0
-  sass-loader: 13.2.1
+  sass-loader: 13.2.2
   select2: 4.1.0-rc.0
   style-loader: 3.3.2
   terser-webpack-plugin: 5.3.7
@@ -39,7 +39,7 @@ devDependencies:
   '@popperjs/core': 2.11.7
   autoprefixer: 10.4.14_postcss@8.4.21
   babel-loader: 9.1.2_qtovpurzjlo3biun26ymnwui7i
-  bootstrap-loader: 4.0.4_ynhaubc3nvxotqusromecrvhve
+  bootstrap-loader: 4.0.4_aqq2hlyf2eul2dbu6z35vr264m
   bootstrap-sass: 3.4.3
   css-loader: 6.7.3_webpack@5.76.3
   css-minimizer-webpack-plugin: 4.2.2_webpack@5.76.3
@@ -53,7 +53,7 @@ devDependencies:
   postcss-loader: 7.1.0_twwyhqqim6liv4fz2ggv7g4m5a
   resolve-url-loader: 5.0.0
   sass: 1.60.0
-  sass-loader: 13.2.1_i7cwirp43tpwwqz5j4tmn4o6pi
+  sass-loader: 13.2.2_i7cwirp43tpwwqz5j4tmn4o6pi
   style-loader: 3.3.2_webpack@5.76.3
   terser-webpack-plugin: 5.3.7_webpack@5.76.3
   url-loader: 4.1.1_cj4axkvnwozfmnmvgy4d36yxaq
@@ -1802,7 +1802,7 @@ packages:
     resolution: {integrity: sha512-JZOSA7Mo9sNGB8+UjSgzdLtokWAky1zbztM3WRLCbZ70/3cTANmQmOdR7y2g+J0e2WXywy1yS468tY+IruqEww==}
     dev: true
 
-  /bootstrap-loader/4.0.4_ynhaubc3nvxotqusromecrvhve:
+  /bootstrap-loader/4.0.4_aqq2hlyf2eul2dbu6z35vr264m:
     resolution: {integrity: sha512-ohdaFAcCx2OASW1CEIXlyiJiBpxFRAVOUyhwrQgFAAK3CUR+DO4I4VrLzmFDtRpFoAUtxyjLhi8mPTujw762vg==}
     peerDependencies:
       css-loader: '*'
@@ -1825,7 +1825,7 @@ packages:
       resolve: 1.10.0
       resolve-url-loader: 5.0.0
       sass: 1.60.0
-      sass-loader: 13.2.1_i7cwirp43tpwwqz5j4tmn4o6pi
+      sass-loader: 13.2.2_i7cwirp43tpwwqz5j4tmn4o6pi
       semver: 5.5.0
       strip-json-comments: 2.0.1
       url-loader: 4.1.1_cj4axkvnwozfmnmvgy4d36yxaq
@@ -4094,8 +4094,8 @@ packages:
       yargs: 17.7.1
     dev: true
 
-  /sass-loader/13.2.1_i7cwirp43tpwwqz5j4tmn4o6pi:
-    resolution: {integrity: sha512-VQUrgUa5/waIzMrzyuko3sj5WD9NMsYph91cNICx+OaODbRtLl6To2fswLx8MH2qNxXFqRtpvdPQIa7mE93YOA==}
+  /sass-loader/13.2.2_i7cwirp43tpwwqz5j4tmn4o6pi:
+    resolution: {integrity: sha512-nrIdVAAte3B9icfBiGWvmMhT/D+eCDwnk+yA7VE/76dp/WkHX+i44Q/pfo71NYbwj0Ap+PGsn0ekOuU1WFJ2AA==}
     engines: {node: '>= 14.15.0'}
     peerDependencies:
       fibers: '>= 3.1.0'
