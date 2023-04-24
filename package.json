@@ -11,10 +11,9 @@
   "devDependencies": {
     "@commitlint/cli": "17.6.1",
     "@commitlint/config-conventional": "17.6.1",
-    "husky": "8.0.3",
-    "shx": "0.3.4"
+    "husky": "8.0.3"
   },
   "scripts": {
-    "prepare": "if [ \"$NODE_ENV\" != \"production\" ]; then husky install && shx rm -rf .git/hooks && shx ln -s ../.husky .git/hooks; fi"
+    "prepare": "husky install"
   }
 }
