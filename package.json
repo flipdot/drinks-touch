@@ -9,8 +9,8 @@
   },
   "packageManager": "pnpm@8.4.0",
   "devDependencies": {
-    "@commitlint/cli": "17.6.1",
-    "@commitlint/config-conventional": "17.6.1",
+    "@commitlint/cli": "17.6.3",
+    "@commitlint/config-conventional": "17.6.3",
     "husky": "8.0.3"
   },
   "scripts": {
