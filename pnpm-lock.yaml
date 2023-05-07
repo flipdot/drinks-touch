@@ -87,8 +87,8 @@ importers:
         specifier: 3.3.2
         version: 3.3.2(webpack@5.82.0)
       terser-webpack-plugin:
-        specifier: 5.3.7
-        version: 5.3.7(webpack@5.82.0)
+        specifier: 5.3.8
+        version: 5.3.8(webpack@5.82.0)
       url-loader:
         specifier: 4.1.1
         version: 4.1.1(file-loader@6.2.0)(webpack@5.82.0)
@@ -5021,8 +5021,8 @@ packages:
       yallist: 4.0.0
     dev: true
 
-  /terser-webpack-plugin@5.3.7(webpack@5.82.0):
-    resolution: {integrity: sha512-AfKwIktyP7Cu50xNjXF/6Qb5lBNzYaWpU6YfoX3uZicTx0zTy0stDDCsvjDapKsSDvOeWo5MEq4TmdBy2cNoHw==}
+  /terser-webpack-plugin@5.3.8(webpack@5.82.0):
+    resolution: {integrity: sha512-WiHL3ElchZMsK27P8uIUh4604IgJyAW47LVXGbEoB21DbQcZ+OuMpGjVYnEUaqcWM6dO8uS2qUbA7LSCWqvsbg==}
     engines: {node: '>= 10.13.0'}
     peerDependencies:
       '@swc/core': '*'
@@ -5332,7 +5332,7 @@ packages:
       neo-async: 2.6.2
       schema-utils: 3.1.2
       tapable: 2.2.1
-      terser-webpack-plugin: 5.3.7(webpack@5.82.0)
+      terser-webpack-plugin: 5.3.8(webpack@5.82.0)
       watchpack: 2.4.0
       webpack-cli: 5.0.2(webpack@5.82.0)
       webpack-sources: 3.2.3
