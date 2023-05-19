@@ -40,7 +40,7 @@ importers:
         version: 9.1.2(@babel/core@7.21.8)(webpack@5.83.1)
       bootstrap-loader:
         specifier: 4.0.4
-        version: 4.0.4(css-loader@6.7.4)(mini-css-extract-plugin@2.7.5)(node-sass@8.0.0)(resolve-url-loader@5.0.0)(sass-loader@13.2.2)(sass@1.62.1)(url-loader@4.1.1)(webpack@5.83.1)
+        version: 4.0.4(css-loader@6.7.4)(mini-css-extract-plugin@2.7.6)(node-sass@8.0.0)(resolve-url-loader@5.0.0)(sass-loader@13.2.2)(sass@1.62.1)(url-loader@4.1.1)(webpack@5.83.1)
       bootstrap-sass:
         specifier: 3.4.3
         version: 3.4.3
@@ -63,8 +63,8 @@ importers:
         specifier: 3.7.0
         version: 3.7.0
       mini-css-extract-plugin:
-        specifier: 2.7.5
-        version: 2.7.5(webpack@5.83.1)
+        specifier: 2.7.6
+        version: 2.7.6(webpack@5.83.1)
       node-sass:
         specifier: 8.0.0
         version: 8.0.0
@@ -2064,7 +2064,7 @@ packages:
     resolution: {integrity: sha512-JZOSA7Mo9sNGB8+UjSgzdLtokWAky1zbztM3WRLCbZ70/3cTANmQmOdR7y2g+J0e2WXywy1yS468tY+IruqEww==}
     dev: true
 
-  /bootstrap-loader@4.0.4(css-loader@6.7.4)(mini-css-extract-plugin@2.7.5)(node-sass@8.0.0)(resolve-url-loader@5.0.0)(sass-loader@13.2.2)(sass@1.62.1)(url-loader@4.1.1)(webpack@5.83.1):
+  /bootstrap-loader@4.0.4(css-loader@6.7.4)(mini-css-extract-plugin@2.7.6)(node-sass@8.0.0)(resolve-url-loader@5.0.0)(sass-loader@13.2.2)(sass@1.62.1)(url-loader@4.1.1)(webpack@5.83.1):
     resolution: {integrity: sha512-ohdaFAcCx2OASW1CEIXlyiJiBpxFRAVOUyhwrQgFAAK3CUR+DO4I4VrLzmFDtRpFoAUtxyjLhi8mPTujw762vg==}
     peerDependencies:
       css-loader: '*'
@@ -2082,7 +2082,7 @@ packages:
       exports-loader: 0.7.0
       js-yaml: 3.13.1
       loader-utils: 1.4.2
-      mini-css-extract-plugin: 2.7.5(webpack@5.83.1)
+      mini-css-extract-plugin: 2.7.6(webpack@5.83.1)
       node-sass: 8.0.0
       resolve: 1.10.0
       resolve-url-loader: 5.0.0
@@ -3685,8 +3685,8 @@ packages:
     engines: {node: '>=4'}
     dev: true
 
-  /mini-css-extract-plugin@2.7.5(webpack@5.83.1):
-    resolution: {integrity: sha512-9HaR++0mlgom81s95vvNjxkg52n2b5s//3ZTI1EtzFb98awsLSivs2LMsVqnQ3ay0PVhqWcGNyDaTE961FOcjQ==}
+  /mini-css-extract-plugin@2.7.6(webpack@5.83.1):
+    resolution: {integrity: sha512-Qk7HcgaPkGG6eD77mLvZS1nmxlao3j+9PkrT9Uc7HAE1id3F41+DdBRYRYkbyfNRGzm8/YWtzhw7nVPmwhqTQw==}
     engines: {node: '>= 12.13.0'}
     peerDependencies:
       webpack: ^5.0.0
