@@ -84,8 +84,8 @@ importers:
         specifier: 13.2.2
         version: 13.2.2(node-sass@8.0.0)(sass@1.62.1)(webpack@5.83.1)
       style-loader:
-        specifier: 3.3.2
-        version: 3.3.2(webpack@5.83.1)
+        specifier: 3.3.3
+        version: 3.3.3(webpack@5.83.1)
       terser-webpack-plugin:
         specifier: 5.3.9
         version: 5.3.9(webpack@5.83.1)
@@ -4945,8 +4945,8 @@ packages:
     engines: {node: '>=0.10.0'}
     dev: true
 
-  /style-loader@3.3.2(webpack@5.83.1):
-    resolution: {integrity: sha512-RHs/vcrKdQK8wZliteNK4NKzxvLBzpuHMqYmUVWeKa6MkaIQ97ZTOS0b+zapZhy6GcrgWnvWYCMHRirC3FsUmw==}
+  /style-loader@3.3.3(webpack@5.83.1):
+    resolution: {integrity: sha512-53BiGLXAcll9maCYtZi2RCQZKa8NQQai5C4horqKyRmHj9H7QmcUyucrH+4KW/gBQbXM2AsB0axoEcFZPlfPcw==}
     engines: {node: '>= 12.13.0'}
     peerDependencies:
       webpack: ^5.0.0
