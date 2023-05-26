@@ -72,8 +72,8 @@ importers:
         specifier: 8.4.23
         version: 8.4.23
       postcss-loader:
-        specifier: 7.3.0
-        version: 7.3.0(postcss@8.4.23)(webpack@5.84.1)
+        specifier: 7.3.1
+        version: 7.3.1(postcss@8.4.23)(webpack@5.84.1)
       resolve-url-loader:
         specifier: 5.0.0
         version: 5.0.0
@@ -4119,8 +4119,8 @@ packages:
       postcss: 8.4.23
     dev: true
 
-  /postcss-loader@7.3.0(postcss@8.4.23)(webpack@5.84.1):
-    resolution: {integrity: sha512-qLAFjvR2BFNz1H930P7mj1iuWJFjGey/nVhimfOAAQ1ZyPpcClAxP8+A55Sl8mBvM+K2a9Pjgdj10KpANWrNfw==}
+  /postcss-loader@7.3.1(postcss@8.4.23)(webpack@5.84.1):
+    resolution: {integrity: sha512-uevGt8yy2gvruNvzy8jxgYSSnyqBcA7CnS6/57qoZnUMM51XgsTqxIpWZWdHyvIyo4ov0lCgnzIbhtWwVFI8lg==}
     engines: {node: '>= 14.15.0'}
     peerDependencies:
       postcss: ^7.0.0 || ^8.0.1
@@ -4130,7 +4130,7 @@ packages:
       jiti: 1.18.2
       klona: 2.0.6
       postcss: 8.4.23
-      semver: 7.4.0
+      semver: 7.5.0
       webpack: 5.84.1(webpack-cli@5.1.1)
     dev: true
 
@@ -4730,14 +4730,6 @@ packages:
   /semver@6.3.0:
     resolution: {integrity: sha512-b39TBaTSfV6yBrapU89p5fKekE2m/NwnDocOVruQFS1/veMgdzuPcnOM34M6CwxW8jH/lxEa5rBoDeUwu5HHTw==}
     hasBin: true
-    dev: true
-
-  /semver@7.4.0:
-    resolution: {integrity: sha512-RgOxM8Mw+7Zus0+zcLEUn8+JfoLpj/huFTItQy2hsM4khuC1HYRDp0cU482Ewn/Fcy6bCjufD8vAj7voC66KQw==}
-    engines: {node: '>=10'}
-    hasBin: true
-    dependencies:
-      lru-cache: 6.0.0
     dev: true
 
   /semver@7.5.0:
