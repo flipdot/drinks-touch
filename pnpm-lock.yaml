@@ -40,13 +40,13 @@ importers:
         version: 9.1.2(@babel/core@7.22.1)(webpack@5.84.1)
       bootstrap-loader:
         specifier: 4.0.4
-        version: 4.0.4(css-loader@6.7.4)(mini-css-extract-plugin@2.7.6)(node-sass@9.0.0)(resolve-url-loader@5.0.0)(sass-loader@13.3.1)(sass@1.62.1)(url-loader@4.1.1)(webpack@5.84.1)
+        version: 4.0.4(css-loader@6.8.1)(mini-css-extract-plugin@2.7.6)(node-sass@9.0.0)(resolve-url-loader@5.0.0)(sass-loader@13.3.1)(sass@1.62.1)(url-loader@4.1.1)(webpack@5.84.1)
       bootstrap-sass:
         specifier: 3.4.3
         version: 3.4.3
       css-loader:
-        specifier: 6.7.4
-        version: 6.7.4(webpack@5.84.1)
+        specifier: 6.8.1
+        version: 6.8.1(webpack@5.84.1)
       css-minimizer-webpack-plugin:
         specifier: 5.0.0
         version: 5.0.0(webpack@5.84.1)
@@ -2179,7 +2179,7 @@ packages:
     resolution: {integrity: sha512-JZOSA7Mo9sNGB8+UjSgzdLtokWAky1zbztM3WRLCbZ70/3cTANmQmOdR7y2g+J0e2WXywy1yS468tY+IruqEww==}
     dev: true
 
-  /bootstrap-loader@4.0.4(css-loader@6.7.4)(mini-css-extract-plugin@2.7.6)(node-sass@9.0.0)(resolve-url-loader@5.0.0)(sass-loader@13.3.1)(sass@1.62.1)(url-loader@4.1.1)(webpack@5.84.1):
+  /bootstrap-loader@4.0.4(css-loader@6.8.1)(mini-css-extract-plugin@2.7.6)(node-sass@9.0.0)(resolve-url-loader@5.0.0)(sass-loader@13.3.1)(sass@1.62.1)(url-loader@4.1.1)(webpack@5.84.1):
     resolution: {integrity: sha512-ohdaFAcCx2OASW1CEIXlyiJiBpxFRAVOUyhwrQgFAAK3CUR+DO4I4VrLzmFDtRpFoAUtxyjLhi8mPTujw762vg==}
     peerDependencies:
       css-loader: '*'
@@ -2192,7 +2192,7 @@ packages:
       webpack: '>=5.0.0'
     dependencies:
       chalk: 2.4.2
-      css-loader: 6.7.4(webpack@5.84.1)
+      css-loader: 6.8.1(webpack@5.84.1)
       escape-regexp: 0.0.1
       exports-loader: 0.7.0
       js-yaml: 3.13.1
@@ -2568,8 +2568,8 @@ packages:
       postcss: 8.4.24
     dev: true
 
-  /css-loader@6.7.4(webpack@5.84.1):
-    resolution: {integrity: sha512-0Y5uHtK5BswfaGJ+jrO+4pPg1msFBc0pwPIE1VqfpmVn6YbDfYfXMj8rfd7nt+4goAhJueO+H/I40VWJfcP1mQ==}
+  /css-loader@6.8.1(webpack@5.84.1):
+    resolution: {integrity: sha512-xDAXtEVGlD0gJ07iclwWVkLoZOpEvAWaSyf6W18S2pOC//K8+qUDIx8IIT3D+HjnmkJPQeesOPv5aiUaJsCM2g==}
     engines: {node: '>= 12.13.0'}
     peerDependencies:
       webpack: ^5.0.0
@@ -2577,7 +2577,7 @@ packages:
       icss-utils: 5.1.0(postcss@8.4.24)
       postcss: 8.4.24
       postcss-modules-extract-imports: 3.0.0(postcss@8.4.24)
-      postcss-modules-local-by-default: 4.0.1(postcss@8.4.24)
+      postcss-modules-local-by-default: 4.0.3(postcss@8.4.24)
       postcss-modules-scope: 3.0.0(postcss@8.4.24)
       postcss-modules-values: 4.0.0(postcss@8.4.24)
       postcss-value-parser: 4.2.0
@@ -4326,8 +4326,8 @@ packages:
       postcss: 8.4.24
     dev: true
 
-  /postcss-modules-local-by-default@4.0.1(postcss@8.4.24):
-    resolution: {integrity: sha512-Zr/dB+IlXaEqdoslLHhhqecwj73vc3rDmOpsBNBEVk7P2aqAlz+Ijy0fFbU5Ie9PtreDOIgGa9MsLWakVGl+fA==}
+  /postcss-modules-local-by-default@4.0.3(postcss@8.4.24):
+    resolution: {integrity: sha512-2/u2zraspoACtrbFRnTijMiQtb4GW4BvatjaG/bCjYQo8kLTdevCUlwuBHx2sCnSyrI3x3qj4ZK1j5LQBgzmwA==}
     engines: {node: ^10 || ^12 || >= 14}
     peerDependencies:
       postcss: ^8.1.0
