@@ -21,8 +21,8 @@ importers:
   drinks_touch/webserver:
     dependencies:
       bootstrap:
-        specifier: 5.2.3
-        version: 5.2.3(@popperjs/core@2.11.8)
+        specifier: 5.3.0
+        version: 5.3.0(@popperjs/core@2.11.8)
       select2:
         specifier: 4.1.0-rc.0
         version: 4.1.0-rc.0
@@ -2167,10 +2167,10 @@ packages:
     resolution: {integrity: sha512-vPgFnGMp1jWZZupOND65WS6mkR8rxhJxndT/AcMbqcq1hHMdkcH4sMPhznLzzoHOHkSCrd6J9F8pWBriPCKP2Q==}
     dev: true
 
-  /bootstrap@5.2.3(@popperjs/core@2.11.8):
-    resolution: {integrity: sha512-cEKPM+fwb3cT8NzQZYEu4HilJ3anCrWqh3CHAok1p9jXqMPsPTBhU25fBckEJHJ/p+tTxTFTsFQGM+gaHpi3QQ==}
+  /bootstrap@5.3.0(@popperjs/core@2.11.8):
+    resolution: {integrity: sha512-UnBV3E3v4STVNQdms6jSGO2CvOkjUMdDAVR2V5N4uCMdaIkaQjbcEAMqRimDHIs4uqBYzDAKCQwCB+97tJgHQw==}
     peerDependencies:
-      '@popperjs/core': ^2.11.6
+      '@popperjs/core': ^2.11.7
     dependencies:
       '@popperjs/core': 2.11.8
     dev: false
