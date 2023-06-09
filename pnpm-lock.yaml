@@ -44,7 +44,7 @@ importers:
         version: 9.1.2(@babel/core@7.22.5)(webpack@5.86.0)
       bootstrap-loader:
         specifier: 4.0.4
-        version: 4.0.4(css-loader@6.8.1)(mini-css-extract-plugin@2.7.6)(node-sass@9.0.0)(resolve-url-loader@5.0.0)(sass-loader@13.3.1)(sass@1.63.3)(url-loader@4.1.1)(webpack@5.86.0)
+        version: 4.0.4(css-loader@6.8.1)(mini-css-extract-plugin@2.7.6)(node-sass@9.0.0)(resolve-url-loader@5.0.0)(sass-loader@13.3.2)(sass@1.63.3)(url-loader@4.1.1)(webpack@5.86.0)
       bootstrap-sass:
         specifier: 3.4.3
         version: 3.4.3
@@ -85,8 +85,8 @@ importers:
         specifier: 1.63.3
         version: 1.63.3
       sass-loader:
-        specifier: 13.3.1
-        version: 13.3.1(node-sass@9.0.0)(sass@1.63.3)(webpack@5.86.0)
+        specifier: 13.3.2
+        version: 13.3.2(node-sass@9.0.0)(sass@1.63.3)(webpack@5.86.0)
       style-loader:
         specifier: 3.3.3
         version: 3.3.3(webpack@5.86.0)
@@ -2130,7 +2130,7 @@ packages:
     resolution: {integrity: sha512-JZOSA7Mo9sNGB8+UjSgzdLtokWAky1zbztM3WRLCbZ70/3cTANmQmOdR7y2g+J0e2WXywy1yS468tY+IruqEww==}
     dev: true
 
-  /bootstrap-loader@4.0.4(css-loader@6.8.1)(mini-css-extract-plugin@2.7.6)(node-sass@9.0.0)(resolve-url-loader@5.0.0)(sass-loader@13.3.1)(sass@1.63.3)(url-loader@4.1.1)(webpack@5.86.0):
+  /bootstrap-loader@4.0.4(css-loader@6.8.1)(mini-css-extract-plugin@2.7.6)(node-sass@9.0.0)(resolve-url-loader@5.0.0)(sass-loader@13.3.2)(sass@1.63.3)(url-loader@4.1.1)(webpack@5.86.0):
     resolution: {integrity: sha512-ohdaFAcCx2OASW1CEIXlyiJiBpxFRAVOUyhwrQgFAAK3CUR+DO4I4VrLzmFDtRpFoAUtxyjLhi8mPTujw762vg==}
     peerDependencies:
       css-loader: '*'
@@ -2153,7 +2153,7 @@ packages:
       resolve: 1.10.0
       resolve-url-loader: 5.0.0
       sass: 1.63.3
-      sass-loader: 13.3.1(node-sass@9.0.0)(sass@1.63.3)(webpack@5.86.0)
+      sass-loader: 13.3.2(node-sass@9.0.0)(sass@1.63.3)(webpack@5.86.0)
       semver: 5.5.0
       strip-json-comments: 2.0.1
       url-loader: 4.1.1(file-loader@6.2.0)(webpack@5.86.0)
@@ -4718,8 +4718,8 @@ packages:
       yargs: 17.7.2
     dev: true
 
-  /sass-loader@13.3.1(node-sass@9.0.0)(sass@1.63.3)(webpack@5.86.0):
-    resolution: {integrity: sha512-cBTxmgyVA1nXPvIK4brjJMXOMJ2v2YrQEuHqLw3LylGb3gsR6jAvdjHMcy/+JGTmmIF9SauTrLLR7bsWDMWqgg==}
+  /sass-loader@13.3.2(node-sass@9.0.0)(sass@1.63.3)(webpack@5.86.0):
+    resolution: {integrity: sha512-CQbKl57kdEv+KDLquhC+gE3pXt74LEAzm+tzywcA0/aHZuub8wTErbjAoNI57rPUWRYRNC5WUnNl8eGJNbDdwg==}
     engines: {node: '>= 14.15.0'}
     peerDependencies:
       fibers: '>= 3.1.0'
@@ -4737,7 +4737,6 @@ packages:
       sass-embedded:
         optional: true
     dependencies:
-      klona: 2.0.6
       neo-async: 2.6.2
       node-sass: 9.0.0
       sass: 1.63.3
