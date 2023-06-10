@@ -76,8 +76,8 @@ importers:
         specifier: 8.4.24
         version: 8.4.24
       postcss-loader:
-        specifier: 7.3.2
-        version: 7.3.2(postcss@8.4.24)(webpack@5.86.0)
+        specifier: 7.3.3
+        version: 7.3.3(postcss@8.4.24)(webpack@5.86.0)
       resolve-url-loader:
         specifier: 5.0.0
         version: 5.0.0
@@ -3490,11 +3490,6 @@ packages:
     engines: {node: '>=0.10.0'}
     dev: true
 
-  /klona@2.0.6:
-    resolution: {integrity: sha512-dhG34DXATL5hSxJbIexCft8FChFXtmskoZYnoPWjXQuebWYCNkVeV3KkGegCK9CP1oswI/vQibS2GY7Em/sJJA==}
-    engines: {node: '>= 8'}
-    dev: true
-
   /lilconfig@2.1.0:
     resolution: {integrity: sha512-utWOt/GHzuUxnLKxB6dk81RoOeoNeHgbrXiuGk4yyF5qlRz+iIVWu56E2fqGHFrXz0QNUhLB/8nKqvRH66JKGQ==}
     engines: {node: '>=10'}
@@ -4186,8 +4181,8 @@ packages:
       postcss: 8.4.24
     dev: true
 
-  /postcss-loader@7.3.2(postcss@8.4.24)(webpack@5.86.0):
-    resolution: {integrity: sha512-c7qDlXErX6n0VT+LUsW+nwefVtTu3ORtVvK8EXuUIDcxo+b/euYqpuHlJAvePb0Af5e8uMjR/13e0lTuYifaig==}
+  /postcss-loader@7.3.3(postcss@8.4.24)(webpack@5.86.0):
+    resolution: {integrity: sha512-YgO/yhtevGO/vJePCQmTxiaEwER94LABZN0ZMT4A0vsak9TpO+RvKRs7EmJ8peIlB9xfXCsS7M8LjqncsUZ5HA==}
     engines: {node: '>= 14.15.0'}
     peerDependencies:
       postcss: ^7.0.0 || ^8.0.1
@@ -4195,7 +4190,6 @@ packages:
     dependencies:
       cosmiconfig: 8.2.0
       jiti: 1.18.2
-      klona: 2.0.6
       postcss: 8.4.24
       semver: 7.5.1
       webpack: 5.86.0(webpack-cli@5.1.4)
