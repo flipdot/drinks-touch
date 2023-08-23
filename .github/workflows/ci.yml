@@ -9,7 +9,7 @@ on:
 jobs:
   build:
     name: Build
-    uses: dargmuesli/github-actions/.github/workflows/docker.yml@0.41.4
+    uses: dargmuesli/github-actions/.github/workflows/docker.yml@0.41.5
     permissions:
       packages: write
     with:
@@ -17,7 +17,7 @@ jobs:
   release-semantic:
     needs: build
     name: Semantic Release
-    uses: dargmuesli/github-actions/.github/workflows/release-semantic.yml@0.41.4
+    uses: dargmuesli/github-actions/.github/workflows/release-semantic.yml@0.41.5
     permissions:
       contents: write
     secrets:
