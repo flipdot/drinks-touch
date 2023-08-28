@@ -64,8 +64,8 @@ importers:
         specifier: 4.0.1
         version: 4.0.1(webpack@5.88.2)
       jquery:
-        specifier: 3.7.0
-        version: 3.7.0
+        specifier: 3.7.1
+        version: 3.7.1
       mini-css-extract-plugin:
         specifier: 2.7.6
         version: 2.7.6(webpack@5.88.2)
@@ -3334,8 +3334,8 @@ packages:
     hasBin: true
     dev: true
 
-  /jquery@3.7.0:
-    resolution: {integrity: sha512-umpJ0/k8X0MvD1ds0P9SfowREz2LenHsQaxSohMZ5OMNEU2r0tf8pdeEFTHMFxWVxKNyU9rTtK3CWzUCTKJUeQ==}
+  /jquery@3.7.1:
+    resolution: {integrity: sha512-m4avr8yL8kmFN8psrbFFFmB/If14iN5o9nw/NgnnM+kybDJpRsAynV2BsfpTYrTRysYUdADVD7CkUUizgkpLfg==}
     dev: true
 
   /js-base64@2.6.4:
