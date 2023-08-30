@@ -31,8 +31,8 @@ importers:
         specifier: 7.22.11
         version: 7.22.11
       '@babel/preset-env':
-        specifier: 7.22.10
-        version: 7.22.10(@babel/core@7.22.11)
+        specifier: 7.22.14
+        version: 7.22.14(@babel/core@7.22.11)
       '@popperjs/core':
         specifier: 2.11.8
         version: 2.11.8
@@ -1118,8 +1118,8 @@ packages:
       '@babel/helper-plugin-utils': 7.22.5
     dev: true
 
-  /@babel/preset-env@7.22.10(@babel/core@7.22.11):
-    resolution: {integrity: sha512-riHpLb1drNkpLlocmSyEg4oYJIQFeXAK/d7rI6mbD0XsvoTOOweXDmQPG/ErxsEhWk3rl3Q/3F6RFQlVFS8m0A==}
+  /@babel/preset-env@7.22.14(@babel/core@7.22.11):
+    resolution: {integrity: sha512-daodMIoVo+ol/g+//c/AH+szBkFj4STQUikvBijRGL72Ph+w+AMTSh55DUETe8KJlPlDT1k/mp7NBfOuiWmoig==}
     engines: {node: '>=6.9.0'}
     peerDependencies:
       '@babel/core': ^7.0.0-0
