@@ -16,7 +16,7 @@
     "select2": "4.1.0-rc.0"
   },
   "devDependencies": {
-    "@babel/core": "7.22.15",
+    "@babel/core": "7.22.17",
     "@babel/preset-env": "7.22.15",
     "@popperjs/core": "2.11.8",
     "autoprefixer": "10.4.15",
