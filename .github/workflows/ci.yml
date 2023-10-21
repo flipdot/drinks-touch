@@ -11,7 +11,7 @@ on:
 
 jobs:
   prepare_jobs:
-    name: 'Prepare: job optimization'
+    name: "Prepare: job optimization"
     runs-on: ubuntu-latest
     outputs:
       pr_found: ${{ steps.pr.outputs.pr_found }}
