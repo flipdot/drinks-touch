@@ -61,8 +61,8 @@ importers:
         specifier: 6.2.0
         version: 6.2.0(webpack@5.89.0)
       imports-loader:
-        specifier: 4.0.1
-        version: 4.0.1(webpack@5.89.0)
+        specifier: 5.0.0
+        version: 5.0.0(webpack@5.89.0)
       jquery:
         specifier: 3.7.1
         version: 3.7.1
@@ -3142,13 +3142,13 @@ packages:
       resolve-cwd: 3.0.0
     dev: true
 
-  /imports-loader@4.0.1(webpack@5.89.0):
-    resolution: {integrity: sha512-ZiY+1xH5fqAJ1Qu1CFv+zw54rvPCC92DdYRDe0IIUboOhbJPLfOPbF/paA2iipelvMwjQUKWydcFOJ7f1+ZFcA==}
-    engines: {node: '>= 14.15.0'}
+  /imports-loader@5.0.0(webpack@5.89.0):
+    resolution: {integrity: sha512-tXgL8xxZFjOjQLLiE7my00UUQfktg4G8fdpXcZphL0bJWbk9eCxKKFaCwmFRcwyRJQl95GXBL1DoE1rCS/tcPw==}
+    engines: {node: '>= 18.12.0'}
     peerDependencies:
       webpack: ^5.0.0
     dependencies:
-      source-map: 0.6.1
+      source-map-js: 1.0.2
       strip-comments: 2.0.1
       webpack: 5.89.0(webpack-cli@5.1.4)
     dev: true
