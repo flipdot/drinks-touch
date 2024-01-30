@@ -1,0 +1,31 @@
+[tool.poetry]
+name = "drinks-touch"
+version = "0.1.0"
+description = ""
+authors = ["malled"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+flask = "^3.0.1"
+flask-compress = "^1.14"
+sudo = "^1.0.0"
+install = "^1.3.5"
+influxdb = "^5.3.1"
+jinja2 = "^3.1.3"
+pillow = "^10.2.0"
+premailer = "^3.10.0"
+psycopg2-binary = "^2.9.9"
+pygame = "2.5.2"
+qrcode = "^7.4.2"
+requests = "^2.31.0"
+sqlalchemy = "^2.0.25"
+werkzeug = "^3.0.1"
+pyserial = "^3.5"
+python-ldap = "^3.4.4"
+pystrich = "^0.8"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
