@@ -1,6 +1,6 @@
 import sys
 
-import keyboard
+import serial
 import logging
 
 from env import is_pi
@@ -43,17 +43,15 @@ def run(worker):
                 barcode = barcode[:index] + target + barcode[index + 1:]
 
         return barcode
+    with serial.Serial("/dev/ttyACM0", baudrate=115200) as s:
 
-    while True:
-        keyboard_input = keyboard.record(until="tab")
-
-        if keyboard_input is None:
-            continue
-
-        for scanned_barcode in keyboard.get_typed_strings(keyboard_input):
-            scanned_barcode = replace_key_code(scanned_barcode, {
+        while True:
+            keyboard_input = s.read_until(b"\r").decode("utf-8")[:-1]
+            print("input '{}'".format(keyboard_input))
+            if keyboard_input is None:
+                continue
+            scanned_barcode = replace_key_code(keyboard_input, {
                 "?": "_",
                 "_": "?"
             })
-
             worker.on_barcode(scanned_barcode.upper())
