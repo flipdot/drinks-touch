@@ -303,7 +303,7 @@ FROM scanevent se
 WHERE user_id = :userid
     AND se.timestamp >= TO_TIMESTAMP('%d')
 ORDER BY se.timestamp""" % since_timestamp)
-    drinks_consumed = session.connection().execute(sql, userid=bytes.decode(user['id'])).fetchall()
+    drinks_consumed = session.connection().execute(sql, {"userid": bytes.decode(user['id'])}).fetchall()
     return drinks_consumed
 
 

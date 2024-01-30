@@ -311,6 +311,6 @@ class ProfileScreen(Screen):
             ORDER by count DESC
         """)
         userid = self.user['id']
-        result = session.connection().execute(sql, userid=bytes.decode(userid)).fetchall()
+        result = session.connection().execute(sql, {"userid":bytes.decode(userid)}).fetchall()
 
         return result

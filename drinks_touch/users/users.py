@@ -194,7 +194,7 @@ class Users(object):
                 WHERE user_id = :user_id
                 GROUP BY user_id
             """)
-        row = session.connection().execute(sql, user_id=bytes.decode(user_id)).fetchone()
+        row = session.connection().execute(sql, {"user_id": bytes.decode(user_id)}).fetchone()
         if not row:
             cost = 0
         else:
@@ -206,7 +206,7 @@ class Users(object):
                 WHERE user_id = :user_id
                 GROUP BY user_id
             """)
-        row = session.connection().execute(sql, user_id=bytes.decode(user_id)).fetchone()
+        row = session.connection().execute(sql, {"user_id": bytes.decode(user_id)}).fetchone()
         if not row:
             credit = 0
         else:

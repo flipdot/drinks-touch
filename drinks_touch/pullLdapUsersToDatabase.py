@@ -19,7 +19,7 @@ def main():
             is_card=ldap_name.startswith("geld")
         )
 
-        old = LdapUser.query.filter_by(ldap_id=user["id"]).all()
+        old = LdapUser.query.filter_by(ldapId=str(user["id"])).all()
         for old_user in old:
             session.delete(old_user)
         session.add(ldap_user)

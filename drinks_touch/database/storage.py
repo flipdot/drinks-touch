@@ -5,7 +5,7 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 import config
 from env import is_pi
 
-engine = create_engine(config.POSTGRES_CONNECTION_STRING, convert_unicode=True)
+engine = create_engine(config.POSTGRES_CONNECTION_STRING)
 db_session = scoped_session(sessionmaker(autocommit=False,
                                          autoflush=False,
                                          bind=engine))

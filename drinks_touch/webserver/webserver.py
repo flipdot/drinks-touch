@@ -3,7 +3,7 @@ import re
 from datetime import datetime
 from decimal import Decimal
 
-from flask import escape
+from markupsafe import escape
 from flask import Flask, make_response
 from flask import render_template
 from flask import request
