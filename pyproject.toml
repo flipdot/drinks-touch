@@ -15,7 +15,7 @@ jinja2 = "2.8"
 keyboard = "0.9.13"
 pygame = "2.5.2"
 qrcode = "6.0"
-requests = "2.18.4"
+requests = "2.31.0"
 sqlalchemy = "1.0.13"
 werkzeug = "0.11.9"
 
