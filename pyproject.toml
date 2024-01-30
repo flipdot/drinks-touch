@@ -8,7 +8,7 @@ packages = [{include = "drinks_touch"}]
 
 [tool.poetry.dependencies]
 python = "^3.5"
-flask = "0.10.1"
+flask = "2.2.5"
 flask-compress = "1.4.0"
 influxdb = "5.0.0"
 jinja2 = "2.8"
