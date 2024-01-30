@@ -1,0 +1,12 @@
+version: '3'
+services:
+  postgres:
+    image: "postgres:9.6"
+    environment:
+      POSTGRES_USER: drinks
+      POSTGRES_PASSWORD: drinks
+      POSTGRES_DB: drinks
+  drinks:
+    build: .
+
+
