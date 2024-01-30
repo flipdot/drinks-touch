@@ -24,6 +24,7 @@ werkzeug = "^3.0.1"
 pyserial = "^3.5"
 python-ldap = "^3.4.4"
 pystrich = "^0.8"
+keyboard = "^0.13.5"
 
 
 [build-system]
