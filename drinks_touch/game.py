@@ -32,8 +32,6 @@ logging.basicConfig(level=getattr(logging, config.LOGLEVEL),
                     format="[%(asctime)s][%(levelname)s][%(filename)s:%(lineno)d] %(message)s")
 logging.Formatter.converter = time.gmtime
 
-debug.listen()
-
 event_queue = queue.Queue()
 screen_manager = None
 

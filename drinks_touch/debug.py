@@ -17,4 +17,12 @@ def debug(sig, frame):
 
 
 def listen():
+    """
+    Installs a signal handler for debugging purposes.
+
+    Print current call stack by sending SIGUSR1 to the process:
+    ```sh
+    kill -s SIGUSR1 `pidof game.py`
+    ```
+    """
     signal.signal(signal.SIGUSR1, debug)  # Register handler
