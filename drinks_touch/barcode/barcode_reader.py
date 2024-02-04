@@ -50,8 +50,10 @@ def run(worker):
             print("input '{}'".format(keyboard_input))
             if keyboard_input is None:
                 continue
-            scanned_barcode = replace_key_code(keyboard_input, {
-                "?": "_",
-                "_": "?"
-            })
+            scanned_barcode = keyboard_input
+            # nessesary for the old Honeywell scanner
+            #scanned_barcode = replace_key_code(keyboard_input, {
+            #    "?": "_",
+            #    "_": "?"
+            #})
             worker.on_barcode(scanned_barcode.upper())
