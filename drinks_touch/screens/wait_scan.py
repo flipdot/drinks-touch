@@ -14,6 +14,7 @@ from users.users import Users
 from .main import MainScreen
 from .screen import Screen
 from .screen_manager import ScreenManager
+from sqlalchemy.sql import text
 
 
 class WaitScanScreen(Screen):
@@ -57,7 +58,7 @@ class WaitScanScreen(Screen):
             Button(
                 self.screen,
                 pos=(210, 700),
-                text="Geld einwerfen",
+                text="Gutschein drucken",
                 click_func=self.btn_new_id
             )
         ]
@@ -86,10 +87,16 @@ class WaitScanScreen(Screen):
         )
         self.processing.is_visible = False
         self.objects.append(self.processing)
-
+        sql = text("""
+            SELECT SUM(amount) - (
+                SELECT COUNT(*) FROM "scanevent"
+                 WHERE "user_id" NOT LIKE 'geld%' AND "user_id" != '0'
+                ) AS Gesamtguthaben
+            FROM "rechargeevent" WHERE "user_id" NOT LIKE 'geld%';""")
+        total_balance = get_session().execute(sql).scalar()
         self.objects.append(Label(
             self.screen,
-            text="Gesamtguthaben aller Member: -XXX,XX€",
+            text="Gesamtguthaben aller Member: {:.02f}€".format(total_balance),
             size=25,
             pos=(125, 755)
         ))

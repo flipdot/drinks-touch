@@ -40,7 +40,7 @@ class NamesScreen(Screen):
             pos=(20, 110),
         ))
 
-        users = list(Users.get_all(self.char))
+        users = list(Users.get_all(filters=["uid="+self.char+"*"]))
 
         btns_y = 7
         num_cols = int(math.ceil(len(users) / float(btns_y)))

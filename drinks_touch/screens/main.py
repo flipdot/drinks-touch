@@ -27,7 +27,7 @@ class MainScreen(Screen):
         i = 0
 
         for c in range(97, 97 + 26):
-            text = str.encode(chr(c))
+            text = str(chr(c))
             users = list(filter(lambda u: u["name"].lower().startswith(text), all_users))
             if len(users) == 0:
                 continue

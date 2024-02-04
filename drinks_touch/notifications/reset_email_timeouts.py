@@ -6,8 +6,8 @@ from users.users import Users
 
 def main():
     for user in Users.get_all():
-        user['meta']['last_emailed'] = 0
-        user['meta']['last_drink_notification'] = 0
+        user['lastEmailed'] = 0
+        user['lastDrinkNotification'] = 0
         Users.save(user)
 
 

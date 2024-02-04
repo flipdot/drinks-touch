@@ -124,7 +124,7 @@ class IDCardScreen(Screen):
     def set_id(self, ean):
         ean = ean.upper() if ean else ean
         self.user['id_card'] = ean
-        Users.save(self.user)
+        Users.set_value(self.user, 'id_card', ean)
         self.id_label.text = self.user['id_card']
 
     def reset_id(self):

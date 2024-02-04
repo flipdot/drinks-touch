@@ -32,8 +32,8 @@ FREQUENCIES = {
 FOOTER = u"""
 Besuchen Sie uns bald wieder!
 
-Einstellungen: http://ldap.fd/
-Aufladen: http://drinks-touch.fd/
+Einstellungen: https://ldap.flipdot.space/
+Aufladen: https://drinks.flipdot.space
 Oder per SEPA:
   Kontoinhaber: flipdot e.V.
   IBAN: DE07 5205 0353 0001 1477 13
@@ -76,7 +76,7 @@ def send_notification(to_address, subject, content_text, content_html, uid):
 
 def send_drink(user, drink, with_summary=False):
     try:
-        if user['email'] and 'instant' in user['meta']['drink_notification']:
+        if user['email'] and 'instant' in user['drinksNotification']:
             content_text = u"Du hast das folgende Getränk getrunken: {drink_name}.".format(drink_name=drink['name'])
             content_html = render_jinja_html('instant.html', drink_name=drink['name'])
 
@@ -120,11 +120,11 @@ def send_low_balance(session, user, with_summary=False, force=False):
 
     if not force and balance >= MINIMUM_BALANCE:
         # reset time
-        user['meta']['last_emailed'] = time.time()
-        Users.save(user)
+        user['lastEmailed'] = time.time()
+        Users.set_value(user, 'lastEmailed', user['lastEmailed'])
         return
 
-    last_emailed = user['meta'].get('last_emailed', 0)
+    last_emailed = user.get('lastEmailed', 0)
     diff = time.time() - last_emailed
     diff_hours = diff / 60 / 60
     diff_days = diff_hours / 24
@@ -137,7 +137,7 @@ def send_low_balance(session, user, with_summary=False, force=False):
     content_text = (u"Du hast seit mehr als {diff_days} Tagen "
                     u"ein Guthaben von unter {minimum_balance}€!\n"
                     u"Aktueller Kontostand: {balance:.2f}€.\n"
-                    u"Zum Aufladen im Space-Netz http://drinks-touch.fd/ besuchen.").format(
+                    u"Zum Aufladen im Space-Netz https://drinks.flipdot.space/ besuchen.").format(
         diff_days=int(REMIND_MAIL_EVERY_X_HOURS / 24),
         minimum_balance=MINIMUM_BALANCE,
         balance=balance)
@@ -159,8 +159,8 @@ def send_low_balance(session, user, with_summary=False, force=False):
                  prepend_text=content_text,
                  prepend_html=content_html,
                  force=True)
-    user['meta']['last_emailed'] = time.time()
-    Users.save(user)
+    user['lastEmailed'] = time.time()
+    Users.set_value(user, 'lastEmailed', user['lastEmailed'])
 
 
 def send_summaries():
@@ -182,15 +182,10 @@ def send_summary(session, user, subject, prepend_text=None, prepend_html=None, f
     if 'email' not in user:
         return
 
-    frequency_str = user['meta']['drink_notification']
+    frequency_str = user['drinksNotification']
     balance = Users.get_balance(user['id'])
 
-    if not force or frequency_str not in FREQUENCIES.keys():
-        return
-    else:
-        freq_secs = FREQUENCIES[frequency_str]
-
-    last_emailed = user['meta']['last_drink_notification']
+    last_emailed = user['lastDrinkNotification']
     if type(last_emailed) not in [int, float]:
         last_emailed = 0
 
@@ -202,6 +197,7 @@ def send_summary(session, user, subject, prepend_text=None, prepend_html=None, f
     if force:
         logger.info("Forcing mail.")
     else:
+        freq_secs = FREQUENCIES.get(frequency_str, 0)
         if diff <= freq_secs:
             return
 
@@ -250,8 +246,8 @@ def send_summary(session, user, subject, prepend_text=None, prepend_html=None, f
 
     logger.info("Got %d drinks and %d recharges. Mailing.", len(drinks_consumed), len(recharges))
     send_notification(email, subject, content_text, content_html, user['id'])
-    user['meta']['last_drink_notification'] = time.time()
-    Users.save(user)
+    user['lastDrinkNotification'] = time.time()
+    Users.set_value(user, 'lastDrinkNotification', user['lastDrinkNotification'])
 
 
 def format_drinks(drinks_consumed):

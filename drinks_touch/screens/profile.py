@@ -1,6 +1,7 @@
 import datetime
 
 from sqlalchemy.sql import text
+from sqlalchemy import select
 
 from database.models.scan_event import ScanEvent
 from database.storage import get_session
@@ -195,10 +196,17 @@ class ProfileScreen(Screen):
             time_text = time
             helper = aufladung.helper_user_id
             if helper:
-                user = Users.get_by_id(aufladung.helper_user_id)
-                if user:
-                    helper = user['name']
-                    time_text += " mit " + bytes.decode(helper)
+                if helper == "SEPA":
+                    time_text += " mit SEPA"
+                elif helper == "DISPLAY":
+                    time_text += " mit DISPLAY"
+                else:
+                    # TODO fixme
+                    #user = Users.get_by_id(aufladung.helper_user_id)
+                    user = {"name": "frank"}
+                    if user:
+                        helper = user['name']
+                        time_text += " mit " + helper
             if date != prev_date:
                 prev_date = date
                 self.elements_aufladungen.append(Label(self.screen,
@@ -311,6 +319,6 @@ class ProfileScreen(Screen):
             ORDER by count DESC
         """)
         userid = self.user['id']
-        result = session.connection().execute(sql, {"userid":bytes.decode(userid)}).fetchall()
+        result = session.connection().execute(sql, {"userid": str(userid)}).fetchall()
 
-        return result
+        return [{"count": x[0], "name": x[1]} for x in result]

@@ -3,7 +3,6 @@ flask-compress
 pyStrich # sudo apt-get install python-pil
 influxdb
 jinja2
-keyboard
 Pillow
 premailer
 psycopg2-binary
