@@ -56,7 +56,7 @@ def send_notification(to_address, subject, content_text, content_html, uid):
     msg['To'] = to_address
     msg['Date'] = formatdate(time.time(), localtime=True)
     msg['Message-id'] = make_msgid()
-    msg['X-LDAP-ID'] = uid
+    msg['X-LDAP-ID'] = str(uid)
 
     logger.info("Mailing %s: '%s'", to_address, subject)
     logger.debug("Content: ---\n%s\n---", content_text)
@@ -299,13 +299,13 @@ FROM scanevent se
 WHERE user_id = :userid
     AND se.timestamp >= TO_TIMESTAMP('%d')
 ORDER BY se.timestamp""" % since_timestamp)
-    drinks_consumed = session.connection().execute(sql, {"userid": bytes.decode(user['id'])}).fetchall()
+    drinks_consumed = session.connection().execute(sql, {"userid": str(user['id'])}).mappings().all()
     return drinks_consumed
 
 
 def get_recharges(session, user, since_timestamp):
     return session.query(RechargeEvent) \
-        .filter(RechargeEvent.user_id == bytes.decode(user['id'])) \
+        .filter(RechargeEvent.user_id == str(user['id'])) \
         .filter(RechargeEvent.timestamp >= datetime.utcfromtimestamp(since_timestamp)) \
         .order_by(RechargeEvent.timestamp) \
         .all()

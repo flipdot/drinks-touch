@@ -54,8 +54,6 @@ class Users(object):
             "ldap_field": "drinksBarcode",
             "index": 0,
             "default": None,
-            "save": lambda x: x.encode('utf-8') if x else x,
-            "load": lambda x: x.decode('utf-8'),
         },
         "email": {
             "ldap_field": "mail",
@@ -66,22 +64,20 @@ class Users(object):
             "ldap_field": "drinksNotification",
             "index": 0,
             "default": "instant",
-            "save": lambda x: x.encode('utf-8'),
-            "load": lambda x: x.decode('utf-8'),
         },
         "lastDrinkNotification": {
             "ldap_field": "lastDrinkNotification",
             "index": 0,
             "default": 0,
             "load": float,
-            "save": lambda x: str(x).encode()
+            "save": str,
         },
         "lastEmailed": {
             "ldap_field": "lastEmailed",
             "index": 0,
             "default": 0,
             "load": float,
-            "save": lambda x: str(x).encode()
+            "save": str,
         },
     }
     @staticmethod
@@ -110,8 +106,9 @@ class Users(object):
             for drinks_key, meta in Users.fields.items():
                 ldap_field = ldap_user['attributes'][meta['ldap_field']]
                 if type(ldap_field) is list:
-
                     ldap_field = next(iter(ldap_field), meta.get('default'))
+                    if "load" in meta:
+                        ldap_field = meta['load'](ldap_field)
 
                 user[drinks_key] = ldap_field
 
@@ -201,9 +198,9 @@ class Users(object):
     @staticmethod
     def get_by_id(user_id):
         all_users = Users.get_all(filters=['uidNumber=' + str(user_id)], include_temp=True)
-        by_id = {u['id']: u for u in all_users if u['id']}
-        if str.encode(user_id) in by_id:
-            return by_id[str.encode(user_id)]
+        by_id = {str(u['id']): u for u in all_users if u['id']}
+        if user_id in by_id:
+            return by_id[user_id]
         return None
 
     @staticmethod
@@ -233,6 +230,8 @@ class Users(object):
     @staticmethod
     def set_value(user, drinks_filed, new):
         con = Users.get_ldap_instance()
+        if "save" in Users.fields[drinks_filed]:
+            new = Users.fields[drinks_filed]["save"](new)
         con.modify(user['path'], {Users.fields[drinks_filed]['ldap_field']: [(ldap3.MODIFY_REPLACE, new)]})
         con.unbind()
 
