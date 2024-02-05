@@ -31,7 +31,7 @@
     "jquery": "3.7.1",
     "mini-css-extract-plugin": "2.8.0",
     "node-sass": "9.0.0",
-    "postcss": "8.4.33",
+    "postcss": "8.4.34",
     "postcss-loader": "8.1.0",
     "resolve-url-loader": "5.0.0",
     "sass": "1.70.0",
