@@ -31,6 +31,9 @@ services:
         LDAP_REPLICATION: "false"
         KEEP_EXISTING_CONFIG: "false"
         LDAP_REMOVE_CONFIG_AFTER_SETUP: "true"
+    ports:
+        - "389:389"
+        - "636:636"
 
   hackertool:
     image: osixia/phpldapadmin:latest
