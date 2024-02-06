@@ -65,7 +65,7 @@ def send_notification(to_address, subject, content_text, content_html, uid):
         logger.info("skipping mail, because config.NO_MAILS")
         return
 
-    s = smtplib.SMTP(config.MAIL_HOST)
+    s = smtplib.SMTP(config.MAIL_HOST, port=config.MAIL_PORT)
     s.connect(host=config.MAIL_HOST, port=config.MAIL_PORT)
     s.ehlo()
     s.starttls()

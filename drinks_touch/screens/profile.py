@@ -201,9 +201,7 @@ class ProfileScreen(Screen):
                 elif helper == "DISPLAY":
                     time_text += " mit DISPLAY"
                 else:
-                    # TODO fixme
-                    #user = Users.get_by_id(aufladung.helper_user_id)
-                    user = {"name": "frank"}
+                    user = Users.get_by_id(aufladung.helper_user_id)
                     if user:
                         helper = user['name']
                         time_text += " mit " + helper

@@ -1,6 +1,6 @@
 import subprocess
 from PIL import Image, ImageDraw, ImageFont
-from io import StringIO
+from io import BytesIO
 from functools import partial
 from pystrich.code128 import Code128Encoder
 
@@ -40,7 +40,7 @@ class NewIDScreen(Screen):
 
         self.objects.append(Label(
             self.screen,
-            text="Wirf EURO in die Kasse!",
+            text="Prepaid Barcode generieren",
             pos=(30, 120),
             size=50
         ))
@@ -143,7 +143,7 @@ class NewIDScreen(Screen):
         enc = Code128Encoder(barcode)
         enc.height = 300
         png = enc.get_imagedata()
-        return Image.open(StringIO(png))
+        return Image.open(BytesIO(png))
 
     @staticmethod
     def generate_receipt(euro, code_img):
@@ -159,7 +159,7 @@ class NewIDScreen(Screen):
         img.paste(code_img, (int(-0.07 * width), int(0.2 * height)))
 
         draw = ImageDraw.Draw(img)
-        font = ImageFont.truetype(font="/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", size=width / 10)
+        font = ImageFont.truetype(font="/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", size=width // 10)
         draw.text((int(0.05 * width), int(0.0 * height)),
                   "flipdot ID-Card", fill="#000", font=font)
         draw.text((int(0.05 * width), int(0.1 * height)),
@@ -169,7 +169,7 @@ class NewIDScreen(Screen):
     @staticmethod
     def to_png(img):
         img.show()
-        img_io = StringIO()
+        img_io = BytesIO()
         img.save(img_io, format="PNG")
         img_data = img_io.getvalue()
         img_io.close()
