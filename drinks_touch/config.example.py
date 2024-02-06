@@ -3,8 +3,8 @@ MONEY_USER = "my_user"
 MONEY_PASSWORD = "my_basicauth_passwd"
 
 LDAP_HOST = "ldap://ldap.example.com"
-LDAP_USER = "cn=admin,dc=example,dc=org"
-LDAP_PW = ""
+LDAP_USER = "cn=admin,dc=flipdot,dc=org"
+LDAP_PW = "admin"
 
 # POSTGRES_CONNECTION_STRING = "postgresql://postgres:postgres@127.0.0.1/drinks"
 POSTGRES_CONNECTION_STRING = "postgresql://postgres:postgres@postgres/drinks"  # Docker

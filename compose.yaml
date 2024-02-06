@@ -18,8 +18,8 @@ services:
     environment:
         LDAP_LOG_LEVEL: "256"
         LDAP_ORGANISATION: "Example Inc."
-        LDAP_DOMAIN: "example.org"
-        LDAP_BASE_DN: ""
+        LDAP_DOMAIN: "flipdot.org"
+        LDAP_BASE_DN: "dc=flipdot,dc=org"
         LDAP_ADMIN_PASSWORD: "admin"
         LDAP_CONFIG_PASSWORD: "config"
         LDAP_READONLY_USER: "false"
@@ -34,6 +34,12 @@ services:
     ports:
         - "389:389"
         - "636:636"
+    volumes:
+      - ./docker/flipdot.ldif:/root/flipdot.ldif:ro
+#    entrypoint: "sleep 3 && service slapd stop && slapadd -n 0 < /root/flipdot.ldif && cat /root/flipdot.ldif && service slapd start"
+#    entrypoint: "sleep 3 && service slapd stop && slapadd -n 0 < /root/flipdot.ldif && /container/tool/run"
+    entrypoint: "/container/tool/run &; sleep 3 && service slapd stop && slapadd -n 0 < /root/flipdot.ldif && service slapd start && tail -f /var/log/ldap.log"
+
 
   hackertool:
     image: osixia/phpldapadmin:latest
