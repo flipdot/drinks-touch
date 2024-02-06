@@ -6,6 +6,8 @@ services:
       POSTGRES_USER: drinks
       POSTGRES_PASSWORD: drinks
       POSTGRES_DB: drinks
+    ports:
+      - 5432:5432
   drinks:
     build: .
 
