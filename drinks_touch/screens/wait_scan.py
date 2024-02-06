@@ -93,7 +93,7 @@ class WaitScanScreen(Screen):
                  WHERE "user_id" NOT LIKE 'geld%' AND "user_id" != '0'
                 ) AS Gesamtguthaben
             FROM "rechargeevent" WHERE "user_id" NOT LIKE 'geld%';""")
-        total_balance = get_session().execute(sql).scalar()
+        total_balance = get_session().execute(sql).scalar() or 0
         self.objects.append(Label(
             self.screen,
             text="Gesamtguthaben aller Member: {:.02f}€".format(total_balance),
