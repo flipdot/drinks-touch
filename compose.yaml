@@ -11,6 +11,8 @@ services:
   drinks:
     build: .
 
+  # user: cn=admin,dc=example,dc=org
+  # password: admin
   openldap:
     image: osixia/openldap:1.5.0
     environment:
