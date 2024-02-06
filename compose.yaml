@@ -1,0 +1,41 @@
+services:
+  postgres:
+    image: "postgres:16.1"
+    environment:
+      POSTGRES_USER: drinks
+      POSTGRES_PASSWORD: drinks
+      POSTGRES_DB: drinks
+    ports:
+      - 5432:5432
+
+  drinks:
+    build: .
+
+  openldap:
+    image: osixia/openldap:1.5.0
+    environment:
+        LDAP_LOG_LEVEL: "256"
+        LDAP_ORGANISATION: "Example Inc."
+        LDAP_DOMAIN: "example.org"
+        LDAP_BASE_DN: ""
+        LDAP_ADMIN_PASSWORD: "admin"
+        LDAP_CONFIG_PASSWORD: "config"
+        LDAP_READONLY_USER: "false"
+        #LDAP_READONLY_USER_USERNAME: "readonly"
+        #LDAP_READONLY_USER_PASSWORD: "readonly"
+        LDAP_RFC2307BIS_SCHEMA: "false"
+        LDAP_BACKEND: "mdb"
+        LDAP_TLS: "false"
+        LDAP_REPLICATION: "false"
+        KEEP_EXISTING_CONFIG: "false"
+        LDAP_REMOVE_CONFIG_AFTER_SETUP: "true"
+
+  hackertool:
+    image: osixia/phpldapadmin:latest
+    environment:
+      PHPLDAPADMIN_LDAP_HOSTS: "openldap"
+      PHPLDAPADMIN_HTTPS: "false"
+    ports:
+      - "9090:80"
+    depends_on:
+      - openldap
