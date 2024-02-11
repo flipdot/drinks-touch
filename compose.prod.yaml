@@ -8,3 +8,5 @@ services:
 
   drinks:
     build: .
+    devices:
+      - "/dev/ttyBarcode:/dev/ttyBarcode"
