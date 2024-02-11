@@ -15,6 +15,7 @@ services:
     environment:
       POSTGRES_CONNECTION_STRING: postgresql://drinks:drinks@postgres/drinks
       MAIL_USE_STARTTLS: "true"
+      SCANNER_DEVICE_PATH: "/dev/ttyBarcode"
     devices:
       - "/dev/ttyBarcode:/dev/ttyBarcode"
 

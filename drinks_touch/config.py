@@ -18,6 +18,8 @@ MAIL_HOST = os.environ.get("MAIL_HOST", "localhost")
 MAIL_PORT = os.environ.get("MAIL_PORT", 1025)
 MAIL_USE_STARTTLS = os.environ.get("MAIL_USE_STARTTLS", "False") in ["True", "true", "1"]
 
+SCANNER_DEVICE_PATH = os.environ.get("SCANNER_DEVICE_PATH", "/dev/ttyACM0")
+
 FPS = 30
 
 LOGLEVEL = "DEBUG"

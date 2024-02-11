@@ -12,6 +12,15 @@ Digital replacement for the drinks tally list featuring a touchscreen, user mana
 1. **[License](#license)**
 
 ## Development
+
+```
+docker compose -f docker-compose.dev.yml up
+```
+
+- Reading mails via mailpit: http://localhost:8025/
+
+
+
 This project is deployed within the [drinks-touch_stack](https://github.com/flipdot/drinks-touch_stack/) in accordance to the [DargStack template](https://github.com/dargstack/dargstack_template/) to make deployment a breeze.
 
 The provided `Dockerfile` lets you build a localized Python image. Build it with the following command:

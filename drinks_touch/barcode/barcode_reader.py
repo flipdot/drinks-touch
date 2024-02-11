@@ -3,6 +3,7 @@ import sys
 import serial
 import logging
 
+import config
 from env import is_pi
 
 logger = logging.getLogger(__name__)
@@ -43,7 +44,7 @@ def run(worker):
                 barcode = barcode[:index] + target + barcode[index + 1:]
 
         return barcode
-    with serial.Serial("/dev/ttyACM0", baudrate=115200) as s:
+    with serial.Serial(config.SCANNER_DEVICE_PATH, baudrate=115200) as s:
 
         while True:
             keyboard_input = s.read_until(b"\r").decode("utf-8")[:-1]
