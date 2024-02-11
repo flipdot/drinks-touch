@@ -31,10 +31,12 @@ RUN mkdir /srv/app/
 
 WORKDIR /srv/app/
 
+RUN pip install poetry
+
 COPY ./docker/asound.conf /etc/asound.conf
 COPY ./docker/pip_extra-index-piwheels.conf /etc/pip.conf
-COPY ./requirements.txt ./
-RUN pip install -r requirements.txt
+COPY ./poetry.lock ./pyproject.toml ./
+RUN poetry install
 
 COPY ./drinks_touch/ ./
 
