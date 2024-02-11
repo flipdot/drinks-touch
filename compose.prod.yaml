@@ -12,6 +12,9 @@ services:
     build: .
     env_file:
       - drinks.env
+    environment:
+      POSTGRES_CONNECTION_STRING: postgresql://drinks:drinks@postgres/drinks
+      MAIL_USE_STARTTLS: "true"
     devices:
       - "/dev/ttyBarcode:/dev/ttyBarcode"
 

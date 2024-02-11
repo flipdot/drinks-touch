@@ -10,21 +10,19 @@ LDAP_PW = os.environ.get("LDAP_PW", "admin")
 
 SENTRY_DSN = os.environ.get("SENTRY_DSN", "")
 
-POSTGRES_CONNECTION_STRING = os.environ.get("POSTGRES_CONNECTION_STRING", "postgresql://drinks:drinks@postgres/drinks")
+POSTGRES_CONNECTION_STRING = os.environ.get("POSTGRES_CONNECTION_STRING", "postgresql://drinks:drinks@localhost/drinks")
 
-MAIL_FROM = os.environ.get("MAIL_FROM", "flipdot-noti@vega.uberspace.de")
+MAIL_FROM = os.environ.get("MAIL_FROM", "flipdot-noti@mailpit")
 MAIL_PW = os.environ.get("MAIL_PW", "pw")
-MAIL_HOST = os.environ.get("MAIL_HOST", "vega.uberspace.de")
-MAIL_PORT = os.environ.get("MAIL_PORT", 587)
+MAIL_HOST = os.environ.get("MAIL_HOST", "localhost")
+MAIL_PORT = os.environ.get("MAIL_PORT", 1025)
+MAIL_USE_STARTTLS = os.environ.get("MAIL_USE_STARTTLS", "False") in ["True", "true", "1"]
 
 FPS = 30
 
 LOGLEVEL = "DEBUG"
 
 # DEVELOPMENT VARIABLES #
-
-# Prevent any mail from being sent.
-NO_MAILS = True
 
 # Send any mail to the user with the given id.
 # Evaluates to MAIL_FROM by default.

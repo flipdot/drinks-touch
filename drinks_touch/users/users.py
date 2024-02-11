@@ -188,7 +188,7 @@ class Users(object):
 
     @staticmethod
     def get_ldap_instance():
-        dn = getattr(config, "LDAP_USER", "cn=admin,dc=flipdot,dc=org")
+        dn = config.LDAP_USER
 
         s = Server(config.LDAP_HOST)
         con = Connection(s, dn, config.LDAP_PW,

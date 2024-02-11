@@ -61,14 +61,11 @@ def send_notification(to_address, subject, content_text, content_html, uid):
     logger.info("Mailing %s: '%s'", to_address, subject)
     logger.debug("Content: ---\n%s\n---", content_text)
 
-    if config.NO_MAILS:
-        logger.info("skipping mail, because config.NO_MAILS")
-        return
-
     s = smtplib.SMTP(config.MAIL_HOST, port=config.MAIL_PORT)
     s.connect(host=config.MAIL_HOST, port=config.MAIL_PORT)
     s.ehlo()
-    s.starttls()
+    if config.MAIL_USE_STARTTLS:
+        s.starttls()
     s.login(user=config.MAIL_FROM, password=config.MAIL_PW)
     s.sendmail(config.MAIL_FROM, [to_address], msg.as_string())
     s.quit()
