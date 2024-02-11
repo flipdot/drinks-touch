@@ -24,9 +24,12 @@ from stats.stats import run as stats_send
 from users.sync import sync_recharges
 from webserver.webserver import run as run_webserver
 import os
+import sentry_sdk
 
 with contextlib.redirect_stdout(None):
     import pygame
+
+sentry_sdk.init(config.SENTRY_DSN)
 
 logging.basicConfig(level=getattr(logging, config.LOGLEVEL),
                     format="[%(asctime)s][%(levelname)s][%(filename)s:%(lineno)d] %(message)s")

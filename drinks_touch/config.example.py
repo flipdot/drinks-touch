@@ -6,6 +6,8 @@ LDAP_HOST = "ldap://ldap.example.com"
 LDAP_USER = "cn=admin,dc=flipdot,dc=org"
 LDAP_PW = "admin"
 
+SENTRY_DSN = ""
+
 # POSTGRES_CONNECTION_STRING = "postgresql://postgres:postgres@127.0.0.1/drinks"
 POSTGRES_CONNECTION_STRING = "postgresql://postgres:postgres@postgres/drinks"  # Docker
 
