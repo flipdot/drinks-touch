@@ -5,8 +5,15 @@ services:
       POSTGRES_USER: drinks
       POSTGRES_PASSWORD: drinks
       POSTGRES_DB: drinks
+    volumes:
+      - db:/var/lib/postgresql/data
 
   drinks:
     build: .
+    env_file:
+      - drinks.env
     devices:
       - "/dev/ttyBarcode:/dev/ttyBarcode"
+
+volumes:
+  db:

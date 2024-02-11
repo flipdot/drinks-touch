@@ -8,9 +8,6 @@ services:
     ports:
       - 5432:5432
 
-  drinks:
-    build: .
-
   # user: cn=admin,dc=example,dc=org
   # password: admin
   openldap:

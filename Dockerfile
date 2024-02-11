@@ -38,6 +38,11 @@ COPY ./docker/pip_extra-index-piwheels.conf /etc/pip.conf
 COPY ./poetry.lock ./pyproject.toml ./
 RUN poetry install
 
-COPY ./drinks_touch/ ./
+COPY ./drinks_touch/ ./drinks_touch/
 
-ENTRYPOINT ["./game.py"]
+ENV ENV=PI
+
+ENTRYPOINT ["poetry", "run"]
+
+#CMD ["python", "game.py"]
+CMD ["python", "./drinks_touch/game.py"]
