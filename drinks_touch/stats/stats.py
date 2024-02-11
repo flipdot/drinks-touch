@@ -6,6 +6,7 @@ import re
 from PIL import Image, ImageDraw, ImageFont, ImageMath
 
 from database.storage import get_session
+from sqlalchemy import text
 from env import is_pi
 from stats.flipdot import create_socket, send_frame, w, h
 import os
@@ -22,14 +23,14 @@ def scans(limit=1000, hours=None):
     if hours:
         where = "WHERE se.timestamp > NOW() - INTERVAL ':hours HOUR'"
         params['hours'] = hours
-    sql = """
+    sql = text("""
     SELECT se.id, barcode, se.timestamp, name
     FROM scanevent se
     LEFT OUTER JOIN drink d on se.barcode = d.ean
     %s
     ORDER BY timestamp DESC
     LIMIT %d
-    """ % (where, limit)
+    """ % (where, int(limit)))
     sql_scans = session.execute(sql, params).fetchall()
     return [dict(zip(row.keys(), row)) for row in sql_scans]
 
