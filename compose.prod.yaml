@@ -1,0 +1,10 @@
+services:
+  postgres:
+    image: "postgres:16.1"
+    environment:
+      POSTGRES_USER: drinks
+      POSTGRES_PASSWORD: drinks
+      POSTGRES_DB: drinks
+
+  drinks:
+    build: .
