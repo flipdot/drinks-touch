@@ -27,15 +27,15 @@ services:
         LDAP_TLS: "false"
         LDAP_REPLICATION: "false"
         KEEP_EXISTING_CONFIG: "false"
-        LDAP_REMOVE_CONFIG_AFTER_SETUP: "true"
+        LDAP_REMOVE_CONFIG_AFTER_SETUP: "false"
+        LDAP_SEED_INTERNAL_SCHEMA_PATH: "/assets/openldap/custom/schema/"
+        LDAP_SEED_INTERNAL_LDIF_PATH: "/assets/openldap/custom/ldif/"
     ports:
         - "389:389"
         - "636:636"
     volumes:
-      - ./docker/flipdot.ldif:/root/flipdot.ldif:ro
-#    entrypoint: "sleep 3 && service slapd stop && slapadd -n 0 < /root/flipdot.ldif && cat /root/flipdot.ldif && service slapd start"
-#    entrypoint: "sleep 3 && service slapd stop && slapadd -n 0 < /root/flipdot.ldif && /container/tool/run"
-    entrypoint: "/container/tool/run &; sleep 3 && service slapd stop && slapadd -n 0 < /root/flipdot.ldif && service slapd start && tail -f /var/log/ldap.log"
+      - ./docker/flipdot.schema:/assets/openldap/custom/schema/flipdot.schema
+      - ./docker/flipdot.ldif:/assets/openldap/custom/ldif/flipdot.ldif
 
 
   hackertool:
