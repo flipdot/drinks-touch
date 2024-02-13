@@ -19,7 +19,7 @@ def get_screen():
 
 
 def __get_screen_xserver():
-    SIZE = 720, 1280
+    SIZE = 480, 800
     pygame.init()
     screen = pygame.display.set_mode(SIZE)
     logger.info("Got regular xserver screen")

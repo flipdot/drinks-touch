@@ -15,8 +15,12 @@ if [[ ! -f "drinks.env" ]]; then
   echo "Please setup a drinks.env file!!!"
 fi
 
+apt-get update
+apt-get install -y xserver-xorg-input-evdev rsync
+
 cp docker/drinks_touch_xorg.service /etc/systemd/system/
-cp docker/xinitrc $HOME
+cp docker/xinitrc "${HOME}"
+cp x/99-calibration.conf /etc/X11/xorg.conf.d/
 
 systemctl daemon-reload
 systemctl enable --now drinks_touch_xorg.service
