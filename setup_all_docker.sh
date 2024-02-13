@@ -28,6 +28,9 @@ export DISPLAY=:0
 
 xhost si:localuser:root
 xrandr --output HDMI-1 --rotate left
+# Maybe we need to do this every 5 secs
+xinput set-prop "eGalax Inc. USB TouchController" "Evdev Axes Swap" "1"
+xinput set-prop "eGalax Inc. USB TouchController" "Coordinate Transformation Matrix" 1.3 0 -0.15 0 1.3 -0.15 0 0 1
 
 docker compose -f compose.prod.yaml down
 docker compose -f compose.prod.yaml up -d --build
