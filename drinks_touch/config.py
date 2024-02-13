@@ -28,7 +28,7 @@ LOGLEVEL = "DEBUG"
 
 # Send any mail to the user with the given id.
 # Evaluates to MAIL_FROM by default.
-FORCE_MAIL_TO_UID = "3"
+FORCE_MAIL_TO_UID = os.environ.get("FORCE_MAIL_TO_UID", None)
 
 # Do not fetch users from ldap.
 # Use debug users instead.
