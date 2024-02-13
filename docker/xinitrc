@@ -1,0 +1,3 @@
+# empty file
+# otherwise start will start an xterm
+sleep infinity
