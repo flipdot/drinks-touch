@@ -12,15 +12,19 @@ def get_screen():
     try:
         screen = __get_screen_framebuffer()
     except Exception:
+        logger.exception("Falling back to regular xserver")
         screen = __get_screen_xserver()
 
     return screen
 
 
 def __get_screen_xserver():
-    SIZE = 480, 800
+    SIZE = 720, 1280
     pygame.init()
     screen = pygame.display.set_mode(SIZE)
+    logger.info("Got regular xserver screen")
+    logger.warn("This has never worked")
+    # raise "X11 init failed"
     return screen
 
 
@@ -51,9 +55,10 @@ def __get_screen_framebuffer():
 
     if not found:
         raise Exception('No suitable video driver found!')
+    logger.info("Using SDL_VIDEODRIVER", os.environ['SDL_VIDEODRIVER'])
 
     size = (pygame.display.Info().current_w, pygame.display.Info().current_h)
-    print("Framebuffer size: %d x %d" % (size[0], size[1]))
+    logger.info("Framebuffer size: %d x %d" % (size[0], size[1]))
     return pygame.display.set_mode(size, pygame.FULLSCREEN)
     # # Clear the screen to start
     # self.screen.fill((0, 0, 0))
