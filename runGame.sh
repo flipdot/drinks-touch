@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
-echo "Starting in 5 seconds!"
-sleep 5
+echo "Starting in 1 seconds!"
+sleep 1
 function fix_display () {
     xrandr --output HDMI-1 --rotate left
     xinput set-prop "eGalax Inc. USB TouchController" "Evdev Axes Swap" "1"
@@ -20,7 +21,7 @@ do
         export ENV=PI
         export PYTHONUNBUFFERED=1
 
-        cd /home/pi/drinks-touch
+        cd "${SCRIPT_DIR}"
         echo "starting..."
         systemd-cat -t"drinks" ./drinks_touch/game.py
     )
