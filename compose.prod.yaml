@@ -16,8 +16,12 @@ services:
       POSTGRES_CONNECTION_STRING: postgresql://drinks:drinks@postgres/drinks
       MAIL_USE_STARTTLS: "true"
       SCANNER_DEVICE_PATH: "/dev/ttyBarcode"
+      DISPLAY: ":0"
     devices:
       - "/dev/ttyBarcode:/dev/ttyBarcode"
+    volumes:
+      - /root/.Xauthority:/root/.Xauthority
+      - /tmp/.X11-unix:/tmp/.X11-unix
 
 volumes:
   db:
