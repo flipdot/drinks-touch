@@ -19,11 +19,13 @@ def get_screen():
 
 
 def __get_screen_xserver():
-    SIZE = 480, 800
+    size = 480, 800
+    # https://www.pygame.org/docs/ref/display.html?highlight=set_mode#pygame.display.set_mode
     pygame.init()
-    screen = pygame.display.set_mode(SIZE)
+    # Untested!
+    flags = pygame.SCALED | pygame.FULLSCREEN | pygame.NOFRAME
+    screen = pygame.display.set_mode(size, flags)
     logger.info("Got regular xserver screen")
-    logger.warn("This has never worked")
     # raise "X11 init failed"
     return screen
 
