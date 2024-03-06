@@ -40,7 +40,7 @@ def __get_screen_framebuffer():
 
     # Check which frame buffer drivers are available
     # Start with fbcon since directfb hangs with composite output
-    drivers = ['fbcon', 'directfb', 'svgalib']
+    drivers = ['wayland', 'fbcon', 'directfb', 'svgalib']
     found = False
     for driver in drivers:
         # Make sure that SDL_VIDEODRIVER is set
@@ -61,7 +61,8 @@ def __get_screen_framebuffer():
 
     size = (pygame.display.Info().current_w, pygame.display.Info().current_h)
     logger.info("Framebuffer size: %d x %d" % (size[0], size[1]))
-    return pygame.display.set_mode(size, pygame.FULLSCREEN)
+    flags = pygame.SCALED | pygame.FULLSCREEN | pygame.NOFRAME
+    return pygame.display.set_mode((0, 0), flags)
     # # Clear the screen to start
     # self.screen.fill((0, 0, 0))
     # # Initialise font support
