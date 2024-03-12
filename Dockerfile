@@ -36,7 +36,9 @@ RUN pip install poetry==1.8.2
 COPY ./docker/asound.conf /etc/asound.conf
 COPY ./docker/pip_extra-index-piwheels.conf /etc/pip.conf
 COPY ./poetry.lock ./pyproject.toml ./
-RUN poetry install
+RUN --mount=type=cache,target=/root/.cache/pypoetry/cache \
+    --mount=type=cache,target=/root/.cache/pypoetry/artifacts \
+    poetry install
 
 COPY ./drinks_touch/ ./drinks_touch/
 
