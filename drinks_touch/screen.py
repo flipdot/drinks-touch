@@ -57,7 +57,7 @@ def __get_screen_framebuffer():
 
     if not found:
         raise Exception('No suitable video driver found!')
-    logger.info("Using SDL_VIDEODRIVER", os.environ['SDL_VIDEODRIVER'])
+    logger.info("Using SDL_VIDEODRIVER %s", os.environ['SDL_VIDEODRIVER'])
 
     size = (pygame.display.Info().current_w, pygame.display.Info().current_h)
     logger.info("Framebuffer size: %d x %d" % (size[0], size[1]))

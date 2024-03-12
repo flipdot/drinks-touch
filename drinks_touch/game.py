@@ -34,11 +34,12 @@ sentry_sdk.init(config.SENTRY_DSN)
 logging.basicConfig(level=getattr(logging, config.LOGLEVEL),
                     format="[%(asctime)s][%(levelname)s][%(filename)s:%(lineno)d] %(message)s")
 logging.Formatter.converter = time.gmtime
+logging.getLogger('ldap3').setLevel(config.LOGLEVEL)
 
 event_queue = queue.Queue()
 screen_manager = None
 
-# Events #
+
 def handle_events():
     while True:
         events = []

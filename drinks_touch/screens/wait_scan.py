@@ -16,6 +16,8 @@ from .screen import Screen
 from .screen_manager import ScreenManager
 from sqlalchemy.sql import text
 
+logger = logging.getLogger(__name__)
+
 
 class WaitScanScreen(Screen):
     def __init__(self, screen):
@@ -93,10 +95,16 @@ class WaitScanScreen(Screen):
                  WHERE "user_id" NOT LIKE 'geld%' AND "user_id" != '0'
                 ) AS Gesamtguthaben
             FROM "rechargeevent" WHERE "user_id" NOT LIKE 'geld%';""")
-        total_balance = get_session().execute(sql).scalar() or 0
+        try:
+            total_balance = get_session().execute(sql).scalar() or 0
+            total_balance_fmt = "{:.02f}€".format(total_balance)
+        except Exception as e:
+            logger.exception("")
+            total_balance_fmt = "(SQL Error)"
+
         self.objects.append(Label(
             self.screen,
-            text="Gesamtguthaben aller Member: {:.02f}€".format(total_balance),
+            text="Gesamtguthaben aller Member: {}€".format(total_balance_fmt),
             size=25,
             pos=(125, 755)
         ))

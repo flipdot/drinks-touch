@@ -22,7 +22,7 @@ SCANNER_DEVICE_PATH = os.environ.get("SCANNER_DEVICE_PATH", "/dev/ttyACM0")
 
 FPS = 30
 
-LOGLEVEL = "DEBUG"
+LOGLEVEL = os.environ.get("LOGLEVEL", "DEBUG")
 
 # DEVELOPMENT VARIABLES #
 
