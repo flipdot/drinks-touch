@@ -100,7 +100,7 @@ class WaitScanScreen(Screen):
             total_balance = get_session().execute(sql).scalar() or 0
             total_balance_fmt = "{:.02f}€".format(total_balance)
         except Exception as e:
-            logger.exception("")
+            logger.exception("sql error while getting total money amount")
             total_balance_fmt = "(SQL Error)"
 
         self.objects.append(Label(
