@@ -1,4 +1,5 @@
 import datetime
+import logging
 
 from database.models.scan_event import ScanEvent
 from database.storage import get_session
