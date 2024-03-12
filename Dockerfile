@@ -31,7 +31,7 @@ RUN mkdir /srv/app/
 
 WORKDIR /srv/app/
 
-RUN pip install poetry
+RUN pip install poetry==1.8.2
 
 COPY ./docker/asound.conf /etc/asound.conf
 COPY ./docker/pip_extra-index-piwheels.conf /etc/pip.conf
