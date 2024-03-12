@@ -25,6 +25,7 @@ from users.sync import sync_recharges
 from webserver.webserver import run as run_webserver
 import os
 import sentry_sdk
+from ldap3.utils.log import set_library_log_detail_level, set_library_log_activation_level, OFF, BASIC, NETWORK, EXTENDED
 
 with contextlib.redirect_stdout(None):
     import pygame
@@ -34,7 +35,11 @@ sentry_sdk.init(config.SENTRY_DSN)
 logging.basicConfig(level=getattr(logging, config.LOGLEVEL),
                     format="[%(asctime)s][%(levelname)s][%(filename)s:%(lineno)d] %(message)s")
 logging.Formatter.converter = time.gmtime
-logging.getLogger('ldap3').setLevel(config.LOGLEVEL)
+
+# ldap log level
+set_library_log_activation_level(logging.CRITICAL)
+if config.LOGLEVEL == logging.DEBUG:
+    set_library_log_detail_level(EXTENDED)
 
 event_queue = queue.Queue()
 screen_manager = None
