@@ -105,7 +105,7 @@ class WaitScanScreen(Screen):
 
         self.objects.append(Label(
             self.screen,
-            text="Gesamtguthaben aller Member: {}€".format(total_balance_fmt),
+            text="Gesamtguthaben aller Member: {}".format(total_balance_fmt),
             size=25,
             pos=(125, 755)
         ))
