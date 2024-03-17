@@ -2,6 +2,7 @@ import json
 import re
 from datetime import datetime
 from decimal import Decimal
+import config
 
 from markupsafe import escape
 from flask import Flask, make_response
@@ -122,9 +123,7 @@ def to_json(dict_arr):
 
 
 def run():
-    port = 5002
-    if is_pi():
-        port = 80
+    port = config.WEBSERVER_PORT
 
     app.run(
         host='0.0.0.0',
