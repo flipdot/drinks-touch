@@ -64,7 +64,7 @@ def handle_events():
 def stats_loop():
     i = 0
     while True:
-        stats_send()
+        #stats_send()
         send_low_balances()
         if env.is_pi():
             sync_recharges()
