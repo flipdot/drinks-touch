@@ -36,7 +36,7 @@
     "resolve-url-loader": "5.0.0",
     "sass": "1.74.1",
     "sass-loader": "14.1.1",
-    "style-loader": "3.3.4",
+    "style-loader": "4.0.0",
     "terser-webpack-plugin": "5.3.10",
     "url-loader": "4.1.1",
     "webpack": "5.91.0",
