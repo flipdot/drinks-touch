@@ -500,13 +500,13 @@ files = [
 
 [[package]]
 name = "influxdb"
-version = "5.3.1"
+version = "5.3.2"
 description = "InfluxDB client"
 optional = false
 python-versions = "*"
 files = [
-    {file = "influxdb-5.3.1-py2.py3-none-any.whl", hash = "sha256:65040a1f53d1a2a4f88a677e89e3a98189a7d30cf2ab61c318aaa89733280747"},
-    {file = "influxdb-5.3.1.tar.gz", hash = "sha256:46f85e7b04ee4b3dee894672be6a295c94709003a7ddea8820deec2ac4d8b27a"},
+    {file = "influxdb-5.3.2-py2.py3-none-any.whl", hash = "sha256:00d86b18a968d011b2eee39ec3b2ae941b1dcf7086bc7211e675914623caffcd"},
+    {file = "influxdb-5.3.2.tar.gz", hash = "sha256:58c647f6043712dd86e9aee12eb4ccfbbb5415467bc9910a48aa8c74c1108970"},
 ]
 
 [package.dependencies]
