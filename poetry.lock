@@ -4032,13 +4032,13 @@ use-chardet-on-py3 = ["chardet (>=3.0.2,<6)"]
 
 [[package]]
 name = "sentry-sdk"
-version = "2.1.0"
+version = "2.1.1"
 description = "Python client for Sentry (https://sentry.io)"
 optional = false
 python-versions = ">=3.6"
 files = [
-    {file = "sentry_sdk-2.1.0-py2.py3-none-any.whl", hash = "sha256:968b599d2ecdb1fae15d529ab03750ff2f34954fd317b4fb1dbc2725bb1702d0"},
-    {file = "sentry_sdk-2.1.0.tar.gz", hash = "sha256:392f1065d6b46e87bf0a0a8eda2fe271601a62b0daf56eeb74e813f99ca0caec"},
+    {file = "sentry_sdk-2.1.1-py2.py3-none-any.whl", hash = "sha256:99aeb78fb76771513bd3b2829d12613130152620768d00cd3e45ac00cb17950f"},
+    {file = "sentry_sdk-2.1.1.tar.gz", hash = "sha256:95d8c0bb41c8b0bc37ab202c2c4a295bb84398ee05f4cdce55051cd75b926ec1"},
 ]
 
 [package.dependencies]
