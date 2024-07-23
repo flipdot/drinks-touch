@@ -44,7 +44,7 @@ importers:
         version: 9.1.3(@babel/core@7.24.9)(webpack@5.93.0(webpack-cli@5.1.4))
       bootstrap-loader:
         specifier: 4.0.4
-        version: 4.0.4(css-loader@7.1.2(webpack@5.93.0(webpack-cli@5.1.4)))(mini-css-extract-plugin@2.9.0(webpack@5.93.0(webpack-cli@5.1.4)))(node-sass@9.0.0)(resolve-url-loader@5.0.0)(sass-loader@14.2.1(node-sass@9.0.0)(sass@1.77.8)(webpack@5.93.0(webpack-cli@5.1.4)))(sass@1.77.8)(url-loader@4.1.1(file-loader@6.2.0(webpack@5.93.0(webpack-cli@5.1.4)))(webpack@5.93.0(webpack-cli@5.1.4)))(webpack@5.93.0(webpack-cli@5.1.4))
+        version: 4.0.4(css-loader@7.1.2(webpack@5.93.0(webpack-cli@5.1.4)))(mini-css-extract-plugin@2.9.0(webpack@5.93.0(webpack-cli@5.1.4)))(node-sass@9.0.0)(resolve-url-loader@5.0.0)(sass-loader@15.0.0(node-sass@9.0.0)(sass@1.77.8)(webpack@5.93.0(webpack-cli@5.1.4)))(sass@1.77.8)(url-loader@4.1.1(file-loader@6.2.0(webpack@5.93.0(webpack-cli@5.1.4)))(webpack@5.93.0(webpack-cli@5.1.4)))(webpack@5.93.0(webpack-cli@5.1.4))
       bootstrap-sass:
         specifier: 3.4.3
         version: 3.4.3
@@ -85,8 +85,8 @@ importers:
         specifier: 1.77.8
         version: 1.77.8
       sass-loader:
-        specifier: 14.2.1
-        version: 14.2.1(node-sass@9.0.0)(sass@1.77.8)(webpack@5.93.0(webpack-cli@5.1.4))
+        specifier: 15.0.0
+        version: 15.0.0(node-sass@9.0.0)(sass@1.77.8)(webpack@5.93.0(webpack-cli@5.1.4))
       style-loader:
         specifier: 4.0.0
         version: 4.0.0(webpack@5.93.0(webpack-cli@5.1.4))
@@ -2084,6 +2084,7 @@ packages:
   node-sass@9.0.0:
     resolution: {integrity: sha512-yltEuuLrfH6M7Pq2gAj5B6Zm7m+gdZoG66wTqG6mIZV/zijq3M2OO2HswtT6oBspPyFhHDcaxWpsBm0fRNDHPg==}
     engines: {node: '>=16'}
+    deprecated: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
     hasBin: true
 
   nopt@5.0.0:
@@ -2536,8 +2537,8 @@ packages:
     engines: {node: '>=12'}
     hasBin: true
 
-  sass-loader@14.2.1:
-    resolution: {integrity: sha512-G0VcnMYU18a4N7VoNDegg2OuMjYtxnqzQWARVWCIVSZwJeiL9kg8QMsuIZOplsJgTzZLF6jGxI3AClj8I9nRdQ==}
+  sass-loader@15.0.0:
+    resolution: {integrity: sha512-mbXAL7sI/fgt3skXR6xHxtKkaGyxRrGf7zrU4hLLWxBDJEcAe0QsoNy92qKttCb3zfMniTkU2kD9yakUKtW7vQ==}
     engines: {node: '>= 18.12.0'}
     peerDependencies:
       '@rspack/core': 0.x || 1.x
@@ -4197,7 +4198,7 @@ snapshots:
 
   boolbase@1.0.0: {}
 
-  bootstrap-loader@4.0.4(css-loader@7.1.2(webpack@5.93.0(webpack-cli@5.1.4)))(mini-css-extract-plugin@2.9.0(webpack@5.93.0(webpack-cli@5.1.4)))(node-sass@9.0.0)(resolve-url-loader@5.0.0)(sass-loader@14.2.1(node-sass@9.0.0)(sass@1.77.8)(webpack@5.93.0(webpack-cli@5.1.4)))(sass@1.77.8)(url-loader@4.1.1(file-loader@6.2.0(webpack@5.93.0(webpack-cli@5.1.4)))(webpack@5.93.0(webpack-cli@5.1.4)))(webpack@5.93.0(webpack-cli@5.1.4)):
+  bootstrap-loader@4.0.4(css-loader@7.1.2(webpack@5.93.0(webpack-cli@5.1.4)))(mini-css-extract-plugin@2.9.0(webpack@5.93.0(webpack-cli@5.1.4)))(node-sass@9.0.0)(resolve-url-loader@5.0.0)(sass-loader@15.0.0(node-sass@9.0.0)(sass@1.77.8)(webpack@5.93.0(webpack-cli@5.1.4)))(sass@1.77.8)(url-loader@4.1.1(file-loader@6.2.0(webpack@5.93.0(webpack-cli@5.1.4)))(webpack@5.93.0(webpack-cli@5.1.4)))(webpack@5.93.0(webpack-cli@5.1.4)):
     dependencies:
       chalk: 2.4.2
       css-loader: 7.1.2(webpack@5.93.0(webpack-cli@5.1.4))
@@ -4210,7 +4211,7 @@ snapshots:
       resolve: 1.10.0
       resolve-url-loader: 5.0.0
       sass: 1.77.8
-      sass-loader: 14.2.1(node-sass@9.0.0)(sass@1.77.8)(webpack@5.93.0(webpack-cli@5.1.4))
+      sass-loader: 15.0.0(node-sass@9.0.0)(sass@1.77.8)(webpack@5.93.0(webpack-cli@5.1.4))
       semver: 5.5.0
       strip-json-comments: 2.0.1
       url-loader: 4.1.1(file-loader@6.2.0(webpack@5.93.0(webpack-cli@5.1.4)))(webpack@5.93.0(webpack-cli@5.1.4))
@@ -5675,7 +5676,7 @@ snapshots:
       scss-tokenizer: 0.4.3
       yargs: 17.7.2
 
-  sass-loader@14.2.1(node-sass@9.0.0)(sass@1.77.8)(webpack@5.93.0(webpack-cli@5.1.4)):
+  sass-loader@15.0.0(node-sass@9.0.0)(sass@1.77.8)(webpack@5.93.0(webpack-cli@5.1.4)):
     dependencies:
       neo-async: 2.6.2
     optionalDependencies:
