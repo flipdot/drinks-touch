@@ -17,9 +17,22 @@ Digital replacement for the drinks tally list featuring a touchscreen, user mana
 docker compose -f docker-compose.dev.yml up
 ```
 
-- Reading mails via mailpit: http://localhost:8025/
+Reading mails via mailpit: http://localhost:8025/
 
+The project is using poetry. Install the dependencies with:
 
+```sh
+poetry install
+```
+
+Python `pre-commit` helps to detect and fix common issues before committing. Install the git hooks with:
+
+```sh
+pre-commit install
+```
+
+It is also being run in the CI pipeline. If you see any rules that don't make sense for us, feel free
+to adjust the `.pre-commit-config.yaml` file or comment out invocation in the `ci.yml` file.
 
 This project is deployed within the [drinks-touch_stack](https://github.com/flipdot/drinks-touch_stack/) in accordance to the [DargStack template](https://github.com/dargstack/dargstack_template/) to make deployment a breeze.
 

@@ -10,8 +10,8 @@ import sys
 import threading
 import time
 
+
 import config
-import debug
 import env
 from barcode.barcode_reader import run as run_barcode_reader
 from barcode.barcode_worker import Worker as BarcodeWorker
@@ -23,17 +23,22 @@ from screens.screen_manager import ScreenManager
 from stats.stats import run as stats_send
 from users.sync import sync_recharges
 from webserver.webserver import run as run_webserver
-import os
 import sentry_sdk
-from ldap3.utils.log import set_library_log_detail_level, set_library_log_activation_level, OFF, BASIC, NETWORK, EXTENDED
+from ldap3.utils.log import (
+    set_library_log_detail_level,
+    set_library_log_activation_level,
+    EXTENDED,
+)
 
 with contextlib.redirect_stdout(None):
     import pygame
 
 sentry_sdk.init(config.SENTRY_DSN)
 
-logging.basicConfig(level=getattr(logging, config.LOGLEVEL),
-                    format="[%(asctime)s][%(levelname)s][%(filename)s:%(lineno)d] %(message)s")
+logging.basicConfig(
+    level=getattr(logging, config.LOGLEVEL),
+    format="[%(asctime)s][%(levelname)s][%(filename)s:%(lineno)d] %(message)s",
+)
 logging.Formatter.converter = time.gmtime
 
 # ldap log level
@@ -64,7 +69,7 @@ def handle_events():
 def stats_loop():
     i = 0
     while True:
-        #stats_send()
+        # stats_send()
         send_low_balances()
         if env.is_pi():
             sync_recharges()
@@ -77,7 +82,7 @@ def stats_loop():
 
 # Rendering #
 def main(argv):
-    locale.setlocale(locale.LC_ALL, 'de_DE.UTF-8')
+    locale.setlocale(locale.LC_ALL, "de_DE.UTF-8")
 
     if "--webserver" in argv:
         run_webserver()
@@ -101,25 +106,18 @@ def main(argv):
 
     # Barcode Scanner #
     barcode_worker = BarcodeWorker()
-    barcode_thread = threading.Thread(
-        target=run_barcode_reader,
-        args=(barcode_worker,)
-    )
+    barcode_thread = threading.Thread(target=run_barcode_reader, args=(barcode_worker,))
     barcode_thread.daemon = True
     barcode_thread.start()
 
     # webserver needs to be a main thread #
     web_thread = subprocess.Popen([sys.argv[0], "--webserver"])
 
-    event_thread = threading.Thread(
-        target=handle_events
-    )
+    event_thread = threading.Thread(target=handle_events)
     event_thread.daemon = True
     event_thread.start()
 
-    stats_thread = threading.Thread(
-        target=stats_loop
-    )
+    stats_thread = threading.Thread(target=stats_loop)
     stats_thread.daemon = True
     stats_thread.start()
 
@@ -144,7 +142,9 @@ def main(argv):
         for e in events:
             e.t = t
             e.dt = dt
-            if e.type == pygame.QUIT or (e.type == pygame.KEYDOWN and e.key == pygame.K_ESCAPE):
+            if e.type == pygame.QUIT or (
+                e.type == pygame.KEYDOWN and e.key == pygame.K_ESCAPE
+            ):
                 done = True
                 break
             event_queue.put(e, True)
