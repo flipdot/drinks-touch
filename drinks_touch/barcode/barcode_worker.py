@@ -8,5 +8,5 @@ class Worker:
 
         screen = ScreenManager.get_instance().get_active()
 
-        if 'on_barcode' in dir(screen):
+        if "on_barcode" in dir(screen):
             screen.on_barcode(barcode)

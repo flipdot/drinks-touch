@@ -16,7 +16,7 @@ def main():
             name=ldap_name,
             id_card=user["id_card"],
             path=user["path"],
-            is_card=ldap_name.startswith("geld")
+            is_card=ldap_name.startswith("geld"),
         )
 
         old = LdapUser.query.filter_by(ldapId=str(user["id"])).all()

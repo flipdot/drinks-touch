@@ -20,14 +20,16 @@ class NewIDScreen(Screen):
     def __init__(self, screen):
         super(NewIDScreen, self).__init__(screen)
 
-        self.objects.append(Button(
-            self.screen,
-            text="BACK",
-            pos=(30, 30),
-            font=monospace,
-            click_func=self.back,
-            size=30
-        ))
+        self.objects.append(
+            Button(
+                self.screen,
+                text="BACK",
+                pos=(30, 30),
+                font=monospace,
+                click_func=self.back,
+                size=30,
+            )
+        )
 
         self.timeout = Progress(
             self.screen,
@@ -38,41 +40,39 @@ class NewIDScreen(Screen):
         self.objects.append(self.timeout)
         self.timeout.start()
 
-        self.objects.append(Label(
-            self.screen,
-            text="Prepaid Barcode generieren",
-            pos=(30, 120),
-            size=50
-        ))
-        self.objects.append(Label(
-            self.screen,
-            text="Wie viel hast du eingeworfen?",
-            pos=(30, 220),
-            size=40
-        ))
-        self.message = Label(
-            self.screen,
-            text="",
-            pos=(50, 320),
-            size=40
+        self.objects.append(
+            Label(
+                self.screen, text="Prepaid Barcode generieren", pos=(30, 120), size=50
+            )
         )
+        self.objects.append(
+            Label(
+                self.screen,
+                text="Wie viel hast du eingeworfen?",
+                pos=(30, 220),
+                size=40,
+            )
+        )
+        self.message = Label(self.screen, text="", pos=(50, 320), size=40)
         self.objects.append(self.message)
 
         for i, euro in enumerate([5, 10, 20, 50]):
-            self.objects.append(Button(
-                self.screen,
-                text="EUR " + str(euro),
-                pos=((i % 2) * 200 + 30, 600 + (i / 2 * 80)),
-                size=30,
-                click_func=partial(self.btn_euro, euro)
-            ))
+            self.objects.append(
+                Button(
+                    self.screen,
+                    text="EUR " + str(euro),
+                    pos=((i % 2) * 200 + 30, 600 + (i / 2 * 80)),
+                    size=30,
+                    click_func=partial(self.btn_euro, euro),
+                )
+            )
 
         self.progress = Progress(
             self.screen,
             pos=(200, 420),
             size=100,
             speed=1 / 10.0,
-            on_elapsed=self.time_elapsed
+            on_elapsed=self.time_elapsed,
         )
         self.progress.stop()
         self.objects.append(self.progress)
@@ -85,6 +85,7 @@ class NewIDScreen(Screen):
     @staticmethod
     def home():
         from .screen_manager import ScreenManager
+
         screen_manager = ScreenManager.get_instance()
         screen_manager.set_default()
 
@@ -99,12 +100,12 @@ class NewIDScreen(Screen):
             self.progress.on_elapsed = None
             self.progress.value = 0
             user = Users.create_temp_user()
-            print("Created temp %s with EUR %d" % (user['id_card'], euro))
+            print("Created temp %s with EUR %d" % (user["id_card"], euro))
             self.progress.value = 0.2
             self.message.text = "Guthaben wird gespeichert..."
             self.aufladen(user, euro)
 
-            barcode = user['id_card']
+            barcode = user["id_card"]
 
             self.message.text = "ID-Card wird generiert..."
             code_img = self.generate_barcode(barcode)
@@ -119,9 +120,7 @@ class NewIDScreen(Screen):
             self.print_png(png)
             self.progress.on_elapsed = self.time_elapsed
             self.progress.stop()
-            ScreenManager.get_instance().set_active(
-                ProfileScreen(self.screen, user)
-            )
+            ScreenManager.get_instance().set_active(ProfileScreen(self.screen, user))
         except Exception as e:
             self.message.text = "Fehler: " + str(e)
             self.progress.value = 0
@@ -130,11 +129,7 @@ class NewIDScreen(Screen):
     @staticmethod
     def aufladen(user, euro):
         session = get_session()
-        ev = RechargeEvent(
-            user["id"],
-            user["id"],
-            euro
-        )
+        ev = RechargeEvent(user["id"], user["id"], euro)
         session.add(ev)
         session.commit()
 
@@ -153,17 +148,29 @@ class NewIDScreen(Screen):
         height = int(width * 1)
         img = Image.new("L", (width, height), "white")
         # code_img = code_img.transpose(Image.ROTATE_90)
-        code_img = code_img.resize((int(width * 1.13), int(height * 0.5)), Image.ANTIALIAS)
+        code_img = code_img.resize(
+            (int(width * 1.13), int(height * 0.5)), Image.ANTIALIAS
+        )
         # code_img = code_img.resize((int(width * 0.5), int(height * 1.0)), Image.ANTIALIAS)
         # img.paste(code_img, (int(0.4*width), int(0.0*height)))
         img.paste(code_img, (int(-0.07 * width), int(0.2 * height)))
 
         draw = ImageDraw.Draw(img)
-        font = ImageFont.truetype(font="/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", size=width // 10)
-        draw.text((int(0.05 * width), int(0.0 * height)),
-                  "flipdot ID-Card", fill="#000", font=font)
-        draw.text((int(0.05 * width), int(0.1 * height)),
-                  "Wert: EUR " + str(euro), fill="#000", font=font)
+        font = ImageFont.truetype(
+            font="/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", size=width // 10
+        )
+        draw.text(
+            (int(0.05 * width), int(0.0 * height)),
+            "flipdot ID-Card",
+            fill="#000",
+            font=font,
+        )
+        draw.text(
+            (int(0.05 * width), int(0.1 * height)),
+            "Wert: EUR " + str(euro),
+            fill="#000",
+            font=font,
+        )
         return img
 
     @staticmethod
@@ -177,7 +184,7 @@ class NewIDScreen(Screen):
 
     @staticmethod
     def print_png(img):
-        p = subprocess.Popen(['lp', '-d', 'bondrucker', '-'], stdin=subprocess.PIPE)
+        p = subprocess.Popen(["lp", "-d", "bondrucker", "-"], stdin=subprocess.PIPE)
         p.communicate(input=img)
         # with open("print.png", "w") as f:
         #    f.write(img)

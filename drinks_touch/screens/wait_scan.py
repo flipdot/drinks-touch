@@ -36,79 +36,73 @@ class WaitScanScreen(Screen):
                 pos=(50, 600),
                 text="drink buchen",
                 size=52,
-                click_func=self.set_member
+                click_func=self.set_member,
             ),
             Button(
                 self.screen,
                 pos=(50, 700),
                 text="Nur Statistik",
-                click_func=self.stat_drink
+                click_func=self.stat_drink,
             ),
-            Button(
-                self.screen,
-                pos=(350, 700),
-                text="nope",
-                click_func=self.btn_reset
-            )
+            Button(self.screen, pos=(350, 700), text="nope", click_func=self.btn_reset),
         ]
         self.empty_info = [
             Button(
-                self.screen,
-                pos=(30, 700),
-                text="Benutzer",
-                click_func=self.set_member
+                self.screen, pos=(30, 700), text="Benutzer", click_func=self.set_member
             ),
             Button(
                 self.screen,
                 pos=(210, 700),
                 text="Gutschein drucken",
-                click_func=self.btn_new_id
-            )
+                click_func=self.btn_new_id,
+            ),
         ]
 
-        self.objects.append(Image(
-            self.screen,
-            pos=(30, 20)
-        ))
+        self.objects.append(Image(self.screen, pos=(30, 20)))
 
-        self.objects.append(Label(
-            self.screen,
-            text=u"Scanne dein Getränk",
-            pos=(60, 240),
-        ))
-        self.objects.append(Label(
-            self.screen,
-            text=u"oder deine ID-Card :)",
-            pos=(70, 280),
-        ))
+        self.objects.append(
+            Label(
+                self.screen,
+                text="Scanne dein Getränk",
+                pos=(60, 240),
+            )
+        )
+        self.objects.append(
+            Label(
+                self.screen,
+                text="oder deine ID-Card :)",
+                pos=(70, 280),
+            )
+        )
 
         self.processing = Label(
-            self.screen,
-            text="Moment bitte...",
-            size=40,
-            pos=(80, 350)
+            self.screen, text="Moment bitte...", size=40, pos=(80, 350)
         )
         self.processing.is_visible = False
         self.objects.append(self.processing)
-        sql = text("""
+        sql = text(
+            """
             SELECT SUM(amount) - (
                 SELECT COUNT(*) FROM "scanevent"
                  WHERE "user_id" NOT LIKE 'geld%' AND "user_id" != '0'
                 ) AS Gesamtguthaben
-            FROM "rechargeevent" WHERE "user_id" NOT LIKE 'geld%';""")
+            FROM "rechargeevent" WHERE "user_id" NOT LIKE 'geld%';"""
+        )
         try:
             total_balance = get_session().execute(sql).scalar() or 0
             total_balance_fmt = "{:.02f}€".format(total_balance)
-        except Exception as e:
+        except Exception:
             logger.exception("sql error while getting total money amount")
             total_balance_fmt = "(SQL Error)"
 
-        self.objects.append(Label(
-            self.screen,
-            text="Gesamtguthaben aller Member: {}".format(total_balance_fmt),
-            size=25,
-            pos=(125, 755)
-        ))
+        self.objects.append(
+            Label(
+                self.screen,
+                text="Gesamtguthaben aller Member: {}".format(total_balance_fmt),
+                size=25,
+                pos=(125, 755),
+            )
+        )
 
         self.timeout = Progress(
             self.screen,
@@ -139,14 +133,12 @@ class WaitScanScreen(Screen):
         self.processing.is_visible = True
         user = Users.get_by_id_card(barcode)
         if user:
-            ScreenManager.get_instance().set_active(
-                ProfileScreen(self.screen, user)
-            )
+            ScreenManager.get_instance().set_active(ProfileScreen(self.screen, user))
             self.processing.is_visible = False
             return
         drink = get_by_ean(barcode)
         DrinksManager.get_instance().set_selected_drink(drink)
-        self.barcode_label.text = drink['name']
+        self.barcode_label.text = drink["name"]
         self.show_scanned_info(True)
         self.processing.is_visible = False
         self.timeout.start()
@@ -160,11 +152,7 @@ class WaitScanScreen(Screen):
         drink = DrinksManager.get_instance().get_selected_drink()
         if drink:
             session = get_session()
-            ev = ScanEvent(
-                drink['ean'],
-                0,
-                datetime.datetime.now()
-            )
+            ev = ScanEvent(drink["ean"], 0, datetime.datetime.now())
             session.add(ev)
             session.commit()
             DrinksManager.get_instance().set_selected_drink(None)
@@ -188,5 +176,6 @@ class WaitScanScreen(Screen):
     @staticmethod
     def back():
         from .screen_manager import ScreenManager
+
         screen_manager = ScreenManager.get_instance()
         screen_manager.set_default()

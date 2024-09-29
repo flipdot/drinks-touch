@@ -16,14 +16,16 @@ class NamesScreen(Screen):
 
         self.char = char
 
-        self.objects.append(Button(
-            self.screen,
-            text="BACK",
-            pos=(30, 30),
-            click_func=self.back,
-            font=monospace,
-            size=30
-        ))
+        self.objects.append(
+            Button(
+                self.screen,
+                text="BACK",
+                pos=(30, 30),
+                click_func=self.back,
+                font=monospace,
+                size=30,
+            )
+        )
 
         self.timeout = Progress(
             self.screen,
@@ -34,13 +36,15 @@ class NamesScreen(Screen):
         self.objects.append(self.timeout)
         self.timeout.start()
 
-        self.objects.append(Label(
-            self.screen,
-            text='Wer bist du?',
-            pos=(20, 110),
-        ))
+        self.objects.append(
+            Label(
+                self.screen,
+                text="Wer bist du?",
+                pos=(20, 110),
+            )
+        )
 
-        users = list(Users.get_all(filters=["uid="+self.char+"*"]))
+        users = list(Users.get_all(filters=["uid=" + self.char + "*"]))
 
         btns_y = 7
         num_cols = int(math.ceil(len(users) / float(btns_y)))
@@ -52,14 +56,16 @@ class NamesScreen(Screen):
             i_x = i // btns_y
             x = i_x * (screen.get_width() / num_cols)
             y = i_y * btn_ypos
-            self.objects.append(Button(
-                self.screen,
-                text=user["name"],
-                pos=(xoff + x, y + yoff),
-                click_func_param=self.switch_to_screen,
-                click_param=user,
-                padding=padding
-            ))
+            self.objects.append(
+                Button(
+                    self.screen,
+                    text=user["name"],
+                    pos=(xoff + x, y + yoff),
+                    click_func_param=self.switch_to_screen,
+                    click_param=user,
+                    padding=padding,
+                )
+            )
             i += 1
 
     @staticmethod
@@ -67,9 +73,7 @@ class NamesScreen(Screen):
         ScreenManager.get_instance().go_back()
 
     def switch_to_screen(self, param):
-        ScreenManager.get_instance().set_active(
-            ProfileScreen(self.screen, param)
-        )
+        ScreenManager.get_instance().set_active(ProfileScreen(self.screen, param))
 
     @staticmethod
     def home():
@@ -83,6 +87,4 @@ class NamesScreen(Screen):
             return
         user = Users.get_by_id_card(barcode)
         if user:
-            ScreenManager.get_instance().set_active(
-                ProfileScreen(self.screen, user)
-            )
+            ScreenManager.get_instance().set_active(ProfileScreen(self.screen, user))

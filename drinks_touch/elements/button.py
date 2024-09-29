@@ -2,26 +2,27 @@ from env import monospace
 from .base_elm import BaseElm
 
 import contextlib
+
 with contextlib.redirect_stdout(None):
     import pygame
 
 
 class Button(BaseElm):
     def __init__(self, screen, **kwargs):
-        self.font = kwargs.get('font', monospace)
-        self.size = kwargs.get('size', 30)
-        self.text = kwargs.get('text', '<Label>')
-        self.color = kwargs.get('color', (246, 198, 0))
-        self.clicked = kwargs.get('click_func', self.__clicked)
-        self.clicked_param = kwargs.get('click_func_param', self.__clicked)
-        self.click_param = kwargs.get('click_param', None)
-        self.padding = kwargs.get('padding', 10)
-        self.force_width = kwargs.get('force_width', None)
-        self.force_height = kwargs.get('force_height', None)
+        self.font = kwargs.get("font", monospace)
+        self.size = kwargs.get("size", 30)
+        self.text = kwargs.get("text", "<Label>")
+        self.color = kwargs.get("color", (246, 198, 0))
+        self.clicked = kwargs.get("click_func", self.__clicked)
+        self.clicked_param = kwargs.get("click_func_param", self.__clicked)
+        self.click_param = kwargs.get("click_param", None)
+        self.padding = kwargs.get("padding", 10)
+        self.force_width = kwargs.get("force_width", None)
+        self.force_height = kwargs.get("force_height", None)
         self.box = None
         self.clicking = False
 
-        pos = kwargs.get('pos', (0, 0))
+        pos = kwargs.get("pos", (0, 0))
         super(Button, self).__init__(screen, pos, self.size, -1)
 
         self.__load_font()
@@ -58,29 +59,23 @@ class Button(BaseElm):
             height = self.force_height
             left = self.pos[1] + elm.get_height() / 2 - height / 2
 
-        self.box = (
-            top, left,
-            width, height
-        )
+        self.box = (top, left, width, height)
 
-        pygame.draw.rect(
-            self.screen,
-            self.color,
-            self.box,
-            1
-        )
+        pygame.draw.rect(self.screen, self.color, self.box, 1)
 
     def events(self, events):
         for event in events:
-            if 'consumed' in event.dict and event.consumed:
+            if "consumed" in event.dict and event.consumed:
                 continue
 
             if event.type == pygame.MOUSEBUTTONUP:
                 pos = event.pos
 
-                if self.box is not None and \
-                        self.visible() and \
-                        pygame.Rect(self.box).collidepoint(pos[0], pos[1]):
+                if (
+                    self.box is not None
+                    and self.visible()
+                    and pygame.Rect(self.box).collidepoint(pos[0], pos[1])
+                ):
                     self.pre_click()
                     try:
                         if self.click_param:

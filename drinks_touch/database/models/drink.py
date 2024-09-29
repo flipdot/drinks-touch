@@ -6,7 +6,7 @@ from database.storage import Base
 
 
 class Drink(Base):
-    __tablename__ = 'drink'
+    __tablename__ = "drink"
     id = Column(Integer, primary_key=True)
     ean = Column(String(20), unique=False)
     name = Column(String(40), unique=False)

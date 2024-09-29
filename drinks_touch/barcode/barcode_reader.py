@@ -41,9 +41,10 @@ def run(worker):
             target = replacements[source]
 
             for index in indexes:
-                barcode = barcode[:index] + target + barcode[index + 1:]
+                barcode = f"{barcode[:index]}{target}{barcode[index + 1:]}"
 
         return barcode
+
     with serial.Serial(config.SCANNER_DEVICE_PATH, baudrate=115200) as s:
 
         while True:
@@ -53,8 +54,8 @@ def run(worker):
                 continue
             scanned_barcode = keyboard_input
             # nessesary for the old Honeywell scanner
-            #scanned_barcode = replace_key_code(keyboard_input, {
+            # scanned_barcode = replace_key_code(keyboard_input, {
             #    "?": "_",
             #    "_": "?"
-            #})
+            # })
             worker.on_barcode(scanned_barcode.upper())

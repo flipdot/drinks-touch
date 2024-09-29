@@ -1,24 +1,26 @@
 from .base_elm import BaseElm
 
 import contextlib
+
 with contextlib.redirect_stdout(None):
     import pygame
 
 pygame.font.init()
 
+
 class Label(BaseElm):
     _font_cache = {}
 
     def __init__(self, screen, **kwargs):
-        self.font_face = kwargs.get('font', 'sans serif')
-        self.size = kwargs.get('size', 50)
-        self.max_width = kwargs.get('max_width', None)
+        self.font_face = kwargs.get("font", "sans serif")
+        self.size = kwargs.get("size", 50)
+        self.max_width = kwargs.get("max_width", None)
         # if True, pos marks top-right instead of top-left corner
-        self.align_right = kwargs.get('align_right', False)
-        self.text = kwargs.get('text', '<Label>')
-        self.color = kwargs.get('color', (246, 198, 0))
+        self.align_right = kwargs.get("align_right", False)
+        self.text = kwargs.get("text", "<Label>")
+        self.color = kwargs.get("color", (246, 198, 0))
 
-        pos = kwargs.get('pos', (0, 0))
+        pos = kwargs.get("pos", (0, 0))
         super(Label, self).__init__(screen, pos, self.size, -1)
 
         self.font = Label.get_font(self.font_face, self.size)
@@ -46,7 +48,7 @@ class Label(BaseElm):
             cutx,
             0,
             self.max_width if self.max_width else elm.get_width(),
-            elm.get_height()
+            elm.get_height(),
         )
 
         self.screen.blit(elm, pos, area)

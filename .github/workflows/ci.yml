@@ -35,27 +35,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - name: checkout
-      # From https://github.com/actions/checkout/issues/438#issuecomment-1114110354
-      # Required to fetch enough depth for diffs with master in the pre-commit step.
-      # Alternative is to use the checkout action with fetch-depth: 0, but that would
-      # fetch the whole history, potentially slowing down the CI pipeline.
-      run: |
-        commits=${{ github.event.pull_request.commits }}
-        if [[ -n "$commits" ]]; then
-          # Prepare enough depth for diffs with master
-          git fetch --depth="$(( commits + 1 ))"
-        fi
     - uses: actions/setup-python@v3
       with:
           python-version: '3.11'
     - uses: pre-commit/action@v3.0.1
-      with:
-        extra_args: '--from-ref origin/master --to-ref ${{ github.sha }}'
   build:
     name: Build
     uses: dargmuesli/github-actions/.github/workflows/docker.yml@2.3.0
-    needs: release_semantic_dry
+    needs: [release_semantic_dry, pre-commit]
     with:
       TAG: ${{ needs.release_semantic_dry.outputs.new_release_version }}
   release_semantic:
