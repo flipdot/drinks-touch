@@ -42,7 +42,7 @@ jobs:
   build:
     name: Build
     uses: dargmuesli/github-actions/.github/workflows/docker.yml@2.3.0
-    needs: release_semantic_dry
+    needs: [release_semantic_dry, pre-commit]
     with:
       TAG: ${{ needs.release_semantic_dry.outputs.new_release_version }}
   release_semantic:
