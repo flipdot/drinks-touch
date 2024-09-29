@@ -22,7 +22,7 @@ from users.users import Users
 app = Flask(__name__)
 Compress(app)
 
-uid_pattern = re.compile("^\\d+$")
+uid_pattern = re.compile(r"^\d+$")
 
 
 class DateTimeEncoder(json.JSONEncoder):
