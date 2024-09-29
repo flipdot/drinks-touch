@@ -3,32 +3,30 @@ import math
 from .base_elm import BaseElm
 
 import contextlib
+
 with contextlib.redirect_stdout(None):
     import pygame
 
 
 class Progress(BaseElm):
     def __init__(self, screen, **kwargs):
-        self.size = kwargs.get('size', 50)
-        self.color = kwargs.get('color', (246, 198, 0))
+        self.size = kwargs.get("size", 50)
+        self.color = kwargs.get("color", (246, 198, 0))
         self.box = None
-        self.tick = kwargs.get('tick', self.__default_tick)
-        self.speed = kwargs.get('speed', 1 / 4.0)  # 4 secs
-        self.on_elapsed = kwargs.get('on_elapsed', None)
+        self.tick = kwargs.get("tick", self.__default_tick)
+        self.speed = kwargs.get("speed", 1 / 4.0)  # 4 secs
+        self.on_elapsed = kwargs.get("on_elapsed", None)
         self.value = 0
         self.is_running = False
 
-        pos = kwargs.get('pos', (0, 0))
+        pos = kwargs.get("pos", (0, 0))
         super(Progress, self).__init__(screen, pos, self.size, -1)
         top = self.pos[0] - self.size / 2
         left = self.pos[1] - self.size / 2
         width = self.size
         height = self.size
 
-        self.box = (
-            top, left,
-            width, height
-        )
+        self.box = (top, left, width, height)
         self.start()
 
     def start(self):
@@ -58,9 +56,5 @@ class Progress(BaseElm):
             start = 0.5 * math.pi + self.value * math.pi * extra_rounds * 2
             end = start + self.value * 2 * math.pi
             pygame.draw.arc(
-                self.screen,
-                self.color,
-                self.box,
-                start, end,
-                int(self.size / 5)
+                self.screen, self.color, self.box, start, end, int(self.size / 5)
             )

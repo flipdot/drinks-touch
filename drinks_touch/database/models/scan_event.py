@@ -6,7 +6,7 @@ from database.storage import Base
 
 
 class ScanEvent(Base):
-    __tablename__ = 'scanevent'
+    __tablename__ = "scanevent"
     id = Column(Integer, primary_key=True)
     barcode = Column(String(20), unique=False)
     user_id = Column(String(20), unique=False)
@@ -20,4 +20,4 @@ class ScanEvent(Base):
         self.uploaded_to_influx = False
 
     def __repr__(self):
-        return '<Barcode %r, User %r>' % (self.barcode, self.user_id)
+        return "<Barcode %r, User %r>" % (self.barcode, self.user_id)

@@ -19,8 +19,11 @@ helper_user = "SEPA"
 
 
 def get_existing(session):
-    rechargeevents = session.query(RechargeEvent) \
-        .filter(RechargeEvent.helper_user_id == str(helper_user)).all()
+    rechargeevents = (
+        session.query(RechargeEvent)
+        .filter(RechargeEvent.helper_user_id == str(helper_user))
+        .all()
+    )
     got_by_user = {}
     for ev in rechargeevents:
         if ev.user_id not in got_by_user:
@@ -38,7 +41,10 @@ def sync_recharges():
 
 def sync_recharges_real():
     try:
-        data = requests.get(config.MONEY_URL, auth=HTTPBasicAuth(config.MONEY_USER, config.MONEY_PASSWORD))
+        data = requests.get(
+            config.MONEY_URL,
+            auth=HTTPBasicAuth(config.MONEY_USER, config.MONEY_PASSWORD),
+        )
         recharges = data.json()
     except requests.exceptions.ConnectionError:
         logger.exception("Cannot connect to sync recharges:")
@@ -46,7 +52,6 @@ def sync_recharges_real():
     except JSONDecodeError:
         logger.exception("Cannot decode sync recharge json:")
         return
-
 
     session = get_session()
     got_by_user = get_existing(session)
@@ -58,8 +63,8 @@ def sync_recharges_real():
             got_by_user[uid] = []
         got = got_by_user[uid]
         for charge in charges:
-            charge_date = datetime.strptime(charge['date'], "%Y-%m-%d")
-            charge_amount = Decimal(charge['amount'])
+            charge_date = datetime.strptime(charge["date"], "%Y-%m-%d")
+            charge_amount = Decimal(charge["amount"])
             logger.debug("charge: %s, %s", charge, charge_date)
             found = False
             for exist in got:
@@ -77,8 +82,9 @@ def sync_recharges_real():
 
 
 def handle_transferred(charge, charge_amount, charge_date, got, session, uid):
-    logger.info("User %s transferred %s on %s: %s",
-                uid, charge_amount, charge_date, charge)
+    logger.info(
+        "User %s transferred %s on %s: %s", uid, charge_amount, charge_date, charge
+    )
     ev = RechargeEvent(uid, helper_user, charge_amount, charge_date)
     got.append(ev)
     session.add(ev)
@@ -88,9 +94,12 @@ def handle_transferred(charge, charge_amount, charge_date, got, session, uid):
         if not user:
             logger.error("could not find user %s to send email", uid)
         else:
-            subject = "Aufladung EUR %s für %s" % (charge_amount, user['name'])
+            subject = "Aufladung EUR %s für %s" % (charge_amount, user["name"])
             text = "Deine Aufladung über %s € am %s mit Text '%s' war erfolgreich." % (
-                charge_amount, charge_date, charge['info'])
+                charge_amount,
+                charge_date,
+                charge["info"],
+            )
             send_summary(session, user, subject=subject, force=True, prepend_text=text)
     except Exception:
         logger.exception("sending notification mail:")

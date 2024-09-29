@@ -4,7 +4,7 @@ from database.storage import Base
 
 
 class LdapUser(Base):
-    __tablename__ = 'ldapUsers'
+    __tablename__ = "ldapUsers"
     id = Column(Integer, primary_key=True)
     ldapId = Column(String(20), unique=False)
     name = Column(String(50), unique=False)

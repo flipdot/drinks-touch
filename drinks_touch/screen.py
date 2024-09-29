@@ -2,6 +2,7 @@ import logging
 import os
 
 import contextlib
+
 with contextlib.redirect_stdout(None):
     import pygame
 
@@ -40,24 +41,24 @@ def __get_screen_framebuffer():
 
     # Check which frame buffer drivers are available
     # Start with fbcon since directfb hangs with composite output
-    drivers = ['wayland', 'fbcon', 'directfb', 'svgalib']
+    drivers = ["wayland", "fbcon", "directfb", "svgalib"]
     found = False
     for driver in drivers:
         # Make sure that SDL_VIDEODRIVER is set
-        if 'SDL_VIDEODRIVER' not in os.environ:
-            os.environ['SDL_VIDEODRIVER'] = driver
+        if "SDL_VIDEODRIVER" not in os.environ:
+            os.environ["SDL_VIDEODRIVER"] = driver
         try:
             pygame.display.init()
         except pygame.error:
-            del os.environ['SDL_VIDEODRIVER']
-            logger.warning('Driver: {0} failed.'.format(driver))
+            del os.environ["SDL_VIDEODRIVER"]
+            logger.warning("Driver: {0} failed.".format(driver))
             continue
         found = True
         break
 
     if not found:
-        raise Exception('No suitable video driver found!')
-    logger.info("Using SDL_VIDEODRIVER %s", os.environ['SDL_VIDEODRIVER'])
+        raise Exception("No suitable video driver found!")
+    logger.info("Using SDL_VIDEODRIVER %s", os.environ["SDL_VIDEODRIVER"])
 
     size = (pygame.display.Info().current_w, pygame.display.Info().current_h)
     logger.info("Framebuffer size: %d x %d" % (size[0], size[1]))

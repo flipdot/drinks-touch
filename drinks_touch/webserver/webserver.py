@@ -22,7 +22,7 @@ from users.users import Users
 app = Flask(__name__)
 Compress(app)
 
-uid_pattern = re.compile("^\d+$")
+uid_pattern = re.compile("^\\d+$")
 
 
 class DateTimeEncoder(json.JSONEncoder):
@@ -33,34 +33,34 @@ class DateTimeEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, o)
 
 
-@app.route('/favicon.png')
+@app.route("/favicon.png")
 def favicon():
-    return send_file('../img/favicon.png', mimetype='image/png')
+    return send_file("../img/favicon.png", mimetype="image/png")
 
 
-@app.route('/')
-@app.route('/recharge')
+@app.route("/")
+@app.route("/recharge")
 def index():
-    users = sorted(Users.get_all(), key=lambda u: u['name'].lower())
+    users = sorted(Users.get_all(), key=lambda u: u["name"].lower())
     users.insert(0, {})
     print(users)
-    return render_template('index.html', users=users)
+    return render_template("index.html", users=users)
 
 
-@app.route('/stats')
+@app.route("/stats")
 def stats():
-    return render_template('stats.html')
+    return render_template("stats.html")
 
 
-@app.route('/recharge/doit', methods=['POST'])
+@app.route("/recharge/doit", methods=["POST"])
 def recharge_doit():
-    user_id = request.form['user_user']
-    helper_id = request.form['helper_user']
-    amount = request.form['amount']
+    user_id = request.form["user_user"]
+    helper_id = request.form["helper_user"]
+    amount = request.form["amount"]
     if not user_id or not helper_id or not amount:
-        return 'Please enter valid data!'
+        return "Please enter valid data!"
 
-    if amount == u"0":
+    if amount == "0":
         return "Invalid amount"
 
     if not uid_pattern.match(user_id):
@@ -68,8 +68,8 @@ def recharge_doit():
     if not uid_pattern.match(helper_id):
         return "Invalid helper id"
 
-    users = Users.get_all(filters=['uidNumber=' + user_id])
-    helpers = Users.get_all(filters=['uidNumber=' + helper_id])
+    users = Users.get_all(filters=["uidNumber=" + user_id])
+    helpers = Users.get_all(filters=["uidNumber=" + helper_id])
 
     if not users:
         return "user %s not found" % escape(user_id)
@@ -79,29 +79,25 @@ def recharge_doit():
     helper = helpers[0]
 
     session = get_session()
-    ev = RechargeEvent(
-        user['id'],
-        helper['id'],
-        amount
-    )
+    ev = RechargeEvent(user["id"], helper["id"], amount)
 
     session.add(ev)
     session.commit()
 
-    return render_template('recharge_success.html', amount=amount, user=user)
+    return render_template("recharge_success.html", amount=amount, user=user)
 
 
-@app.route('/scans.json')
+@app.route("/scans.json")
 def scans_json():
-    limit = int(request.args.get('limit', 1000))
+    limit = int(request.args.get("limit", 1000))
     return to_json(scans(limit))
 
 
-@app.route('/tx.png')
+@app.route("/tx.png")
 def tx_png():
-    uid = request.args.get('uid')
-    name = request.args.get('name')
-    amount = request.args.get('amount')
+    uid = request.args.get("uid")
+    name = request.args.get("name")
+    amount = request.args.get("amount")
 
     if not uid or not name or not amount:
         return "Please add parameters 'uid', 'name', and 'amount'!"
@@ -113,7 +109,7 @@ def tx_png():
 
     img_data = make_sepa_qr(amount, name, uid)
     response = make_response(img_data.getvalue())
-    response.headers['Content-Type'] = 'image/png'
+    response.headers["Content-Type"] = "image/png"
 
     return response
 
@@ -125,8 +121,4 @@ def to_json(dict_arr):
 def run():
     port = config.WEBSERVER_PORT
 
-    app.run(
-        host='0.0.0.0',
-        debug=not is_pi(),
-        port=port
-    )
+    app.run(host="0.0.0.0", debug=not is_pi(), port=port)

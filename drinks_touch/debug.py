@@ -9,11 +9,10 @@ def debug(sig, frame):
     for threadId, stack in sys._current_frames().items():
         code += "\n# ThreadID: %s" % threadId
         for filename, lineno, name, line in traceback.extract_stack(stack):
-            code += '\nFile: "%s", line %d, in %s' % (filename,
-                                                      lineno, name)
+            code += '\nFile: "%s", line %d, in %s' % (filename, lineno, name)
             if line:
                 code += "  %s" % (line.strip())
-    print >> sys.stderr, code
+    print(code, file=sys.stderr)
 
 
 def listen():

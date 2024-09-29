@@ -6,16 +6,16 @@ import config
 from env import is_pi
 
 engine = create_engine(config.POSTGRES_CONNECTION_STRING)
-db_session = scoped_session(sessionmaker(autocommit=False,
-                                         autoflush=False,
-                                         bind=engine))
+db_session = scoped_session(
+    sessionmaker(autocommit=False, autoflush=False, bind=engine)
+)
 Base = declarative_base()
 Base.query = db_session.query_property()
 
 if not is_pi():
     import logging
 
-    logger = logging.getLogger('sqlalchemy.engine')
+    logger = logging.getLogger("sqlalchemy.engine")
     logger.setLevel(getattr(logging, config.LOGLEVEL))
 
 
