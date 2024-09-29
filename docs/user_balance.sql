@@ -16,4 +16,3 @@ FROM
   ) x2
   WHERE x1.user_id = x2.user_id
 ORDER BY total
-

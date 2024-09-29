@@ -22,6 +22,3 @@ objectClass: person
 objectClass: posixAccount
 objectClass: flipdotter
 objectClass: top
-
-
-
