@@ -4186,22 +4186,18 @@ files = [
 cp2110 = ["hidapi"]
 
 [[package]]
-name = "pyStrich"
-version = "0.8"
+name = "pystrich"
+version = "0.9"
 description = "PyStrich is a Python module to generate 1D and 2D barcodes (Code 39, Code 128, DataMatrix, QRCode and EAN13). Forked from huBarcode."
 optional = false
-python-versions = "*"
-files = []
-develop = false
+python-versions = "<4.0,>=3.8"
+files = [
+    {file = "pystrich-0.9-py3-none-any.whl", hash = "sha256:a82d0dcdc1b02c1a6126f45b00fa25ec4e94e6c19f45d34d028aa244d48c8375"},
+    {file = "pystrich-0.9.tar.gz", hash = "sha256:b1f30ecbc35f14dd19b938b25154a22175bc011c49033b963654a70794155095"},
+]
 
 [package.dependencies]
-Pillow = "*"
-
-[package.source]
-type = "git"
-url = "https://github.com/mmulqueen/pyStrich.git"
-reference = "34b797f2a4e8838bd75dda18a2d08d2830802a66"
-resolved_reference = "34b797f2a4e8838bd75dda18a2d08d2830802a66"
+pillow = ">=10.3"
 
 [[package]]
 name = "python-dateutil"
@@ -4673,4 +4669,4 @@ cffi = ["cffi (>=1.11)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "b86819213b7c597d57013ade8938210a3d01972c8d69659a57933951e0ce8342"
+content-hash = "15b0afdc43d4b4c541b3c43e54c60a972bbc8e5d7c5af3dcae39fd33d76f3bd7"
