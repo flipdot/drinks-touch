@@ -149,7 +149,7 @@ class NewIDScreen(Screen):
         img = Image.new("L", (width, height), "white")
         # code_img = code_img.transpose(Image.ROTATE_90)
         code_img = code_img.resize(
-            (int(width * 1.13), int(height * 0.5)), Image.ANTIALIAS
+            (int(width * 1.13), int(height * 0.5)), Image.LANZOS
         )
         # code_img = code_img.resize((int(width * 0.5), int(height * 1.0)), Image.ANTIALIAS)
         # img.paste(code_img, (int(0.4*width), int(0.0*height)))
