@@ -13,6 +13,8 @@ Digital replacement for the drinks tally list featuring a touchscreen, user mana
 
 ## Development
 
+Start dependencies like Postgre and keycloak with:
+
 ```
 docker compose -f docker-compose.dev.yml up
 ```
@@ -24,6 +26,16 @@ The project is using poetry. Install the dependencies with:
 ```sh
 poetry install
 ```
+
+To start the application, run:
+
+```sh
+FULLSCREEN=0 poetry run python drinks_touch/game.py
+```
+
+There are more environment variables available. Checkout the `drinks_touch/config.py` file for more information.
+
+---
 
 Python `pre-commit` helps to detect and fix common issues before committing. Install the git hooks with:
 

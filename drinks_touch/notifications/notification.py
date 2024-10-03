@@ -108,17 +108,20 @@ def send_drink(user, drink, with_summary=False):
 
 
 def send_low_balances(with_summary=True):
-    session = get_session()
+    db_session = get_session()
 
     if config.FORCE_MAIL_TO_UID:
         send_low_balance(
-            session, Users.get_by_id(config.FORCE_MAIL_TO_UID), with_summary, force=True
+            db_session,
+            Users.get_by_id(config.FORCE_MAIL_TO_UID),
+            with_summary,
+            force=True,
         )
         return
 
     for user in Users.get_all():
         try:
-            send_low_balance(session, user, with_summary)
+            send_low_balance(db_session, user, with_summary)
         except Exception:
             logger.exception("while sending lowbalances:")
             continue

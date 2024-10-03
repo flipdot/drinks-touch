@@ -52,9 +52,4 @@ LOGLEVEL = os.environ.get("LOGLEVEL", "DEBUG")
 # Evaluates to MAIL_FROM by default.
 FORCE_MAIL_TO_UID = os.environ.get("FORCE_MAIL_TO_UID", None)
 
-# Do not fetch users from ldap.
-# Use debug users instead.
-USE_DEBUG_USERS = True
-
-# ldap: do not save changes to users.
-NO_USER_CHANGES = True
+FULLSCREEN = os.environ.get("FULLSCREEN", "True") in ["True", "true", "1"]
