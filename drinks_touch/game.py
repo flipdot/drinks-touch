@@ -10,7 +10,6 @@ import sys
 import threading
 import time
 
-
 import config
 import env
 from barcode.barcode_reader import run as run_barcode_reader
@@ -81,6 +80,12 @@ def stats_loop():
         i %= 60 * 12
 
 
+def sync_db_loop():
+    while True:
+        Account.sync_all_from_ldap()
+        time.sleep(60)
+
+
 # Rendering #
 def main(argv):
     locale.setlocale(locale.LC_ALL, "de_DE.UTF-8")
@@ -105,8 +110,6 @@ def main(argv):
 
     init_db()
 
-    Account.sync_all_from_ldap()
-
     # Barcode Scanner #
     barcode_worker = BarcodeWorker()
     barcode_thread = threading.Thread(target=run_barcode_reader, args=(barcode_worker,))
@@ -123,6 +126,10 @@ def main(argv):
     stats_thread = threading.Thread(target=stats_loop)
     stats_thread.daemon = True
     stats_thread.start()
+
+    db_sync_thread = threading.Thread(target=sync_db_loop)
+    db_sync_thread.daemon = True
+    db_sync_thread.start()
 
     if env.is_pi():
         os.system("rsync -a sounds/ pi@pixelfun:sounds/ &")
