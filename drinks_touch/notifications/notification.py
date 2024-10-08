@@ -127,7 +127,7 @@ def send_low_balances(with_summary=True):
             continue
 
 
-def send_low_balance(session, user, with_summary=False, force=False):
+def send_low_balance(session, user: dict, with_summary=False, force=False):
     if "email" not in user:
         return
 

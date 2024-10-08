@@ -15,6 +15,7 @@ import config
 import env
 from barcode.barcode_reader import run as run_barcode_reader
 from barcode.barcode_worker import Worker as BarcodeWorker
+from database.models.account import Account
 from database.storage import init_db
 from drinks.drinks_manager import DrinksManager
 from notifications.notification import send_low_balances, send_summaries
@@ -103,6 +104,8 @@ def main(argv):
     ScreenManager.set_instance(screen_manager)
 
     init_db()
+
+    Account.sync_all_from_ldap()
 
     # Barcode Scanner #
     barcode_worker = BarcodeWorker()

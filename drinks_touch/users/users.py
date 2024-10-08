@@ -74,7 +74,7 @@ class Users(object):
     }
 
     @staticmethod
-    def get_all(filters=None, include_temp=False):
+    def get_all(filters=None, include_temp=False) -> list[dict]:
         if filters is None:
             filters = []
 
