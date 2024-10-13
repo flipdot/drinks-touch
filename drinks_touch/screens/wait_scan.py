@@ -1,6 +1,7 @@
 import datetime
 import logging
 
+import config
 from database.models.scan_event import ScanEvent
 from database.storage import get_session
 from drinks.drinks import get_by_ean
@@ -101,6 +102,15 @@ class WaitScanScreen(Screen):
                 text="Gesamtguthaben aller Member: {}".format(total_balance_fmt),
                 size=25,
                 pos=(125, 755),
+            )
+        )
+
+        self.objects.append(
+            Label(
+                self.screen,
+                text=f"Build: {config.BUILD_NUMBER}",
+                size=20,
+                pos=(0, 785),
             )
         )
 
