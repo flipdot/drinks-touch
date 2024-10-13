@@ -1,6 +1,8 @@
+import functools
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 
+import babel.dates
 import jinja2
 import logging
 import smtplib
@@ -12,23 +14,15 @@ from premailer import transform
 from sqlalchemy import text
 
 import config
+from database.models.account import Account
 from database.models.recharge_event import RechargeEvent
-from database.storage import get_session
+from database.storage import get_session, Session
 from users.users import Users
 
 logger = logging.getLogger(__name__)
 
 SUBJECT_PREFIX = "[fd-noti]"
-MINIMUM_BALANCE = -5
-REMIND_MAIL_EVERY_X_HOURS = 24 * 7
 
-# THese entries describe when to send a summary
-FREQUENCIES = {
-    "daily": 60 * 60 * 24,
-    "instant and daily": 60 * 60 * 24,
-    "weekly": 60 * 60 * 24 * 7,
-    "instant and weekly": 60 * 60 * 24 * 7,
-}
 FOOTER = """
 Besuchen Sie uns bald wieder!
 
@@ -108,85 +102,98 @@ def send_drink(user, drink, with_summary=False):
 
 
 def send_low_balances(with_summary=True):
-    session = get_session()
-
     if config.FORCE_MAIL_TO_UID:
+        account = (
+            Session()
+            .query(Account)
+            .filter(Account.ldap_id == config.FORCE_MAIL_TO_UID)
+            .first()
+        )
         send_low_balance(
-            session, Users.get_by_id(config.FORCE_MAIL_TO_UID), with_summary, force=True
+            account,
+            with_summary,
+            force=True,
         )
         return
 
-    for user in Users.get_all():
+    accounts = Session().query(Account).filter(Account.email.isnot(None)).all()
+    for account in accounts:
         try:
-            send_low_balance(session, user, with_summary)
+            send_low_balance(account, with_summary)
         except Exception:
             logger.exception("while sending lowbalances:")
             continue
 
 
-def send_low_balance(session, user, with_summary=False, force=False):
-    if "email" not in user:
-        return
+def send_low_balance(account: Account, with_summary=False, force=False):
+    assert account.email, "Account has no email"
 
-    balance = Users.get_balance(user["id"])
-
-    if not force and balance >= MINIMUM_BALANCE:
+    if not force and account.balance >= config.MINIMUM_BALANCE:
         # reset time
-        user["lastEmailed"] = time.time()
-        Users.set_value(user, "lastEmailed", user["lastEmailed"])
+        # TODO: It's a bit misleading when looking in the DB,
+        #  because it will contain a timestamp at which the user didn't
+        #  actually got an email.
+        #  Maybe we can instead store the time at which the balance went negative
+        account.last_balance_warning_email_sent_at = datetime.now()
         return
 
-    last_emailed = user.get("lastEmailed", 0)
-    diff = time.time() - last_emailed
-    diff_hours = diff / 60 / 60
-    diff_days = diff_hours / 24
-
-    if not force and diff_hours <= REMIND_MAIL_EVERY_X_HOURS:
+    delta = datetime.now() - account.last_balance_warning_email_sent_at
+    if delta < config.REMIND_MAIL_DELTA_FOR_MINIMUM_BALANCE:
         return
 
     logger.info(
-        "%s's low balance last emailed %.2f days (%.2f hours) ago. Mailing now.",
-        user["name"],
-        diff_days,
-        diff_hours,
+        "%s's low balance last emailed %s ago. Mailing now.",
+        account.name,
+        babel.dates.format_timedelta(delta, locale="en_US"),
     )
     content_text = (
-        "Du hast seit mehr als {diff_days} Tagen "
+        "Du hast seit mehr als {diff_days} "
         "ein Guthaben von unter {minimum_balance}€!\n"
         "Aktueller Kontostand: {balance:.2f}€.\n"
         "Zum Aufladen im Space-Netz https://drinks.flipdot.space/ besuchen."
     ).format(
-        diff_days=int(REMIND_MAIL_EVERY_X_HOURS / 24),
-        minimum_balance=MINIMUM_BALANCE,
-        balance=balance,
+        diff_days=babel.dates.format_timedelta(delta, locale="de_DE"),
+        minimum_balance=config.MINIMUM_BALANCE,
+        balance=account.balance,
     )
     content_html = render_jinja_html(
         "low_balance.html",
-        diff_days=REMIND_MAIL_EVERY_X_HOURS / 24,
-        minimum_balance=MINIMUM_BALANCE,
-        balance=balance,
-        uid=user["id"],
+        # TODO: the template tells the user that he "has a negative balance
+        #  since {delta}", but as a delta we pass the time since the last email
+        #  was sent. This is not the same as the time since the balance went
+        #  negative. This should be fixed.
+        delta=delta,
+        minimum_balance=config.MINIMUM_BALANCE,
+        balance=account.balance,
+        uid=account.ldap_id,
     )
 
     if not with_summary:
-        content_text += FOOTER.format(uid=user["id"])
-        content_html = render_jinja_html("main.html", prepend_html=content_html)
+        content_text += FOOTER.format(uid=account.ldap_id)
+        content_html = render_jinja_html(
+            "main.html",
+            prepend_html=content_html,
+            uid=account.ldap_id,
+        )
 
         send_notification(
-            user["email"], "Negatives Guthaben", content_text, content_html, user["id"]
+            account.email,
+            "Negatives Guthaben",
+            content_text,
+            content_html,
+            account.ldap_id,
         )
         return
 
     send_summary(
-        session,
-        user,
+        account,
         subject="Negatives Guthaben",
         prepend_text=content_text,
         prepend_html=content_html,
         force=True,
     )
-    user["lastEmailed"] = time.time()
-    Users.set_value(user, "lastEmailed", user["lastEmailed"])
+
+    account.last_balance_warning_email_sent_at = datetime.now()
 
 
 def send_summaries():
@@ -201,46 +208,35 @@ def send_summaries():
         )
         return
 
-    for user in Users.get_all():
+    for account in session.query(Account).filter(Account.email.isnot(None)).all():
         try:
-            send_summary(session, user, "Getränkeübersicht")
+            send_summary(account, "Getränkeübersicht")
         except Exception:
-            logger.exception("While sending summary for %s", user)
+            logger.exception("Error while sending summary for %s", account.name)
             continue
 
 
 def send_summary(
-    session, user, subject, prepend_text=None, prepend_html=None, force=False
+    account: Account, subject, prepend_text=None, prepend_html=None, force=False
 ):
-    if "email" not in user:
+    assert account.email, "Account has no email"
+
+    frequency_str = account.summary_email_notification_setting
+
+    if last_noti := account.last_summary_email_sent_at:
+        delta = datetime.now() - last_noti
+    else:
+        delta = timedelta.max
+
+    if not force and delta < config.MAIL_SUMMARY_DELTA.get(
+        frequency_str, timedelta.max
+    ):
         return
 
-    frequency_str = user["drinksNotification"]
-    balance = Users.get_balance(user["id"])
-
-    last_emailed = user["lastDrinkNotification"]
-    if type(last_emailed) not in [int, float]:
-        last_emailed = 0
-
-    last_emailed_str = datetime.fromtimestamp(last_emailed).strftime(
-        "%d.%m.%Y %H:%M:%S"
-    )
-    diff = time.time() - last_emailed
-    diff_hours = diff / 60 / 60
-    diff_days = diff_hours / 24
-
-    if force:
-        logger.info("Forcing mail.")
-    else:
-        freq_secs = FREQUENCIES.get(frequency_str, 0)
-        if diff <= freq_secs:
-            return
-
     logger.info(
-        "%s's summary last emailed %.2f days (%.2f hours) ago. Mailing now.",
-        user["name"],
-        diff_days,
-        diff_hours,
+        "%s's summary last emailed %s ago. Mailing now.",
+        account.name,
+        babel.dates.format_timedelta(delta, locale="en_US"),
     )
 
     content_text = ""
@@ -251,12 +247,12 @@ def send_summary(
     content_text += (
         "Hier ist deine Getränkeübersicht seit {since}.\n"
         "Dein aktuelles Guthaben beträgt EUR {balance:.2f}.\n".format(
-            since=last_emailed_str, balance=balance
+            since=account.last_summary_email_sent_at, balance=account.balance
         )
     )
 
-    drinks_consumed = get_drinks_consumed(session, user, last_emailed)
-    recharges = get_recharges(session, user, last_emailed)
+    drinks_consumed = get_drinks_consumed(account)
+    recharges = get_recharges(account)
 
     if drinks_consumed:
         content_text += format_drinks(drinks_consumed)
@@ -264,36 +260,35 @@ def send_summary(
     if recharges:
         content_text += format_recharges(recharges)
 
-    content_text += FOOTER.format(uid=user["id"])
+    content_text += FOOTER.format(uid=account.ldap_id)
     content_html = render_jinja_html(
         "main.html",
         with_report=True,
-        balance=balance,
-        since_text=last_emailed_str,
+        balance=account.balance,
+        last_drink_notification_sent_at=account.last_summary_email_sent_at,
         drinks=drinks_consumed,
         recharges=recharges,
         prepend_html=prepend_html,
-        limit_days=REMIND_MAIL_EVERY_X_HOURS / 24,
-        minimum_balance=MINIMUM_BALANCE,
-        uid=user["id"],
+        minimum_balance=config.MINIMUM_BALANCE,
+        uid=account.ldap_id,
     )
 
-    email = user["email"]
-
-    if not email:
-        logger.warning("User %s has no email. skipping.", user)
-        return
-
     if len(drinks_consumed) == 0 and len(recharges) == 0 and not force:
-        logger.debug("got no rows. skipping.")
+        logger.info("Nothing to mail to %s", account.email)
         return
 
     logger.info(
         "Got %d drinks and %d recharges. Mailing.", len(drinks_consumed), len(recharges)
     )
-    send_notification(email, subject, content_text, content_html, user["id"])
-    user["lastDrinkNotification"] = time.time()
-    Users.set_value(user, "lastDrinkNotification", user["lastDrinkNotification"])
+    send_notification(
+        account.email,
+        subject,
+        content_text,
+        content_html,
+        account.ldap_id,
+    )
+
+    account.last_summary_email_sent_at = datetime.now()
 
 
 def format_drinks(drinks_consumed):
@@ -338,7 +333,9 @@ def format_recharges(recharges):
     return recharges_fmt
 
 
-def get_drinks_consumed(session, user, since_timestamp):
+def get_drinks_consumed(account: Account):
+    # TODO: table "drink" is not being created locally, crashes here
+    since_timestamp = account.last_summary_email_sent_at.timestamp()
     sql = text(
         """SELECT
     se.barcode,
@@ -353,26 +350,37 @@ ORDER BY se.timestamp"""
         % since_timestamp
     )
     drinks_consumed = (
-        session.connection().execute(sql, {"userid": str(user["id"])}).mappings().all()
+        Session()
+        .connection()
+        .execute(sql, {"userid": account.ldap_id})
+        .mappings()
+        .all()
     )
     return drinks_consumed
 
 
-def get_recharges(session, user, since_timestamp):
-    return (
-        session.query(RechargeEvent)
-        .filter(RechargeEvent.user_id == str(user["id"]))
-        .filter(RechargeEvent.timestamp >= datetime.utcfromtimestamp(since_timestamp))
-        .order_by(RechargeEvent.timestamp)
-        .all()
+def get_recharges(account: Account):
+    query = (
+        Session().query(RechargeEvent).filter(RechargeEvent.user_id == account.ldap_id)
     )
+    if account.last_summary_email_sent_at:
+        query = query.filter(
+            RechargeEvent.timestamp >= account.last_summary_email_sent_at
+        )
+    return query.order_by(RechargeEvent.timestamp).all()
 
 
 def render_jinja_html(
     file_name, template_loc="drinks_touch/notifications/templates", **context
 ):
-    return (
-        jinja2.Environment(loader=jinja2.FileSystemLoader(template_loc))
-        .get_template(file_name)
-        .render(context)
+    environment = jinja2.Environment(loader=jinja2.FileSystemLoader(template_loc))
+    environment.filters["format_datetime"] = functools.partial(
+        datetime.strftime, format="%d.%m.%Y %H:%M:%S"
     )
+    environment.filters["format_date"] = functools.partial(
+        datetime.strftime, format="%d.%m.%Y"
+    )
+    environment.filters["format_timedelta"] = functools.partial(
+        babel.dates.format_timedelta, locale="de_DE"
+    )
+    return environment.get_template(file_name).render(context)

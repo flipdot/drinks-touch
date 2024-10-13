@@ -2,7 +2,7 @@
     Getränkebericht
 </h1>
 <p>
-    Hier ist deine Getränkeübersicht seit dem {{ since_text }}.
+    Hier ist deine Getränkeübersicht{% if last_drink_notification_sent_at %} seit dem {{ last_drink_notification_sent_at | format_datetime }}{% endif %}.
     <br>
     Dein aktuelles Guthaben beträgt
     {% if balance > 0 %}

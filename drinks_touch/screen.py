@@ -3,6 +3,8 @@ import os
 
 import contextlib
 
+import config
+
 with contextlib.redirect_stdout(None):
     import pygame
 
@@ -23,8 +25,12 @@ def __get_screen_xserver():
     size = 480, 800
     # https://www.pygame.org/docs/ref/display.html?highlight=set_mode#pygame.display.set_mode
     pygame.init()
-    # Untested!
-    flags = pygame.SCALED | pygame.FULLSCREEN | pygame.NOFRAME
+
+    if config.FULLSCREEN:
+        flags = pygame.FULLSCREEN | pygame.NOFRAME
+    else:
+        flags = 0
+    pygame.display.set_caption("Drinks Touch")
     screen = pygame.display.set_mode(size, flags)
     logger.info("Got regular xserver screen")
     # raise "X11 init failed"

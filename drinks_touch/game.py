@@ -10,12 +10,12 @@ import sys
 import threading
 import time
 
-
 import config
 import env
 from barcode.barcode_reader import run as run_barcode_reader
 from barcode.barcode_worker import Worker as BarcodeWorker
-from database.storage import init_db
+from database.models.account import Account
+from database.storage import init_db, Session
 from drinks.drinks_manager import DrinksManager
 from notifications.notification import send_low_balances, send_summaries
 from screen import get_screen
@@ -70,14 +70,26 @@ def stats_loop():
     i = 0
     while True:
         # stats_send()
-        send_low_balances()
-        if env.is_pi():
-            sync_recharges()
-        if i % 60 * 12 == 0:
-            send_summaries()
+        with Session.begin():
+            send_low_balances()
+            if env.is_pi():
+                sync_recharges()
+            if i % 60 * 12 == 0:
+                send_summaries()
         time.sleep(60)
         i += 1
         i %= 60 * 12
+
+
+def sync_db_loop():
+    while True:
+        try:
+            with Session.begin():
+                Account.sync_all_from_ldap()
+        except Exception:
+            # Catch all exceptions to prevent the thread from dying
+            logging.exception("error on sync_db_loop")
+        time.sleep(60)
 
 
 # Rendering #
@@ -120,6 +132,10 @@ def main(argv):
     stats_thread = threading.Thread(target=stats_loop)
     stats_thread.daemon = True
     stats_thread.start()
+
+    db_sync_thread = threading.Thread(target=sync_db_loop)
+    db_sync_thread.daemon = True
+    db_sync_thread.start()
 
     if env.is_pi():
         os.system("rsync -a sounds/ pi@pixelfun:sounds/ &")
