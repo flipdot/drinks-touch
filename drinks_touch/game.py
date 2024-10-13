@@ -12,6 +12,7 @@ import time
 
 import config
 import env
+import version_updater
 from barcode.barcode_reader import run as run_barcode_reader
 from barcode.barcode_worker import Worker as BarcodeWorker
 from database.models.account import Account
@@ -92,9 +93,24 @@ def sync_db_loop():
         time.sleep(60)
 
 
+def check_for_updates_loop():
+    while True:
+        try:
+            version_updater.check_for_updates()
+        except Exception:
+            # Catch all exceptions to prevent the thread from dying
+            logging.exception("error on check_for_updates_loop")
+        time.sleep(60)
+
+
 # Rendering #
 def main(argv):
     locale.setlocale(locale.LC_ALL, "de_DE.UTF-8")
+
+    try:
+        version_updater.check_for_updates()
+    except Exception:
+        logging.exception("error while checking for updates on startup")
 
     if "--webserver" in argv:
         run_webserver()
@@ -125,6 +141,14 @@ def main(argv):
     # webserver needs to be a main thread #
     web_thread = subprocess.Popen([sys.argv[0], "--webserver"])
 
+    db_sync_thread = threading.Thread(target=sync_db_loop)
+    db_sync_thread.daemon = True
+    db_sync_thread.start()
+
+    check_for_updates_thread = threading.Thread(target=check_for_updates_loop)
+    check_for_updates_thread.daemon = True
+    check_for_updates_thread.start()
+
     event_thread = threading.Thread(target=handle_events)
     event_thread.daemon = True
     event_thread.start()
@@ -132,10 +156,6 @@ def main(argv):
     stats_thread = threading.Thread(target=stats_loop)
     stats_thread.daemon = True
     stats_thread.start()
-
-    db_sync_thread = threading.Thread(target=sync_db_loop)
-    db_sync_thread.daemon = True
-    db_sync_thread.start()
 
     if env.is_pi():
         os.system("rsync -a sounds/ pi@pixelfun:sounds/ &")
