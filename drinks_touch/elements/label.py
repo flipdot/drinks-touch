@@ -19,7 +19,13 @@ class Label(BaseElm):
         self.align_right = kwargs.get("align_right", False)
         self.text = kwargs.get("text", "<Label>")
         self.color = kwargs.get("color", (246, 198, 0))
+        self.bg_color = kwargs.get("bg_color", None)
+        self.border_color = kwargs.get("border_color", None)
+        self.border_width = kwargs.get("border_width", 0)
+        self.padding = kwargs.get("padding", 0)
+        self.blink_frequency = kwargs.get("blink_frequency", 0)
 
+        self.frame_counter = 0
         pos = kwargs.get("pos", (0, 0))
         super(Label, self).__init__(screen, pos, self.size, -1)
 
@@ -33,6 +39,35 @@ class Label(BaseElm):
         return cls._font_cache[(font_face, size)]
 
     def render(self):
+        self.frame_counter += 1
+        if self.blink_frequency:
+            if (self.frame_counter // self.blink_frequency) % 2:
+                return
+
+        text, pos, area = self._build_text()
+        self._render_background(area)
+        self.screen.blit(text, pos, area)
+
+    def _render_background(self, area: pygame.Rect):
+        if not self.bg_color:
+            return
+        if self.align_right:
+            pos = (self.pos[0] - area.width, self.pos[1])
+        else:
+            pos = self.pos
+        box = (
+            pos[0] - self.padding,
+            pos[1] - self.padding,
+            area.width + 2 * self.padding,
+            area.height + 2 * self.padding,
+        )
+        pygame.draw.rect(
+            self.screen,
+            self.bg_color,
+            box,
+        )
+
+    def _build_text(self):
         elm = self.font.render(self.text, 1, self.color)
         cutx = 0
         pos = self.pos
@@ -51,4 +86,4 @@ class Label(BaseElm):
             elm.get_height(),
         )
 
-        self.screen.blit(elm, pos, area)
+        return elm, pos, area

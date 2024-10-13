@@ -2,6 +2,7 @@ import datetime
 import logging
 
 import config
+import version_updater
 from database.models.scan_event import ScanEvent
 from database.storage import get_session
 from drinks.drinks import get_by_ean
@@ -113,6 +114,24 @@ class WaitScanScreen(Screen):
                 pos=(0, 785),
             )
         )
+        if (
+            version_updater.newest_version_sha_short
+            and version_updater.newest_version_sha_short not in config.BUILD_NUMBER
+        ):
+            # make build number flash, show "Update available" when flashing
+            self.objects.append(
+                Label(
+                    self.screen,
+                    text=f"Update available: {version_updater.newest_version_sha_short}",
+                    size=25,
+                    pos=(475, 780),
+                    align_right=True,
+                    color=(0, 0, 0),
+                    bg_color=(255, 255, 255),
+                    padding=5,
+                    blink_frequency=60,
+                )
+            )
 
         self.timeout = Progress(
             self.screen,

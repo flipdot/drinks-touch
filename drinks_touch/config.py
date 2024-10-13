@@ -16,7 +16,6 @@ else:
         os.popen("git describe --tags --dirty").read().strip() or "git is not available"
     )
 
-
 OIDC_DISCOVERY_URL = os.environ.get(
     "OIDC_DISCOVERY_URL",
     "http://localhost:8080/realms/flipdot/.well-known/openid-configuration",
