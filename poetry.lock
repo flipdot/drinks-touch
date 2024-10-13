@@ -458,13 +458,13 @@ dotenv = ["python-dotenv"]
 
 [[package]]
 name = "flask-compress"
-version = "1.15"
+version = "1.16"
 description = "Compress responses in your Flask app with gzip, deflate, brotli or zstandard."
 optional = false
-python-versions = "*"
+python-versions = ">=3.9"
 files = [
-    {file = "Flask_Compress-1.15-py3-none-any.whl", hash = "sha256:5d6efe3584c89516c3ab9d94adabe08c218517b957a9bd5cd0c3955dd3834c51"},
-    {file = "flask_compress-1.15.tar.gz", hash = "sha256:b7b66cd5d08fc46bbcc71561e13ca64321590b0ca4c172f8001bf5374f8f5c58"},
+    {file = "Flask_Compress-1.16-py3-none-any.whl", hash = "sha256:40fa77a557543c6220afd0b8f6b832c20d0e0dcfa14b83e839433a15fed1c769"},
+    {file = "flask_compress-1.16.tar.gz", hash = "sha256:376c7c2137bc9a537a1016c1032b0b80a5daf1b2cdc8a175806c59d5a5dafa48"},
 ]
 
 [package.dependencies]
