@@ -100,7 +100,7 @@ def check_for_updates_loop():
         except Exception:
             # Catch all exceptions to prevent the thread from dying
             logging.exception("error on check_for_updates_loop")
-        time.sleep(60)
+        time.sleep(60 * 30)  # check every 30 minutes
 
 
 # Rendering #
