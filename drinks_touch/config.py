@@ -9,6 +9,13 @@ LDAP_HOST = os.environ.get("LDAP_HOST", "ldap://127.0.0.1")
 LDAP_USER = os.environ.get("LDAP_USER", "cn=admin,dc=flipdot,dc=org")
 LDAP_PW = os.environ.get("LDAP_PW", "admin")
 
+if bn := os.environ.get("BUILD_NUMBER"):
+    BUILD_NUMBER = bn
+else:
+    BUILD_NUMBER = (
+        os.popen("git describe --tags --dirty").read().strip() or "git is not available"
+    )
+
 
 OIDC_DISCOVERY_URL = os.environ.get(
     "OIDC_DISCOVERY_URL",
