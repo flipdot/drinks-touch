@@ -2,8 +2,9 @@ import math
 from datetime import datetime
 
 from sqlalchemy import Column, Integer, String, UUID, DateTime
+from sqlalchemy.sql import text
 
-from database.storage import Base, get_session
+from database.storage import Base, get_session, Session
 from users.users import Users
 
 
@@ -16,12 +17,21 @@ class Account(Base):
 
     name = Column(String(50), unique=False)
     id_card = Column(String(50), unique=True)
-    last_email_sent_at = Column(DateTime(), unique=False)
-    last_drink_notification_sent_at = Column(DateTime(), unique=False)
+    # > In addition to restrictions on syntax, there is a length limit on
+    # > email addresses.  That limit is a maximum of 64 characters (octets)
+    # > in the "local part" (before the "@") and a maximum of 255 characters
+    # > (octets) in the domain part (after the "@") for a total length of 320
+    # > characters.  Systems that handle email should be prepared to process
+    # > addresses which are that long, even though they are rarely
+    # > encountered.
+    # https://datatracker.ietf.org/doc/html/rfc3696.html#section-3
+    email = Column(String(320), unique=True)
+    last_balance_warning_email_sent_at = Column(DateTime(), unique=False)
+    last_summary_email_sent_at = Column(DateTime(), unique=False)
 
     @classmethod
     def sync_all_from_ldap(cls):
-        session = get_session()
+        # session = get_session()
 
         ldap_users = Users.get_all(include_temp=True)
 
@@ -36,7 +46,10 @@ class Account(Base):
 
             # find existing account based on ldap_path (the anonymous accounts don't have an ldap_id)
             account = (
-                session.query(Account).filter(Account.ldap_path == user["path"]).first()
+                Session()
+                .query(Account)
+                .filter(Account.ldap_path == user["path"])
+                .first()
             )
             if not account:
                 account = Account(
@@ -46,11 +59,51 @@ class Account(Base):
 
             account.name = user["name"]
             account.id_card = user["id_card"]
-            if ts := user["lastEmailed"]:
-                account.last_email_sent_at = datetime.fromtimestamp(ts)
-            if ts := user["lastDrinkNotification"]:
-                account.last_drink_notification_sent_at = datetime.fromtimestamp(ts)
+            account.email = user["email"]
 
-            session.add(account)
+            # Only update the last email sent at if it is not set yet
+            # This way we can start writing the new value to the DB without needing
+            # to worry about it getting overridden on sync.
+            if not account.last_balance_warning_email_sent_at and (
+                ts := user["lastEmailed"]
+            ):
+                account.last_balance_warning_email_sent_at = datetime.fromtimestamp(ts)
+            if not account.last_summary_email_sent_at and (
+                ts := user["lastDrinkNotification"]
+            ):
+                account.last_summary_email_sent_at = datetime.fromtimestamp(ts)
 
-        session.commit()
+            Session().add(account)
+
+    @property
+    def balance(self):
+        session = get_session()
+        sql = text(
+            """
+                SELECT user_id, count(*) AS amount
+                FROM scanevent
+                WHERE user_id = :user_id
+                GROUP BY user_id
+            """
+        )
+        row = session.connection().execute(sql, {"user_id": self.ldap_id}).fetchone()
+        if not row:
+            cost = 0
+        else:
+            cost = row.amount
+
+        sql = text(
+            """
+                SELECT user_id, sum(amount) AS amount
+                FROM rechargeevent
+                WHERE user_id = :user_id
+                GROUP BY user_id
+            """
+        )
+        row = session.connection().execute(sql, {"user_id": self.ldap_id}).fetchone()
+        if not row:
+            credit = 0
+        else:
+            credit = row.amount
+
+        return credit - cost

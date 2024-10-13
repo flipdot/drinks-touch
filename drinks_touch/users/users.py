@@ -6,7 +6,6 @@ from ldap3 import Server, Connection, SAFE_SYNC, SUBTREE
 import logging
 import random
 import traceback
-from sqlalchemy.sql import text
 
 import config
 from database.models.recharge_event import RechargeEvent
@@ -116,39 +115,20 @@ class Users(object):
         return users
 
     @staticmethod
-    def get_balance(user_id, session=get_session()):
-        sql = text(
-            """
-                SELECT user_id, count(*) AS amount
-                FROM scanevent
-                WHERE user_id = :user_id
-                GROUP BY user_id
-            """
-        )
-        row = session.connection().execute(sql, {"user_id": str(user_id)}).fetchone()
-        if not row:
-            cost = 0
-        else:
-            cost = row.amount
+    def get_balance(user_id, session=None) -> int | None:
+        if session is None:
+            session = get_session()
+        from database.models.account import Account
 
-        sql = text(
-            """
-                SELECT user_id, sum(amount) AS amount
-                FROM rechargeevent
-                WHERE user_id = :user_id
-                GROUP BY user_id
-            """
-        )
-        row = session.connection().execute(sql, {"user_id": str(user_id)}).fetchone()
-        if not row:
-            credit = 0
-        else:
-            credit = row.amount
-
-        return credit - cost
+        account = session.query(Account).filter(Account.ldap_id == str(user_id)).first()
+        if not account:
+            return None
+        return account.balance
 
     @staticmethod
-    def get_recharges(user_id, session=get_session(), limit=None):
+    def get_recharges(user_id, session=None, limit=None):
+        if session is None:
+            session = get_session()
         # type: # (str, session) -> RechargeEvent
         q = (
             session.query(RechargeEvent)
@@ -168,7 +148,9 @@ class Users(object):
         return None
 
     @staticmethod
-    def delete_if_nomoney(user, session=get_session()):
+    def delete_if_nomoney(user, session=None):
+        if session is None:
+            session = get_session()
         if not user["path"].endswith(",ou=temp_members,dc=flipdot,dc=org"):
             return
         balance = Users.get_balance(user["id"], session=session)

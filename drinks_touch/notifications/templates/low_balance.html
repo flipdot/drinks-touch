@@ -2,7 +2,7 @@
     Guthabenwarnung
 </h1>
 <p>
-    Du hast seit mehr als {{ diff_days }} Tagen ein Guthaben unter {{ minimum_balance }}&thinsp;€!
+    Du hast seit mehr als {{ delta | format_timedelta }} ein Guthaben unter {{ minimum_balance }}&thinsp;€!
     <br>
     Dein aktuelles Guthaben beträgt {{ balance }}&thinsp;€.
 </p>

@@ -1,4 +1,5 @@
 import os
+from datetime import timedelta
 
 MONEY_URL = os.environ.get("MONEY_URL", "https://somewhere/x.json")
 MONEY_USER = os.environ.get("MONEY_USER", "my_user")
@@ -38,13 +39,22 @@ MAIL_USE_STARTTLS = os.environ.get("MAIL_USE_STARTTLS", "False") in [
     "1",
 ]
 
+MINIMUM_BALANCE = -5
+REMIND_MAIL_DELTA_FOR_MINIMUM_BALANCE = timedelta(weeks=1)
+MAIL_SUMMARY_DELTA = {
+    "daily": timedelta(days=1),
+    "instant and daily": timedelta(days=1),
+    "weekly": timedelta(weeks=1),
+    "instant and weekly": timedelta(weeks=1),
+}
+
 SCANNER_DEVICE_PATH = os.environ.get("SCANNER_DEVICE_PATH", "/dev/ttyACM0")
 
 WEBSERVER_PORT = os.environ.get("WEBSERVER_PORT", 5002)
 
 FPS = 30
 
-LOGLEVEL = os.environ.get("LOGLEVEL", "DEBUG")
+LOGLEVEL = os.environ.get("LOGLEVEL", "WARNING")
 
 # DEVELOPMENT VARIABLES #
 

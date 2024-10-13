@@ -6,11 +6,9 @@ import config
 from env import is_pi
 
 engine = create_engine(config.POSTGRES_CONNECTION_STRING)
-db_session = scoped_session(
-    sessionmaker(autocommit=False, autoflush=False, bind=engine)
-)
+Session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
 Base = declarative_base()
-Base.query = db_session.query_property()
+Base.query = Session.query_property()
 
 if not is_pi():
     import logging
@@ -27,5 +25,5 @@ def init_db():
 
 
 def get_session():
-    db_session.remove()
-    return db_session
+    # Session.remove()
+    return Session

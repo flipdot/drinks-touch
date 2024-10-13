@@ -15,7 +15,7 @@ import env
 from barcode.barcode_reader import run as run_barcode_reader
 from barcode.barcode_worker import Worker as BarcodeWorker
 from database.models.account import Account
-from database.storage import init_db
+from database.storage import init_db, Session
 from drinks.drinks_manager import DrinksManager
 from notifications.notification import send_low_balances, send_summaries
 from screen import get_screen
@@ -70,11 +70,12 @@ def stats_loop():
     i = 0
     while True:
         # stats_send()
-        send_low_balances()
-        if env.is_pi():
-            sync_recharges()
-        if i % 60 * 12 == 0:
-            send_summaries()
+        with Session.begin():
+            send_low_balances()
+            if env.is_pi():
+                sync_recharges()
+            if i % 60 * 12 == 0:
+                send_summaries()
         time.sleep(60)
         i += 1
         i %= 60 * 12
@@ -82,7 +83,8 @@ def stats_loop():
 
 def sync_db_loop():
     while True:
-        Account.sync_all_from_ldap()
+        with Session.begin():
+            Account.sync_all_from_ldap()
         time.sleep(60)
 
 
