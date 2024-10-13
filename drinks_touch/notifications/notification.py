@@ -335,12 +335,7 @@ def format_recharges(recharges):
 
 
 def get_drinks_consumed(account: Account):
-    return []
     # TODO: table "drink" is not being created locally, crashes here
-    # Also TODO: since_timestamp was I think an int or something, now please use
-    #            account.last_summary_email_sent_at
-
-    # JUST A PLACEHOLDER, untested, and below is anyway an sql injection!
     since_timestamp = account.last_summary_email_sent_at.timestamp()
     sql = text(
         """SELECT
