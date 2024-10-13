@@ -83,8 +83,12 @@ def stats_loop():
 
 def sync_db_loop():
     while True:
-        with Session.begin():
-            Account.sync_all_from_ldap()
+        try:
+            with Session.begin():
+                Account.sync_all_from_ldap()
+        except Exception:
+            # Catch all exceptions to prevent the thread from dying
+            logging.exception("error on sync_db_loop")
         time.sleep(60)
 
 

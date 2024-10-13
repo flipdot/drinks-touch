@@ -27,9 +27,9 @@ def __get_screen_xserver():
     pygame.init()
 
     if config.FULLSCREEN:
-        flags = pygame.SCALED | pygame.FULLSCREEN | pygame.NOFRAME
+        flags = pygame.FULLSCREEN | pygame.NOFRAME
     else:
-        flags = pygame.SCALED
+        flags = 0
     pygame.display.set_caption("Drinks Touch")
     screen = pygame.display.set_mode(size, flags)
     logger.info("Got regular xserver screen")

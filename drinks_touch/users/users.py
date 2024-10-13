@@ -9,7 +9,7 @@ import traceback
 
 import config
 from database.models.recharge_event import RechargeEvent
-from database.storage import get_session
+from database.storage import get_session, Session
 
 logger = logging.getLogger(__name__)
 
@@ -116,22 +116,21 @@ class Users(object):
 
     @staticmethod
     def get_balance(user_id, session=None) -> int | None:
-        if session is None:
-            session = get_session()
         from database.models.account import Account
 
-        account = session.query(Account).filter(Account.ldap_id == str(user_id)).first()
+        account = (
+            Session().query(Account).filter(Account.ldap_id == str(user_id)).first()
+        )
         if not account:
             return None
         return account.balance
 
     @staticmethod
     def get_recharges(user_id, session=None, limit=None):
-        if session is None:
-            session = get_session()
         # type: # (str, session) -> RechargeEvent
         q = (
-            session.query(RechargeEvent)
+            Session()
+            .query(RechargeEvent)
             .filter(RechargeEvent.user_id == str(user_id))
             .order_by(RechargeEvent.timestamp.desc())
         )

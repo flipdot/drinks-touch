@@ -2,6 +2,7 @@ import math
 from datetime import datetime
 
 from sqlalchemy import Column, Integer, String, UUID, DateTime
+from sqlalchemy.exc import NoResultFound
 from sqlalchemy.sql import text
 
 from database.storage import Base, get_session, Session
@@ -29,10 +30,8 @@ class Account(Base):
     last_balance_warning_email_sent_at = Column(DateTime(), unique=False)
     last_summary_email_sent_at = Column(DateTime(), unique=False)
 
-    @classmethod
-    def sync_all_from_ldap(cls):
-        # session = get_session()
-
+    @staticmethod
+    def sync_all_from_ldap():
         ldap_users = Users.get_all(include_temp=True)
 
         # sort by id, but put None last
@@ -45,13 +44,14 @@ class Account(Base):
                 continue
 
             # find existing account based on ldap_path (the anonymous accounts don't have an ldap_id)
-            account = (
-                Session()
-                .query(Account)
-                .filter(Account.ldap_path == user["path"])
-                .first()
-            )
-            if not account:
+            try:
+                account = (
+                    Session()
+                    .query(Account)
+                    .filter(Account.ldap_path == user["path"])
+                    .one()
+                )
+            except NoResultFound:
                 account = Account(
                     ldap_id=user["id"],
                     ldap_path=user["path"],

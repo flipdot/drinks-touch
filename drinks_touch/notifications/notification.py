@@ -23,9 +23,6 @@ logger = logging.getLogger(__name__)
 
 SUBJECT_PREFIX = "[fd-noti]"
 
-# TODO: Refactor everything to get rid of REMIND_MAIL_EVERY_X_HOURS
-REMIND_MAIL_EVERY_X_HOURS = 24 * 7
-
 FOOTER = """
 Besuchen Sie uns bald wieder!
 
@@ -106,8 +103,12 @@ def send_drink(user, drink, with_summary=False):
 
 def send_low_balances(with_summary=True):
     if config.FORCE_MAIL_TO_UID:
-        user = Users.get_by_id(config.FORCE_MAIL_TO_UID)
-        account = Session().query(Account).filter(Account.ldap_id == user["id"]).first()
+        account = (
+            Session()
+            .query(Account)
+            .filter(Account.ldap_id == config.FORCE_MAIL_TO_UID)
+            .first()
+        )
         send_low_balance(
             account,
             with_summary,
@@ -115,9 +116,7 @@ def send_low_balances(with_summary=True):
         )
         return
 
-    accounts = (
-        Session().query(Account).filter(Account.email != None).all()  # noqa: E711
-    )
+    accounts = Session().query(Account).filter(Account.email.isnot(None)).all()
     for account in accounts:
         try:
             send_low_balance(account, with_summary)
@@ -143,10 +142,9 @@ def send_low_balance(account: Account, with_summary=False, force=False):
         return
 
     logger.info(
-        "%s's low balance last emailed %.2f days (%.2f seconds) ago. Mailing now.",
+        "%s's low balance last emailed %s ago. Mailing now.",
         account.name,
-        delta.days,
-        delta.total_seconds(),
+        babel.dates.format_timedelta(delta, locale="en_US"),
     )
     content_text = (
         "Du hast seit mehr als {diff_days} "
@@ -210,9 +208,7 @@ def send_summaries():
         )
         return
 
-    for account in (
-        session.query(Account).filter(Account.email != None).all()  # noqa: E711
-    ):
+    for account in session.query(Account).filter(Account.email.isnot(None)).all():
         try:
             send_summary(account, "Getränkeübersicht")
         except Exception:
