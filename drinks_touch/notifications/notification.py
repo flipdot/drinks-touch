@@ -221,8 +221,7 @@ def send_summary(
 ):
     assert account.email, "Account has no email"
 
-    ldap_user = Users.get_by_id(account.ldap_id)
-    frequency_str = ldap_user["drinksNotification"]
+    frequency_str = account.summary_email_notification_setting
 
     if last_noti := account.last_summary_email_sent_at:
         delta = datetime.now() - last_noti

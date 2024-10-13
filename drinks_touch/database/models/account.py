@@ -29,6 +29,7 @@ class Account(Base):
     email = Column(String(320), unique=True)
     last_balance_warning_email_sent_at = Column(DateTime(), unique=False)
     last_summary_email_sent_at = Column(DateTime(), unique=False)
+    summary_email_notification_setting = Column(String(50), unique=False)
 
     @staticmethod
     def sync_all_from_ldap():
@@ -60,6 +61,7 @@ class Account(Base):
             account.name = user["name"]
             account.id_card = user["id_card"]
             account.email = user["email"]
+            account.summary_email_notification_setting = user["drinksNotification"]
 
             # Only update the last email sent at if it is not set yet
             # This way we can start writing the new value to the DB without needing
