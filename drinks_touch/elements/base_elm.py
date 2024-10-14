@@ -11,3 +11,6 @@ class BaseElm(object):
 
     def visible(self):
         return self.is_visible
+
+    def render(self, *args, **kwargs):
+        pass
