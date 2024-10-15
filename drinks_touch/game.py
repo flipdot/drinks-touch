@@ -12,8 +12,6 @@ import time
 
 import config
 import env
-from barcode.barcode_reader import run as run_barcode_reader
-from barcode.barcode_worker import Worker as BarcodeWorker
 from database.models.account import Account
 from database.storage import init_db, Session
 from drinks.drinks_manager import DrinksManager
@@ -92,14 +90,6 @@ def sync_db_loop():
             logging.exception("error on sync_db_loop")
         time.sleep(60)
 
-def barcode_reader_loop(worker):
-    while True:
-        try:
-            run_barcode_reader(worker)
-        except Exception:
-            # Catch all exceptions to prevent the thread from dying
-            logging.exception("error on barcode_reader_loop")
-            time.sleep(10)
 
 # Rendering #
 def main(argv):
@@ -125,14 +115,6 @@ def main(argv):
     ScreenManager.set_instance(screen_manager)
 
     init_db()
-
-    # Barcode Scanner #
-    barcode_worker = BarcodeWorker()
-    barcode_thread = threading.Thread(
-        target=barcode_reader_loop, args=(barcode_worker,)
-    )
-    barcode_thread.daemon = True
-    barcode_thread.start()
 
     # webserver needs to be a main thread #
     web_thread = subprocess.Popen([sys.argv[0], "--webserver"])

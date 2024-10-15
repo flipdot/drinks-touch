@@ -1,3 +1,3 @@
 from .check_for_updates import CheckForUpdatesTask
 from .sync_from_ldap import SyncFromLDAPTask
-from .initialize_scanner import InitializeScannerTask
+from .barcode_scanner import InitializeBarcodeScannerTask

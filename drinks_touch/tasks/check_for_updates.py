@@ -13,7 +13,7 @@ class CheckForUpdatesTask(BaseTask):
 
         # download latest commit sha from github
         request_url = "https://api.github.com/repos/flipdot/drinks-touch/commits/master?per_page=1"
-        self.output += f"Requesting {request_url}\n"
+        self.output += f"GET {request_url}\n"
         response = requests.get(
             request_url,
             timeout=5,
