@@ -1,3 +1,4 @@
+import select
 import threading
 
 from tasks.base import BaseTask
@@ -15,50 +16,76 @@ logger = logging.getLogger(__name__)
 
 class InitializeBarcodeScannerTask(BaseTask):
     label = "Initialisiere Barcode-Scanner"
-
-    def __init__(self):
-        super().__init__()
-        self.barcode_thread = threading.Thread(target=run_barcode_thread)
-        self.barcode_thread.daemon = True
+    thread = None
 
     def run(self):
-        self.barcode_thread.start()
+        if (
+            InitializeBarcodeScannerTask.thread
+            and InitializeBarcodeScannerTask.thread.is_alive()
+        ):
+            self.output += "Barcode-Scanner läuft bereits. Starte neu...\n"
+            BarcodeWorker.kill()
+            InitializeBarcodeScannerTask.thread.join()
+
+        InitializeBarcodeScannerTask.thread = threading.Thread(target=BarcodeWorker.run)
+        InitializeBarcodeScannerTask.thread.daemon = True
+        InitializeBarcodeScannerTask.thread.start()
 
 
-def on_barcode(barcode):
-    from screens.screen_manager import ScreenManager
+class BarcodeWorker:
+    killed = False
 
-    screen = ScreenManager.get_instance().get_active()
+    @staticmethod
+    def run():
+        BarcodeWorker.killed = False
+        if is_pi():
+            BarcodeWorker._read_from_serial()
+        else:
+            BarcodeWorker._read_from_stdin()
 
-    if hasattr(screen, "on_barcode"):
-        screen.on_barcode(barcode)
+    @staticmethod
+    def kill():
+        BarcodeWorker.killed = True
 
+    @staticmethod
+    def on_barcode(barcode):
+        from screens.screen_manager import ScreenManager
 
-def run_barcode_thread():
-    if is_pi():
-        read_from_serial(callback=on_barcode)
-    else:
-        read_from_stdin(callback=on_barcode)
+        screen = ScreenManager.get_instance().get_active()
 
+        if hasattr(screen, "on_barcode"):
+            screen.on_barcode(barcode)
 
-def read_from_stdin(callback):
-    """
-    Read from stdin to simulate barcode scanner input
-    """
-    logger.info("Enter EAN here to simulate scanned barcode!")
+    @staticmethod
+    def _read_from_stdin():
+        """
+        Read from stdin to simulate barcode scanner input
+        """
+        logger.info("Enter EAN here to simulate scanned barcode!")
 
-    while True:
-        try:
-            callback(sys.stdin.readline().strip().upper())
-        except Exception:
-            logger.exception("Caught exception in barcode handler...")
+        while not BarcodeWorker.killed:
+            try:
+                if select.select(
+                    [
+                        sys.stdin,
+                    ],
+                    [],
+                    [],
+                    2.0,
+                )[0]:
+                    line = sys.stdin.readline().strip().upper()
+                    BarcodeWorker.on_barcode(line)
+                else:
+                    logger.debug("No input available")
+            except Exception:
+                logger.exception("Caught exception in barcode handler...")
 
-
-def read_from_serial(callback):
-    with serial.Serial(config.SCANNER_DEVICE_PATH, baudrate=115200) as s:
-        while True:
-            keyboard_input = s.read_until(b"\r").decode("utf-8")[:-1]
-            if keyboard_input is None:
-                continue
-            scanned_barcode = keyboard_input
-            callback(scanned_barcode.upper())
+    @staticmethod
+    def _read_from_serial():
+        with serial.Serial(config.SCANNER_DEVICE_PATH, baudrate=115200) as s:
+            while not BarcodeWorker.killed:
+                keyboard_input = s.read_until(b"\r").decode("utf-8")[:-1]
+                if keyboard_input is None:
+                    continue
+                scanned_barcode = keyboard_input
+                BarcodeWorker.on_barcode(scanned_barcode.upper())
