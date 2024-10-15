@@ -32,9 +32,13 @@ class ProgressBar(BaseElm):
 
     def success(self):
         self.color = (0, 255, 0)
+        if self.percent is None:
+            self.percent = 1
 
     def fail(self):
         self.color = (255, 0, 0)
+        if self.percent is None:
+            self.percent = 1
 
     def render(self, dt, *args, **kwargs):
         self.tick += dt
