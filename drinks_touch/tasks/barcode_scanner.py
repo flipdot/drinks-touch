@@ -71,7 +71,7 @@ class BarcodeWorker:
                     ],
                     [],
                     [],
-                    2.0,
+                    5.0,
                 )[0]:
                     line = sys.stdin.readline().strip().upper()
                     BarcodeWorker.on_barcode(line)
