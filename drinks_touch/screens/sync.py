@@ -1,49 +1,71 @@
-from elements import Label, Progress
-from elements.progress_bar import ProgressBar
+from elements import Label, Progress, Button
+from inspect import getmembers, isclass
+import tasks
+from elements.base_elm import BaseElm
+from tasks.base import BaseTask
 from .screen import Screen
 
-LOREM = """
-Lorem ipsum dolor sit amet, consectetur adipiscing elit
-sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris
-nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
-reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-"""
+
+def discover_tasks():
+    return [
+        Task for _, Task in getmembers(tasks, isclass) if issubclass(Task, BaseTask)
+    ]
 
 
 class SyncScreen(Screen):
 
     def __init__(self, screen):
         super(SyncScreen, self).__init__(screen)
-        self.progess_bar = ProgressBar(
-            self.screen,
-            pos=(10, 350),
-            label="Syncing",
-            text=LOREM,
-        )
+        self.finished = False
 
-        self.objects = [
+        self.tasks = [Task() for Task in discover_tasks()]
+
+        self.objects: list[BaseElm] = [
             Label(
                 self.screen,
-                text="Sync",
-                pos=(50, 50),
+                text="Initialisierung...",
+                pos=(10, 25),
             ),
-            Progress(
+            Button(
                 self.screen,
-                pos=(50, 150),
-                speed=1 / 5,
-                on_elapsed=self.time_elapsed,
+                text="Abbrechen",
+                pos=(20, 750),
+                click_func=self.cancel_tasks,
             ),
-            self.progess_bar,
         ]
 
+        for i, task in enumerate(self.tasks):
+            self.objects.append(
+                task.make_progress_bar(
+                    self.screen,
+                    pos=(10, 100 + i * 135),
+                    box_height=60,
+                )
+            )
+            task.start()
+
+    def render(self, *args, **kwargs):
+        super(SyncScreen, self).render(*args, **kwargs)
+        self.check_task_completion()
+
+    def check_task_completion(self):
+        if not self.finished and all(task.finished for task in self.tasks):
+            self.objects.append(
+                Progress(
+                    self.screen,
+                    pos=(440, 760),
+                    speed=1 / 5,
+                    on_elapsed=self.time_elapsed,
+                )
+            )
+            self.finished = True
+
+    def cancel_tasks(self):
+        for task in self.tasks:
+            task.kill()
+
     def time_elapsed(self):
-        # from screens.screen_manager import ScreenManager
+        from screens.screen_manager import ScreenManager
 
-        # self.progess_bar.success()
-        self.progess_bar.fail()
-
-        # self.progess_bar.percent = 0.9
-
-        # screen_manager = ScreenManager.get_instance()
-        # screen_manager.set_default()
+        screen_manager = ScreenManager.get_instance()
+        screen_manager.set_default()

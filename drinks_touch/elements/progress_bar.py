@@ -12,19 +12,19 @@ class ProgressBar(BaseElm):
         screen,
         pos,
         bar_height=30,
-        text_height=150,
+        box_height=150,
         width=460,
         label=None,
         text=None,
     ):
-        super(ProgressBar, self).__init__(screen, pos, bar_height + text_height, width)
+        super(ProgressBar, self).__init__(screen, pos, bar_height + box_height, width)
         self.bar_height = bar_height
-        self.text_height = text_height
+        self.text_height = box_height
         self.label = label
         self.text = text
         self.padding = 5
         self.max_line_length = math.floor(width / 9.2)
-        self.max_lines = math.floor(text_height / 15)
+        self.max_lines = math.floor(box_height / 15)
 
         self.color = (246, 198, 0)
         self.percent = None
@@ -32,11 +32,9 @@ class ProgressBar(BaseElm):
 
     def success(self):
         self.color = (0, 255, 0)
-        self.percent = 1
 
     def fail(self):
         self.color = (255, 0, 0)
-        self.percent = 1
 
     def render(self, dt, *args, **kwargs):
         self.tick += dt
