@@ -13,6 +13,7 @@ def discover_tasks():
 
 
 class SyncScreen(Screen):
+    BOX_HEIGHT = 90
 
     def __init__(self, screen):
         super(SyncScreen, self).__init__(screen)
@@ -38,8 +39,8 @@ class SyncScreen(Screen):
             self.objects.append(
                 task.make_progress_bar(
                     self.screen,
-                    pos=(10, 100 + i * 135),
-                    box_height=60,
+                    pos=(10, 100 + i * (SyncScreen.BOX_HEIGHT + 80)),
+                    box_height=SyncScreen.BOX_HEIGHT,
                 )
             )
             task.start()
@@ -48,8 +49,12 @@ class SyncScreen(Screen):
         super(SyncScreen, self).render(*args, **kwargs)
         self.check_task_completion()
 
+    @property
+    def all_tasks_finished(self):
+        return all(task.finished for task in self.tasks)
+
     def check_task_completion(self):
-        if not self.finished and all(task.finished for task in self.tasks):
+        if not self.finished and self.all_tasks_finished:
             self.objects.append(
                 Progress(
                     self.screen,
@@ -61,6 +66,8 @@ class SyncScreen(Screen):
             self.finished = True
 
     def cancel_tasks(self):
+        if self.all_tasks_finished:
+            self.time_elapsed()
         for task in self.tasks:
             task.kill()
 

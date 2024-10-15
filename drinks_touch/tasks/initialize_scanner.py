@@ -10,6 +10,6 @@ class InitializeScannerTask(BaseTask):
         for i in range(100):
             if self.sig_killed:
                 break
-            self.output += f"Doing stuff {i}\n"
+            self.output += f"Simulate Doing Stuff {i}\n"
             sleep(0.03)
         self._fail()
