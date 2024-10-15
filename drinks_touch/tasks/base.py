@@ -3,6 +3,7 @@ import time
 from random import random
 
 from elements.progress_bar import ProgressBar
+from notifications.notification import logger
 
 
 class BaseTask:
@@ -15,7 +16,7 @@ class BaseTask:
         self.status = None
         self.sig_killed = False
 
-        self.thread = threading.Thread(target=self.run)
+        self.thread = threading.Thread(target=self._run)
         self.thread.daemon = True
 
     @property
@@ -52,6 +53,16 @@ class BaseTask:
     def start(self):
         self.thread.start()
 
+    def _run(self):
+        try:
+            self.run()
+        except Exception as e:
+            logger.exception(f"Error in task {self.label}")
+            self.output += f"Error: {e}\n"
+            self._fail()
+        else:
+            self._success()
+
     def run(self):
         for i in range(100):
             if self.sig_killed:
@@ -59,7 +70,7 @@ class BaseTask:
             self.progress = i / 100
             self.output += f"Not implemented {i}%\n"
             time.sleep(0.1 * random())
-        self._fail()
+        raise NotImplementedError(f"Override tasks.{self.__class__.__name__}.run()")
 
     def _success(self):
         if self.progress_bar is not None:

@@ -2,7 +2,6 @@ import datetime
 import logging
 
 import config
-import version_updater
 from database.models.scan_event import ScanEvent
 from database.storage import get_session
 from drinks.drinks import get_by_ean
@@ -14,6 +13,7 @@ from elements.progress import Progress
 from icons import RefreshIcon
 from screens.new_id_screen import NewIDScreen
 from screens.profile import ProfileScreen
+from tasks import CheckForUpdatesTask
 from users.users import Users
 from .main import MainScreen
 from .screen import Screen
@@ -135,14 +135,14 @@ class WaitScanScreen(Screen):
             )
         )
         if (
-            version_updater.newest_version_sha_short
-            and version_updater.newest_version_sha_short not in config.BUILD_NUMBER
+            CheckForUpdatesTask.newest_version_sha_short
+            and CheckForUpdatesTask.newest_version_sha_short not in config.BUILD_NUMBER
         ):
             # make build number flash, show "Update available" when flashing
             self.objects.append(
                 Label(
                     self.screen,
-                    text=f"Update available: {version_updater.newest_version_sha_short}",
+                    text=f"Update available: {CheckForUpdatesTask.newest_version_sha_short}",
                     size=25,
                     pos=(475, 780),
                     align_right=True,

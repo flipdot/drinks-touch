@@ -12,4 +12,4 @@ class InitializeScannerTask(BaseTask):
                 break
             self.output += f"Simulate Doing Stuff {i}\n"
             sleep(0.03)
-        self._fail()
+        raise ValueError("Scanner nicht gefunden")
