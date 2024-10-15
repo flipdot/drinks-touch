@@ -12,7 +12,6 @@ import time
 
 import config
 import env
-from database.models.account import Account
 from database.storage import init_db, Session
 from drinks.drinks_manager import DrinksManager
 from notifications.notification import send_low_balances, send_summaries
@@ -80,17 +79,6 @@ def stats_loop():
         i %= 60 * 12
 
 
-def sync_db_loop():
-    while True:
-        try:
-            with Session.begin():
-                Account.sync_all_from_ldap()
-        except Exception:
-            # Catch all exceptions to prevent the thread from dying
-            logging.exception("error on sync_db_loop")
-        time.sleep(60)
-
-
 # Rendering #
 def main(argv):
     locale.setlocale(locale.LC_ALL, "de_DE.UTF-8")
@@ -119,17 +107,14 @@ def main(argv):
     # webserver needs to be a main thread #
     web_thread = subprocess.Popen([sys.argv[0], "--webserver"])
 
-    db_sync_thread = threading.Thread(target=sync_db_loop)
-    db_sync_thread.daemon = True
-    db_sync_thread.start()
-
     event_thread = threading.Thread(target=handle_events)
     event_thread.daemon = True
     event_thread.start()
 
     stats_thread = threading.Thread(target=stats_loop)
     stats_thread.daemon = True
-    stats_thread.start()
+    # TODO: This is causing transaction errors
+    # stats_thread.start()
 
     if env.is_pi():
         os.system("rsync -a sounds/ pi@pixelfun:sounds/ &")

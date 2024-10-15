@@ -1,6 +1,7 @@
 import select
 import threading
 
+from screens.screen_manager import ScreenManager
 from tasks.base import BaseTask
 
 import sys
@@ -49,8 +50,6 @@ class BarcodeWorker:
 
     @staticmethod
     def on_barcode(barcode):
-        from screens.screen_manager import ScreenManager
-
         screen = ScreenManager.get_instance().get_active()
 
         if hasattr(screen, "on_barcode"):
