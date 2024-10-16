@@ -97,3 +97,6 @@ class BaseTask:
     def kill(self):
         self.sig_killed = True
         self.thread.join()
+
+    def on_barcode(self, barcode):
+        pass

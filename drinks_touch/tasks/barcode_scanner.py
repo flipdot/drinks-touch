@@ -31,6 +31,13 @@ class InitializeBarcodeScannerTask(BaseTask):
         InitializeBarcodeScannerTask.thread = threading.Thread(target=BarcodeWorker.run)
         InitializeBarcodeScannerTask.thread.daemon = True
         InitializeBarcodeScannerTask.thread.start()
+        self.logger.info("Bereit. Scan doch mal was!")
+
+    def on_barcode(self, barcode):
+        self.logger.info(f"Barcode gescannt: {barcode}")
+
+
+888
 
 
 class BarcodeWorker:

@@ -73,3 +73,7 @@ class SyncScreen(Screen):
 
         screen_manager = ScreenManager.get_instance()
         screen_manager.set_default()
+
+    def on_barcode(self, barcode):
+        for task in self.tasks:
+            task.on_barcode(barcode)
