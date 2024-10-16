@@ -56,7 +56,7 @@ class SyncScreen(Screen):
                 Progress(
                     self.screen,
                     pos=(440, 760),
-                    speed=1 / 5,
+                    speed=1 / 10,
                     on_elapsed=self.time_elapsed,
                 )
             )
