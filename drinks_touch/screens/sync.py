@@ -2,6 +2,7 @@ from elements import Label, Progress, Button
 from inspect import getmembers, isclass
 import tasks
 from elements.base_elm import BaseElm
+from elements.vbox import VBox
 from tasks.base import BaseTask
 from .screen import Screen
 
@@ -13,13 +14,18 @@ def discover_tasks():
 
 
 class SyncScreen(Screen):
-    BOX_HEIGHT = 90
-
     def __init__(self, screen):
         super(SyncScreen, self).__init__(screen)
         self.finished = False
 
         self.tasks = [Task() for Task in discover_tasks()]
+
+        progress_bars = [
+            task.make_progress_bar(self.screen, box_height=90) for task in self.tasks
+        ]
+
+        for task in self.tasks:
+            task.start()
 
         self.objects: list[BaseElm] = [
             Label(
@@ -27,6 +33,7 @@ class SyncScreen(Screen):
                 text="Initialisierung...",
                 pos=(10, 25),
             ),
+            VBox(self.screen, progress_bars, gap=10, pos=(10, 80)),
             Button(
                 self.screen,
                 text="Abbrechen",
@@ -34,16 +41,6 @@ class SyncScreen(Screen):
                 click_func=self.cancel_tasks,
             ),
         ]
-
-        for i, task in enumerate(self.tasks):
-            self.objects.append(
-                task.make_progress_bar(
-                    self.screen,
-                    pos=(10, 100 + i * (SyncScreen.BOX_HEIGHT + 80)),
-                    box_height=SyncScreen.BOX_HEIGHT,
-                )
-            )
-            task.start()
 
     def render(self, *args, **kwargs):
         super(SyncScreen, self).render(*args, **kwargs)

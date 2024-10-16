@@ -10,17 +10,22 @@ class ProgressBar(BaseElm):
     def __init__(
         self,
         screen,
-        pos,
+        pos=None,
         bar_height=30,
         box_height=150,
         width=460,
         label=None,
         text=None,
     ):
-        super(ProgressBar, self).__init__(screen, pos, bar_height + box_height, width)
+        super(ProgressBar, self).__init__(
+            screen,
+            pos=pos,
+            width=width,
+        )
         self.bar_height = bar_height
         self.text_height = box_height
         self.label = label
+        self.label_height = None
         self.text = text
         self.padding = 5
         self.max_line_length = math.floor(width / 9.2)
@@ -29,6 +34,29 @@ class ProgressBar(BaseElm):
         self.color = (246, 198, 0)
         self.percent = None
         self.tick = 0
+
+    @property
+    def pos_label(self):
+        return self.pos
+
+    @property
+    def pos_bar(self):
+        if self.label:
+            return self.pos_label[0], self.pos_label[1] + self.label_height
+        return self.pos_label
+
+    @property
+    def pos_textbox(self):
+        return self.pos_bar[0], self.pos_bar[1] + self.bar_height
+
+    @property
+    def height(self):
+        h = self.bar_height
+        if self.label:
+            h += self.label_height
+        if self.text:
+            h += self.text_height
+        return h
 
     def success(self):
         self.color = (0, 255, 0)
@@ -42,24 +70,25 @@ class ProgressBar(BaseElm):
 
     def render(self, dt, *args, **kwargs):
         self.tick += dt
-        self._render_bar()
         if self.label:
             self._render_label()
+        self._render_bar()
         if self.text:
             self._render_textbox()
 
     def _render_label(self):
         font = pygame.font.SysFont("sans serif", 25)
         label = font.render(self.label, 1, self.color)
-        self.screen.blit(label, (self.pos[0], self.pos[1] - 25))
+        self.label_height = label.get_height()
+        self.screen.blit(label, self.pos_label)
 
     def _render_textbox(self):
         pygame.draw.rect(
             self.screen,
             self.color,
             (
-                self.pos[0],
-                self.pos[1] + self.bar_height,
+                self.pos_textbox[0],
+                self.pos_textbox[1],
                 self.width,
                 self.text_height,
             ),
@@ -85,8 +114,8 @@ class ProgressBar(BaseElm):
             self.screen.blit(
                 text,
                 (
-                    self.pos[0] + self.padding,
-                    self.pos[1] + self.bar_height + self.padding + i * 15,
+                    self.pos_textbox[0] + self.padding,
+                    self.pos_textbox[1] + self.padding + i * 15,
                 ),
             )
 
@@ -94,29 +123,34 @@ class ProgressBar(BaseElm):
         pygame.draw.rect(
             self.screen,
             self.color,
-            (self.pos[0], self.pos[1], self.width, self.bar_height),
+            (self.pos_bar[0], self.pos_bar[1], self.width, self.bar_height),
             width=2,
         )
         if self.percent is not None:
             pygame.draw.rect(
                 self.screen,
                 self.color,
-                (self.pos[0], self.pos[1], self.width * self.percent, self.bar_height),
+                (
+                    self.pos_bar[0],
+                    self.pos_bar[1],
+                    self.width * self.percent,
+                    self.bar_height,
+                ),
             )
         else:
             inner_width = self.width * 0.3
-            cx, y = self.pos
+            cx, y = self.pos_bar
             cx -= inner_width / 2
 
             cx += self.tick * 300 % (self.width + inner_width)
 
             x = cx - inner_width / 2
             width = inner_width
-            if x < self.pos[0]:
-                width -= self.pos[0] - x
-                x = self.pos[0]
-            if width + x > self.pos[0] + self.width:
-                width = self.pos[0] + self.width - x
+            if x < self.pos_bar[0]:
+                width -= self.pos_bar[0] - x
+                x = self.pos_bar[0]
+            if width + x > self.pos_bar[0] + self.width:
+                width = self.pos_bar[0] + self.width - x
 
             pygame.draw.rect(
                 self.screen,
