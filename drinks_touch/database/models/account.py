@@ -83,7 +83,6 @@ class Account(Base):
 
     @property
     def balance(self):
-        return 0
         sql = text(
             """
                 SELECT user_id, count(*) AS amount
