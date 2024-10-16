@@ -82,6 +82,8 @@ class Users(object):
         filters.append("objectclass=person")
         filter_str = "".join(["(" + f.replace(")", "_") + ")" for f in filters])
 
+        logger.info("Searching in %s for users with filter: %s", base_dn, filter_str)
+
         if len(filters) > 1:
             filter_str = "(&%s)" % filter_str
 

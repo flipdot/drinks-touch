@@ -35,7 +35,7 @@ sentry_sdk.init(config.SENTRY_DSN)
 
 logging.basicConfig(
     level=getattr(logging, config.LOGLEVEL),
-    format="[%(asctime)s][%(levelname)s][%(filename)s:%(lineno)d] %(message)s",
+    format="[%(asctime)s][%(levelname)s][%(filename)s:%(lineno)d] %(name)s: %(message)s",
 )
 logging.Formatter.converter = time.gmtime
 

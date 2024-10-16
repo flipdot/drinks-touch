@@ -3,7 +3,21 @@ import time
 from random import random
 
 from elements.progress_bar import ProgressBar
-from notifications.notification import logger
+import logging
+
+logger = logging.getLogger(__name__)
+
+
+class LogHandler(logging.Handler):
+    def __init__(self, task):
+        super(LogHandler, self).__init__()
+        self.task = task
+        self.output = ""
+
+    def emit(self, record):
+        self.output += self.format(record) + "\n"
+        if self.task.progress_bar is not None:
+            self.task.progress_bar.text = self.output
 
 
 class BaseTask:
@@ -18,6 +32,14 @@ class BaseTask:
 
         self.thread = threading.Thread(target=self._run)
         self.thread.daemon = True
+
+        self.logger = logging.getLogger(self.__class__.__name__)
+
+        handler = LogHandler(self)
+        formatter = logging.Formatter("%(message)s")
+        handler.setFormatter(formatter)
+        self.logger.setLevel(logging.INFO)
+        self.logger.addHandler(handler)
 
     @property
     def label(self):
@@ -34,20 +56,8 @@ class BaseTask:
         if self.progress_bar is not None:
             self.progress_bar.percent = value
 
-    @property
-    def output(self):
-        return self._output
-
-    @output.setter
-    def output(self, value: str):
-        self._output = value
-        if self.progress_bar is not None:
-            self.progress_bar.text = value
-
     def make_progress_bar(self, *args, **kwargs) -> ProgressBar:
-        self.progress_bar = ProgressBar(
-            *args, **kwargs, label=self.label, text=self.output
-        )
+        self.progress_bar = ProgressBar(*args, **kwargs, label=self.label, text=None)
         return self.progress_bar
 
     def start(self):
@@ -58,7 +68,7 @@ class BaseTask:
             self.run()
         except Exception as e:
             logger.exception(f"Error in task {self.label}")
-            self.output += f"Error: {e}\n"
+            self.logger.error(f"Error: {e}")
             self._fail()
         else:
             self._success()
@@ -68,7 +78,7 @@ class BaseTask:
             if self.sig_killed:
                 break
             self.progress = i / 100
-            self.output += f"Not implemented {i}%\n"
+            self.logger.info(f"Not implemented {i}%")
             time.sleep(0.1 * random())
         raise NotImplementedError(f"Override tasks.{self.__class__.__name__}.run()")
 

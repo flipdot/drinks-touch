@@ -32,9 +32,9 @@ class Account(Base):
     summary_email_notification_setting = Column(String(50), unique=False)
 
     @staticmethod
-    def sync_all_from_ldap(callback=None):
-        if callback is None:
-            callback = lambda *args, **kwargs: None  # noqa: E731
+    def sync_all_from_ldap(progress=None):
+        if progress is None:
+            progress = lambda *args, **kwargs: None  # noqa: E731
 
         ldap_users = Users.get_all(include_temp=True)
 
@@ -43,7 +43,7 @@ class Account(Base):
         # Not really necessary, but it's nice to keep history.
         ldap_users = sorted(ldap_users, key=lambda x: x["id"] or math.inf)
         for i, user in enumerate(ldap_users):
-            callback(progress=i / len(ldap_users))
+            progress(i / len(ldap_users))
             if user["id"] == 10000 and user["name"] == "malled2":
                 # malled how did you manage to get two accounts with the same id?
                 continue

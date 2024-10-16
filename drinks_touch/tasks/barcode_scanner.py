@@ -24,7 +24,7 @@ class InitializeBarcodeScannerTask(BaseTask):
             InitializeBarcodeScannerTask.thread
             and InitializeBarcodeScannerTask.thread.is_alive()
         ):
-            self.output += "Barcode-Scanner läuft bereits. Starte neu...\n"
+            self.logger.info("Barcode-Scanner läuft bereits. Starte neu...")
             BarcodeWorker.kill()
             InitializeBarcodeScannerTask.thread.join()
 
