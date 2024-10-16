@@ -336,6 +336,7 @@ def format_recharges(recharges):
 
 def get_drinks_consumed(account: Account):
     # TODO: table "drink" is not being created locally, crashes here
+    return []
     since_timestamp = account.last_summary_email_sent_at.timestamp()
     sql = text(
         """SELECT

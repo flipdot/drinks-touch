@@ -113,8 +113,7 @@ def main(argv):
 
     stats_thread = threading.Thread(target=stats_loop)
     stats_thread.daemon = True
-    # TODO: This is causing transaction errors
-    # stats_thread.start()
+    stats_thread.start()
 
     if env.is_pi():
         os.system("rsync -a sounds/ pi@pixelfun:sounds/ &")
