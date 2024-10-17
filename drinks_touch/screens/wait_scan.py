@@ -11,10 +11,12 @@ from elements.image import Image
 from elements.label import Label
 from elements.progress import Progress
 from icons import RefreshIcon
+from icons.svg import SvgIcon
 from screens.new_id_screen import NewIDScreen
 from screens.profile import ProfileScreen
 from tasks import CheckForUpdatesTask
 from users.users import Users
+from .git import GitScreen
 from .main import MainScreen
 from .screen import Screen
 from .screen_manager import ScreenManager
@@ -108,7 +110,7 @@ class WaitScanScreen(Screen):
         self.objects.append(
             Label(
                 self.screen,
-                text="Gesamtguthaben aller Member: {}".format(total_balance_fmt),
+                text="∑ = {}".format(total_balance_fmt),
                 size=25,
                 pos=(0, 755),
             )
@@ -125,6 +127,23 @@ class WaitScanScreen(Screen):
                 ),
             )
         )
+
+        if config.GIT_REPO_AVAILABLE:
+            self.objects.append(
+                Button(
+                    self.screen,
+                    pos=(370, 750),
+                    text=None,
+                    icon=SvgIcon(
+                        "drinks_touch/static/images/git.svg",
+                        color=config.COLORS["infragelb"],
+                        height=36,
+                    ),
+                    click_func=lambda: ScreenManager.get_instance().set_active(
+                        GitScreen(self.screen)
+                    ),
+                ),
+            )
 
         self.objects.append(
             Label(
