@@ -5,7 +5,7 @@ from sqlalchemy import Column, Integer, String, UUID, DateTime
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.sql import text
 
-from database.storage import Base, get_session, Session
+from database.storage import Base, Session
 from users.users import Users
 
 
@@ -32,14 +32,18 @@ class Account(Base):
     summary_email_notification_setting = Column(String(50), unique=False)
 
     @staticmethod
-    def sync_all_from_ldap():
+    def sync_all_from_ldap(progress=None):
+        if progress is None:
+            progress = lambda *args, **kwargs: None  # noqa: E731
+
         ldap_users = Users.get_all(include_temp=True)
 
         # sort by id, but put None last
         # this way, our oldest flipdot members get the smallest ids.
         # Not really necessary, but it's nice to keep history.
         ldap_users = sorted(ldap_users, key=lambda x: x["id"] or math.inf)
-        for user in ldap_users:
+        for i, user in enumerate(ldap_users):
+            progress(i / len(ldap_users))
             if user["id"] == 10000 and user["name"] == "malled2":
                 # malled how did you manage to get two accounts with the same id?
                 continue
@@ -79,7 +83,6 @@ class Account(Base):
 
     @property
     def balance(self):
-        session = get_session()
         sql = text(
             """
                 SELECT user_id, count(*) AS amount
@@ -88,7 +91,7 @@ class Account(Base):
                 GROUP BY user_id
             """
         )
-        row = session.connection().execute(sql, {"user_id": self.ldap_id}).fetchone()
+        row = Session().connection().execute(sql, {"user_id": self.ldap_id}).fetchone()
         if not row:
             cost = 0
         else:
@@ -102,7 +105,7 @@ class Account(Base):
                 GROUP BY user_id
             """
         )
-        row = session.connection().execute(sql, {"user_id": self.ldap_id}).fetchone()
+        row = Session().connection().execute(sql, {"user_id": self.ldap_id}).fetchone()
         if not row:
             credit = 0
         else:

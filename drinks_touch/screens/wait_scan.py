@@ -2,7 +2,6 @@ import datetime
 import logging
 
 import config
-import version_updater
 from database.models.scan_event import ScanEvent
 from database.storage import get_session
 from drinks.drinks import get_by_ean
@@ -11,13 +10,17 @@ from elements.button import Button
 from elements.image import Image
 from elements.label import Label
 from elements.progress import Progress
+from icons import RefreshIcon
 from screens.new_id_screen import NewIDScreen
 from screens.profile import ProfileScreen
+from tasks import CheckForUpdatesTask
 from users.users import Users
 from .main import MainScreen
 from .screen import Screen
 from .screen_manager import ScreenManager
 from sqlalchemy.sql import text
+
+from .sync import SyncScreen
 
 logger = logging.getLogger(__name__)
 
@@ -50,11 +53,16 @@ class WaitScanScreen(Screen):
         ]
         self.empty_info = [
             Button(
-                self.screen, pos=(30, 700), text="Benutzer", click_func=self.set_member
+                self.screen,
+                pos=(30, 680),
+                size=45,
+                text="Benutzer",
+                click_func=self.set_member,
             ),
             Button(
                 self.screen,
-                pos=(210, 700),
+                pos=(290, 700),
+                size=15,
                 text="Gutschein drucken",
                 click_func=self.btn_new_id,
             ),
@@ -102,7 +110,19 @@ class WaitScanScreen(Screen):
                 self.screen,
                 text="Gesamtguthaben aller Member: {}".format(total_balance_fmt),
                 size=25,
-                pos=(125, 755),
+                pos=(0, 755),
+            )
+        )
+
+        self.objects.append(
+            Button(
+                self.screen,
+                pos=(430, 750),
+                text=None,
+                icon=RefreshIcon(),
+                click_func=lambda: ScreenManager.get_instance().set_active(
+                    SyncScreen(self.screen)
+                ),
             )
         )
 
@@ -115,14 +135,14 @@ class WaitScanScreen(Screen):
             )
         )
         if (
-            version_updater.newest_version_sha_short
-            and version_updater.newest_version_sha_short not in config.BUILD_NUMBER
+            CheckForUpdatesTask.newest_version_sha_short
+            and CheckForUpdatesTask.newest_version_sha_short not in config.BUILD_NUMBER
         ):
             # make build number flash, show "Update available" when flashing
             self.objects.append(
                 Label(
                     self.screen,
-                    text=f"Update available: {version_updater.newest_version_sha_short}",
+                    text=f"Update available: {CheckForUpdatesTask.newest_version_sha_short}",
                     size=25,
                     pos=(475, 780),
                     align_right=True,
@@ -159,6 +179,7 @@ class WaitScanScreen(Screen):
     def on_barcode(self, barcode):
         if not barcode:
             return
+        self.processing.text = f"Gescannt: {barcode}"
         self.processing.is_visible = True
         user = Users.get_by_id_card(barcode)
         if user:

@@ -1,13 +1,24 @@
 class BaseElm(object):
-    def __init__(self, screen, pos, height, width):
+    def __init__(self, screen, pos=None, height=None, width=None):
         self.screen = screen
         self.pos = pos
-        self.height = height
+        self._height = height
         self.width = width
         self.is_visible = True
+
+    @property
+    def height(self):
+        return self._height
+
+    @height.setter
+    def height(self, value):
+        self._height = value
 
     def events(self, events):
         pass
 
     def visible(self):
         return self.is_visible
+
+    def render(self, *args, **kwargs):
+        pass

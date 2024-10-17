@@ -8,10 +8,10 @@ from decimal import Decimal
 from requests.auth import HTTPBasicAuth
 
 import config
+from database.models.account import Account
 from database.models.recharge_event import RechargeEvent
-from database.storage import get_session
+from database.storage import get_session, Session
 from notifications.notification import send_summary
-from users.users import Users
 
 logger = logging.getLogger(__name__)
 
@@ -90,17 +90,17 @@ def handle_transferred(charge, charge_amount, charge_date, got, session, uid):
     session.add(ev)
     session.commit()
     try:
-        user = Users.get_by_id(uid)
-        if not user:
+        account = Session().query(Account).filter(Account.ldap_id == uid).one()
+        if not account:
             logger.error("could not find user %s to send email", uid)
         else:
-            subject = "Aufladung EUR %s für %s" % (charge_amount, user["name"])
+            subject = "Aufladung EUR %s für %s" % (charge_amount, account.name)
             text = "Deine Aufladung über %s € am %s mit Text '%s' war erfolgreich." % (
                 charge_amount,
                 charge_date,
                 charge["info"],
             )
-            send_summary(session, user, subject=subject, force=True, prepend_text=text)
+            send_summary(account, subject=subject, force=True, prepend_text=text)
     except Exception:
         logger.exception("sending notification mail:")
 
