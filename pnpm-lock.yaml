@@ -43,8 +43,8 @@ importers:
         specifier: 9.2.1
         version: 9.2.1(@babel/core@7.25.8)(webpack@5.95.0)
       bootstrap-loader:
-        specifier: 4.0.4
-        version: 4.0.4(css-loader@7.1.2(webpack@5.95.0))(mini-css-extract-plugin@2.9.1(webpack@5.95.0))(node-sass@9.0.0)(resolve-url-loader@5.0.0)(sass-loader@16.0.2(node-sass@9.0.0)(sass@1.80.2)(webpack@5.95.0))(sass@1.80.2)(url-loader@4.1.1(file-loader@6.2.0(webpack@5.95.0))(webpack@5.95.0))(webpack@5.95.0)
+        specifier: 4.0.5
+        version: 4.0.5(css-loader@7.1.2(webpack@5.95.0))(mini-css-extract-plugin@2.9.1(webpack@5.95.0))(node-sass@9.0.0)(resolve-url-loader@5.0.0)(sass-loader@16.0.2(node-sass@9.0.0)(sass@1.80.2)(webpack@5.95.0))(sass@1.80.2)(url-loader@4.1.1(file-loader@6.2.0(webpack@5.95.0))(webpack@5.95.0))(webpack@5.95.0)
       bootstrap-sass:
         specifier: 3.4.3
         version: 3.4.3
@@ -1056,8 +1056,8 @@ packages:
   boolbase@1.0.0:
     resolution: {integrity: sha512-JZOSA7Mo9sNGB8+UjSgzdLtokWAky1zbztM3WRLCbZ70/3cTANmQmOdR7y2g+J0e2WXywy1yS468tY+IruqEww==}
 
-  bootstrap-loader@4.0.4:
-    resolution: {integrity: sha512-ohdaFAcCx2OASW1CEIXlyiJiBpxFRAVOUyhwrQgFAAK3CUR+DO4I4VrLzmFDtRpFoAUtxyjLhi8mPTujw762vg==}
+  bootstrap-loader@4.0.5:
+    resolution: {integrity: sha512-tML2lYsqedYXMcnWBTW6AO0zPbMsIh2yyXkBCwarXDPW4OPW2kjaNFaTztXWSKU1CRRS3Jf7o5aJIVZvbl6hDQ==}
     peerDependencies:
       css-loader: '*'
       mini-css-extract-plugin: '>=0.4.0'
@@ -2512,10 +2512,6 @@ packages:
 
   select2@4.1.0-rc.0:
     resolution: {integrity: sha512-Hr9TdhyHCZUtwznEH2CBf7967mEM0idtJ5nMtjvk3Up5tPukOLXbHUNmh10oRfeNIhj+3GD3niu+g6sVK+gK0A==}
-
-  semver@5.5.0:
-    resolution: {integrity: sha512-4SJ3dm0WAwWy/NVeioZh5AntkdJoWKxHxcmyP622fOkgHa4z3R0TdBJICINyaSDE6uNwVc8gZr+ZinwZAH4xIA==}
-    hasBin: true
 
   semver@5.7.2:
     resolution: {integrity: sha512-cBznnQ9KjJqU67B52RMC65CMarK2600WFnbkcaiwWq3xy/5haFJlshgnpjovMVJ+Hff49d8GEn0b87C5pDQ10g==}
@@ -4056,7 +4052,7 @@ snapshots:
 
   boolbase@1.0.0: {}
 
-  bootstrap-loader@4.0.4(css-loader@7.1.2(webpack@5.95.0))(mini-css-extract-plugin@2.9.1(webpack@5.95.0))(node-sass@9.0.0)(resolve-url-loader@5.0.0)(sass-loader@16.0.2(node-sass@9.0.0)(sass@1.80.2)(webpack@5.95.0))(sass@1.80.2)(url-loader@4.1.1(file-loader@6.2.0(webpack@5.95.0))(webpack@5.95.0))(webpack@5.95.0):
+  bootstrap-loader@4.0.5(css-loader@7.1.2(webpack@5.95.0))(mini-css-extract-plugin@2.9.1(webpack@5.95.0))(node-sass@9.0.0)(resolve-url-loader@5.0.0)(sass-loader@16.0.2(node-sass@9.0.0)(sass@1.80.2)(webpack@5.95.0))(sass@1.80.2)(url-loader@4.1.1(file-loader@6.2.0(webpack@5.95.0))(webpack@5.95.0))(webpack@5.95.0):
     dependencies:
       chalk: 2.4.2
       css-loader: 7.1.2(webpack@5.95.0)
@@ -4070,7 +4066,7 @@ snapshots:
       resolve-url-loader: 5.0.0
       sass: 1.80.2
       sass-loader: 16.0.2(node-sass@9.0.0)(sass@1.80.2)(webpack@5.95.0)
-      semver: 5.5.0
+      semver: 5.7.2
       strip-json-comments: 2.0.1
       url-loader: 4.1.1(file-loader@6.2.0(webpack@5.95.0))(webpack@5.95.0)
       webpack: 5.95.0(webpack-cli@5.1.4)
@@ -5522,8 +5518,6 @@ snapshots:
       source-map: 0.7.4
 
   select2@4.1.0-rc.0: {}
-
-  semver@5.5.0: {}
 
   semver@5.7.2: {}
 
