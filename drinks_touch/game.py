@@ -12,15 +12,12 @@ import time
 
 import config
 import env
-import version_updater
-from barcode.barcode_reader import run as run_barcode_reader
-from barcode.barcode_worker import Worker as BarcodeWorker
-from database.models.account import Account
 from database.storage import init_db, Session
 from drinks.drinks_manager import DrinksManager
 from notifications.notification import send_low_balances, send_summaries
 from screen import get_screen
 from screens.screen_manager import ScreenManager
+from screens.sync import SyncScreen
 from stats.stats import run as stats_send
 from users.sync import sync_recharges
 from webserver.webserver import run as run_webserver
@@ -38,7 +35,7 @@ sentry_sdk.init(config.SENTRY_DSN)
 
 logging.basicConfig(
     level=getattr(logging, config.LOGLEVEL),
-    format="[%(asctime)s][%(levelname)s][%(filename)s:%(lineno)d] %(message)s",
+    format="[%(asctime)s][%(levelname)s][%(filename)s:%(lineno)d] %(name)s: %(message)s",
 )
 logging.Formatter.converter = time.gmtime
 
@@ -82,45 +79,9 @@ def stats_loop():
         i %= 60 * 12
 
 
-def sync_db_loop():
-    while True:
-        try:
-            with Session.begin():
-                Account.sync_all_from_ldap()
-        except Exception:
-            # Catch all exceptions to prevent the thread from dying
-            logging.exception("error on sync_db_loop")
-        time.sleep(60)
-
-
-def check_for_updates_loop():
-    while True:
-        try:
-            version_updater.check_for_updates()
-        except Exception:
-            # Catch all exceptions to prevent the thread from dying
-            logging.exception("error on check_for_updates_loop")
-        time.sleep(60 * 30)  # check every 30 minutes
-
-
-def barcode_reader_loop(worker):
-    while True:
-        try:
-            run_barcode_reader(worker)
-        except Exception:
-            # Catch all exceptions to prevent the thread from dying
-            logging.exception("error on barcode_reader_loop")
-            time.sleep(10)
-
-
 # Rendering #
 def main(argv):
     locale.setlocale(locale.LC_ALL, "de_DE.UTF-8")
-
-    try:
-        version_updater.check_for_updates()
-    except Exception:
-        logging.exception("error while checking for updates on startup")
 
     if "--webserver" in argv:
         run_webserver()
@@ -138,28 +99,13 @@ def main(argv):
 
     global screen_manager
     screen_manager = ScreenManager(screen)
+    screen_manager.set_active(SyncScreen(screen))
     ScreenManager.set_instance(screen_manager)
 
     init_db()
 
-    # Barcode Scanner #
-    barcode_worker = BarcodeWorker()
-    barcode_thread = threading.Thread(
-        target=barcode_reader_loop, args=(barcode_worker,)
-    )
-    barcode_thread.daemon = True
-    barcode_thread.start()
-
     # webserver needs to be a main thread #
     web_thread = subprocess.Popen([sys.argv[0], "--webserver"])
-
-    db_sync_thread = threading.Thread(target=sync_db_loop)
-    db_sync_thread.daemon = True
-    db_sync_thread.start()
-
-    check_for_updates_thread = threading.Thread(target=check_for_updates_loop)
-    check_for_updates_thread.daemon = True
-    check_for_updates_thread.start()
 
     event_thread = threading.Thread(target=handle_events)
     event_thread.daemon = True

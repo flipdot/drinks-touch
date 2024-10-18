@@ -1,4 +1,5 @@
 from env import monospace
+from icons.base import BaseIcon
 from .base_elm import BaseElm
 
 import contextlib
@@ -8,21 +9,37 @@ with contextlib.redirect_stdout(None):
 
 
 class Button(BaseElm):
-    def __init__(self, screen, **kwargs):
-        self.font = kwargs.get("font", monospace)
-        self.size = kwargs.get("size", 30)
-        self.text = kwargs.get("text", "<Label>")
-        self.color = kwargs.get("color", (246, 198, 0))
-        self.clicked = kwargs.get("click_func", self.__clicked)
-        self.clicked_param = kwargs.get("click_func_param", self.__clicked)
-        self.click_param = kwargs.get("click_param", None)
-        self.padding = kwargs.get("padding", 10)
-        self.force_width = kwargs.get("force_width", None)
-        self.force_height = kwargs.get("force_height", None)
+    def __init__(
+        self,
+        screen,
+        font=monospace,
+        size=30,
+        text="<Label>",
+        color=(246, 198, 0),
+        click_func=None,
+        click_func_param=None,
+        click_param=None,
+        padding=10,
+        force_width=None,
+        force_height=None,
+        icon: BaseIcon = None,
+        pos=(0, 0),
+    ):
+        self.font = font
+        self.size = size
+        self.text = text
+        self.color = color
+        self.clicked = click_func or self.__clicked
+        self.clicked_param = click_func_param
+        self.click_param = click_param
+        self.padding = padding
+        self.force_width = force_width
+        self.force_height = force_height
+        self.icon = icon
+
         self.box = None
         self.clicking = False
 
-        pos = kwargs.get("pos", (0, 0))
         super(Button, self).__init__(screen, pos, self.size, -1)
 
         self.__load_font()
@@ -40,24 +57,45 @@ class Button(BaseElm):
     def post_click(self):
         self.clicking = False
 
-    def render(self):
+    def render(self, *args, **kwargs):
         if self.clicking:
             self.screen.fill(tuple(c * 0.7 for c in self.color), self.box)
 
-        elm = self.font.render(self.text, 1, self.color)
-        self.screen.blit(elm, self.pos)
-
         top = self.pos[0] - self.padding
         left = self.pos[1] - self.padding
-        width = elm.get_width() + self.padding * 2
-        height = elm.get_height() + self.padding * 2
+        width = self.padding * 2
+        height = self.padding * 2
 
-        if self.force_width is not None:
-            width = self.force_width
-            top = self.pos[0] + elm.get_width() / 2 - width / 2
-        if self.force_height is not None:
-            height = self.force_height
-            left = self.pos[1] + elm.get_height() / 2 - height / 2
+        if self.icon:
+            icon_element = self.icon.render()
+            width += icon_element.get_width()
+            height += icon_element.get_height()
+            self.screen.blit(icon_element, self.pos)
+            text_pos = (
+                self.pos[0] + icon_element.get_width() + self.padding,
+                self.pos[1],
+            )
+        else:
+            text_pos = self.pos
+            icon_element = None
+
+        if self.text:
+            text_element = self.font.render(self.text, 1, self.color)
+            width += text_element.get_width()
+            if icon_element:
+                width += 10
+                if icon_element.get_height() > text_element.get_height():
+                    height = icon_element.get_height() + self.padding * 2
+            else:
+                height = text_element.get_height() + self.padding * 2
+            self.screen.blit(text_element, text_pos)
+
+            if self.force_width is not None:
+                width = self.force_width
+                top = self.pos[0] + text_element.get_width() / 2 - width / 2
+            if self.force_height is not None:
+                height = self.force_height
+                left = self.pos[1] + text_element.get_height() / 2 - height / 2
 
         self.box = (top, left, width, height)
 
