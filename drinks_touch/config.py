@@ -68,6 +68,8 @@ WEBSERVER_PORT = os.environ.get("WEBSERVER_PORT", 5002)
 
 FPS = 30
 
+FONTS = {"monospace": "DejaVu Sans Mono", "sans serif": "DejaVu Sans"}
+
 LOGLEVEL = os.environ.get("LOGLEVEL", "WARNING")
 
 # DEVELOPMENT VARIABLES #

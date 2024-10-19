@@ -2,7 +2,7 @@ import math
 
 import pygame
 
-from icons.base import BaseIcon
+from .base import BaseIcon
 
 
 class RefreshIcon(BaseIcon):

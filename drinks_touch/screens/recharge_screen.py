@@ -1,12 +1,12 @@
 from functools import partial
 
+from config import FONTS
 from database.models.recharge_event import RechargeEvent
 from database.storage import get_session
 from elements.button import Button
 from elements.image import Image
 from elements.label import Label
 from elements.progress import Progress
-from env import monospace
 from users.qr import make_sepa_qr
 from .screen import Screen
 from .screen_manager import ScreenManager
@@ -25,7 +25,7 @@ class RechargeScreen(Screen):
                 self.screen,
                 text="BACK",
                 pos=(30, 30),
-                font=monospace,
+                font=FONTS["monospace"],
                 click_func=self.back,
                 size=30,
             )
@@ -106,8 +106,7 @@ class RechargeScreen(Screen):
                     self.objects.remove(o)
             self.objects.extend(self.select_objects)
         else:
-            screen_manager = ScreenManager.get_instance()
-            screen_manager.go_back()
+            super().back()
 
     @staticmethod
     def home():

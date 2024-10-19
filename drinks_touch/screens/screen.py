@@ -1,3 +1,6 @@
+from screens.screen_manager import ScreenManager
+
+
 class Screen(object):
     def __init__(self, screen):
         self.screen = screen
@@ -11,3 +14,7 @@ class Screen(object):
     def events(self, events):
         for o in self.objects:
             o.events(events)
+
+    @staticmethod
+    def back():
+        ScreenManager.get_instance().go_back()

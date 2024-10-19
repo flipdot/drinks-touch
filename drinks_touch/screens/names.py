@@ -1,9 +1,9 @@
 import math
 
+from config import FONTS
 from elements.button import Button
 from elements.label import Label
 from elements.progress import Progress
-from env import monospace
 from screens.profile import ProfileScreen
 from users.users import Users
 from .screen import Screen
@@ -22,7 +22,7 @@ class NamesScreen(Screen):
                 text="BACK",
                 pos=(30, 30),
                 click_func=self.back,
-                font=monospace,
+                font=FONTS["monospace"],
                 size=30,
             )
         )
@@ -67,10 +67,6 @@ class NamesScreen(Screen):
                 )
             )
             i += 1
-
-    @staticmethod
-    def back():
-        ScreenManager.get_instance().go_back()
 
     def switch_to_screen(self, param):
         ScreenManager.get_instance().set_active(ProfileScreen(self.screen, param))

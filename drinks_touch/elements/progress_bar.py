@@ -2,6 +2,7 @@ import math
 
 import pygame.draw
 
+from config import FONTS
 from elements.base_elm import BaseElm
 
 
@@ -77,7 +78,7 @@ class ProgressBar(BaseElm):
             self._render_textbox()
 
     def _render_label(self):
-        font = pygame.font.SysFont("sans serif", 25)
+        font = pygame.font.SysFont(FONTS["sans serif"], 22)
         label = font.render(self.label, 1, self.color)
         self.label_height = label.get_height()
         self.screen.blit(label, self.pos_label)
@@ -94,7 +95,7 @@ class ProgressBar(BaseElm):
             ),
             width=1,
         )
-        font = pygame.font.SysFont("monospace", 15)
+        font = pygame.font.SysFont(FONTS["monospace"], 15)
 
         lines = self.text.split("\n")
 

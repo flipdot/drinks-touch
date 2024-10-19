@@ -1,5 +1,5 @@
-from env import monospace
-from icons.base import BaseIcon
+from config import FONTS
+from .icons.base import BaseIcon
 from .base_elm import BaseElm
 
 import contextlib
@@ -12,7 +12,7 @@ class Button(BaseElm):
     def __init__(
         self,
         screen,
-        font=monospace,
+        font=FONTS["monospace"],
         size=30,
         text="<Label>",
         color=(246, 198, 0),
@@ -67,12 +67,11 @@ class Button(BaseElm):
         height = self.padding * 2
 
         if self.icon:
-            icon_element = self.icon.render()
-            width += icon_element.get_width()
-            height += icon_element.get_height()
-            self.screen.blit(icon_element, self.pos)
+            self.icon.render()
+            width += self.icon.width
+            height += self.icon.height
             text_pos = (
-                self.pos[0] + icon_element.get_width() + self.padding,
+                self.pos[0] + self.icon.width + self.padding,
                 self.pos[1],
             )
         else:

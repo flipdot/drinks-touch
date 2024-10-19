@@ -3,12 +3,12 @@ import time
 import subprocess
 from pystrich.code128 import Code128Encoder
 
+from config import FONTS
 from drinks.drinks import get_by_ean
 from drinks.drinks_manager import DrinksManager
 from elements.button import Button
 from elements.label import Label
 from elements.progress import Progress
-from env import monospace
 from users.users import Users
 from .screen import Screen
 from .screen_manager import ScreenManager
@@ -25,7 +25,7 @@ class IDCardScreen(Screen):
                 self.screen,
                 text="BACK",
                 pos=(30, 30),
-                font=monospace,
+                font=FONTS["monospace"],
                 click_func=self.back,
                 size=30,
             )
@@ -92,11 +92,6 @@ class IDCardScreen(Screen):
         self.progress = Progress(self.screen, pos=(200, 720), speed=1 / 15.0)
         self.progress.stop()
         self.objects.append(self.progress)
-
-    @staticmethod
-    def back():
-        screen_manager = ScreenManager.get_instance()
-        screen_manager.go_back()
 
     @staticmethod
     def home():
