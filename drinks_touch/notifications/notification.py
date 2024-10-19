@@ -66,8 +66,9 @@ def send_notification(to_address, subject, content_text, content_html, uid):
 
 
 def send_drink(user, drink, with_summary=False):
+    account = Account.query.filter(Account.email == user["email"]).one()
     try:
-        if user["email"] and "instant" in user["drinksNotification"]:
+        if account.email and "instant" in account.summary_email_notification_setting:
             content_text = (
                 "Du hast das folgende Getränk getrunken: {drink_name}.".format(
                     drink_name=drink["name"]
@@ -76,20 +77,19 @@ def send_drink(user, drink, with_summary=False):
             content_html = render_jinja_html("instant.html", drink_name=drink["name"])
 
             if not with_summary:
-                content_text += FOOTER.format(uid=user["id"])
+                content_text += FOOTER.format(uid=account.ldap_id)
                 content_html = render_jinja_html("main.html", prepend_html=content_html)
-
                 send_notification(
-                    user["email"],
+                    account,
                     "Getränk getrunken",
                     content_text,
                     content_html,
-                    user["id"],
+                    account.ldap_id,
                 )
                 return
 
             send_summary(
-                user,
+                account,
                 subject="Getränk getrunken",
                 prepend_text=content_text,
                 prepend_html=content_html,
