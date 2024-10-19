@@ -11,6 +11,7 @@ LDAP_PW = os.environ.get("LDAP_PW", "admin")
 
 COLORS = {
     "infragelb": (246, 198, 0),
+    "disabled": (50, 50, 50),
 }
 
 if bn := os.environ.get("BUILD_NUMBER"):

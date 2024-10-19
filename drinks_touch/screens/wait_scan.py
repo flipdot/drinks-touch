@@ -11,7 +11,6 @@ from screens.new_id_screen import NewIDScreen
 from screens.profile import ProfileScreen
 from tasks import CheckForUpdatesTask
 from users.users import Users
-from .git import GitScreen
 from .main import MainScreen
 from .screen import Screen
 from .screen_manager import ScreenManager
@@ -133,12 +132,13 @@ class WaitScanScreen(Screen):
                         self.screen,
                         "drinks_touch/static/images/git.svg",
                         pos=(370, 750),
-                        color=config.COLORS["infragelb"],
+                        color=config.COLORS["disabled"],
                         height=36,
                     ),
-                    click_func=lambda: ScreenManager.get_instance().set_active(
-                        GitScreen(self.screen)
-                    ),
+                    color=config.COLORS["disabled"],
+                    # click_func=lambda: ScreenManager.get_instance().set_active(
+                    #     GitScreen(self.screen)
+                    # ),
                 ),
             )
 
