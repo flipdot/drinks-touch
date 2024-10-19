@@ -29,7 +29,6 @@ class MainScreen(Screen):
                 continue
             self.objects.append(
                 Button(
-                    self.screen,
                     text=text,
                     pos=self.__get_pos(i),
                     click_func_param=self.switch_to_screen,
@@ -44,7 +43,6 @@ class MainScreen(Screen):
 
         self.objects.append(
             Button(
-                self.screen,
                 text="Abbrechen",
                 pos=(150, 700),
                 size=30,

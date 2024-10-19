@@ -22,7 +22,6 @@ class IDCardScreen(Screen):
 
         self.objects.append(
             Button(
-                self.screen,
                 text="BACK",
                 pos=(30, 30),
                 font=FONTS["monospace"],
@@ -42,7 +41,6 @@ class IDCardScreen(Screen):
 
         self.objects.append(
             Button(
-                self.screen,
                 text="Reset",
                 pos=(350, 30),
                 size=30,
@@ -64,7 +62,6 @@ class IDCardScreen(Screen):
 
         self.objects.append(
             Button(
-                self.screen,
                 text="OK bye",
                 pos=(330, 700),
                 size=30,
@@ -74,7 +71,6 @@ class IDCardScreen(Screen):
 
         self.objects.append(
             Button(
-                self.screen,
                 text="Drucken",
                 pos=(30, 700),
                 size=30,

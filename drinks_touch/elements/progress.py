@@ -13,7 +13,6 @@ class Progress(BaseElm):
     def __init__(self, screen, **kwargs):
         self.size = kwargs.get("size", 50)
         self.color = kwargs.get("color", COLORS["infragelb"])
-        self.box = None
         self.tick = kwargs.get("tick", self.__default_tick)
         self.speed = kwargs.get("speed", 1 / 4.0)  # 4 secs
         self.on_elapsed = kwargs.get("on_elapsed", None)
@@ -22,12 +21,6 @@ class Progress(BaseElm):
 
         pos = kwargs.get("pos", (0, 0))
         super(Progress, self).__init__(screen, pos, self.size, -1)
-        top = self.pos[0] - self.size / 2
-        left = self.pos[1] - self.size / 2
-        width = self.size
-        height = self.size
-
-        self.box = (top, left, width, height)
         self.start()
 
     def start(self):

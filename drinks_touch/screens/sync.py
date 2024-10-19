@@ -34,7 +34,6 @@ class SyncScreen(Screen):
             ),
             VBox(self.screen, progress_bars, gap=10, pos=(10, 80)),
             Button(
-                self.screen,
                 text="Abbrechen",
                 pos=(20, 750),
                 click_func=self.cancel_tasks,

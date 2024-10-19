@@ -22,7 +22,6 @@ class NewIDScreen(Screen):
 
         self.objects.append(
             Button(
-                self.screen,
                 text="BACK",
                 pos=(30, 30),
                 font=FONTS["monospace"],
@@ -59,7 +58,6 @@ class NewIDScreen(Screen):
         for i, euro in enumerate([5, 10, 20, 50]):
             self.objects.append(
                 Button(
-                    self.screen,
                     text="EUR " + str(euro),
                     pos=((i % 2) * 200 + 30, 600 + (i / 2 * 80)),
                     size=30,

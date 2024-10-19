@@ -33,30 +33,30 @@ class WaitScanScreen(Screen):
         self.scanned_info = [
             self.barcode_label,
             Button(
-                self.screen,
                 pos=(50, 600),
                 text="drink buchen",
                 size=52,
                 click_func=self.set_member,
             ),
             Button(
-                self.screen,
                 pos=(50, 700),
                 text="Nur Statistik",
                 click_func=self.stat_drink,
             ),
-            Button(self.screen, pos=(350, 700), text="nope", click_func=self.btn_reset),
+            Button(
+                pos=(350, 700),
+                text="nope",
+                click_func=self.btn_reset,
+            ),
         ]
         self.empty_info = [
             Button(
-                self.screen,
                 pos=(30, 680),
                 size=45,
                 text="Benutzer",
                 click_func=self.set_member,
             ),
             Button(
-                self.screen,
                 pos=(290, 700),
                 size=15,
                 text="Gutschein drucken",
@@ -107,26 +107,24 @@ class WaitScanScreen(Screen):
 
         self.objects.append(
             Button(
-                self.screen,
-                pos=(430, 750),
+                pos=(480, 800),
+                align_right=True,
+                align_bottom=True,
                 text=None,
                 click_func=lambda: ScreenManager.get_instance().set_active(
                     SyncScreen(self.screen)
                 ),
-                inner=RefreshIcon(self.screen, pos=(430, 750)),
+                inner=RefreshIcon(),
             )
         )
 
         if config.GIT_REPO_AVAILABLE:
             self.objects.append(
                 Button(
-                    self.screen,
                     pos=(370, 750),
                     text=None,
                     inner=SvgIcon(
-                        self.screen,
                         "drinks_touch/static/images/git.svg",
-                        pos=(370, 750),
                         color=config.COLORS["disabled"],
                         height=36,
                     ),

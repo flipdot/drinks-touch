@@ -18,7 +18,6 @@ class NamesScreen(Screen):
 
         self.objects.append(
             Button(
-                self.screen,
                 text="BACK",
                 pos=(30, 30),
                 click_func=self.back,
@@ -57,7 +56,6 @@ class NamesScreen(Screen):
             y = i_y * btn_ypos
             self.objects.append(
                 Button(
-                    self.screen,
                     text=user["name"],
                     pos=(xoff + x, y + yoff),
                     click_func_param=self.switch_to_screen,

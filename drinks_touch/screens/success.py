@@ -33,7 +33,10 @@ class SuccessScreen(Screen):
 
         self.objects.append(
             Button(
-                self.screen, text="OK", pos=(50, 600), size=50, click_func=self.btn_home
+                text="OK",
+                pos=(50, 600),
+                size=50,
+                click_func=self.btn_home,
             )
         )
 

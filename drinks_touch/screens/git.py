@@ -9,14 +9,12 @@ class GitScreen(Screen):
 
         self.objects = [
             SvgIcon(
-                self.screen,
                 "drinks_touch/static/images/git-full.svg",
                 pos=(10, 20),
                 color=config.COLORS["infragelb"],
                 height=36,
             ),
             Button(
-                self.screen,
                 text="BACK",
                 pos=(20, 750),
                 click_func=self.back,

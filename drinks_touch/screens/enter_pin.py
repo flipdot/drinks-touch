@@ -13,7 +13,6 @@ class EnterPinScreen(Screen):
 
         self.objects.append(
             Button(
-                self.screen,
                 text="BACK",
                 pos=(30, 30),
                 click_func=self.back,
@@ -33,7 +32,6 @@ class EnterPinScreen(Screen):
 
         self.objects.append(
             Button(
-                self.screen,
                 text="UNLOCK!",
                 pos=(100, 680),
                 click_func=self.btn_ok,
@@ -68,7 +66,6 @@ class EnterPinScreen(Screen):
 
         self.objects.append(
             Button(
-                self.screen,
                 text="DEL",
                 pos=(200, 580),
                 font=FONTS["monospace"],
@@ -83,7 +80,6 @@ class EnterPinScreen(Screen):
         cord_y = 250 + y * width
         self.objects.append(
             Button(
-                self.screen,
                 text=label,
                 pos=(cord_x, cord_y),
                 click_func_param=self.add_char,

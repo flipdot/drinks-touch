@@ -15,6 +15,8 @@ class BaseElm(object):
         **kwargs
     ):
         self.screen = screen
+        if pos is None:
+            pos = (0, 0)
         self.pos = pos
         self._height = height
         self._width = width
@@ -47,10 +49,19 @@ class BaseElm(object):
             y -= self.height
         return x, y
 
+    @property
+    def box(self):
+        return self.screen_pos + (self.width, self.height)
+
+    # def on_click(self):
+    #     pass
+
     def events(self, events):
         pass
 
+    @property
     def visible(self):
+        # TODO get rid of is_visible
         return self.is_visible
 
     def render(self, *args, **kwargs) -> Surface:

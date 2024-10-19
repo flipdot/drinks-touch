@@ -11,7 +11,7 @@ class Screen(object):
 
     def render(self, dt):
         for o in self.objects:
-            if o.visible():
+            if o.visible:
                 surface = o.render(dt)
                 if surface is not None:
                     self.screen.blit(surface, o.screen_pos)
@@ -20,7 +20,7 @@ class Screen(object):
 
     def render_debug(self):
         for o in self.objects:
-            if o.visible():
+            if o.visible:
                 w = o.width
                 h = o.height
                 x = o.screen_pos[0]
@@ -34,8 +34,32 @@ class Screen(object):
                 )
 
     def events(self, events):
-        for o in self.objects:
-            o.events(events)
+        for obj in self.objects:
+            obj.events(events)
+            for event in events:
+                if "consumed" in event.dict and event.consumed:
+                    continue
+
+                if event.type == pygame.MOUSEBUTTONUP:
+                    if not hasattr(obj, "on_click"):
+                        continue
+                    pos = event.pos
+
+                    if (
+                        obj.box is not None
+                        and obj.visible
+                        and pygame.Rect(obj.box).collidepoint(pos[0], pos[1])
+                    ):
+                        obj.on_click()
+                        # self.pre_click()
+                        # try:
+                        #     if self.click_param:
+                        #         self.clicked_param(self.click_param)
+                        #     else:
+                        #         self.clicked()
+                        # finally:
+                        #     self.post_click()
+                        event.consumed = True
 
     @staticmethod
     def back():

@@ -10,7 +10,6 @@ with contextlib.redirect_stdout(None):
 class Button(BaseElm):
     def __init__(
         self,
-        screen,
         font=FONTS["monospace"],
         size=30,
         text="<Label>",
@@ -25,10 +24,12 @@ class Button(BaseElm):
         force_height=None,
         inner: BaseElm = None,
         pos=(0, 0),
+        *args,
+        **kwargs,
     ):
         from . import Label
 
-        super(Button, self).__init__(screen, pos, size, -1)
+        super().__init__(None, pos, size, -1, *args, **kwargs)
 
         self.size = size
         self.color = color
@@ -68,7 +69,7 @@ class Button(BaseElm):
             )
         self.inner = inner
 
-        self.box = None
+        # self.box = None
         self.clicking = False
 
     @staticmethod
@@ -82,40 +83,38 @@ class Button(BaseElm):
         self.clicking = False
 
     def render(self, *args, **kwargs) -> pygame.Surface:
-        if self.clicking:
-            self.screen.fill(tuple(c * 0.7 for c in self.color), self.box)
+        inner = self.inner.render(*args, **kwargs)
 
-        self.inner.render(*args, **kwargs)
+        # self.box = (
+        #     self.inner.pos[0] - self.padding_left,
+        #     self.inner.pos[1] - self.padding_top,
+        #     self.inner.width + self.padding_left + self.padding_right,
+        #     self.inner.height + self.padding_top + self.padding_bottom,
+        # )
 
-        self.box = (
-            self.inner.pos[0] - self.padding_left,
-            self.inner.pos[1] - self.padding_top,
+        size = (
             self.inner.width + self.padding_left + self.padding_right,
             self.inner.height + self.padding_top + self.padding_bottom,
         )
 
-        pygame.draw.rect(self.screen, self.color, self.box, 1)
-        return super().render()
+        self.width = size[0]
+        self.height = size[1]
 
-    def events(self, events):
-        for event in events:
-            if "consumed" in event.dict and event.consumed:
-                continue
+        surface = pygame.Surface(size, pygame.SRCALPHA)
+        if self.clicking:
+            surface.fill(tuple(c * 0.7 for c in self.color), (0, 0, *size))
 
-            if event.type == pygame.MOUSEBUTTONUP:
-                pos = event.pos
+        if inner is not None:
+            surface.blit(inner, (self.padding_left, self.padding_top))
+        pygame.draw.rect(surface, self.color, (0, 0, *size), 1)
+        return surface
 
-                if (
-                    self.box is not None
-                    and self.visible()
-                    and pygame.Rect(self.box).collidepoint(pos[0], pos[1])
-                ):
-                    self.pre_click()
-                    try:
-                        if self.click_param:
-                            self.clicked_param(self.click_param)
-                        else:
-                            self.clicked()
-                    finally:
-                        self.post_click()
-                    event.consumed = True
+    def on_click(self):
+        self.pre_click()
+        try:
+            if self.click_param:
+                self.clicked_param(self.click_param)
+            else:
+                self.clicked()
+        finally:
+            self.post_click()

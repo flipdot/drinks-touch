@@ -22,7 +22,6 @@ class RechargeScreen(Screen):
 
         self.objects.append(
             Button(
-                self.screen,
                 text="BACK",
                 pos=(30, 30),
                 font=FONTS["monospace"],
@@ -51,28 +50,24 @@ class RechargeScreen(Screen):
         )
         self.select_objects = [
             Button(
-                self.screen,
                 text="EUR 5",
                 pos=(30, 300),
                 size=30,
                 click_func=partial(self.verify_payment, 5),
             ),
             Button(
-                self.screen,
                 text="EUR 10",
                 pos=(250, 300),
                 size=30,
                 click_func=partial(self.verify_payment, 10),
             ),
             Button(
-                self.screen,
                 text="EUR 20",
                 pos=(30, 400),
                 size=30,
                 click_func=partial(self.verify_payment, 20),
             ),
             Button(
-                self.screen,
                 text="EUR 50",
                 pos=(250, 400),
                 size=30,
@@ -89,7 +84,6 @@ class RechargeScreen(Screen):
             Label(self.screen, text="Hast du", pos=(30, 150), size=55),
             Label(self.screen, text="in die Kasse geworfen?", pos=(30, 250), size=55),
             Button(
-                self.screen,
                 text="Ja",
                 pos=(250, 400),
                 size=30,
