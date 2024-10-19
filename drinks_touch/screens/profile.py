@@ -242,6 +242,7 @@ class ProfileScreen(Screen):
     def on_barcode(self, barcode):
         if not barcode:
             return
+        self.processing.text = f"Gescannt: {barcode}"
         self.processing.is_visible = True
         user = Users.get_by_id_card(barcode)
         if user:

@@ -16,7 +16,7 @@ from sqlalchemy import text
 import config
 from database.models.account import Account
 from database.models.recharge_event import RechargeEvent
-from database.storage import get_session, Session
+from database.storage import Session
 from users.users import Users
 
 logger = logging.getLogger(__name__)
@@ -88,9 +88,7 @@ def send_drink(user, drink, with_summary=False):
                 )
                 return
 
-            session = get_session()
             send_summary(
-                session,
                 user,
                 subject="Getränk getrunken",
                 prepend_text=content_text,
@@ -197,18 +195,21 @@ def send_low_balance(account: Account, with_summary=False, force=False):
 
 
 def send_summaries():
-    session = get_session()
-
     if config.FORCE_MAIL_TO_UID:
+        account = (
+            Session()
+            .query(Account)
+            .filter(Account.ldap_id == config.FORCE_MAIL_TO_UID)
+            .one()
+        )
         send_summary(
-            session,
-            Users.get_by_id(config.FORCE_MAIL_TO_UID),
+            account,
             "Getränkeübersicht",
             force=True,
         )
         return
 
-    for account in session.query(Account).filter(Account.email.isnot(None)).all():
+    for account in Session().query(Account).filter(Account.email.isnot(None)).all():
         try:
             send_summary(account, "Getränkeübersicht")
         except Exception:
@@ -334,8 +335,10 @@ def format_recharges(recharges):
 
 
 def get_drinks_consumed(account: Account):
-    # TODO: table "drink" is not being created locally, crashes here
-    since_timestamp = account.last_summary_email_sent_at.timestamp()
+    if account.last_summary_email_sent_at:
+        since_timestamp = account.last_summary_email_sent_at.timestamp()
+    else:
+        since_timestamp = 0
     sql = text(
         """SELECT
     se.barcode,

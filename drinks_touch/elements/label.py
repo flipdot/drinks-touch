@@ -38,7 +38,7 @@ class Label(BaseElm):
             cls._font_cache[(font_face, size)] = font
         return cls._font_cache[(font_face, size)]
 
-    def render(self):
+    def render(self, *args, **kwargs):
         self.frame_counter += 1
         if self.blink_frequency:
             if (self.frame_counter // self.blink_frequency) % 2:

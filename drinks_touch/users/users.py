@@ -74,6 +74,7 @@ class Users(object):
 
     @staticmethod
     def get_all(filters=None, include_temp=False) -> list[dict]:
+        logger = logging.getLogger("SyncFromLDAPTask")
         if filters is None:
             filters = []
 
@@ -85,17 +86,23 @@ class Users(object):
         if len(filters) > 1:
             filter_str = "(&%s)" % filter_str
 
+        logger.info("Searching %s", base_dn)
+
         attrs = [k["ldap_field"] for k in Users.fields.values()]
         con = Users.get_ldap_instance()
         _, _, ldap_res, _ = con.search(
             base_dn, filter_str, search_scope=SUBTREE, attributes=attrs
         )
+        logger.info("Found %d members", len(ldap_res))
         if include_temp:
+            logger.info("Searching %s", temp_dn)
             _, _, ldap_res2, _ = con.search(
                 temp_dn, filter_str, search_scope=SUBTREE, attributes=attrs
             )
             ldap_res.extend(ldap_res2)
+            logger.info("Found %d tmp users", len(ldap_res2))
 
+        logger.info("Found %d total users", len(ldap_res))
         users = []
         for ldap_user in ldap_res:
             user = {}
