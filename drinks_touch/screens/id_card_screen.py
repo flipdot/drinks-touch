@@ -50,25 +50,17 @@ class IDCardScreen(Screen):
             )
         )
 
-        self.objects.append(
-            Label(self.screen, text=self.user["name"], pos=(30, 120), size=70)
-        )
+        self.objects.append(Label(text=self.user["name"], pos=(30, 120), size=70))
 
-        self.objects.append(
-            Label(self.screen, text="Momentan zugeordnet:", pos=(30, 300))
-        )
+        self.objects.append(Label(text="Momentan zugeordnet:", pos=(30, 300)))
 
         self.id_label = Label(
-            self.screen, text=self.user["id_card"], pos=(50, 400), size=70, font="Serif"
+            text=self.user["id_card"], pos=(50, 400), size=70, font="Serif"
         )
         self.objects.append(self.id_label)
 
-        self.objects.append(
-            Label(self.screen, text="Scanne deine ID,", pos=(30, 550), size=60)
-        )
-        self.objects.append(
-            Label(self.screen, text="um sie zuzuweisen.", pos=(30, 600), size=60)
-        )
+        self.objects.append(Label(text="Scanne deine ID,", pos=(30, 550), size=60))
+        self.objects.append(Label(text="um sie zuzuweisen.", pos=(30, 600), size=60))
 
         self.objects.append(
             Button(

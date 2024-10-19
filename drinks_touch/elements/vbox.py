@@ -1,3 +1,5 @@
+import pygame
+
 from elements.base_elm import BaseElm
 
 
@@ -10,7 +12,7 @@ class VBox(BaseElm):
         self.elements = elements
         self.gap = gap
 
-    def render(self, *args, **kwargs):
+    def render(self, *args, **kwargs) -> pygame.Surface:
         y = self.pos[1]
         for element in self.elements:
             element.pos = (self.pos[0], y)
@@ -18,3 +20,4 @@ class VBox(BaseElm):
             y += element.height + self.gap
         self.width = max([element.width for element in self.elements])
         self.height = y - self.pos[1] - self.gap
+        return super().render()

@@ -1,5 +1,8 @@
 import os
 from datetime import timedelta
+import dotenv
+
+dotenv.load_dotenv()
 
 MONEY_URL = os.environ.get("MONEY_URL", "https://somewhere/x.json")
 MONEY_USER = os.environ.get("MONEY_USER", "my_user")
@@ -8,6 +11,13 @@ MONEY_PASSWORD = os.environ.get("MONEY_PASSWORD", "my_basicauth_passwd")
 LDAP_HOST = os.environ.get("LDAP_HOST", "ldap://127.0.0.1")
 LDAP_USER = os.environ.get("LDAP_USER", "cn=admin,dc=flipdot,dc=org")
 LDAP_PW = os.environ.get("LDAP_PW", "admin")
+
+DEBUG_UI_ELEMENTS = os.environ.get("DEBUG_UI_ELEMENTS", "False") in [
+    "True",
+    "true",
+    "1",
+    "yes",
+]
 
 COLORS = {
     "infragelb": (246, 198, 0),
@@ -79,4 +89,4 @@ LOGLEVEL = os.environ.get("LOGLEVEL", "WARNING")
 # Evaluates to MAIL_FROM by default.
 FORCE_MAIL_TO_UID = os.environ.get("FORCE_MAIL_TO_UID", None)
 
-FULLSCREEN = os.environ.get("FULLSCREEN", "True") in ["True", "true", "1"]
+FULLSCREEN = os.environ.get("FULLSCREEN", "True") in ["True", "true", "1", "yes"]

@@ -48,7 +48,7 @@ class Progress(BaseElm):
         else:
             return old_value
 
-    def render(self, dt):
+    def render(self, dt) -> pygame.Surface:
         if self.tick is not None:
             self.value = self.tick(self.value, dt)
 
@@ -59,3 +59,4 @@ class Progress(BaseElm):
             pygame.draw.arc(
                 self.screen, self.color, self.box, start, end, int(self.size / 5)
             )
+        return super().render()

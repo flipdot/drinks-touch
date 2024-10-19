@@ -133,8 +133,7 @@ class Users(object):
         return account.balance
 
     @staticmethod
-    def get_recharges(user_id, session=None, limit=None):
-        # type: # (str, session) -> RechargeEvent
+    def get_recharges(user_id, session=None, limit=None) -> RechargeEvent:
         q = (
             Session()
             .query(RechargeEvent)

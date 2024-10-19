@@ -29,7 +29,6 @@ class SyncScreen(Screen):
 
         self.objects: list[BaseElm] = [
             Label(
-                self.screen,
                 text="Initialisierung...",
                 pos=(10, 25),
             ),

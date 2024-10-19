@@ -69,13 +69,15 @@ class ProgressBar(BaseElm):
         if self.percent is None:
             self.percent = 1
 
-    def render(self, dt, *args, **kwargs):
+    def render(self, dt, *args, **kwargs) -> pygame.Surface:
         self.tick += dt
         if self.label:
             self._render_label()
         self._render_bar()
         if self.text:
             self._render_textbox()
+
+        return super().render()
 
     def _render_label(self):
         font = pygame.font.SysFont(FONTS["sans serif"], 22)

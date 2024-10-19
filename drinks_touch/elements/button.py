@@ -60,7 +60,6 @@ class Button(BaseElm):
         self.force_height = force_height
         if inner is None:
             inner = Label(
-                screen,
                 pos=(self.pos[0] + self.padding_left, self.pos[1] + self.padding_top),
                 text=text,
                 font=font,
@@ -82,7 +81,7 @@ class Button(BaseElm):
     def post_click(self):
         self.clicking = False
 
-    def render(self, *args, **kwargs):
+    def render(self, *args, **kwargs) -> pygame.Surface:
         if self.clicking:
             self.screen.fill(tuple(c * 0.7 for c in self.color), self.box)
 
@@ -96,6 +95,7 @@ class Button(BaseElm):
         )
 
         pygame.draw.rect(self.screen, self.color, self.box, 1)
+        return super().render()
 
     def events(self, events):
         for event in events:

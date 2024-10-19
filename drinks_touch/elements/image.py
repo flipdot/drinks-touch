@@ -23,5 +23,6 @@ class Image(BaseElm):
     def __load_img(self):
         self.img = pygame.image.load(self.src).convert_alpha()
 
-    def render(self, *args, **kwargs):
+    def render(self, *args, **kwargs) -> pygame.Surface:
         self.screen.blit(self.img, self.pos)
+        return super().render()

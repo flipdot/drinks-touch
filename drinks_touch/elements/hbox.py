@@ -1,3 +1,5 @@
+import pygame
+
 from elements.base_elm import BaseElm
 
 
@@ -10,7 +12,7 @@ class HBox(BaseElm):
         self.elements = elements
         self.gap = gap
 
-    def render(self, *args, **kwargs):
+    def render(self, *args, **kwargs) -> pygame.Surface:
         x = self.pos[0]
         for element in self.elements:
             element.pos = (x, self.pos[1])
@@ -18,3 +20,4 @@ class HBox(BaseElm):
             x += element.width + self.gap
         self.height = max([element.height for element in self.elements])
         self.width = x - self.pos[0] - self.gap
+        return super().render()

@@ -68,22 +68,18 @@ class WaitScanScreen(Screen):
 
         self.objects.append(
             Label(
-                self.screen,
                 text="Scanne dein Getränk",
                 pos=(60, 240),
             )
         )
         self.objects.append(
             Label(
-                self.screen,
                 text="oder deine ID-Card :)",
                 pos=(70, 280),
             )
         )
 
-        self.processing = Label(
-            self.screen, text="Moment bitte...", size=40, pos=(80, 350)
-        )
+        self.processing = Label(text="Moment bitte...", size=40, pos=(80, 350))
         self.processing.is_visible = False
         self.objects.append(self.processing)
         sql = text(
@@ -103,7 +99,6 @@ class WaitScanScreen(Screen):
 
         self.objects.append(
             Label(
-                self.screen,
                 text="∑ = {}".format(total_balance_fmt),
                 size=25,
                 pos=(0, 755),
@@ -144,7 +139,6 @@ class WaitScanScreen(Screen):
 
         self.objects.append(
             Label(
-                self.screen,
                 text=f"Build: {config.BUILD_NUMBER}",
                 size=20,
                 pos=(0, 785),
@@ -157,11 +151,11 @@ class WaitScanScreen(Screen):
             # make build number flash, show "Update available" when flashing
             self.objects.append(
                 Label(
-                    self.screen,
                     text=f"Update available: {CheckForUpdatesTask.newest_version_sha_short}",
                     size=25,
-                    pos=(475, 780),
+                    pos=(480, 800),
                     align_right=True,
+                    align_bottom=True,
                     color=(0, 0, 0),
                     bg_color=(255, 255, 255),
                     padding=5,

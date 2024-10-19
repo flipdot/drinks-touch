@@ -44,14 +44,12 @@ class EnterPinScreen(Screen):
 
         self.objects.append(
             Label(
-                self.screen,
                 text="/s Barcode oder /e PIN:",
                 pos=(40, 110),
             )
         )
 
         self.input = Label(
-            self.screen,
             text="_",
             pos=(100, 180),
         )
