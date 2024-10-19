@@ -17,46 +17,25 @@ class Button(BaseElm):
         click_func=None,
         click_func_param=None,
         click_param=None,
-        padding: (
-            int | tuple[int, int] | tuple[int, int, int] | tuple[int, int, int, int]
-        ) = 10,
         force_width=None,
         force_height=None,
         inner: BaseElm = None,
         pos=(0, 0),
+        padding: (
+            int | tuple[int, int] | tuple[int, int, int] | tuple[int, int, int, int]
+        ) = 10,
         *args,
         **kwargs,
     ):
         from . import Label
 
-        super().__init__(None, pos, size, -1, *args, **kwargs)
+        super().__init__(None, pos, size, size, *args, padding=padding, **kwargs)
 
         self.size = size
         self.color = color
         self.clicked = click_func or self.__clicked
         self.clicked_param = click_func_param
         self.click_param = click_param
-
-        if not isinstance(padding, tuple):
-            self.padding_top = padding
-            self.padding_right = padding
-            self.padding_bottom = padding
-            self.padding_left = padding
-        elif len(padding) == 2:
-            self.padding_top = padding[0]
-            self.padding_right = padding[1]
-            self.padding_bottom = padding[0]
-            self.padding_left = padding[1]
-        elif len(padding) == 3:
-            self.padding_top = padding[0]
-            self.padding_right = padding[1]
-            self.padding_bottom = padding[2]
-            self.padding_left = padding[1]
-        else:
-            self.padding_top = padding[0]
-            self.padding_right = padding[1]
-            self.padding_bottom = padding[2]
-            self.padding_left = padding[3]
         self.force_width = force_width
         self.force_height = force_height
         if inner is None:
@@ -109,7 +88,7 @@ class Button(BaseElm):
         pygame.draw.rect(surface, self.color, (0, 0, *size), 1)
         return surface
 
-    def on_click(self):
+    def on_click(self, x, y):
         self.pre_click()
         try:
             if self.click_param:

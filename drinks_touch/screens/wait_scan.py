@@ -7,6 +7,7 @@ from database.storage import get_session
 from drinks.drinks import get_by_ean
 from drinks.drinks_manager import DrinksManager
 from elements import RefreshIcon, SvgIcon, Progress, Label, Image, Button
+from elements.hbox import HBox
 from screens.new_id_screen import NewIDScreen
 from screens.profile import ProfileScreen
 from tasks import CheckForUpdatesTask
@@ -57,7 +58,7 @@ class WaitScanScreen(Screen):
                 click_func=self.set_member,
             ),
             Button(
-                pos=(290, 700),
+                pos=(290, 690),
                 size=15,
                 text="Gutschein drucken",
                 click_func=self.btn_new_id,
@@ -105,23 +106,11 @@ class WaitScanScreen(Screen):
             )
         )
 
-        self.objects.append(
-            Button(
-                pos=(480, 800),
-                align_right=True,
-                align_bottom=True,
-                text=None,
-                click_func=lambda: ScreenManager.get_instance().set_active(
-                    SyncScreen(self.screen)
-                ),
-                inner=RefreshIcon(),
-            )
-        )
+        bottom_right_buttons = []
 
         if config.GIT_REPO_AVAILABLE:
-            self.objects.append(
+            bottom_right_buttons.append(
                 Button(
-                    pos=(370, 750),
                     text=None,
                     inner=SvgIcon(
                         "drinks_touch/static/images/git.svg",
@@ -134,6 +123,27 @@ class WaitScanScreen(Screen):
                     # ),
                 ),
             )
+        bottom_right_buttons.append(
+            Button(
+                text=None,
+                click_func=lambda: ScreenManager.get_instance().set_active(
+                    SyncScreen(self.screen)
+                ),
+                inner=RefreshIcon(),
+            )
+        )
+
+        self.objects.append(
+            HBox(
+                pos=(480, 800),
+                align_right=True,
+                align_bottom=True,
+                elements=bottom_right_buttons,
+                right_to_left=True,
+                gap=5,
+                padding=5,
+            )
+        )
 
         self.objects.append(
             Label(

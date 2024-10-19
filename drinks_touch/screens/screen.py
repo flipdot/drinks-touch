@@ -15,23 +15,10 @@ class Screen(object):
                 surface = o.render(dt)
                 if surface is not None:
                     self.screen.blit(surface, o.screen_pos)
-        if config.DEBUG_UI_ELEMENTS:
-            self.render_debug()
-
-    def render_debug(self):
-        for o in self.objects:
-            if o.visible:
-                w = o.width
-                h = o.height
-                x = o.screen_pos[0]
-                y = o.screen_pos[1]
-                pygame.draw.rect(self.screen, (255, 0, 255), (x, y, w, h), width=1)
-                pygame.draw.line(
-                    self.screen, (255, 0, 255), (x, y), (x + w, y + h), width=1
-                )
-                pygame.draw.line(
-                    self.screen, (255, 0, 255), (x + w, y), (x, y + h), width=1
-                )
+                if config.DEBUG_UI_ELEMENTS:
+                    debug_surface = o.render_debug()
+                    if debug_surface is not None:
+                        self.screen.blit(debug_surface, o.screen_pos)
 
     def events(self, events):
         for obj in self.objects:
@@ -50,7 +37,11 @@ class Screen(object):
                         and obj.visible
                         and pygame.Rect(obj.box).collidepoint(pos[0], pos[1])
                     ):
-                        obj.on_click()
+                        transformed_pos = (
+                            pos[0] - obj.screen_pos[0],
+                            pos[1] - obj.screen_pos[1],
+                        )
+                        obj.on_click(*transformed_pos)
                         # self.pre_click()
                         # try:
                         #     if self.click_param:

@@ -20,7 +20,7 @@ class Progress(BaseElm):
         self.is_running = False
 
         pos = kwargs.get("pos", (0, 0))
-        super(Progress, self).__init__(screen, pos, self.size, -1)
+        super(Progress, self).__init__(screen, pos, self.size, self.size)
         self.start()
 
     def start(self):

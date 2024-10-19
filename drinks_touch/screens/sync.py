@@ -30,7 +30,7 @@ class SyncScreen(Screen):
         self.objects: list[BaseElm] = [
             Label(
                 text="Initialisierung...",
-                pos=(10, 25),
+                pos=(5, 5),
             ),
             VBox(self.screen, progress_bars, gap=10, pos=(10, 80)),
             Button(
