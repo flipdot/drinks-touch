@@ -40,9 +40,7 @@ class SuccessScreen(Screen):
             )
         )
 
-        self.progress = Progress(
-            self.screen, pos=(400, 500), size=80, on_elapsed=self.home
-        )
+        self.progress = Progress(pos=(400, 500), size=80, on_elapsed=self.home)
         self.objects.append(self.progress)
         self.progress.start()
         balance = Users.get_balance(user["id"])

@@ -141,7 +141,7 @@ class WaitScanScreen(Screen):
                 elements=bottom_right_buttons,
                 right_to_left=True,
                 gap=5,
-                padding=5,
+                padding=(0, 5),
             )
         )
 
@@ -172,7 +172,6 @@ class WaitScanScreen(Screen):
             )
 
         self.timeout = Progress(
-            self.screen,
             pos=(400, 500),
             size=100,
             speed=1 / 10.0,

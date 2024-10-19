@@ -27,7 +27,6 @@ class NamesScreen(Screen):
         )
 
         self.timeout = Progress(
-            self.screen,
             pos=(200, 50),
             speed=1 / 15.0,
             on_elapsed=self.time_elapsed,
@@ -37,7 +36,6 @@ class NamesScreen(Screen):
 
         self.objects.append(
             Label(
-                self.screen,
                 text="Wer bist du?",
                 pos=(20, 110),
             )

@@ -50,7 +50,6 @@ class MainScreen(Screen):
             )
         )
         self.timeout = Progress(
-            self.screen,
             pos=(380, 715),
             speed=1 / 15.0,
             on_elapsed=self.time_elapsed,

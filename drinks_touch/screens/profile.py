@@ -79,7 +79,6 @@ class ProfileScreen(Screen):
         self.objects.append(self.processing)
 
         self.timeout = Progress(
-            self.screen,
             pos=(200, 50),
             speed=1 / 30.0,
             on_elapsed=self.time_elapsed,
@@ -136,9 +135,7 @@ class ProfileScreen(Screen):
             self.elements_drinks.append(self.btn_aufladungen)
 
         balance = Users.get_balance(self.user["id"])
-        self.objects.append(
-            Label(self.screen, text=str(balance), pos=(335, 145), size=40)
-        )
+        self.objects.append(Label(text=str(balance), pos=(335, 145), size=40))
 
         drinks = self.get_stats()
         for i, drinks in enumerate(drinks):

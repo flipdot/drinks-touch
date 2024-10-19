@@ -22,7 +22,6 @@ class EnterPinScreen(Screen):
         )
 
         self.timeout = Progress(
-            self.screen,
             pos=(200, 50),
             speed=1 / 15.0,
             on_elapsed=self.time_elapsed,

@@ -35,7 +35,8 @@ class SyncScreen(Screen):
             VBox(self.screen, progress_bars, gap=10, pos=(10, 80)),
             Button(
                 text="Abbrechen",
-                pos=(20, 750),
+                pos=(5, 795),
+                align_bottom=True,
                 click_func=self.cancel_tasks,
             ),
         ]
@@ -52,9 +53,10 @@ class SyncScreen(Screen):
         if not self.finished and self.all_tasks_finished:
             self.objects.append(
                 Progress(
-                    self.screen,
-                    pos=(440, 760),
+                    pos=(475, 795),
                     speed=1 / 10,
+                    align_right=True,
+                    align_bottom=True,
                     on_elapsed=self.time_elapsed,
                 )
             )

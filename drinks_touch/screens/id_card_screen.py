@@ -31,7 +31,6 @@ class IDCardScreen(Screen):
         )
 
         self.timeout = Progress(
-            self.screen,
             pos=(200, 50),
             speed=1 / 15.0,
             on_elapsed=self.time_elapsed,
@@ -77,7 +76,7 @@ class IDCardScreen(Screen):
                 click_func=self.print_id,
             )
         )
-        self.progress = Progress(self.screen, pos=(200, 720), speed=1 / 15.0)
+        self.progress = Progress(pos=(200, 720), speed=1 / 15.0)
         self.progress.stop()
         self.objects.append(self.progress)
 

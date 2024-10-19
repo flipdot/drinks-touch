@@ -31,7 +31,6 @@ class NewIDScreen(Screen):
         )
 
         self.timeout = Progress(
-            self.screen,
             pos=(200, 50),
             speed=1 / 30.0,
             on_elapsed=self.time_elapsed,
@@ -41,18 +40,19 @@ class NewIDScreen(Screen):
 
         self.objects.append(
             Label(
-                self.screen, text="Prepaid Barcode generieren", pos=(30, 120), size=50
+                text="Prepaid Barcode generieren",
+                pos=(30, 120),
+                size=50,
             )
         )
         self.objects.append(
             Label(
-                self.screen,
                 text="Wie viel hast du eingeworfen?",
                 pos=(30, 220),
                 size=40,
             )
         )
-        self.message = Label(self.screen, text="", pos=(50, 320), size=40)
+        self.message = Label(text="", pos=(50, 320), size=40)
         self.objects.append(self.message)
 
         for i, euro in enumerate([5, 10, 20, 50]):
@@ -66,7 +66,6 @@ class NewIDScreen(Screen):
             )
 
         self.progress = Progress(
-            self.screen,
             pos=(200, 420),
             size=100,
             speed=1 / 10.0,
