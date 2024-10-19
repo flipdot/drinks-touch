@@ -66,7 +66,7 @@ def send_notification(to_address, subject, content_text, content_html, uid):
 
 
 def send_drink(user, drink, with_summary=False):
-    account = Account.query.filter(Account.email == user["email"]).one()
+    account = Account.query.filter(Account.ldap_id == user["id"]).one()
     try:
         if account.email and "instant" in account.summary_email_notification_setting:
             content_text = (
