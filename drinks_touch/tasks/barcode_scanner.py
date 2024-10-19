@@ -37,9 +37,6 @@ class InitializeBarcodeScannerTask(BaseTask):
         self.logger.info(f"Barcode gescannt: {barcode}")
 
 
-888
-
-
 class BarcodeWorker:
     killed = False
 
