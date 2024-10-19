@@ -2,6 +2,7 @@ import math
 
 import pygame.draw
 
+from config import FONTS, COLORS
 from elements.base_elm import BaseElm
 
 
@@ -31,7 +32,7 @@ class ProgressBar(BaseElm):
         self.max_line_length = math.floor(width / 9.2)
         self.max_lines = math.floor(box_height / 15)
 
-        self.color = (246, 198, 0)
+        self.color = COLORS["infragelb"]
         self.percent = None
         self.tick = 0
 
@@ -77,7 +78,7 @@ class ProgressBar(BaseElm):
             self._render_textbox()
 
     def _render_label(self):
-        font = pygame.font.SysFont("sans serif", 25)
+        font = pygame.font.SysFont(FONTS["sans serif"], 22)
         label = font.render(self.label, 1, self.color)
         self.label_height = label.get_height()
         self.screen.blit(label, self.pos_label)
@@ -94,7 +95,7 @@ class ProgressBar(BaseElm):
             ),
             width=1,
         )
-        font = pygame.font.SysFont("monospace", 15)
+        font = pygame.font.SysFont(FONTS["monospace"], 15)
 
         lines = self.text.split("\n")
 
@@ -110,7 +111,7 @@ class ProgressBar(BaseElm):
         last_lines = lines[-self.max_lines :]
 
         for i, line in enumerate(last_lines):
-            text = font.render(line, 1, (246, 198, 0))
+            text = font.render(line, 1, COLORS["infragelb"])
             self.screen.blit(
                 text,
                 (

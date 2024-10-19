@@ -2,6 +2,7 @@ import datetime
 
 from sqlalchemy.sql import text
 
+from config import FONTS
 from database.models.scan_event import ScanEvent
 from database.storage import get_session
 from drinks.drinks import get_by_ean
@@ -9,7 +10,6 @@ from drinks.drinks_manager import DrinksManager
 from elements.button import Button
 from elements.label import Label
 from elements.progress import Progress
-from env import monospace
 from screens.recharge_screen import RechargeScreen
 from users.users import Users
 from .id_card_screen import IDCardScreen
@@ -29,7 +29,7 @@ class ProfileScreen(Screen):
                 self.screen,
                 text="BACK",
                 pos=(30, 30),
-                font=monospace,
+                font=FONTS["monospace"],
                 click_func=self.back,
             )
         )
@@ -39,7 +39,7 @@ class ProfileScreen(Screen):
                 self.screen,
                 text="ID card",
                 pos=(340, 30),
-                font=monospace,
+                font=FONTS["monospace"],
                 click_func=self.id_card,
             )
         )
@@ -260,11 +260,6 @@ class ProfileScreen(Screen):
             self.objects.remove(self.btn_drinks)
         self.processing.is_visible = False
         self.timeout.start()
-
-    @staticmethod
-    def back():
-        screen_manager = ScreenManager.get_instance()
-        screen_manager.go_back()
 
     def id_card(self):
         screen_manager = ScreenManager.get_instance()

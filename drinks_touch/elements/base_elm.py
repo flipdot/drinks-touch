@@ -3,7 +3,7 @@ class BaseElm(object):
         self.screen = screen
         self.pos = pos
         self._height = height
-        self.width = width
+        self._width = width
         self.is_visible = True
 
     @property
@@ -13,6 +13,14 @@ class BaseElm(object):
     @height.setter
     def height(self, value):
         self._height = value
+
+    @property
+    def width(self):
+        return self._width
+
+    @width.setter
+    def width(self, value):
+        self._width = value
 
     def events(self, events):
         pass

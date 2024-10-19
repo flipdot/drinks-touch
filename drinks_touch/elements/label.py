@@ -1,3 +1,4 @@
+from config import COLORS
 from .base_elm import BaseElm
 
 import contextlib
@@ -18,7 +19,7 @@ class Label(BaseElm):
         # if True, pos marks top-right instead of top-left corner
         self.align_right = kwargs.get("align_right", False)
         self.text = kwargs.get("text", "<Label>")
-        self.color = kwargs.get("color", (246, 198, 0))
+        self.color = kwargs.get("color", COLORS["infragelb"])
         self.bg_color = kwargs.get("bg_color", None)
         self.border_color = kwargs.get("border_color", None)
         self.border_width = kwargs.get("border_width", 0)

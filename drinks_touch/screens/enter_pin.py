@@ -1,7 +1,7 @@
+from config import FONTS
 from elements.button import Button
 from elements.label import Label
 from elements.progress import Progress
-from env import monospace
 from screens.profile import ProfileScreen
 from .screen import Screen
 
@@ -17,7 +17,7 @@ class EnterPinScreen(Screen):
                 text="BACK",
                 pos=(30, 30),
                 click_func=self.back,
-                font=monospace,
+                font=FONTS["monospace"],
                 size=30,
             )
         )
@@ -37,7 +37,7 @@ class EnterPinScreen(Screen):
                 text="UNLOCK!",
                 pos=(100, 680),
                 click_func=self.btn_ok,
-                font=monospace,
+                font=FONTS["monospace"],
                 size=70,
             )
         )
@@ -73,7 +73,7 @@ class EnterPinScreen(Screen):
                 self.screen,
                 text="DEL",
                 pos=(200, 580),
-                font=monospace,
+                font=FONTS["monospace"],
                 click_func=self.del_char,
                 size=50,
             )
@@ -90,7 +90,7 @@ class EnterPinScreen(Screen):
                 pos=(cord_x, cord_y),
                 click_func_param=self.add_char,
                 click_param=label,
-                font=monospace,
+                font=FONTS["monospace"],
                 size=50,
                 force_width=width,
                 force_height=width,
@@ -115,13 +115,6 @@ class EnterPinScreen(Screen):
 
     def get_pin(self):
         return self.input.text[: len(self.input.text) - 1]
-
-    @staticmethod
-    def back():
-        from .screen_manager import ScreenManager
-
-        screen_manager = ScreenManager.get_instance()
-        screen_manager.go_back()
 
     def switch_to_screen(self, param):
         from .screen_manager import ScreenManager

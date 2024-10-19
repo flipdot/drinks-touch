@@ -6,11 +6,7 @@ from database.models.scan_event import ScanEvent
 from database.storage import get_session
 from drinks.drinks import get_by_ean
 from drinks.drinks_manager import DrinksManager
-from elements.button import Button
-from elements.image import Image
-from elements.label import Label
-from elements.progress import Progress
-from icons import RefreshIcon
+from elements import RefreshIcon, SvgIcon, Progress, Label, Image, Button
 from screens.new_id_screen import NewIDScreen
 from screens.profile import ProfileScreen
 from tasks import CheckForUpdatesTask
@@ -108,7 +104,7 @@ class WaitScanScreen(Screen):
         self.objects.append(
             Label(
                 self.screen,
-                text="Gesamtguthaben aller Member: {}".format(total_balance_fmt),
+                text="∑ = {}".format(total_balance_fmt),
                 size=25,
                 pos=(0, 755),
             )
@@ -119,12 +115,32 @@ class WaitScanScreen(Screen):
                 self.screen,
                 pos=(430, 750),
                 text=None,
-                icon=RefreshIcon(),
+                icon=RefreshIcon(self.screen, pos=(430, 750)),
                 click_func=lambda: ScreenManager.get_instance().set_active(
                     SyncScreen(self.screen)
                 ),
             )
         )
+
+        if config.GIT_REPO_AVAILABLE:
+            self.objects.append(
+                Button(
+                    self.screen,
+                    pos=(370, 750),
+                    text=None,
+                    icon=SvgIcon(
+                        self.screen,
+                        "drinks_touch/static/images/git.svg",
+                        pos=(370, 750),
+                        color=config.COLORS["disabled"],
+                        height=36,
+                    ),
+                    color=config.COLORS["disabled"],
+                    # click_func=lambda: ScreenManager.get_instance().set_active(
+                    #     GitScreen(self.screen)
+                    # ),
+                ),
+            )
 
         self.objects.append(
             Label(
@@ -222,10 +238,3 @@ class WaitScanScreen(Screen):
 
         self.barcode_label.text = None
         self.show_scanned_info(False)
-
-    @staticmethod
-    def back():
-        from .screen_manager import ScreenManager
-
-        screen_manager = ScreenManager.get_instance()
-        screen_manager.set_default()

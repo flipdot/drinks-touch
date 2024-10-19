@@ -4,12 +4,12 @@ from io import BytesIO
 from functools import partial
 from pystrich.code128 import Code128Encoder
 
+from config import FONTS
 from database.models.recharge_event import RechargeEvent
 from database.storage import get_session
 from elements.button import Button
 from elements.label import Label
 from elements.progress import Progress
-from env import monospace
 from users.users import Users
 from .profile import ProfileScreen
 from .screen import Screen
@@ -25,7 +25,7 @@ class NewIDScreen(Screen):
                 self.screen,
                 text="BACK",
                 pos=(30, 30),
-                font=monospace,
+                font=FONTS["monospace"],
                 click_func=self.back,
                 size=30,
             )
@@ -76,11 +76,6 @@ class NewIDScreen(Screen):
         )
         self.progress.stop()
         self.objects.append(self.progress)
-
-    @staticmethod
-    def back():
-        screen_manager = ScreenManager.get_instance()
-        screen_manager.go_back()
 
     @staticmethod
     def home():

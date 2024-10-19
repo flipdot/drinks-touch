@@ -9,12 +9,21 @@ LDAP_HOST = os.environ.get("LDAP_HOST", "ldap://127.0.0.1")
 LDAP_USER = os.environ.get("LDAP_USER", "cn=admin,dc=flipdot,dc=org")
 LDAP_PW = os.environ.get("LDAP_PW", "admin")
 
+COLORS = {
+    "infragelb": (246, 198, 0),
+    "disabled": (50, 50, 50),
+}
+
 if bn := os.environ.get("BUILD_NUMBER"):
     BUILD_NUMBER = bn
 else:
     BUILD_NUMBER = (
         os.popen("git describe --tags --dirty").read().strip() or "git is not available"
     )
+
+GIT_REPO_AVAILABLE = (
+    os.popen("git rev-parse --is-inside-work-tree").read().strip() == "true"
+)
 
 OIDC_DISCOVERY_URL = os.environ.get(
     "OIDC_DISCOVERY_URL",
@@ -59,6 +68,8 @@ SCANNER_DEVICE_PATH = os.environ.get("SCANNER_DEVICE_PATH", "/dev/ttyACM0")
 WEBSERVER_PORT = os.environ.get("WEBSERVER_PORT", 5002)
 
 FPS = 30
+
+FONTS = {"monospace": "DejaVu Sans Mono", "sans serif": "DejaVu Sans"}
 
 LOGLEVEL = os.environ.get("LOGLEVEL", "WARNING")
 

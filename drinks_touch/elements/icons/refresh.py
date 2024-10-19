@@ -2,7 +2,7 @@ import math
 
 import pygame
 
-from icons.base import BaseIcon
+from .base import BaseIcon
 
 
 class RefreshIcon(BaseIcon):
@@ -12,7 +12,7 @@ class RefreshIcon(BaseIcon):
         pygame.draw.arc(
             surface,
             self.COLOR,
-            (0, 0, self.size, self.size),
+            (0, 0, self.width, self.height),
             math.pi * 0.2,
             math.pi * 0.8,
             6,
@@ -21,7 +21,7 @@ class RefreshIcon(BaseIcon):
         pygame.draw.arc(
             surface,
             self.COLOR,
-            (0, 0, self.size, self.size),
+            (0, 0, self.width, self.height),
             math.pi * 1.2,
             math.pi * 1.8,
             6,
@@ -31,9 +31,9 @@ class RefreshIcon(BaseIcon):
             surface,
             self.COLOR,
             [
-                (self.size * 0.6, self.size * 0.4),
-                (self.size * 0.95, self.size * 0.4),
-                (self.size * 0.95, self.size * 0.05),
+                (self.width * 0.6, self.height * 0.4),
+                (self.width * 0.95, self.height * 0.4),
+                (self.width * 0.95, self.height * 0.05),
             ],
         )
 
@@ -41,8 +41,8 @@ class RefreshIcon(BaseIcon):
             surface,
             self.COLOR,
             [
-                (self.size * 0.4, self.size * 0.6),
-                (self.size * 0.05, self.size * 0.6),
-                (self.size * 0.05, self.size * 0.95),
+                (self.width * 0.4, self.height * 0.6),
+                (self.width * 0.05, self.height * 0.6),
+                (self.width * 0.05, self.height * 0.95),
             ],
         )
