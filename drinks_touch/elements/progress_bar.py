@@ -2,7 +2,7 @@ import math
 
 import pygame.draw
 
-from config import FONTS
+from config import FONTS, COLORS
 from elements.base_elm import BaseElm
 
 
@@ -32,7 +32,7 @@ class ProgressBar(BaseElm):
         self.max_line_length = math.floor(width / 9.2)
         self.max_lines = math.floor(box_height / 15)
 
-        self.color = (246, 198, 0)
+        self.color = COLORS["infragelb"]
         self.percent = None
         self.tick = 0
 
@@ -111,7 +111,7 @@ class ProgressBar(BaseElm):
         last_lines = lines[-self.max_lines :]
 
         for i, line in enumerate(last_lines):
-            text = font.render(line, 1, (246, 198, 0))
+            text = font.render(line, 1, COLORS["infragelb"])
             self.screen.blit(
                 text,
                 (

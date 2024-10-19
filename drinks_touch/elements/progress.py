@@ -1,5 +1,6 @@
 import math
 
+from config import COLORS
 from .base_elm import BaseElm
 
 import contextlib
@@ -11,7 +12,7 @@ with contextlib.redirect_stdout(None):
 class Progress(BaseElm):
     def __init__(self, screen, **kwargs):
         self.size = kwargs.get("size", 50)
-        self.color = kwargs.get("color", (246, 198, 0))
+        self.color = kwargs.get("color", COLORS["infragelb"])
         self.box = None
         self.tick = kwargs.get("tick", self.__default_tick)
         self.speed = kwargs.get("speed", 1 / 4.0)  # 4 secs

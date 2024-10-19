@@ -1,11 +1,12 @@
 import pygame
 
+from config import COLORS
 from elements.base_elm import BaseElm
 
 
 class BaseIcon(BaseElm):
     SIZE = 24
-    COLOR = (246, 198, 0)
+    COLOR = COLORS["infragelb"]
 
     def __init__(self, screen, pos=None, width=None, height=None):
         super().__init__(screen, pos=pos)

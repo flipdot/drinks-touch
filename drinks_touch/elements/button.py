@@ -1,4 +1,4 @@
-from config import FONTS
+from config import FONTS, COLORS
 from .icons.base import BaseIcon
 from .base_elm import BaseElm
 
@@ -15,7 +15,7 @@ class Button(BaseElm):
         font=FONTS["monospace"],
         size=30,
         text="<Label>",
-        color=(246, 198, 0),
+        color=COLORS["infragelb"],
         click_func=None,
         click_func_param=None,
         click_param=None,
