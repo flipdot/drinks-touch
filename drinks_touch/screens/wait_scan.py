@@ -115,10 +115,10 @@ class WaitScanScreen(Screen):
                 self.screen,
                 pos=(430, 750),
                 text=None,
-                icon=RefreshIcon(self.screen, pos=(430, 750)),
                 click_func=lambda: ScreenManager.get_instance().set_active(
                     SyncScreen(self.screen)
                 ),
+                inner=RefreshIcon(self.screen, pos=(430, 750)),
             )
         )
 
@@ -128,7 +128,7 @@ class WaitScanScreen(Screen):
                     self.screen,
                     pos=(370, 750),
                     text=None,
-                    icon=SvgIcon(
+                    inner=SvgIcon(
                         self.screen,
                         "drinks_touch/static/images/git.svg",
                         pos=(370, 750),

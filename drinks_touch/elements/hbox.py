@@ -1,7 +1,7 @@
 from elements.base_elm import BaseElm
 
 
-class VBox(BaseElm):
+class HBox(BaseElm):
 
     def __init__(self, screen, elements: list[BaseElm], gap=5, pos=(0, 0), **kwargs):
         super().__init__(screen, pos, 0, 0)
@@ -11,10 +11,10 @@ class VBox(BaseElm):
         self.gap = gap
 
     def render(self, *args, **kwargs):
-        y = self.pos[1]
+        x = self.pos[0]
         for element in self.elements:
-            element.pos = (self.pos[0], y)
+            element.pos = (x, self.pos[1])
             element.render(*args, **kwargs)
-            y += element.height + self.gap
-        self.width = max([element.width for element in self.elements])
-        self.height = y - self.pos[1] - self.gap
+            x += element.width + self.gap
+        self.height = max([element.height for element in self.elements])
+        self.width = x - self.pos[0] - self.gap

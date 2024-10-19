@@ -36,6 +36,7 @@ class MainScreen(Screen):
                     click_param=text,
                     force_width=440 / 6,
                     force_height=440 / 6,
+                    padding=20,
                 )
             )
 

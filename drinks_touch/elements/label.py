@@ -46,6 +46,8 @@ class Label(BaseElm):
                 return
 
         text, pos, area = self._build_text()
+        self.width = area.width
+        self.height = area.height
         self._render_background(area)
         self.screen.blit(text, pos, area)
 

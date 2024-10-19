@@ -49,7 +49,6 @@ class NamesScreen(Screen):
         btns_y = 7
         num_cols = int(math.ceil(len(users) / float(btns_y)))
         for i, user in enumerate(users):
-            padding = 20
             xoff, yoff = 30, 190
             btn_ypos = 90
             i_y = i % btns_y
@@ -63,7 +62,7 @@ class NamesScreen(Screen):
                     pos=(xoff + x, y + yoff),
                     click_func_param=self.switch_to_screen,
                     click_param=user,
-                    padding=padding,
+                    padding=20,
                 )
             )
             i += 1
