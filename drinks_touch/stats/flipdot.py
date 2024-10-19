@@ -32,7 +32,7 @@ def send_bytes(byte_socket, msg):
 
 def send_frame(s, i):
     i.thumbnail((w, h))
-    i = i.convert("1").transpose(Image.ROTATE_90)
+    i = i.convert("1").transpose(Image.Transpose.ROTATE_90)
     send_bytes(s, i.tobytes())
     # i.show()
 
