@@ -85,10 +85,11 @@ class BarcodeWorker:
 
     @staticmethod
     def _read_from_serial():
-        with serial.Serial(config.SCANNER_DEVICE_PATH, baudrate=115200) as s:
+        with serial.Serial(config.SCANNER_DEVICE_PATH, baudrate=115200, timeout=5) as s:
+            buffer = b""
             while not BarcodeWorker.killed:
-                keyboard_input = s.read_until(b"\r").decode("utf-8")[:-1]
-                if keyboard_input is None:
-                    continue
-                scanned_barcode = keyboard_input
-                BarcodeWorker.on_barcode(scanned_barcode.upper())
+                buffer += s.read_until(b"\r")
+                if buffer.endswith(b"\r"):
+                    scanned_barcode = buffer.decode("utf-8").strip()
+                    buffer = b""
+                    BarcodeWorker.on_barcode(scanned_barcode.upper())
