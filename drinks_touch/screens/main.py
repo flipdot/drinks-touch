@@ -11,7 +11,7 @@ class MainScreen(Screen):
     def __init__(self, screen):
         super(MainScreen, self).__init__(screen)
 
-        self.objects.append(Image(self.screen, pos=(30, 20)))
+        self.objects.append(Image(pos=(30, 20)))
 
         self.objects.append(
             Label(self.screen, text="member auswählen", pos=(65, 250), size=50)

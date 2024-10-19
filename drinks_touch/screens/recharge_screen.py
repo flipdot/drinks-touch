@@ -75,7 +75,7 @@ class RechargeScreen(Screen):
             Label(text="Wirf Geld in die Kasse,", pos=(30, 100), size=50),
             Label(text="und drück den passenden", pos=(30, 150), size=50),
             Label(text="Knopf.", pos=(30, 200), size=50),
-            Image(self.screen, src=qr_file, pos=(70, 470), size=(300, 330)),
+            Image(src=qr_file, pos=(70, 470), size=(300, 330)),
         ]
         self.objects.extend(self.select_objects)
 

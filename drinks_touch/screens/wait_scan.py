@@ -65,7 +65,7 @@ class WaitScanScreen(Screen):
             ),
         ]
 
-        self.objects.append(Image(self.screen, pos=(30, 20)))
+        self.objects.append(Image(pos=(30, 20)))
 
         self.objects.append(
             Label(
