@@ -11,10 +11,6 @@ class CheckForUpdatesTask(BaseTask):
     def run(self):
         global newest_version_sha_short
 
-        with CheckForUpdatesTask.newest_version_lock:
-            CheckForUpdatesTask.newest_version_sha_short = "deadbefe"
-        return
-
         # download latest commit sha from github
         request_url = "https://api.github.com/repos/flipdot/drinks-touch/commits/master?per_page=1"
         self.logger.info(f"GET {request_url}")
