@@ -16,8 +16,9 @@ class GitScreen(Screen):
             ),
             Button(
                 text="BACK",
-                pos=(20, 750),
-                click_func=self.back,
+                pos=(5, 795),
+                on_click=self.back,
+                align_bottom=True,
                 font=config.FONTS["monospace"],
                 size=30,
             ),

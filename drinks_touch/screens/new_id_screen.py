@@ -25,7 +25,7 @@ class NewIDScreen(Screen):
                 text="BACK",
                 pos=(30, 30),
                 font=FONTS["monospace"],
-                click_func=self.back,
+                on_click=self.back,
                 size=30,
             )
         )
@@ -61,7 +61,7 @@ class NewIDScreen(Screen):
                     text="EUR " + str(euro),
                     pos=((i % 2) * 200 + 30, 600 + (i / 2 * 80)),
                     size=30,
-                    click_func=partial(self.btn_euro, euro),
+                    on_click=partial(self.btn_euro, euro),
                 )
             )
 

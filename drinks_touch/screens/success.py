@@ -31,7 +31,7 @@ class SuccessScreen(Screen):
                 text="OK",
                 pos=(50, 600),
                 size=50,
-                click_func=self.btn_home,
+                on_click=self.btn_home,
             )
         )
 

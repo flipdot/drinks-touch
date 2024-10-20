@@ -37,7 +37,7 @@ class SyncScreen(Screen):
                 text="Abbrechen",
                 pos=(5, 795),
                 align_bottom=True,
-                click_func=self.cancel_tasks,
+                on_click=self.cancel_tasks,
             ),
         ]
 

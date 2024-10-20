@@ -14,7 +14,7 @@ class Button(BaseElm):
         size=30,
         text="<Label>",
         color=COLORS["infragelb"],
-        click_func=None,
+        on_click=None,
         click_func_param=None,
         click_param=None,
         force_width=None,
@@ -33,7 +33,7 @@ class Button(BaseElm):
 
         self.size = size
         self.color = color
-        self.clicked = click_func or self.__clicked
+        self.on_click_handler = on_click
         self.clicked_param = click_func_param
         self.click_param = click_param
         self.force_width = force_width
@@ -49,10 +49,6 @@ class Button(BaseElm):
         self.inner = inner
 
         self.clicking = False
-
-    @staticmethod
-    def __clicked():
-        print("Clicked on button without handler")
 
     def pre_click(self):
         self.clicking = True
@@ -81,11 +77,13 @@ class Button(BaseElm):
         return surface
 
     def on_click(self, x, y):
+        if self.on_click_handler is None:
+            raise NotImplementedError("No on_click handler defined")
         self.pre_click()
         try:
             if self.click_param:
                 self.clicked_param(self.click_param)
             else:
-                self.clicked()
+                self.on_click_handler()
         finally:
             self.post_click()

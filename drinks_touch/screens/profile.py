@@ -29,7 +29,7 @@ class ProfileScreen(Screen):
                 text="BACK",
                 pos=(30, 30),
                 font=FONTS["monospace"],
-                click_func=self.back,
+                on_click=self.back,
             )
         )
 
@@ -38,7 +38,7 @@ class ProfileScreen(Screen):
                 text="ID card",
                 pos=(340, 30),
                 font=FONTS["monospace"],
-                click_func=self.id_card,
+                on_click=self.id_card,
             )
         )
 
@@ -98,29 +98,29 @@ class ProfileScreen(Screen):
             text="Trinken",
             pos=(30, 690),
             size=50,
-            click_func=self.save_drink,
+            on_click=self.save_drink,
         )
         self.btn_aufladungen = Button(
             text="Aufladungen",
             pos=(30, 700),
-            click_func=self.show_aufladungen,
+            on_click=self.show_aufladungen,
         )
         self.btn_drinks = Button(
             text="Buchungen",
             pos=(20, 700),
-            click_func=self.show_drinks,
+            on_click=self.show_drinks,
         )
         self.btn_abbrechen = Button(
             text="Abbrechen",
             pos=(290, 700),
             size=30,
-            click_func=self.btn_home,
+            on_click=self.btn_home,
         )
         self.btn_aufladen = Button(
             text="Jetzt Aufladen",
             pos=(210, 700),
             size=30,
-            click_func=self.recharge,
+            on_click=self.recharge,
         )
 
         self.elements_aufladungen = [
