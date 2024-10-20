@@ -1,3 +1,5 @@
+import functools
+
 from elements.button import Button
 from elements.image import Image
 from elements.label import Label
@@ -29,8 +31,7 @@ class MainScreen(Screen):
                 Button(
                     text=text,
                     pos=self.__get_pos(i),
-                    click_func_param=self.switch_to_screen,
-                    click_param=text,
+                    on_click=functools.partial(self.switch_to_screen, text),
                     force_width=440 / 6,
                     force_height=440 / 6,
                     padding=(15, 25),

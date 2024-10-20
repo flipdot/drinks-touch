@@ -1,3 +1,4 @@
+import functools
 import math
 
 from config import FONTS
@@ -56,8 +57,7 @@ class NamesScreen(Screen):
                 Button(
                     text=user["name"],
                     pos=(xoff + x, y + yoff),
-                    click_func_param=self.switch_to_screen,
-                    click_param=user,
+                    on_click=functools.partial(self.switch_to_screen, user),
                     padding=20,
                 )
             )
