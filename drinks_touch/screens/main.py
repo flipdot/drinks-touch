@@ -11,11 +11,9 @@ class MainScreen(Screen):
     def __init__(self, screen):
         super(MainScreen, self).__init__(screen)
 
-        self.objects.append(Image(self.screen, pos=(30, 20)))
+        self.objects.append(Image(pos=(30, 20)))
 
-        self.objects.append(
-            Label(self.screen, text="member auswählen", pos=(65, 250), size=50)
-        )
+        self.objects.append(Label(text="member auswählen", pos=(65, 250), size=50))
 
         all_users = list(Users.get_all())
         i = 0
@@ -29,13 +27,13 @@ class MainScreen(Screen):
                 continue
             self.objects.append(
                 Button(
-                    self.screen,
                     text=text,
                     pos=self.__get_pos(i),
                     click_func_param=self.switch_to_screen,
                     click_param=text,
                     force_width=440 / 6,
                     force_height=440 / 6,
+                    padding=(15, 25),
                 )
             )
 
@@ -43,7 +41,6 @@ class MainScreen(Screen):
 
         self.objects.append(
             Button(
-                self.screen,
                 text="Abbrechen",
                 pos=(150, 700),
                 size=30,
@@ -51,7 +48,6 @@ class MainScreen(Screen):
             )
         )
         self.timeout = Progress(
-            self.screen,
             pos=(380, 715),
             speed=1 / 15.0,
             on_elapsed=self.time_elapsed,
@@ -90,4 +86,4 @@ class MainScreen(Screen):
         row = int(i / 6)
         col = int(i % 6)
 
-        return col * 80 + 30, row * 80 + 350
+        return col * 80 + 5, row * 80 + 350

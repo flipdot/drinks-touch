@@ -18,7 +18,6 @@ class NamesScreen(Screen):
 
         self.objects.append(
             Button(
-                self.screen,
                 text="BACK",
                 pos=(30, 30),
                 click_func=self.back,
@@ -28,7 +27,6 @@ class NamesScreen(Screen):
         )
 
         self.timeout = Progress(
-            self.screen,
             pos=(200, 50),
             speed=1 / 15.0,
             on_elapsed=self.time_elapsed,
@@ -38,7 +36,6 @@ class NamesScreen(Screen):
 
         self.objects.append(
             Label(
-                self.screen,
                 text="Wer bist du?",
                 pos=(20, 110),
             )
@@ -49,7 +46,6 @@ class NamesScreen(Screen):
         btns_y = 7
         num_cols = int(math.ceil(len(users) / float(btns_y)))
         for i, user in enumerate(users):
-            padding = 20
             xoff, yoff = 30, 190
             btn_ypos = 90
             i_y = i % btns_y
@@ -58,12 +54,11 @@ class NamesScreen(Screen):
             y = i_y * btn_ypos
             self.objects.append(
                 Button(
-                    self.screen,
                     text=user["name"],
                     pos=(xoff + x, y + yoff),
                     click_func_param=self.switch_to_screen,
                     click_param=user,
-                    padding=padding,
+                    padding=20,
                 )
             )
             i += 1

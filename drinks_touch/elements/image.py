@@ -7,21 +7,22 @@ with contextlib.redirect_stdout(None):
 
 
 class Image(BaseElm):
-    def __init__(self, screen, **kwargs):
-        self.pos = kwargs.get("pos", (0, 0))
+    def __init__(self, *args, **kwargs):
         self.src = kwargs.get("src", "drinks_touch/resources/images/test.jpg")
         self.size = kwargs.get("size", None)
-
-        self.__load_img()
-
-        pos = kwargs.get("pos", (0, 0))
-        if self.size:
-            self.img = pygame.transform.smoothscale(self.img, self.size)
-        img_size = self.img.get_size()
-        super(Image, self).__init__(screen, pos, img_size[1], img_size[0])
-
-    def __load_img(self):
         self.img = pygame.image.load(self.src).convert_alpha()
 
-    def render(self, *args, **kwargs):
-        self.screen.blit(self.img, self.pos)
+        if self.size:
+            self.img = pygame.transform.smoothscale(self.img, self.size)
+        super(Image, self).__init__(*args, **kwargs)
+
+    @property
+    def width(self):
+        return self.img.get_width()
+
+    @property
+    def height(self):
+        return self.img.get_height()
+
+    def render(self, *args, **kwargs) -> pygame.Surface:
+        return self.img

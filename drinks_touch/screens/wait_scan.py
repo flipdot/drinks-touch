@@ -7,6 +7,8 @@ from database.storage import get_session
 from drinks.drinks import get_by_ean
 from drinks.drinks_manager import DrinksManager
 from elements import RefreshIcon, SvgIcon, Progress, Label, Image, Button
+from elements.hbox import HBox
+from elements.vbox import VBox
 from screens.new_id_screen import NewIDScreen
 from screens.profile import ProfileScreen
 from tasks import CheckForUpdatesTask
@@ -26,64 +28,59 @@ class WaitScanScreen(Screen):
         super(WaitScanScreen, self).__init__(screen)
 
         self.barcode_label = Label(
-            self.screen,
             pos=(60, 400),
         )
 
         self.scanned_info = [
             self.barcode_label,
             Button(
-                self.screen,
                 pos=(50, 600),
                 text="drink buchen",
                 size=52,
                 click_func=self.set_member,
             ),
             Button(
-                self.screen,
                 pos=(50, 700),
                 text="Nur Statistik",
                 click_func=self.stat_drink,
             ),
-            Button(self.screen, pos=(350, 700), text="nope", click_func=self.btn_reset),
+            Button(
+                pos=(350, 700),
+                text="nope",
+                click_func=self.btn_reset,
+            ),
         ]
         self.empty_info = [
             Button(
-                self.screen,
-                pos=(30, 680),
+                pos=(30, 655),
                 size=45,
                 text="Benutzer",
                 click_func=self.set_member,
             ),
             Button(
-                self.screen,
-                pos=(290, 700),
+                pos=(290, 690),
                 size=15,
                 text="Gutschein drucken",
                 click_func=self.btn_new_id,
             ),
         ]
 
-        self.objects.append(Image(self.screen, pos=(30, 20)))
+        self.objects.append(Image(pos=(30, 20)))
 
         self.objects.append(
             Label(
-                self.screen,
                 text="Scanne dein Getränk",
                 pos=(60, 240),
             )
         )
         self.objects.append(
             Label(
-                self.screen,
                 text="oder deine ID-Card :)",
                 pos=(70, 280),
             )
         )
 
-        self.processing = Label(
-            self.screen, text="Moment bitte...", size=40, pos=(80, 350)
-        )
+        self.processing = Label(text="Moment bitte...", size=40, pos=(80, 350))
         self.processing.is_visible = False
         self.objects.append(self.processing)
         sql = text(
@@ -102,36 +99,30 @@ class WaitScanScreen(Screen):
             total_balance_fmt = "(SQL Error)"
 
         self.objects.append(
-            Label(
-                self.screen,
-                text="∑ = {}".format(total_balance_fmt),
-                size=25,
-                pos=(0, 755),
+            VBox(
+                elements=[
+                    Label(
+                        text="∑ = {}".format(total_balance_fmt),
+                        size=25,
+                    ),
+                    Label(
+                        text=f"Build: {config.BUILD_NUMBER}",
+                        size=20,
+                    ),
+                ],
+                pos=(5, 800),
+                align_bottom=True,
             )
         )
 
-        self.objects.append(
-            Button(
-                self.screen,
-                pos=(430, 750),
-                text=None,
-                icon=RefreshIcon(self.screen, pos=(430, 750)),
-                click_func=lambda: ScreenManager.get_instance().set_active(
-                    SyncScreen(self.screen)
-                ),
-            )
-        )
+        bottom_right_buttons = []
 
         if config.GIT_REPO_AVAILABLE:
-            self.objects.append(
+            bottom_right_buttons.append(
                 Button(
-                    self.screen,
-                    pos=(370, 750),
                     text=None,
-                    icon=SvgIcon(
-                        self.screen,
+                    inner=SvgIcon(
                         "drinks_touch/static/images/git.svg",
-                        pos=(370, 750),
                         color=config.COLORS["disabled"],
                         height=36,
                     ),
@@ -141,13 +132,25 @@ class WaitScanScreen(Screen):
                     # ),
                 ),
             )
+        bottom_right_buttons.append(
+            Button(
+                text=None,
+                click_func=lambda: ScreenManager.get_instance().set_active(
+                    SyncScreen(self.screen)
+                ),
+                inner=RefreshIcon(),
+            )
+        )
 
         self.objects.append(
-            Label(
-                self.screen,
-                text=f"Build: {config.BUILD_NUMBER}",
-                size=20,
-                pos=(0, 785),
+            HBox(
+                pos=(480, 800),
+                align_right=True,
+                align_bottom=True,
+                elements=bottom_right_buttons,
+                right_to_left=True,
+                gap=5,
+                padding=(0, 5),
             )
         )
         if (
@@ -157,11 +160,11 @@ class WaitScanScreen(Screen):
             # make build number flash, show "Update available" when flashing
             self.objects.append(
                 Label(
-                    self.screen,
                     text=f"Update available: {CheckForUpdatesTask.newest_version_sha_short}",
                     size=25,
-                    pos=(475, 780),
+                    pos=(480, 800),
                     align_right=True,
+                    align_bottom=True,
                     color=(0, 0, 0),
                     bg_color=(255, 255, 255),
                     padding=5,
@@ -170,7 +173,6 @@ class WaitScanScreen(Screen):
             )
 
         self.timeout = Progress(
-            self.screen,
             pos=(400, 500),
             size=100,
             speed=1 / 10.0,

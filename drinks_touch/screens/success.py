@@ -14,18 +14,13 @@ class SuccessScreen(Screen):
 
         self.user = user
 
-        self.objects.append(Label(self.screen, text="Danke,", pos=(30, 120), size=70))
-        self.objects.append(
-            Label(self.screen, text=user["name"] + "!", pos=(30, 170), size=70)
-        )
-        self.objects.append(Label(self.screen, text=text, size=45, pos=(30, 250)))
+        self.objects.append(Label(text="Danke,", pos=(30, 120), size=70))
+        self.objects.append(Label(text=user["name"] + "!", pos=(30, 170), size=70))
+        self.objects.append(Label(text=text, size=45, pos=(30, 250)))
 
-        self.objects.append(
-            Label(self.screen, text="Verbleibendes Guthaben: ", pos=(30, 350))
-        )
+        self.objects.append(Label(text="Verbleibendes Guthaben: ", pos=(30, 350)))
         self.objects.append(
             Label(
-                self.screen,
                 text=str(Users.get_balance(self.user["id"], session=session)) + " EUR",
                 pos=(50, 400),
             )
@@ -33,13 +28,14 @@ class SuccessScreen(Screen):
 
         self.objects.append(
             Button(
-                self.screen, text="OK", pos=(50, 600), size=50, click_func=self.btn_home
+                text="OK",
+                pos=(50, 600),
+                size=50,
+                click_func=self.btn_home,
             )
         )
 
-        self.progress = Progress(
-            self.screen, pos=(400, 500), size=80, on_elapsed=self.home
-        )
+        self.progress = Progress(pos=(400, 500), size=80, on_elapsed=self.home)
         self.objects.append(self.progress)
         self.progress.start()
         balance = Users.get_balance(user["id"])

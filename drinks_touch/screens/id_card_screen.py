@@ -22,7 +22,6 @@ class IDCardScreen(Screen):
 
         self.objects.append(
             Button(
-                self.screen,
                 text="BACK",
                 pos=(30, 30),
                 font=FONTS["monospace"],
@@ -32,7 +31,6 @@ class IDCardScreen(Screen):
         )
 
         self.timeout = Progress(
-            self.screen,
             pos=(200, 50),
             speed=1 / 15.0,
             on_elapsed=self.time_elapsed,
@@ -42,7 +40,6 @@ class IDCardScreen(Screen):
 
         self.objects.append(
             Button(
-                self.screen,
                 text="Reset",
                 pos=(350, 30),
                 size=30,
@@ -50,29 +47,20 @@ class IDCardScreen(Screen):
             )
         )
 
-        self.objects.append(
-            Label(self.screen, text=self.user["name"], pos=(30, 120), size=70)
-        )
+        self.objects.append(Label(text=self.user["name"], pos=(30, 120), size=70))
 
-        self.objects.append(
-            Label(self.screen, text="Momentan zugeordnet:", pos=(30, 300))
-        )
+        self.objects.append(Label(text="Momentan zugeordnet:", pos=(30, 300)))
 
         self.id_label = Label(
-            self.screen, text=self.user["id_card"], pos=(50, 400), size=70, font="Serif"
+            text=self.user["id_card"], pos=(50, 400), size=70, font="Serif"
         )
         self.objects.append(self.id_label)
 
-        self.objects.append(
-            Label(self.screen, text="Scanne deine ID,", pos=(30, 550), size=60)
-        )
-        self.objects.append(
-            Label(self.screen, text="um sie zuzuweisen.", pos=(30, 600), size=60)
-        )
+        self.objects.append(Label(text="Scanne deine ID,", pos=(30, 550), size=60))
+        self.objects.append(Label(text="um sie zuzuweisen.", pos=(30, 600), size=60))
 
         self.objects.append(
             Button(
-                self.screen,
                 text="OK bye",
                 pos=(330, 700),
                 size=30,
@@ -82,14 +70,13 @@ class IDCardScreen(Screen):
 
         self.objects.append(
             Button(
-                self.screen,
                 text="Drucken",
                 pos=(30, 700),
                 size=30,
                 click_func=self.print_id,
             )
         )
-        self.progress = Progress(self.screen, pos=(200, 720), speed=1 / 15.0)
+        self.progress = Progress(pos=(200, 720), speed=1 / 15.0)
         self.progress.stop()
         self.objects.append(self.progress)
 

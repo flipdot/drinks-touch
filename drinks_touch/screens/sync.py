@@ -21,7 +21,7 @@ class SyncScreen(Screen):
         self.tasks = [Task() for Task in discover_tasks()]
 
         progress_bars = [
-            task.make_progress_bar(self.screen, box_height=90) for task in self.tasks
+            task.make_progress_bar(box_height=90, width=470) for task in self.tasks
         ]
 
         for task in self.tasks:
@@ -29,15 +29,14 @@ class SyncScreen(Screen):
 
         self.objects: list[BaseElm] = [
             Label(
-                self.screen,
                 text="Initialisierung...",
-                pos=(10, 25),
+                pos=(5, 5),
             ),
-            VBox(self.screen, progress_bars, gap=10, pos=(10, 80)),
+            VBox(progress_bars, gap=10, pos=(5, 80)),
             Button(
-                self.screen,
                 text="Abbrechen",
-                pos=(20, 750),
+                pos=(5, 795),
+                align_bottom=True,
                 click_func=self.cancel_tasks,
             ),
         ]
@@ -54,9 +53,10 @@ class SyncScreen(Screen):
         if not self.finished and self.all_tasks_finished:
             self.objects.append(
                 Progress(
-                    self.screen,
-                    pos=(440, 760),
+                    pos=(475, 795),
                     speed=1 / 10,
+                    align_right=True,
+                    align_bottom=True,
                     on_elapsed=self.time_elapsed,
                 )
             )

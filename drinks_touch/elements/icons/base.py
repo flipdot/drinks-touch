@@ -8,16 +8,16 @@ class BaseIcon(BaseElm):
     SIZE = 24
     COLOR = COLORS["infragelb"]
 
-    def __init__(self, screen, pos=None, width=None, height=None):
-        super().__init__(screen, pos=pos)
+    def __init__(self, pos=None, width=None, height=None):
+        super().__init__(pos=pos)
         self.width = width or self.SIZE
         self.height = height or self.SIZE
 
-    def render(self, *args, **kwargs):
+    def render(self, *args, **kwargs) -> pygame.Surface:
         assert self.pos is not None
         surface = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
         self.draw(surface)
-        self.screen.blit(surface, self.pos)
+        return surface
 
     def draw(self, surface):
         pygame.draw.circle(

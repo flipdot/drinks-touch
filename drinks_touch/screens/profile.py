@@ -26,7 +26,6 @@ class ProfileScreen(Screen):
 
         self.objects.append(
             Button(
-                self.screen,
                 text="BACK",
                 pos=(30, 30),
                 font=FONTS["monospace"],
@@ -36,7 +35,6 @@ class ProfileScreen(Screen):
 
         self.objects.append(
             Button(
-                self.screen,
                 text="ID card",
                 pos=(340, 30),
                 font=FONTS["monospace"],
@@ -46,7 +44,6 @@ class ProfileScreen(Screen):
 
         self.objects.append(
             Label(
-                self.screen,
                 text=self.user["name"],
                 pos=(30, 120),
                 size=70,
@@ -55,24 +52,33 @@ class ProfileScreen(Screen):
         )
 
         self.objects.append(
-            Label(self.screen, text="Guthaben", pos=(330, 120), size=30)
+            Label(
+                text="Guthaben",
+                pos=(330, 120),
+                size=30,
+            )
         )
 
         self.label_verbrauch = Label(
-            self.screen, text="Bisheriger Verbrauch:", pos=(30, 180), size=30
+            text="Bisheriger Verbrauch:",
+            pos=(30, 180),
+            size=30,
         )
         self.label_aufladungen = Label(
-            self.screen, text="Aufladungen:", pos=(30, 180), size=30
+            text="Aufladungen:",
+            pos=(30, 180),
+            size=30,
         )
 
         self.processing = Label(
-            self.screen, text="Moment bitte...", size=40, pos=(150, 750)
+            text="Moment bitte...",
+            size=40,
+            pos=(150, 750),
         )
         self.processing.is_visible = False
         self.objects.append(self.processing)
 
         self.timeout = Progress(
-            self.screen,
             pos=(200, 50),
             speed=1 / 30.0,
             on_elapsed=self.time_elapsed,
@@ -83,34 +89,34 @@ class ProfileScreen(Screen):
 
         drink = DrinksManager.get_instance().get_selected_drink()
         self.drink_info = Label(
-            self.screen, text=drink["name"] if drink else "", size=60, pos=(30, 630)
+            text=drink["name"] if drink else "",
+            size=60,
+            pos=(30, 630),
         )
 
         self.zuordnen = Button(
-            self.screen,
             text="Trinken",
             pos=(30, 690),
             size=50,
             click_func=self.save_drink,
         )
         self.btn_aufladungen = Button(
-            self.screen,
             text="Aufladungen",
             pos=(30, 700),
             click_func=self.show_aufladungen,
         )
         self.btn_drinks = Button(
-            self.screen, text="Buchungen", pos=(20, 700), click_func=self.show_drinks
+            text="Buchungen",
+            pos=(20, 700),
+            click_func=self.show_drinks,
         )
         self.btn_abbrechen = Button(
-            self.screen,
             text="Abbrechen",
             pos=(290, 700),
             size=30,
             click_func=self.btn_home,
         )
         self.btn_aufladen = Button(
-            self.screen,
             text="Jetzt Aufladen",
             pos=(210, 700),
             size=30,
@@ -129,17 +135,13 @@ class ProfileScreen(Screen):
             self.elements_drinks.append(self.btn_aufladungen)
 
         balance = Users.get_balance(self.user["id"])
-        self.objects.append(
-            Label(self.screen, text=str(balance), pos=(335, 145), size=40)
-        )
+        self.objects.append(Label(text=str(balance), pos=(335, 145), size=40))
 
         drinks = self.get_stats()
         for i, drinks in enumerate(drinks):
             x = 30
             if i == 11:
-                self.elements_drinks.append(
-                    Label(self.screen, text="...", pos=(x, 210 + (i * 35)))
-                )
+                self.elements_drinks.append(Label(text="...", pos=(x, 210 + (i * 35))))
                 continue
             if i > 11:
                 continue
@@ -148,7 +150,6 @@ class ProfileScreen(Screen):
             margin_right = 10
             self.elements_drinks.append(
                 Label(
-                    self.screen,
                     text=ean_text,
                     pos=(x, 210 + (i * 35)),
                     max_width=480 - x - margin_right - count_width,
@@ -156,7 +157,6 @@ class ProfileScreen(Screen):
             )
             self.elements_drinks.append(
                 Label(
-                    self.screen,
                     text=str(drinks["count"]),
                     align_right=True,
                     pos=(480 - margin_right, 210 + (i * 35)),
@@ -175,9 +175,7 @@ class ProfileScreen(Screen):
         for i, aufladung in enumerate(aufladungen):
             x = 30
             if y + 45 * 2 >= self.btn_drinks.pos[1]:
-                self.elements_aufladungen.append(
-                    Label(self.screen, text="...", pos=(x, y))
-                )
+                self.elements_aufladungen.append(Label(text="...", pos=(x, y)))
                 break
             date = aufladung.timestamp.strftime("%a, %-d.%-m.%Y")
             time = aufladung.timestamp.strftime("%H:%M")
@@ -196,14 +194,13 @@ class ProfileScreen(Screen):
             if date != prev_date:
                 prev_date = date
                 self.elements_aufladungen.append(
-                    Label(self.screen, text=date, size=35, pos=(x, y + 15))
+                    Label(text=date, size=35, pos=(x, y + 15))
                 )
                 y += 45
             count_width = 120
             margin_right = 10
             self.elements_aufladungen.append(
                 Label(
-                    self.screen,
                     text=time_text,
                     pos=(x + 10, y),
                     size=45,
@@ -212,7 +209,6 @@ class ProfileScreen(Screen):
             )
             self.elements_aufladungen.append(
                 Label(
-                    self.screen,
                     text=str(aufladung.amount),
                     align_right=True,
                     pos=(480 - margin_right, y - 5),

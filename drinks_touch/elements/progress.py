@@ -10,24 +10,16 @@ with contextlib.redirect_stdout(None):
 
 
 class Progress(BaseElm):
-    def __init__(self, screen, **kwargs):
+    def __init__(self, pos=None, *args, **kwargs):
         self.size = kwargs.get("size", 50)
         self.color = kwargs.get("color", COLORS["infragelb"])
-        self.box = None
         self.tick = kwargs.get("tick", self.__default_tick)
         self.speed = kwargs.get("speed", 1 / 4.0)  # 4 secs
         self.on_elapsed = kwargs.get("on_elapsed", None)
         self.value = 0
         self.is_running = False
 
-        pos = kwargs.get("pos", (0, 0))
-        super(Progress, self).__init__(screen, pos, self.size, -1)
-        top = self.pos[0] - self.size / 2
-        left = self.pos[1] - self.size / 2
-        width = self.size
-        height = self.size
-
-        self.box = (top, left, width, height)
+        super(Progress, self).__init__(pos, self.size, self.size, *args, **kwargs)
         self.start()
 
     def start(self):
@@ -48,14 +40,21 @@ class Progress(BaseElm):
         else:
             return old_value
 
-    def render(self, dt):
+    def render(self, dt) -> pygame.Surface:
         if self.tick is not None:
             self.value = self.tick(self.value, dt)
 
+        surface = pygame.Surface((self.size, self.size), pygame.SRCALPHA)
         if self.is_running:
             extra_rounds = 0.75
             start = 0.5 * math.pi + self.value * math.pi * extra_rounds * 2
             end = start + self.value * 2 * math.pi
             pygame.draw.arc(
-                self.screen, self.color, self.box, start, end, int(self.size / 5)
+                surface,
+                self.color,
+                (0, 0, self.width, self.height),
+                start,
+                end,
+                int(self.size / 5),
             )
+        return surface

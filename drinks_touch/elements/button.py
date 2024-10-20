@@ -1,5 +1,4 @@
 from config import FONTS, COLORS
-from .icons.base import BaseIcon
 from .base_elm import BaseElm
 
 import contextlib
@@ -11,7 +10,6 @@ with contextlib.redirect_stdout(None):
 class Button(BaseElm):
     def __init__(
         self,
-        screen,
         font=FONTS["monospace"],
         size=30,
         text="<Label>",
@@ -19,33 +17,38 @@ class Button(BaseElm):
         click_func=None,
         click_func_param=None,
         click_param=None,
-        padding=10,
         force_width=None,
         force_height=None,
-        icon: BaseIcon = None,
+        inner: BaseElm = None,
         pos=(0, 0),
+        padding: (
+            int | tuple[int, int] | tuple[int, int, int] | tuple[int, int, int, int]
+        ) = 10,
+        *args,
+        **kwargs,
     ):
-        self.font = font
+        from . import Label
+
+        super().__init__(pos, size, size, *args, padding=padding, **kwargs)
+
         self.size = size
-        self.text = text
         self.color = color
         self.clicked = click_func or self.__clicked
         self.clicked_param = click_func_param
         self.click_param = click_param
-        self.padding = padding
         self.force_width = force_width
         self.force_height = force_height
-        self.icon = icon
+        if inner is None:
+            inner = Label(
+                pos=(self.pos[0] + self.padding_left, self.pos[1] + self.padding_top),
+                text=text,
+                font=font,
+                size=size,
+                color=color,
+            )
+        self.inner = inner
 
-        self.box = None
         self.clicking = False
-
-        super(Button, self).__init__(screen, pos, self.size, -1)
-
-        self.__load_font()
-
-    def __load_font(self):
-        self.font = pygame.font.SysFont(self.font, self.size)
 
     @staticmethod
     def __clicked():
@@ -57,68 +60,32 @@ class Button(BaseElm):
     def post_click(self):
         self.clicking = False
 
-    def render(self, *args, **kwargs):
+    def render(self, *args, **kwargs) -> pygame.Surface:
+        inner = self.inner.render(*args, **kwargs)
+
+        size = (
+            self.inner.width + self.padding_left + self.padding_right,
+            self.inner.height + self.padding_top + self.padding_bottom,
+        )
+
+        self.width = size[0]
+        self.height = size[1]
+
+        surface = pygame.Surface(size, pygame.SRCALPHA)
         if self.clicking:
-            self.screen.fill(tuple(c * 0.7 for c in self.color), self.box)
+            surface.fill(tuple(c * 0.7 for c in self.color), (0, 0, *size))
 
-        top = self.pos[0] - self.padding
-        left = self.pos[1] - self.padding
-        width = self.padding * 2
-        height = self.padding * 2
+        if inner is not None:
+            surface.blit(inner, (self.padding_left, self.padding_top))
+        pygame.draw.rect(surface, self.color, (0, 0, *size), 1)
+        return surface
 
-        if self.icon:
-            self.icon.render()
-            width += self.icon.width
-            height += self.icon.height
-            text_pos = (
-                self.pos[0] + self.icon.width + self.padding,
-                self.pos[1],
-            )
-        else:
-            text_pos = self.pos
-            icon_element = None
-
-        if self.text:
-            text_element = self.font.render(self.text, 1, self.color)
-            width += text_element.get_width()
-            if icon_element:
-                width += 10
-                if icon_element.get_height() > text_element.get_height():
-                    height = icon_element.get_height() + self.padding * 2
+    def on_click(self, x, y):
+        self.pre_click()
+        try:
+            if self.click_param:
+                self.clicked_param(self.click_param)
             else:
-                height = text_element.get_height() + self.padding * 2
-            self.screen.blit(text_element, text_pos)
-
-            if self.force_width is not None:
-                width = self.force_width
-                top = self.pos[0] + text_element.get_width() / 2 - width / 2
-            if self.force_height is not None:
-                height = self.force_height
-                left = self.pos[1] + text_element.get_height() / 2 - height / 2
-
-        self.box = (top, left, width, height)
-
-        pygame.draw.rect(self.screen, self.color, self.box, 1)
-
-    def events(self, events):
-        for event in events:
-            if "consumed" in event.dict and event.consumed:
-                continue
-
-            if event.type == pygame.MOUSEBUTTONUP:
-                pos = event.pos
-
-                if (
-                    self.box is not None
-                    and self.visible()
-                    and pygame.Rect(self.box).collidepoint(pos[0], pos[1])
-                ):
-                    self.pre_click()
-                    try:
-                        if self.click_param:
-                            self.clicked_param(self.click_param)
-                        else:
-                            self.clicked()
-                    finally:
-                        self.post_click()
-                    event.consumed = True
+                self.clicked()
+        finally:
+            self.post_click()

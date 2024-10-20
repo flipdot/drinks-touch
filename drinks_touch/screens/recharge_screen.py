@@ -22,7 +22,6 @@ class RechargeScreen(Screen):
 
         self.objects.append(
             Button(
-                self.screen,
                 text="BACK",
                 pos=(30, 30),
                 font=FONTS["monospace"],
@@ -32,7 +31,6 @@ class RechargeScreen(Screen):
         )
 
         self.timeout = Progress(
-            self.screen,
             pos=(200, 50),
             speed=1 / 30.0,
             on_elapsed=self.time_elapsed,
@@ -51,52 +49,47 @@ class RechargeScreen(Screen):
         )
         self.select_objects = [
             Button(
-                self.screen,
                 text="EUR 5",
                 pos=(30, 300),
                 size=30,
                 click_func=partial(self.verify_payment, 5),
             ),
             Button(
-                self.screen,
                 text="EUR 10",
                 pos=(250, 300),
                 size=30,
                 click_func=partial(self.verify_payment, 10),
             ),
             Button(
-                self.screen,
                 text="EUR 20",
                 pos=(30, 400),
                 size=30,
                 click_func=partial(self.verify_payment, 20),
             ),
             Button(
-                self.screen,
                 text="EUR 50",
                 pos=(250, 400),
                 size=30,
                 click_func=partial(self.verify_payment, 50),
             ),
-            Label(self.screen, text="Wirf Geld in die Kasse,", pos=(30, 100), size=50),
-            Label(self.screen, text="und drück den passenden", pos=(30, 150), size=50),
-            Label(self.screen, text="Knopf.", pos=(30, 200), size=50),
-            Image(self.screen, src=qr_file, pos=(70, 470), size=(300, 330)),
+            Label(text="Wirf Geld in die Kasse,", pos=(30, 100), size=50),
+            Label(text="und drück den passenden", pos=(30, 150), size=50),
+            Label(text="Knopf.", pos=(30, 200), size=50),
+            Image(src=qr_file, pos=(70, 470), size=(300, 330)),
         ]
         self.objects.extend(self.select_objects)
 
         self.verify_objects = [
-            Label(self.screen, text="Hast du", pos=(30, 150), size=55),
-            Label(self.screen, text="in die Kasse geworfen?", pos=(30, 250), size=55),
+            Label(text="Hast du", pos=(30, 150), size=55),
+            Label(text="in die Kasse geworfen?", pos=(30, 250), size=55),
             Button(
-                self.screen,
                 text="Ja",
                 pos=(250, 400),
                 size=30,
                 click_func=self.save_payment,
             ),
         ]
-        self.verify_amount = Label(self.screen, text="EUR X", pos=(30, 200), size=60)
+        self.verify_amount = Label(text="EUR X", pos=(30, 200), size=60)
         self.verify_objects.append(self.verify_amount)
 
     def back(self):

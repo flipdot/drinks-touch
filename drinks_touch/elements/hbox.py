@@ -3,9 +3,16 @@ import pygame
 from elements.base_elm import BaseElm
 
 
-class VBox(BaseElm):
+class HBox(BaseElm):
 
-    def __init__(self, elements: list[BaseElm], gap=5, pos=(0, 0), *args, **kwargs):
+    def __init__(
+        self,
+        elements: list[BaseElm],
+        gap=0,
+        pos=(0, 0),
+        *args,
+        **kwargs,
+    ):
         super().__init__(pos, 0, 0, *args, **kwargs)
         self.pos = pos
         self.elements = elements
@@ -13,18 +20,19 @@ class VBox(BaseElm):
 
     def render(self, *args, **kwargs) -> pygame.Surface:
         surface = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
-        y = self.padding_top
+        x = self.padding_left
         for element in self.elements:
-            element.pos = (self.padding_left, y)
+            element.pos = (x, self.padding_top)
             element_surface = element.render(*args, **kwargs)
             surface.blit(element_surface, element.pos)
-            y += element.height + self.gap
+            x += element.width + self.gap
         return surface
 
     @property
     def width(self):
         return (
-            max([element.width for element in self.elements])
+            sum([element.width for element in self.elements])
+            + (len(self.elements) - 1) * self.gap
             + self.padding_left
             + self.padding_right
         )
@@ -32,8 +40,7 @@ class VBox(BaseElm):
     @property
     def height(self):
         return (
-            sum([element.height for element in self.elements])
-            + (len(self.elements) - 1) * self.gap
+            max([element.height for element in self.elements])
             + self.padding_top
             + self.padding_bottom
         )
