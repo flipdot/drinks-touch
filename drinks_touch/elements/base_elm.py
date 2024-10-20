@@ -74,9 +74,6 @@ class BaseElm(object):
     def box(self):
         return self.screen_pos + (self.width, self.height)
 
-    # def on_click(self):
-    #     pass
-
     def events(self, events):
         pass
 
