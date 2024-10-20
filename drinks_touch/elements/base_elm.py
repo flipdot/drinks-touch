@@ -5,7 +5,6 @@ from pygame import Surface
 class BaseElm(object):
     def __init__(
         self,
-        screen,
         pos=None,
         height=None,
         width=None,
@@ -17,7 +16,6 @@ class BaseElm(object):
         *args,
         **kwargs
     ):
-        self.screen = screen
         if pos is None:
             pos = (0, 0)
         self.pos = pos

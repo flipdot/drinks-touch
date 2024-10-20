@@ -27,7 +27,6 @@ class WaitScanScreen(Screen):
         super(WaitScanScreen, self).__init__(screen)
 
         self.barcode_label = Label(
-            self.screen,
             pos=(60, 400),
         )
 

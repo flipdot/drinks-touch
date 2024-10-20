@@ -13,7 +13,7 @@ class HBox(BaseElm):
         *args,
         **kwargs,
     ):
-        super().__init__(None, pos, 0, 0, *args, **kwargs)
+        super().__init__(pos, 0, 0, *args, **kwargs)
         self.pos = pos
         self.elements = elements
         self.gap = gap

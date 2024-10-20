@@ -32,7 +32,7 @@ class SyncScreen(Screen):
                 text="Initialisierung...",
                 pos=(5, 5),
             ),
-            VBox(self.screen, progress_bars, gap=10, pos=(5, 80)),
+            VBox(progress_bars, gap=10, pos=(5, 80)),
             Button(
                 text="Abbrechen",
                 pos=(5, 795),

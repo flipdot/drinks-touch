@@ -14,7 +14,7 @@ class Image(BaseElm):
 
         if self.size:
             self.img = pygame.transform.smoothscale(self.img, self.size)
-        super(Image, self).__init__(None, *args, **kwargs)
+        super(Image, self).__init__(*args, **kwargs)
 
     @property
     def width(self):

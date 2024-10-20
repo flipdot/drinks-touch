@@ -22,7 +22,6 @@ class ProgressBar(BaseElm):
         **kwargs
     ):
         super(ProgressBar, self).__init__(
-            None,
             pos=pos,
             width=width,
             padding=padding,

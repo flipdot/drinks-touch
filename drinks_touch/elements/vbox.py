@@ -5,11 +5,8 @@ from elements.base_elm import BaseElm
 
 class VBox(BaseElm):
 
-    def __init__(
-        self, screen, elements: list[BaseElm], gap=5, pos=(0, 0), *args, **kwargs
-    ):
-        super().__init__(screen, pos, 0, 0, *args, **kwargs)
-        self.screen = screen
+    def __init__(self, elements: list[BaseElm], gap=5, pos=(0, 0), *args, **kwargs):
+        super().__init__(pos, 0, 0, *args, **kwargs)
         self.pos = pos
         self.elements = elements
         self.gap = gap

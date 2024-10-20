@@ -9,7 +9,7 @@ class BaseIcon(BaseElm):
     COLOR = COLORS["infragelb"]
 
     def __init__(self, pos=None, width=None, height=None):
-        super().__init__(None, pos=pos)
+        super().__init__(pos=pos)
         self.width = width or self.SIZE
         self.height = height or self.SIZE
 

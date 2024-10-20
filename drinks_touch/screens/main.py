@@ -13,9 +13,7 @@ class MainScreen(Screen):
 
         self.objects.append(Image(pos=(30, 20)))
 
-        self.objects.append(
-            Label(self.screen, text="member auswählen", pos=(65, 250), size=50)
-        )
+        self.objects.append(Label(text="member auswählen", pos=(65, 250), size=50))
 
         all_users = list(Users.get_all())
         i = 0

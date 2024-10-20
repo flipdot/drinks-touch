@@ -29,7 +29,7 @@ class Button(BaseElm):
     ):
         from . import Label
 
-        super().__init__(None, pos, size, size, *args, padding=padding, **kwargs)
+        super().__init__(pos, size, size, *args, padding=padding, **kwargs)
 
         self.size = size
         self.color = color
