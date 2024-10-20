@@ -70,7 +70,7 @@ def create_image(scan_list):
     for i, drink in enumerate(drinks):
         count = drink["count"]
         height = int(count * 1.0 / max_count * (h - 1))
-        coords = [(width * i + 1, h), (int(width * (i + 1)) - 1, h - height)]
+        coords = [(width * i + 1, h - height), (int(width * (i + 1)) - 1, h)]
         draw.rectangle(coords, 1, 1)
         draw_drinkname(text_draw, width * i + 1, width, drink)
         _x = 0

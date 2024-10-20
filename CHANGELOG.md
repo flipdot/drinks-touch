@@ -1,3 +1,10 @@
+## [0.4.51](https://github.com/flipdot/drinks-touch/compare/0.4.50...0.4.51) (2024-10-19)
+
+
+### Bug Fixes
+
+* send_summay needs account instead of user dict ([#237](https://github.com/flipdot/drinks-touch/issues/237)) ([dfcb4c8](https://github.com/flipdot/drinks-touch/commit/dfcb4c893c9282bb47c771a69d79ca94721a58fc))
+
 ## [0.4.50](https://github.com/flipdot/drinks-touch/compare/0.4.49...0.4.50) (2024-10-17)
 
 
