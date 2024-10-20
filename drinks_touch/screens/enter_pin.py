@@ -15,7 +15,7 @@ class EnterPinScreen(Screen):
             Button(
                 text="BACK",
                 pos=(30, 30),
-                click_func=self.back,
+                on_click=self.back,
                 font=FONTS["monospace"],
                 size=30,
             )
@@ -33,7 +33,7 @@ class EnterPinScreen(Screen):
             Button(
                 text="UNLOCK!",
                 pos=(100, 680),
-                click_func=self.btn_ok,
+                on_click=self.btn_ok,
                 font=FONTS["monospace"],
                 size=70,
             )
@@ -68,7 +68,7 @@ class EnterPinScreen(Screen):
                 text="DEL",
                 pos=(200, 580),
                 font=FONTS["monospace"],
-                click_func=self.del_char,
+                on_click=self.del_char,
                 size=50,
             )
         )

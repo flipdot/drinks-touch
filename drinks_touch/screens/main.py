@@ -44,7 +44,7 @@ class MainScreen(Screen):
                 text="Abbrechen",
                 pos=(150, 700),
                 size=30,
-                click_func=self.home,
+                on_click=self.home,
             )
         )
         self.timeout = Progress(

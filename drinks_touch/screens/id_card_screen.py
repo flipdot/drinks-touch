@@ -25,7 +25,7 @@ class IDCardScreen(Screen):
                 text="BACK",
                 pos=(30, 30),
                 font=FONTS["monospace"],
-                click_func=self.back,
+                on_click=self.back,
                 size=30,
             )
         )
@@ -43,7 +43,7 @@ class IDCardScreen(Screen):
                 text="Reset",
                 pos=(350, 30),
                 size=30,
-                click_func=self.reset_id,
+                on_click=self.reset_id,
             )
         )
 
@@ -64,7 +64,7 @@ class IDCardScreen(Screen):
                 text="OK bye",
                 pos=(330, 700),
                 size=30,
-                click_func=self.btn_home,
+                on_click=self.btn_home,
             )
         )
 
@@ -73,7 +73,7 @@ class IDCardScreen(Screen):
                 text="Drucken",
                 pos=(30, 700),
                 size=30,
-                click_func=self.print_id,
+                on_click=self.print_id,
             )
         )
         self.progress = Progress(pos=(200, 720), speed=1 / 15.0)

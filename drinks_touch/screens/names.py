@@ -20,7 +20,7 @@ class NamesScreen(Screen):
             Button(
                 text="BACK",
                 pos=(30, 30),
-                click_func=self.back,
+                on_click=self.back,
                 font=FONTS["monospace"],
                 size=30,
             )

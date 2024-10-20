@@ -13,6 +13,7 @@ from screens.new_id_screen import NewIDScreen
 from screens.profile import ProfileScreen
 from tasks import CheckForUpdatesTask
 from users.users import Users
+from .git import GitScreen
 from .main import MainScreen
 from .screen import Screen
 from .screen_manager import ScreenManager
@@ -37,17 +38,17 @@ class WaitScanScreen(Screen):
                 pos=(50, 600),
                 text="drink buchen",
                 size=52,
-                click_func=self.set_member,
+                on_click=self.set_member,
             ),
             Button(
                 pos=(50, 700),
                 text="Nur Statistik",
-                click_func=self.stat_drink,
+                on_click=self.stat_drink,
             ),
             Button(
                 pos=(350, 700),
                 text="nope",
-                click_func=self.btn_reset,
+                on_click=self.btn_reset,
             ),
         ]
         self.empty_info = [
@@ -55,13 +56,13 @@ class WaitScanScreen(Screen):
                 pos=(30, 655),
                 size=45,
                 text="Benutzer",
-                click_func=self.set_member,
+                on_click=self.set_member,
             ),
             Button(
                 pos=(290, 690),
                 size=15,
                 text="Gutschein drucken",
-                click_func=self.btn_new_id,
+                on_click=self.btn_new_id,
             ),
         ]
 
@@ -115,36 +116,42 @@ class WaitScanScreen(Screen):
             )
         )
 
-        bottom_right_buttons = []
-
-        if config.GIT_REPO_AVAILABLE:
-            bottom_right_buttons.append(
-                Button(
-                    text=None,
-                    inner=SvgIcon(
-                        "drinks_touch/static/images/git.svg",
-                        color=config.COLORS["disabled"],
-                        height=36,
-                    ),
-                    color=config.COLORS["disabled"],
-                    # click_func=lambda: ScreenManager.get_instance().set_active(
-                    #     GitScreen(self.screen)
-                    # ),
-                ),
-            )
-        bottom_right_buttons.append(
+        color = (
+            config.COLORS["infragelb"]
+            if config.GIT_REPO_AVAILABLE
+            else config.COLORS["disabled"]
+        )
+        bottom_right_buttons = [
             Button(
                 text=None,
-                click_func=lambda: ScreenManager.get_instance().set_active(
+                inner=SvgIcon(
+                    "drinks_touch/static/images/git.svg",
+                    color=color,
+                    height=36,
+                ),
+                color=color,
+                on_click=(
+                    (
+                        lambda: ScreenManager.get_instance().set_active(
+                            GitScreen(self.screen)
+                        )
+                    )
+                    if config.GIT_REPO_AVAILABLE
+                    else None
+                ),
+            ),
+            Button(
+                text=None,
+                on_click=lambda: ScreenManager.get_instance().set_active(
                     SyncScreen(self.screen)
                 ),
                 inner=RefreshIcon(),
-            )
-        )
+            ),
+        ]
 
         self.objects.append(
             HBox(
-                pos=(480, 800),
+                pos=(480, 795),
                 align_right=True,
                 align_bottom=True,
                 elements=bottom_right_buttons,

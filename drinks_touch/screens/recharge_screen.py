@@ -25,7 +25,7 @@ class RechargeScreen(Screen):
                 text="BACK",
                 pos=(30, 30),
                 font=FONTS["monospace"],
-                click_func=self.back,
+                on_click=self.back,
                 size=30,
             )
         )
@@ -52,25 +52,25 @@ class RechargeScreen(Screen):
                 text="EUR 5",
                 pos=(30, 300),
                 size=30,
-                click_func=partial(self.verify_payment, 5),
+                on_click=partial(self.verify_payment, 5),
             ),
             Button(
                 text="EUR 10",
                 pos=(250, 300),
                 size=30,
-                click_func=partial(self.verify_payment, 10),
+                on_click=partial(self.verify_payment, 10),
             ),
             Button(
                 text="EUR 20",
                 pos=(30, 400),
                 size=30,
-                click_func=partial(self.verify_payment, 20),
+                on_click=partial(self.verify_payment, 20),
             ),
             Button(
                 text="EUR 50",
                 pos=(250, 400),
                 size=30,
-                click_func=partial(self.verify_payment, 50),
+                on_click=partial(self.verify_payment, 50),
             ),
             Label(text="Wirf Geld in die Kasse,", pos=(30, 100), size=50),
             Label(text="und drück den passenden", pos=(30, 150), size=50),
@@ -86,7 +86,7 @@ class RechargeScreen(Screen):
                 text="Ja",
                 pos=(250, 400),
                 size=30,
-                click_func=self.save_payment,
+                on_click=self.save_payment,
             ),
         ]
         self.verify_amount = Label(text="EUR X", pos=(30, 200), size=60)
