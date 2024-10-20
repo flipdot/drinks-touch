@@ -8,6 +8,7 @@ from drinks.drinks import get_by_ean
 from drinks.drinks_manager import DrinksManager
 from elements import RefreshIcon, SvgIcon, Progress, Label, Image, Button
 from elements.hbox import HBox
+from elements.vbox import VBox
 from screens.new_id_screen import NewIDScreen
 from screens.profile import ProfileScreen
 from tasks import CheckForUpdatesTask
@@ -51,7 +52,7 @@ class WaitScanScreen(Screen):
         ]
         self.empty_info = [
             Button(
-                pos=(30, 680),
+                pos=(30, 655),
                 size=45,
                 text="Benutzer",
                 click_func=self.set_member,
@@ -98,10 +99,19 @@ class WaitScanScreen(Screen):
             total_balance_fmt = "(SQL Error)"
 
         self.objects.append(
-            Label(
-                text="∑ = {}".format(total_balance_fmt),
-                size=25,
-                pos=(0, 755),
+            VBox(
+                elements=[
+                    Label(
+                        text="∑ = {}".format(total_balance_fmt),
+                        size=25,
+                    ),
+                    Label(
+                        text=f"Build: {config.BUILD_NUMBER}",
+                        size=20,
+                    ),
+                ],
+                pos=(5, 800),
+                align_bottom=True,
             )
         )
 
@@ -141,14 +151,6 @@ class WaitScanScreen(Screen):
                 right_to_left=True,
                 gap=5,
                 padding=(0, 5),
-            )
-        )
-
-        self.objects.append(
-            Label(
-                text=f"Build: {config.BUILD_NUMBER}",
-                size=20,
-                pos=(0, 785),
             )
         )
         if (

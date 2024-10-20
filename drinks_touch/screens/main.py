@@ -33,7 +33,7 @@ class MainScreen(Screen):
                     click_param=text,
                     force_width=440 / 6,
                     force_height=440 / 6,
-                    padding=20,
+                    padding=(15, 25),
                 )
             )
 
@@ -86,4 +86,4 @@ class MainScreen(Screen):
         row = int(i / 6)
         col = int(i % 6)
 
-        return col * 80 + 30, row * 80 + 350
+        return col * 80 + 5, row * 80 + 350

@@ -28,7 +28,7 @@ class Label(BaseElm):
 
         self.frame_counter = 0
         pos = kwargs.pop("pos", (0, 0))
-        super().__init__(pos, self.size, -1, *args, **kwargs)
+        super().__init__(pos, self.size, self.size, *args, **kwargs)
 
         self.font = Label.get_font(self.font_face, self.size)
 
