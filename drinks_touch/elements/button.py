@@ -48,7 +48,6 @@ class Button(BaseElm):
             )
         self.inner = inner
 
-        # self.box = None
         self.clicking = False
 
     @staticmethod
@@ -63,13 +62,6 @@ class Button(BaseElm):
 
     def render(self, *args, **kwargs) -> pygame.Surface:
         inner = self.inner.render(*args, **kwargs)
-
-        # self.box = (
-        #     self.inner.pos[0] - self.padding_left,
-        #     self.inner.pos[1] - self.padding_top,
-        #     self.inner.width + self.padding_left + self.padding_right,
-        #     self.inner.height + self.padding_top + self.padding_bottom,
-        # )
 
         size = (
             self.inner.width + self.padding_left + self.padding_right,
