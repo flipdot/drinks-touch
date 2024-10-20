@@ -2,7 +2,7 @@ import math
 
 import pygame.draw
 
-from config import COLORS
+from config import COLORS, FONTS
 from elements.base_elm import BaseElm
 
 
@@ -122,7 +122,7 @@ class ProgressBar(BaseElm):
             ),
             width=1,
         )
-        font = pygame.font.SysFont("monospace", 15)
+        font = pygame.font.SysFont(FONTS["monospace"], 15)
 
         lines = self.text.split("\n")
 
