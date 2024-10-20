@@ -15,8 +15,6 @@ class Button(BaseElm):
         text="<Label>",
         color=COLORS["infragelb"],
         on_click=None,
-        click_func_param=None,
-        click_param=None,
         force_width=None,
         force_height=None,
         inner: BaseElm = None,
@@ -34,8 +32,6 @@ class Button(BaseElm):
         self.size = size
         self.color = color
         self.on_click_handler = on_click
-        self.clicked_param = click_func_param
-        self.click_param = click_param
         self.force_width = force_width
         self.force_height = force_height
         if inner is None:
@@ -81,9 +77,6 @@ class Button(BaseElm):
             raise NotImplementedError("No on_click handler defined")
         self.pre_click()
         try:
-            if self.click_param:
-                self.clicked_param(self.click_param)
-            else:
-                self.on_click_handler()
+            self.on_click_handler()
         finally:
             self.post_click()
