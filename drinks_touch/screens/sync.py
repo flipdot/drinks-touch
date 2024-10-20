@@ -21,7 +21,7 @@ class SyncScreen(Screen):
         self.tasks = [Task() for Task in discover_tasks()]
 
         progress_bars = [
-            task.make_progress_bar(self.screen, box_height=90) for task in self.tasks
+            task.make_progress_bar(box_height=90, width=470) for task in self.tasks
         ]
 
         for task in self.tasks:
@@ -32,7 +32,7 @@ class SyncScreen(Screen):
                 text="Initialisierung...",
                 pos=(5, 5),
             ),
-            VBox(self.screen, progress_bars, gap=10, pos=(10, 80)),
+            VBox(self.screen, progress_bars, gap=10, pos=(5, 80)),
             Button(
                 text="Abbrechen",
                 pos=(5, 795),
