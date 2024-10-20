@@ -2,6 +2,7 @@ import math
 
 import pygame.draw
 
+from config import COLORS
 from elements.base_elm import BaseElm
 
 
@@ -38,7 +39,7 @@ class ProgressBar(BaseElm):
         )
         self.max_lines = math.floor(box_height / 15)
 
-        self.color = (246, 198, 0)
+        self.color = COLORS["infragelb"]
         self.percent = None
         self.tick = 0
 
@@ -95,7 +96,6 @@ class ProgressBar(BaseElm):
             surface.blit(label, (x, y))
             y += label.get_height()
         bar = self._render_bar()
-        # self.bar_height = bar.get_height()
         surface.blit(bar, (x, y))
         y += bar.get_height()
         if self.text:

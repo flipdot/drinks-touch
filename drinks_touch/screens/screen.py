@@ -42,14 +42,6 @@ class Screen(object):
                             pos[1] - obj.screen_pos[1],
                         )
                         obj.on_click(*transformed_pos)
-                        # self.pre_click()
-                        # try:
-                        #     if self.click_param:
-                        #         self.clicked_param(self.click_param)
-                        #     else:
-                        #         self.clicked()
-                        # finally:
-                        #     self.post_click()
                         event.consumed = True
 
     @staticmethod
