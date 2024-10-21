@@ -1,13 +1,14 @@
 import pygame
 
 import config
+from elements.base_elm import BaseElm
 from screens.screen_manager import ScreenManager
 
 
 class Screen(object):
     def __init__(self, screen):
         self.screen = screen
-        self.objects = []
+        self.objects: list[BaseElm] = []
 
     def render(self, dt):
         for o in self.objects:

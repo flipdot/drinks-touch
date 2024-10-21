@@ -19,7 +19,7 @@ from .screen import Screen
 from .screen_manager import ScreenManager
 from sqlalchemy.sql import text
 
-from .sync import SyncScreen
+from .tasks_screen import TasksScreen
 
 logger = logging.getLogger(__name__)
 
@@ -143,7 +143,7 @@ class WaitScanScreen(Screen):
             Button(
                 text=None,
                 on_click=lambda: ScreenManager.get_instance().set_active(
-                    SyncScreen(self.screen)
+                    TasksScreen(self.screen)
                 ),
                 inner=RefreshIcon(),
             ),

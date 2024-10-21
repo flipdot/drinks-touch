@@ -17,7 +17,7 @@ from drinks.drinks_manager import DrinksManager
 from notifications.notification import send_low_balances, send_summaries
 from screen import get_screen
 from screens.screen_manager import ScreenManager
-from screens.sync import SyncScreen
+from screens.tasks_screen import TasksScreen
 from stats.stats import run as stats_send
 from users.sync import sync_recharges
 from webserver.webserver import run as run_webserver
@@ -99,7 +99,7 @@ def main(argv):
 
     global screen_manager
     screen_manager = ScreenManager(screen)
-    screen_manager.set_active(SyncScreen(screen))
+    screen_manager.set_active(TasksScreen(screen))
     ScreenManager.set_instance(screen_manager)
 
     init_db()
