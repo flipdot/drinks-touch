@@ -53,6 +53,6 @@ class GitFetchTask(RunCmdTask):
             "-5",
             "--oneline",
             "--reverse",
-            "--format=format:%h %<(8,trunc)%an %<(34,ltrunc)%s",
+            "--format=format:%h %<(8,trunc)%an %<(34,trunc)%s",
         ],
     )
