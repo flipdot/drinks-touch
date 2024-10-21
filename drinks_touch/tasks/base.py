@@ -42,7 +42,7 @@ class BaseTask:
         self.logger.addHandler(handler)
 
     @property
-    def label(self):
+    def LABEL(self):
         return self.__class__.__name__
 
     @property
@@ -57,7 +57,7 @@ class BaseTask:
             self.progress_bar.percent = value
 
     def make_progress_bar(self, *args, **kwargs) -> ProgressBar:
-        self.progress_bar = ProgressBar(*args, **kwargs, label=self.label, text=None)
+        self.progress_bar = ProgressBar(*args, **kwargs, label=self.LABEL, text=None)
         return self.progress_bar
 
     def start(self):
@@ -67,8 +67,8 @@ class BaseTask:
         try:
             self.run()
         except Exception as e:
-            logger.exception(f"Error in task {self.label}")
-            self.logger.error(f"Error: {e}")
+            logger.exception(f"Error in task {self.LABEL}")
+            self.logger.error(e)
             self._fail()
         else:
             self._success()
@@ -92,7 +92,7 @@ class BaseTask:
         if self.progress_bar is not None:
             self.progress_bar.fail()
         self.finished = True
-        self.status = -1
+        self.status = status
 
     def kill(self):
         self.sig_killed = True
