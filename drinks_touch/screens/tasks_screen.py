@@ -1,4 +1,4 @@
-from elements import Label, Progress, Button
+from elements import Label, Button
 from inspect import getmembers, isclass
 import tasks
 from elements.vbox import VBox
@@ -23,9 +23,6 @@ class TasksScreen(Screen):
             task.make_progress_bar(box_height=90, width=470) for task in self.tasks
         ]
 
-        for task in self.tasks:
-            task.start()
-
         self.objects = [
             Label(
                 text="Initialisierung...",
@@ -40,6 +37,10 @@ class TasksScreen(Screen):
             ),
         ]
 
+    def on_start(self):
+        for task in self.tasks:
+            task.start()
+
     def render(self, *args, **kwargs):
         super(TasksScreen, self).render(*args, **kwargs)
         self.check_task_completion()
@@ -50,28 +51,24 @@ class TasksScreen(Screen):
 
     def check_task_completion(self):
         if not self.finished and self.all_tasks_finished:
-            self.objects.append(
-                Progress(
-                    pos=(475, 795),
-                    speed=1 / 10,
-                    align_right=True,
-                    align_bottom=True,
-                    on_elapsed=self.time_elapsed,
-                )
-            )
+            # TODO: Progress object doesn't work well with navigating back and forth
+            #  / reusing an old screen instance
+            # self.objects.append(
+            #     Progress(
+            #         pos=(475, 795),
+            #         speed=1 / 10,
+            #         align_right=True,
+            #         align_bottom=True,
+            #         on_elapsed=self.back,
+            #     )
+            # )
             self.finished = True
 
     def cancel_tasks(self):
         if self.all_tasks_finished:
-            self.time_elapsed()
+            self.back()
         for task in self.tasks:
             task.kill()
-
-    def time_elapsed(self):
-        from screens.screen_manager import ScreenManager
-
-        screen_manager = ScreenManager.get_instance()
-        screen_manager.set_default()
 
     def on_barcode(self, barcode):
         for task in self.tasks:

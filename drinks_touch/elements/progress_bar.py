@@ -84,6 +84,10 @@ class ProgressBar(BaseElm):
         if self.percent is None:
             self.percent = 1
 
+    def reset(self):
+        self.color = COLORS["infragelb"]
+        self.percent = None
+
     def render(self, dt, *args, **kwargs) -> pygame.Surface:
         self.tick += dt
         surface = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
