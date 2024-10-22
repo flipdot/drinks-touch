@@ -50,7 +50,6 @@ class GitFetchTask(RunCmdTask):
         [
             "git",
             "log",
-            "-5",
             "--oneline",
             "--all",
             "--reverse",

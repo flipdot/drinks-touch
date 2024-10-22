@@ -50,8 +50,8 @@ class Screen(object):
         ScreenManager.get_instance().go_back()
 
     @staticmethod
-    def goto(screen):
-        ScreenManager.get_instance().set_active(screen)
+    def goto(screen, *args, **kwargs):
+        ScreenManager.get_instance().set_active(screen, *args, **kwargs)
 
     # lifecycle inspired by https://developer.android.com/guide/components/activities/activity-lifecycle
     # Not all yet implemented

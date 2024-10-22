@@ -1,13 +1,14 @@
 import functools
 
 import config
-from elements import Button, SvgIcon, RefreshIcon
+from elements import Button, SvgIcon
 from elements.hbox import HBox
 from elements.vbox import VBox
 from screens.git.branch_screen import GitBranchScreen
 from screens.git.log_screen import GitLogScreen
 from screens.screen import Screen
 from screens.tasks_screen import TasksScreen
+from tasks import GitFetchTask
 
 
 class GitMainScreen(Screen):
@@ -38,17 +39,23 @@ class GitMainScreen(Screen):
                                 size=25,
                             ),
                             Button(
-                                text="Dev-Version",
+                                text="Branches",
                                 on_click=functools.partial(
                                     self.goto, GitBranchScreen(self.screen)
                                 ),
                                 size=25,
                             ),
                             Button(
+                                text="Fetch",
                                 on_click=functools.partial(
-                                    self.goto, TasksScreen(self.screen)
+                                    self.goto,
+                                    TasksScreen(
+                                        self.screen,
+                                        tasks=[GitFetchTask()],
+                                        box_height=600,
+                                    ),
                                 ),
-                                inner=RefreshIcon(height=25, width=25),
+                                size=25,
                             ),
                         ],
                         gap=15,

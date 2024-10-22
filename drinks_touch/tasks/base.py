@@ -72,6 +72,7 @@ class BaseTask:
         self.finished = False
         self.status = None
         self.progress = None
+        self.sig_killed = False
         self.progress_bar.reset()
 
     def _run(self):
