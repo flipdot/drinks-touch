@@ -1,4 +1,5 @@
 import functools
+import subprocess
 
 import config
 from elements import Button, SvgIcon
@@ -8,7 +9,7 @@ from screens.git.branch_screen import GitBranchScreen
 from screens.git.log_screen import GitLogScreen
 from screens.screen import Screen
 from screens.tasks_screen import TasksScreen
-from tasks import GitFetchTask
+from tasks import GitFetchTask, UpdateAndRestartTask
 
 
 class GitMainScreen(Screen):
@@ -26,7 +27,14 @@ class GitMainScreen(Screen):
                 [
                     Button(
                         text="Update & Restart",
-                        on_click=self.update_and_restart,
+                        on_click=functools.partial(
+                            self.goto,
+                            TasksScreen(
+                                self.screen,
+                                tasks=[UpdateAndRestartTask()],
+                                box_height=600,
+                            ),
+                        ),
                         size=40,
                     ),
                     HBox(
@@ -75,4 +83,9 @@ class GitMainScreen(Screen):
         ]
 
     def update_and_restart(self):
-        pass
+        # git checkout master
+        # git merge --ff-only origin/master
+        subprocess.run(["git", "checkout", "master"], cwd=config.REPO_PATH)
+        subprocess.run(
+            ["git", "merge", "--ff-only", "origin/master"], cwd=config.REPO_PATH
+        )

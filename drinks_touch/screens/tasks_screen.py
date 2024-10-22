@@ -10,7 +10,7 @@ def discover_tasks():
     return [
         Task
         for _, Task in getmembers(tasks_module, isclass)
-        if issubclass(Task, BaseTask)
+        if issubclass(Task, BaseTask) and Task.ON_STARTUP
     ]
 
 

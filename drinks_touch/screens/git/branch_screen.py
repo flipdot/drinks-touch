@@ -14,6 +14,11 @@ class GitBranchScreen(Screen):
                 pos=(10, 20),
                 size=36,
             ),
+            Label(
+                text="WORK IN PROGRESS",
+                pos=(10, 360),
+                size=60,
+            ),
             Button(
                 text="BACK",
                 pos=(5, 795),

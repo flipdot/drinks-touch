@@ -21,6 +21,8 @@ class LogHandler(logging.Handler):
 
 
 class BaseTask:
+    ON_STARTUP = True
+
     def __init__(self):
         self.progress_bar: ProgressBar | None = None
         self.lock = threading.Lock()

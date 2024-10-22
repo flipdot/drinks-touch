@@ -1,5 +1,6 @@
 import subprocess
 
+import config
 from tasks.base import BaseTask
 
 
@@ -13,6 +14,7 @@ class RunCmdTask(BaseTask):
     """
 
     CMD = ["echo", "Hello, World!"]
+    PWD = None
 
     def run(self):
         for cmd in self.CMDS:
@@ -23,6 +25,7 @@ class RunCmdTask(BaseTask):
                 cmd,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
+                cwd=self.PWD,
             )
             while process.poll() is None:
                 if self.sig_killed:
@@ -55,4 +58,14 @@ class GitFetchTask(RunCmdTask):
             "--reverse",
             "--format=format:%h %<(6,trunc)%D %<(7,trunc)%an %<(28,trunc)%s",
         ],
+    )
+
+
+class UpdateAndRestartTask(RunCmdTask):
+    ON_STARTUP = False
+    PWD = config.REPO_PATH
+    CMDS = (
+        ["git", "checkout", "master"],
+        ["git", "merge", "--ff-only", "origin/master"],
+        ["sudo", "systemctl", "restart", "drinks-touch"],
     )
