@@ -36,7 +36,7 @@ class TasksScreen(Screen):
             ),
             VBox(progress_bars, gap=10, pos=(5, 80)),
             Button(
-                text="Abbrechen",
+                text="Abbrechen / Zurück",
                 pos=(5, 795),
                 align_bottom=True,
                 on_click=self.cancel_tasks,
