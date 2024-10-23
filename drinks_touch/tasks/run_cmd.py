@@ -68,5 +68,6 @@ class UpdateAndRestartTask(RunCmdTask):
     CMDS = (
         ["git", "checkout", "master"],
         ["git", "merge", "--ff-only", "origin/master"],
+        ["sleep", "7"],
         ["sudo", "systemctl", "restart", "drinks-touch"],
     )
