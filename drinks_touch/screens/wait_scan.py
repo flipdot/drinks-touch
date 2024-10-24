@@ -1,4 +1,5 @@
 import datetime
+import functools
 import logging
 
 import config
@@ -13,7 +14,7 @@ from screens.new_id_screen import NewIDScreen
 from screens.profile import ProfileScreen
 from tasks import CheckForUpdatesTask
 from users.users import Users
-from .git import GitScreen
+from .git.main_screen import GitMainScreen
 from .main import MainScreen
 from .screen import Screen
 from .screen_manager import ScreenManager
@@ -133,7 +134,7 @@ class WaitScanScreen(Screen):
                 on_click=(
                     (
                         lambda: ScreenManager.get_instance().set_active(
-                            GitScreen(self.screen)
+                            GitMainScreen(self.screen)
                         )
                     )
                     if config.GIT_REPO_AVAILABLE
@@ -141,10 +142,7 @@ class WaitScanScreen(Screen):
                 ),
             ),
             Button(
-                text=None,
-                on_click=lambda: ScreenManager.get_instance().set_active(
-                    TasksScreen(self.screen)
-                ),
+                on_click=functools.partial(self.goto, TasksScreen(self.screen)),
                 inner=RefreshIcon(),
             ),
         ]

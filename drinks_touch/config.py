@@ -1,5 +1,7 @@
 import os
 from datetime import timedelta
+from pathlib import Path
+
 import dotenv
 
 dotenv.load_dotenv()
@@ -34,6 +36,7 @@ else:
 GIT_REPO_AVAILABLE = (
     os.popen("git rev-parse --is-inside-work-tree").read().strip() == "true"
 )
+REPO_PATH = Path(__file__).parent
 
 OIDC_DISCOVERY_URL = os.environ.get(
     "OIDC_DISCOVERY_URL",

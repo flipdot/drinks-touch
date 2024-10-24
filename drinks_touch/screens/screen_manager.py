@@ -13,9 +13,10 @@ class ScreenManager(object):
         self.reset_history()
         self.set_active(WaitScanScreen(self.screen))
 
-    def set_active(self, screen):
+    def set_active(self, screen, *args, **kwargs):
         self.screen_history.append(screen)
         self.current_screen = screen
+        screen.on_start(*args, **kwargs)
 
     def get_active(self):
         return self.current_screen

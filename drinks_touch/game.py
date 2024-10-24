@@ -99,8 +99,10 @@ def main(argv):
 
     global screen_manager
     screen_manager = ScreenManager(screen)
-    screen_manager.set_active(TasksScreen(screen))
     ScreenManager.set_instance(screen_manager)
+
+    screen_manager.set_default()
+    screen_manager.set_active(TasksScreen(screen))
 
     init_db()
 

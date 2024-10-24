@@ -8,7 +8,7 @@ class HBox(BaseElm):
     def __init__(
         self,
         elements: list[BaseElm],
-        gap=0,
+        gap=5,
         pos=(0, 0),
         *args,
         **kwargs,

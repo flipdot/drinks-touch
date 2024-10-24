@@ -21,17 +21,17 @@ class LogHandler(logging.Handler):
 
 
 class BaseTask:
+    ON_STARTUP = True
+
     def __init__(self):
         self.progress_bar: ProgressBar | None = None
         self.lock = threading.Lock()
         self._output = ""
-        self._progress = None
+        self.progress = None
         self.finished = False
         self.status = None
         self.sig_killed = False
-
-        self.thread = threading.Thread(target=self._run)
-        self.thread.daemon = True
+        self.thread = None
 
         self.logger = logging.getLogger(self.__class__.__name__)
 
@@ -50,8 +50,9 @@ class BaseTask:
         return self._progress
 
     @progress.setter
-    def progress(self, value: float):
-        assert 0 <= value <= 1, "Progress must be between 0 and 1"
+    def progress(self, value: float | None):
+        if __debug__ and value is not None:
+            assert 0 <= value <= 1, "Progress must be between 0 and 1"
         self._progress = value
         if self.progress_bar is not None:
             self.progress_bar.percent = value
@@ -61,7 +62,20 @@ class BaseTask:
         return self.progress_bar
 
     def start(self):
+        self.reset()
+        self.thread = threading.Thread(target=self._run)
+        self.thread.daemon = True
         self.thread.start()
+
+    def reset(self):
+        if self.thread is not None:
+            while self.thread.is_alive():
+                self.kill()
+        self.finished = False
+        self.status = None
+        self.progress = None
+        self.sig_killed = False
+        self.progress_bar.reset()
 
     def _run(self):
         try:

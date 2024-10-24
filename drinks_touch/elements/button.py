@@ -12,7 +12,7 @@ class Button(BaseElm):
         self,
         font=FONTS["monospace"],
         size=30,
-        text="<Label>",
+        text=None,
         color=COLORS["infragelb"],
         on_click=None,
         force_width=None,
