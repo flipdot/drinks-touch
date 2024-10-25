@@ -1,4 +1,4 @@
-from elements import Label, Button
+from elements import Label, Button, Progress
 from inspect import getmembers, isclass
 import tasks as tasks_module
 from elements.vbox import VBox
@@ -29,9 +29,13 @@ class TasksScreen(Screen):
                 box_height = 600
             else:
                 box_height = 360 / len(self.tasks)
+        self.box_height = box_height
+
+    def on_start(self, *args, **kwargs):
+        self.finished = False
 
         progress_bars = [
-            task.make_progress_bar(box_height=box_height, width=470)
+            task.make_progress_bar(box_height=self.box_height, width=470)
             for task in self.tasks
         ]
 
@@ -49,8 +53,6 @@ class TasksScreen(Screen):
             ),
         ]
 
-    def on_start(self, *args, **kwargs):
-        self.finished = False
         for task in self.tasks:
             task.start()
 
@@ -64,17 +66,15 @@ class TasksScreen(Screen):
 
     def check_task_completion(self):
         if not self.finished and self.all_tasks_finished:
-            # TODO: Progress object doesn't work well with navigating back and forth
-            #  / reusing an old screen instance
-            # self.objects.append(
-            #     Progress(
-            #         pos=(475, 795),
-            #         speed=1 / 10,
-            #         align_right=True,
-            #         align_bottom=True,
-            #         on_elapsed=self.back,
-            #     )
-            # )
+            self.objects.append(
+                Progress(
+                    pos=(475, 795),
+                    speed=1 / 10,
+                    align_right=True,
+                    align_bottom=True,
+                    on_elapsed=self.back,
+                )
+            )
             self.finished = True
 
     def cancel_tasks(self):

@@ -27,8 +27,14 @@ logger = logging.getLogger(__name__)
 
 class WaitScanScreen(Screen):
     def __init__(self, screen):
-        super(WaitScanScreen, self).__init__(screen)
+        super().__init__(screen)
+        self.barcode_label = None
+        self.scanned_info = []
+        self.empty_info = []
+        self.processing = None
+        self.timeout = None
 
+    def on_start(self, *args, **kwargs):
         self.barcode_label = Label(
             pos=(60, 400),
         )
