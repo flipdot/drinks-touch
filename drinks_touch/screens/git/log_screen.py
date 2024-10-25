@@ -93,7 +93,7 @@ class GitLogScreen(Screen):
         ]
 
     def get_commits(self, max_num=None) -> list[Commit]:
-        reference = self.repository.lookup_reference(f"refs/heads/{self.branch}")
+        reference = self.repository.lookup_reference_dwim(self.branch)
         commits = []
         for commit in self.repository.walk(reference.target):
             commits.append(
