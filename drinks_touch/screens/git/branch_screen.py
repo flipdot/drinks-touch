@@ -23,7 +23,7 @@ class GitBranchScreen(Screen):
                 on_click=functools.partial(
                     self.goto, GitLogScreen(self.screen, branch=branch)
                 ),
-                size=15,
+                size=20,
             )
             for branch in self.get_branches()
         ]
@@ -46,4 +46,4 @@ class GitBranchScreen(Screen):
         ]
 
     def get_branches(self):
-        return self.repository.listall_branches(BranchType.ALL)
+        return sorted(self.repository.listall_branches(BranchType.ALL))
