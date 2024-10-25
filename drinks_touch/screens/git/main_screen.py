@@ -32,7 +32,6 @@ class GitMainScreen(Screen):
                             TasksScreen(
                                 self.screen,
                                 tasks=[UpdateAndRestartTask()],
-                                box_height=600,
                             ),
                         ),
                         size=40,
@@ -42,7 +41,8 @@ class GitMainScreen(Screen):
                             Button(
                                 text="Downgrade",
                                 on_click=functools.partial(
-                                    self.goto, GitLogScreen(self.screen)
+                                    self.goto,
+                                    GitLogScreen(self.screen, branch="master"),
                                 ),
                                 size=25,
                             ),

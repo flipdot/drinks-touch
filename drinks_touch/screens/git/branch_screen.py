@@ -1,12 +1,32 @@
+import functools
+
+from pygit2 import Repository
+from pygit2.enums import BranchType
+
 import config
 from elements import Label, Button
+from elements.vbox import VBox
+from screens.git.log_screen import GitLogScreen
 from screens.screen import Screen
 
 
 class GitBranchScreen(Screen):
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, screen):
+        super().__init__(screen)
+        self.repository = Repository(config.REPO_PATH)
+
+    def on_start(self, *args, **kwargs):
+        branch_buttons = [
+            Button(
+                text=branch,
+                on_click=functools.partial(
+                    self.goto, GitLogScreen(self.screen, branch=branch)
+                ),
+                size=15,
+            )
+            for branch in self.get_branches()
+        ]
 
         self.objects = [
             Label(
@@ -14,11 +34,7 @@ class GitBranchScreen(Screen):
                 pos=(10, 20),
                 size=36,
             ),
-            Label(
-                text="WORK IN PROGRESS",
-                pos=(10, 360),
-                size=60,
-            ),
+            VBox(branch_buttons, gap=5, pos=(10, 80)),
             Button(
                 text="BACK",
                 pos=(5, 795),
@@ -28,3 +44,6 @@ class GitBranchScreen(Screen):
                 size=30,
             ),
         ]
+
+    def get_branches(self):
+        return self.repository.listall_branches(BranchType.ALL)

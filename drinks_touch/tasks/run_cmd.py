@@ -71,3 +71,20 @@ class UpdateAndRestartTask(RunCmdTask):
         ["sleep", "7"],
         ["sudo", "systemctl", "restart", "drinks-touch"],
     )
+
+
+class CheckoutAndRestartTask(RunCmdTask):
+    ON_STARTUP = False
+    PWD = config.REPO_PATH
+
+    def __init__(self, revision: str):
+        self.revision = revision
+        super().__init__()
+
+    @property
+    def CMDS(self):
+        return (
+            ["git", "checkout", self.revision],
+            ["sleep", "7"],
+            ["sudo", "systemctl", "restart", "drinks-touch"],
+        )
