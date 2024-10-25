@@ -1,5 +1,9 @@
 import functools
 
+from sqlalchemy import func
+
+from database.models import Account
+from database.storage import Session
 from elements.button import Button
 from elements.image import Image
 from elements.label import Label
@@ -20,16 +24,21 @@ class MainScreen(Screen):
 
         self.objects.append(Label(text="member auswählen", pos=(65, 250), size=50))
 
-        all_users = list(Users.get_all())
         i = 0
 
-        for c in range(97, 97 + 26):
-            text = str(chr(c))
-            users = list(
-                filter(lambda u: u["name"].lower().startswith(text), all_users)
+        query = (
+            Session()
+            .query(
+                func.upper(func.substr(Account.name, 1, 1)).label("first_char"),
+                func.count(Account.id),
             )
-            if len(users) == 0:
-                continue
+            .group_by("first_char")
+            .order_by("first_char")
+            .all()
+        )
+
+        for first_char, count in query:
+            text = first_char
             self.objects.append(
                 Button(
                     text=text,
@@ -40,7 +49,6 @@ class MainScreen(Screen):
                     padding=(15, 25),
                 )
             )
-
             i += 1
 
         self.objects.append(
