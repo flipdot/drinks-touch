@@ -15,7 +15,7 @@ def discover_tasks():
 
 
 class TasksScreen(Screen):
-    def __init__(self, screen, tasks: list[BaseTask] | None = None, box_height=90):
+    def __init__(self, screen, tasks: list[BaseTask] | None = None, box_height=None):
         super().__init__(screen)
         self.finished = False
 
@@ -23,6 +23,12 @@ class TasksScreen(Screen):
             self.tasks = tasks
         else:
             self.tasks = [Task() for Task in discover_tasks()]
+
+        if box_height is None:
+            if len(self.tasks) == 1:
+                box_height = 600
+            else:
+                box_height = 360 / len(self.tasks)
 
         progress_bars = [
             task.make_progress_bar(box_height=box_height, width=470)
