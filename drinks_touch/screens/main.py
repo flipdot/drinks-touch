@@ -11,8 +11,11 @@ from .screen import Screen
 
 class MainScreen(Screen):
     def __init__(self, screen):
-        super(MainScreen, self).__init__(screen)
+        super().__init__(screen)
+        self.timeout = None
 
+    def on_start(self, *args, **kwargs):
+        self.objects = []
         self.objects.append(Image(pos=(30, 20)))
 
         self.objects.append(Label(text="member auswählen", pos=(65, 250), size=50))

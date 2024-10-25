@@ -13,10 +13,12 @@ from .screen_manager import ScreenManager
 
 class NamesScreen(Screen):
     def __init__(self, screen, char):
-        super(NamesScreen, self).__init__(screen)
-
+        super().__init__(screen)
         self.char = char
+        self.timeout = None
 
+    def on_start(self, *args, **kwargs):
+        self.objects = []
         self.objects.append(
             Button(
                 text="BACK",
@@ -51,7 +53,7 @@ class NamesScreen(Screen):
             btn_ypos = 90
             i_y = i % btns_y
             i_x = i // btns_y
-            x = i_x * (screen.get_width() / num_cols)
+            x = i_x * (self.screen.get_width() / num_cols)
             y = i_y * btn_ypos
             self.objects.append(
                 Button(
