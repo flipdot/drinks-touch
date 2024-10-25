@@ -1,6 +1,7 @@
 from functools import partial
 
 from config import FONTS
+from database.models import Account
 from database.models.recharge_event import RechargeEvent
 from database.storage import get_session
 from elements.button import Button
@@ -14,12 +15,18 @@ from .success import SuccessScreen
 
 
 class RechargeScreen(Screen):
-    def __init__(self, screen, user):
+    def __init__(self, screen, account: Account):
         super(RechargeScreen, self).__init__(screen)
 
-        self.user = user
+        self.account = account
         self.payment_amount = 0
+        self.timeout = None
+        self.select_objects = []
+        self.verify_objects = []
+        self.verify_amount = None
 
+    def on_start(self, *args, **kwargs):
+        self.objects = []
         self.objects.append(
             Button(
                 text="BACK",
@@ -40,8 +47,8 @@ class RechargeScreen(Screen):
 
         qr_file = make_sepa_qr(
             20,
-            self.user["name"],
-            self.user["id"],
+            self.account.name,
+            self.account.ldap_id,
             pixel_width=7,
             border=4,
             color="black",
@@ -125,7 +132,7 @@ class RechargeScreen(Screen):
 
     def save_payment(self):
         session = get_session()
-        ev = RechargeEvent(self.user["id"], "DISPLAY", self.payment_amount)
+        ev = RechargeEvent(self.account.ldap_id, "DISPLAY", self.payment_amount)
         session.add(ev)
         session.commit()
 
@@ -133,7 +140,7 @@ class RechargeScreen(Screen):
         screen_manager.set_active(
             SuccessScreen(
                 self.screen,
-                self.user,
+                self.account,
                 None,
                 "EUR %s aufgeladen" % self.payment_amount,
                 session,

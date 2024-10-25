@@ -2,11 +2,11 @@ import functools
 import math
 
 from config import FONTS
+from database.models import Account
 from elements.button import Button
 from elements.label import Label
 from elements.progress import Progress
 from screens.profile import ProfileScreen
-from users.users import Users
 from .screen import Screen
 from .screen_manager import ScreenManager
 
@@ -44,11 +44,16 @@ class NamesScreen(Screen):
             )
         )
 
-        users = list(Users.get_all(filters=["uid=" + self.char + "*"]))
+        # users = list(Users.get_all(filters=["uid=" + self.char + "*"]))
+        accounts = (
+            Account.query.filter(Account.name.ilike(self.char + "%"))
+            .order_by(Account.name)
+            .all()
+        )
 
         btns_y = 7
-        num_cols = int(math.ceil(len(users) / float(btns_y)))
-        for i, user in enumerate(users):
+        num_cols = int(math.ceil(len(accounts) / float(btns_y)))
+        for i, account in enumerate(accounts):
             xoff, yoff = 30, 190
             btn_ypos = 90
             i_y = i % btns_y
@@ -57,16 +62,15 @@ class NamesScreen(Screen):
             y = i_y * btn_ypos
             self.objects.append(
                 Button(
-                    text=user["name"],
+                    text=account.name,
                     pos=(xoff + x, y + yoff),
-                    on_click=functools.partial(self.switch_to_screen, user),
+                    on_click=functools.partial(
+                        self.goto, ProfileScreen(self.screen, account)
+                    ),
                     padding=20,
                 )
             )
             i += 1
-
-    def switch_to_screen(self, param):
-        ScreenManager.get_instance().set_active(ProfileScreen(self.screen, param))
 
     @staticmethod
     def home():
@@ -78,6 +82,6 @@ class NamesScreen(Screen):
     def on_barcode(self, barcode):
         if not barcode:
             return
-        user = Users.get_by_id_card(barcode)
-        if user:
-            ScreenManager.get_instance().set_active(ProfileScreen(self.screen, user))
+        account = Account.query.filter(Account.id_card == barcode).first()
+        if account:
+            self.goto(ProfileScreen(self.screen, account))
