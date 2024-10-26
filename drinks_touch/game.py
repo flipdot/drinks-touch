@@ -15,6 +15,7 @@ import env
 from database.storage import init_db, Session
 from drinks.drinks_manager import DrinksManager
 from notifications.notification import send_low_balances, send_summaries
+from overlays import MouseOverlay
 from screen import get_screen
 from screens.screen_manager import ScreenManager
 from screens.tasks_screen import TasksScreen
@@ -45,6 +46,7 @@ if config.LOGLEVEL == logging.DEBUG:
     set_library_log_detail_level(EXTENDED)
 
 event_queue = queue.Queue()
+overlays = []
 screen_manager = None
 
 
@@ -57,6 +59,8 @@ def handle_events():
                 events.append(event_queue.get(block))
             except queue.Empty:
                 break
+        for overlay in overlays:
+            overlay.events(events)
         current_screen = screen_manager.get_active()
         try:
             current_screen.events(events)
@@ -98,6 +102,12 @@ def main(argv):
     DrinksManager.set_instance(drinks_manager)
 
     global screen_manager
+    global overlays
+    overlays.extend(
+        [
+            MouseOverlay(screen),
+        ]
+    )
     screen_manager = ScreenManager(screen)
     ScreenManager.set_instance(screen_manager)
 
@@ -131,6 +141,8 @@ def main(argv):
 
         screen.fill((0, 0, 0))
         current_screen.render(dt)
+        for overlay in overlays:
+            overlay.render(dt)
 
         pygame.display.flip()
 
