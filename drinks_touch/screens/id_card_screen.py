@@ -4,21 +4,27 @@ import subprocess
 from pystrich.code128 import Code128Encoder
 
 from config import FONTS
+from database.models import Account
 from drinks.drinks import get_by_ean
 from drinks.drinks_manager import DrinksManager
 from elements.button import Button
 from elements.label import Label
 from elements.progress import Progress
-from users.users import Users
 from .screen import Screen
 from .screen_manager import ScreenManager
 
 
 class IDCardScreen(Screen):
-    def __init__(self, screen, user):
-        super(IDCardScreen, self).__init__(screen)
+    def __init__(self, screen, account: Account):
+        super().__init__(screen)
 
-        self.user = user
+        self.account = account
+        self.timeout = None
+        self.id_label = None
+        self.progress = None
+
+    def on_start(self, *args, **kwargs):
+        self.objects = []
 
         self.objects.append(
             Button(
@@ -47,12 +53,12 @@ class IDCardScreen(Screen):
             )
         )
 
-        self.objects.append(Label(text=self.user["name"], pos=(30, 120), size=70))
+        self.objects.append(Label(text=self.account.name, pos=(30, 120), size=70))
 
         self.objects.append(Label(text="Momentan zugeordnet:", pos=(30, 300)))
 
         self.id_label = Label(
-            text=self.user["id_card"], pos=(50, 400), size=70, font="Serif"
+            text=self.account.id_card, pos=(50, 400), size=70, font="Serif"
         )
         self.objects.append(self.id_label)
 
@@ -95,18 +101,16 @@ class IDCardScreen(Screen):
 
     def set_id(self, ean):
         ean = ean.upper() if ean else ean
-        self.user["id_card"] = ean
-        Users.set_value(self.user, "id_card", ean)
-        self.id_label.text = self.user["id_card"]
+        self.id_label.text = self.account.id_card = ean
 
     def reset_id(self):
         self.set_id(None)
 
     def print_id(self):
         self.progress.start()
-        if not self.user["id_card"]:
-            self.set_id("fd_" + bytes.decode(self.user["name"]))
-        enc = Code128Encoder(str(self.user["id_card"]))
+        if not self.account.id_card:
+            self.set_id("fd_" + bytes.decode(self.account.name))
+        enc = Code128Encoder(str(self.account.id_card))
         enc.height = 300
         png = enc.get_imagedata()
         p = subprocess.Popen(["lp", "-d", "labeldrucker", "-"], stdin=subprocess.PIPE)
@@ -122,7 +126,7 @@ class IDCardScreen(Screen):
 
             DrinksManager.get_instance().set_selected_drink(drink)
             ScreenManager.get_instance().set_active(
-                ProfileScreen(self.screen, self.user)
+                ProfileScreen(self.screen, self.account)
             )
             return
         self.set_id(barcode)

@@ -1,8 +1,10 @@
 import datetime
+import functools
 
 from sqlalchemy.sql import text
 
 from config import FONTS
+from database.models import Account
 from database.models.scan_event import ScanEvent
 from database.storage import get_session
 from drinks.drinks import get_by_ean
@@ -19,11 +21,25 @@ from .success import SuccessScreen
 
 
 class ProfileScreen(Screen):
-    def __init__(self, screen, user):
-        super(ProfileScreen, self).__init__(screen)
+    def __init__(self, screen, account: Account):
+        super().__init__(screen)
 
-        self.user = user
+        self.account = account
+        self.label_verbrauch = None
+        self.label_aufladungen = None
+        self.processing = None
+        self.timeout = None
+        self.drink_info = None
+        self.zuordnen = None
+        self.btn_aufladungen = None
+        self.btn_drinks = None
+        self.btn_abbrechen = None
+        self.btn_aufladen = None
+        self.elements_aufladungen = []
+        self.elements_drinks = []
 
+    def on_start(self, *args, **kwargs):
+        self.objects = []
         self.objects.append(
             Button(
                 text="BACK",
@@ -44,7 +60,7 @@ class ProfileScreen(Screen):
 
         self.objects.append(
             Label(
-                text=self.user["name"],
+                text=self.account.name,
                 pos=(30, 120),
                 size=70,
                 max_width=335 - 30 - 10,  # balance.x - self.x - margin
@@ -120,7 +136,9 @@ class ProfileScreen(Screen):
             text="Jetzt Aufladen",
             pos=(210, 700),
             size=30,
-            on_click=self.recharge,
+            on_click=functools.partial(
+                self.goto, RechargeScreen(self.screen, self.account)
+            ),
         )
 
         self.elements_aufladungen = [
@@ -134,8 +152,9 @@ class ProfileScreen(Screen):
         else:
             self.elements_drinks.append(self.btn_aufladungen)
 
-        balance = Users.get_balance(self.user["id"])
-        self.objects.append(Label(text=str(balance), pos=(335, 145), size=40))
+        self.objects.append(
+            Label(text=str(self.account.balance), pos=(335, 145), size=40)
+        )
 
         drinks = self.get_stats()
         for i, drinks in enumerate(drinks):
@@ -169,7 +188,8 @@ class ProfileScreen(Screen):
         self.render_aufladungen()
 
     def render_aufladungen(self):
-        aufladungen = Users.get_recharges(self.user["id"], limit=12)
+        # aufladungen = Users.get_recharges(self.user["id"], limit=12)
+        aufladungen = self.account.get_recharges().limit(12).all()
         y = 210
         prev_date = None
         for i, aufladung in enumerate(aufladungen):
@@ -222,16 +242,25 @@ class ProfileScreen(Screen):
         drink = DrinksManager.get_instance().get_selected_drink()
         if not drink:
             return
-        ev = ScanEvent(drink["ean"], self.user["id"], datetime.datetime.now())
+        ev = ScanEvent(drink["ean"], self.account.ldap_id, datetime.datetime.now())
         session.add(ev)
         session.commit()
         DrinksManager.get_instance().set_selected_drink(None)
-        Users.delete_if_nomoney(self.user)
+        Users.delete_if_nomoney(
+            {
+                "path": self.account.ldap_path,
+                "id": self.account.ldap_id,
+            }
+        )
 
         screen_manager = ScreenManager.get_instance()
         screen_manager.set_active(
             SuccessScreen(
-                self.screen, self.user, drink, "getrunken: %s" % drink["name"], session
+                self.screen,
+                self.account,
+                drink,
+                "getrunken: %s" % drink["name"],
+                session,
             )
         )
 
@@ -259,7 +288,7 @@ class ProfileScreen(Screen):
 
     def id_card(self):
         screen_manager = ScreenManager.get_instance()
-        screen_manager.set_active(IDCardScreen(self.screen, self.user))
+        screen_manager.set_active(IDCardScreen(self.screen, self.account))
 
     @staticmethod
     def home():
@@ -273,10 +302,6 @@ class ProfileScreen(Screen):
 
     def time_elapsed(self):
         self.home()
-
-    def recharge(self):
-        screen_manager = ScreenManager.get_instance()
-        screen_manager.set_active(RechargeScreen(self.screen, self.user))
 
     def show_aufladungen(self):
         for d in self.elements_drinks:
@@ -301,7 +326,10 @@ class ProfileScreen(Screen):
             ORDER by count DESC
         """
         )
-        userid = self.user["id"]
-        result = session.connection().execute(sql, {"userid": str(userid)}).fetchall()
+        result = (
+            session.connection()
+            .execute(sql, {"userid": self.account.ldap_id})
+            .fetchall()
+        )
 
         return [{"count": x[0], "name": x[1]} for x in result]

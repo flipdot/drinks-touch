@@ -112,3 +112,10 @@ class Account(Base):
             credit = row.amount
 
         return credit - cost
+
+    def get_recharges(self):
+        from database.models import RechargeEvent
+
+        return RechargeEvent.query.filter(
+            RechargeEvent.user_id == self.ldap_id
+        ).order_by(RechargeEvent.timestamp.desc())

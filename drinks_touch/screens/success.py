@@ -1,27 +1,32 @@
 import os
 
+from database.models import Account
 from elements.button import Button
 from elements.label import Label
 from elements.progress import Progress
 from notifications.notification import send_drink
-from users.users import Users
 from .screen import Screen
 
 
 class SuccessScreen(Screen):
-    def __init__(self, screen, user, drink, text, session):
-        super(SuccessScreen, self).__init__(screen)
+    def __init__(self, screen, account: Account, drink, text, session):
+        super().__init__(screen)
 
-        self.user = user
+        self.account = account
+        self.text = text
+        self.drink = drink
 
+    def on_start(self, *args, **kwargs):
+
+        self.objects = []
         self.objects.append(Label(text="Danke,", pos=(30, 120), size=70))
-        self.objects.append(Label(text=user["name"] + "!", pos=(30, 170), size=70))
-        self.objects.append(Label(text=text, size=45, pos=(30, 250)))
+        self.objects.append(Label(text=self.account.name + "!", pos=(30, 170), size=70))
+        self.objects.append(Label(text=self.text, size=45, pos=(30, 250)))
 
         self.objects.append(Label(text="Verbleibendes Guthaben: ", pos=(30, 350)))
         self.objects.append(
             Label(
-                text=str(Users.get_balance(self.user["id"], session=session)) + " EUR",
+                text=f"{self.account.balance} EUR",
                 pos=(50, 400),
             )
         )
@@ -38,7 +43,7 @@ class SuccessScreen(Screen):
         self.progress = Progress(pos=(400, 500), size=80, on_elapsed=self.home)
         self.objects.append(self.progress)
         self.progress.start()
-        balance = Users.get_balance(user["id"])
+        balance = self.account.balance
         if balance >= 0:
             sound = "smb_coin.wav"
         elif balance < -10:
@@ -50,8 +55,8 @@ class SuccessScreen(Screen):
             % sound
         )
 
-        if drink:
-            send_drink(user, drink, True)
+        if self.drink:
+            send_drink(self.account, self.drink, True)
 
     @staticmethod
     def home():
