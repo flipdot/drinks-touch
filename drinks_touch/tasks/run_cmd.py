@@ -49,7 +49,7 @@ class RunCmdTask(BaseTask):
 
 class GitFetchTask(RunCmdTask):
     CMDS = (
-        ["git", "fetch"],
+        ["git", "fetch", "-p"],
         [
             "git",
             "log",
