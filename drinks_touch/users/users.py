@@ -8,7 +8,6 @@ import random
 import traceback
 
 import config
-from database.models.recharge_event import RechargeEvent
 from database.storage import get_session, Session
 
 logger = logging.getLogger(__name__)
@@ -131,18 +130,6 @@ class Users(object):
         if not account:
             return None
         return account.balance
-
-    @staticmethod
-    def get_recharges(user_id, session=None, limit=None) -> RechargeEvent:
-        q = (
-            Session()
-            .query(RechargeEvent)
-            .filter(RechargeEvent.user_id == str(user_id))
-            .order_by(RechargeEvent.timestamp.desc())
-        )
-        if limit:
-            q = q.limit(limit)
-        return q.all()
 
     @staticmethod
     def get_by_id_card(ean):
