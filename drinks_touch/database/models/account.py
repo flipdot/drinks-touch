@@ -50,6 +50,8 @@ class Account(Base):
 
             # find existing account based on ldap_path (the anonymous accounts don't have an ldap_id)
             try:
+                # Search for an ldap path. Guest accounts don't have an ID, so we can't
+                # just search for the ID.
                 account = (
                     Session()
                     .query(Account)
@@ -57,14 +59,24 @@ class Account(Base):
                     .one()
                 )
             except NoResultFound:
-                account = Account(
-                    ldap_id=user["id"],
-                    ldap_path=user["path"],
-                )
+                try:
+                    # A user might have changed their name. Search for just the ID
+                    account = (
+                        Session()
+                        .query(Account)
+                        .filter(Account.ldap_id == str(user["id"]))
+                        .one()
+                    )
+                except NoResultFound:
+                    account = Account(
+                        ldap_id=user["id"],
+                        ldap_path=user["path"],
+                    )
 
             account.name = user["name"]
             account.id_card = user["id_card"]
             account.email = user["email"]
+            account.ldap_path = user["path"]
             account.summary_email_notification_setting = user["drinksNotification"]
 
             # Only update the last email sent at if it is not set yet
