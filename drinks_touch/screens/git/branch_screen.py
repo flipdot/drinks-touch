@@ -34,7 +34,6 @@ class GitBranchScreen(Screen):
                 pos=(10, 20),
                 size=36,
             ),
-            VBox(branch_buttons, gap=5, pos=(10, 80)),
             Button(
                 text="BACK",
                 pos=(5, 795),
@@ -43,6 +42,7 @@ class GitBranchScreen(Screen):
                 font=config.FONTS["monospace"],
                 size=30,
             ),
+            VBox(branch_buttons, gap=5, pos=(10, 80)),
         ]
 
     def get_branches(self):

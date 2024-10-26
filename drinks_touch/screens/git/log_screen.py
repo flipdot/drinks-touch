@@ -69,18 +69,13 @@ class GitLogScreen(Screen):
                     ),
                 ]
             )
-            for commit in self.get_commits(15)
+            for commit in self.get_commits(12)
         ]
         self.objects = [
             Label(
                 text=f"git log {self.branch}",
                 pos=(10, 20),
                 size=36,
-            ),
-            VBox(
-                commit_buttons,
-                pos=(10, 70),
-                gap=5,
             ),
             Button(
                 text="BACK",
@@ -89,6 +84,11 @@ class GitLogScreen(Screen):
                 align_bottom=True,
                 font=config.FONTS["monospace"],
                 size=30,
+            ),
+            VBox(
+                commit_buttons,
+                pos=(10, 70),
+                gap=16,
             ),
         ]
 
