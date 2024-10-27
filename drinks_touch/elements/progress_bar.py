@@ -2,6 +2,7 @@ import math
 
 import pygame.draw
 
+import config
 from config import COLORS, FONTS
 from elements.base_elm import BaseElm
 
@@ -42,6 +43,8 @@ class ProgressBar(BaseElm):
         self.color = COLORS["infragelb"]
         self.percent = None
         self.tick = 0
+        self.font = pygame.font.SysFont("sans serif", 25)
+        self.font_mono = pygame.font.SysFont(FONTS["monospace"], 15)
 
     @property
     def pos_label(self):
@@ -61,13 +64,9 @@ class ProgressBar(BaseElm):
     def height(self):
         h = self.bar_height
         if self.label:
-            # TODO: calculate label height instead of rendering it
-            surface = self._render_label()
-            h += surface.get_height()
+            h += self.font.size(self.label)[1]
         if self.text:
-            # TODO: calculate text height instead of rendering it
-            surface = self._render_textbox()
-            h += surface.get_height()
+            h += self.text_height
         return h
 
     @property
@@ -101,7 +100,7 @@ class ProgressBar(BaseElm):
             y += label.get_height()
         bar = self._render_bar()
         surface.blit(bar, (x, y))
-        y += bar.get_height()
+        y += self.bar_height
         if self.text:
             text = self._render_textbox()
             surface.blit(text, (x, y))
@@ -109,8 +108,7 @@ class ProgressBar(BaseElm):
         return surface
 
     def _render_label(self) -> pygame.Surface:
-        font = pygame.font.SysFont("sans serif", 25)
-        label = font.render(self.label, 1, self.color)
+        label = self.font.render(self.label, 1, self.color)
         return label
 
     def _render_textbox(self) -> pygame.Surface:
@@ -126,7 +124,6 @@ class ProgressBar(BaseElm):
             ),
             width=1,
         )
-        font = pygame.font.SysFont(FONTS["monospace"], 15)
 
         lines = self.text.split("\n")
 
@@ -142,7 +139,7 @@ class ProgressBar(BaseElm):
         last_lines = lines[-self.max_lines :]
 
         for i, line in enumerate(last_lines):
-            text = font.render(line, 1, (246, 198, 0))
+            text = self.font_mono.render(line, 1, config.COLORS["infragelb"])
             surface.blit(
                 text,
                 (
