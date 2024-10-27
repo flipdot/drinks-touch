@@ -17,4 +17,6 @@ class SyncFromLDAPTask(BaseTask):
         self.progress = 0
 
         with Session.begin():
-            Account.sync_all_from_ldap(progress=set_progress)
+            Account.sync_all_from_ldap(
+                progress=set_progress, was_killed=lambda: self.sig_killed
+            )

@@ -32,7 +32,7 @@ class Account(Base):
     summary_email_notification_setting = Column(String(50), unique=False)
 
     @staticmethod
-    def sync_all_from_ldap(progress=None):
+    def sync_all_from_ldap(progress=None, was_killed=None):
         if progress is None:
             progress = lambda *args, **kwargs: None  # noqa: E731
 
@@ -43,6 +43,8 @@ class Account(Base):
         # Not really necessary, but it's nice to keep history.
         ldap_users = sorted(ldap_users, key=lambda x: x["id"] or math.inf)
         for i, user in enumerate(ldap_users):
+            if was_killed is not None and was_killed():
+                raise Exception("Task was killed")
             progress(i / len(ldap_users))
             if user["id"] == 10000 and user["name"] == "malled2":
                 # malled how did you manage to get two accounts with the same id?
