@@ -1,3 +1,5 @@
+import functools
+
 from config import FONTS
 from elements.button import Button
 from elements.label import Label
@@ -81,8 +83,7 @@ class EnterPinScreen(Screen):
             Button(
                 text=label,
                 pos=(cord_x, cord_y),
-                click_func_param=self.add_char,
-                click_param=label,
+                on_click=functools.partial(self.add_char, label),
                 font=FONTS["monospace"],
                 size=50,
                 force_width=width,

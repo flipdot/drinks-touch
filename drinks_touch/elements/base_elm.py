@@ -5,6 +5,7 @@ from pygame import Surface
 class BaseElm(object):
     def __init__(
         self,
+        children: list["BaseElm"] | None = None,
         pos=None,
         height=None,
         width=None,
@@ -13,8 +14,6 @@ class BaseElm(object):
         padding: (
             int | tuple[int, int] | tuple[int, int, int] | tuple[int, int, int, int]
         ) = 0,
-        *args,
-        **kwargs
     ):
         if pos is None:
             pos = (0, 0)
@@ -24,6 +23,10 @@ class BaseElm(object):
         self.is_visible = True
         self.align_right = align_right
         self.align_bottom = align_bottom
+        self.focus = False
+        if children is None:
+            children = []
+        self.children = children
         if not isinstance(padding, tuple):
             self.padding_top = padding
             self.padding_right = padding
@@ -74,13 +77,51 @@ class BaseElm(object):
     def box(self):
         return self.screen_pos + (self.width, self.height)
 
-    def events(self, events):
-        pass
+    def events(self, events, pos=None):
+        for event in events:
+            consumed = "consumed" in event.dict and event.consumed
+            if pos is None and hasattr(event, "pos"):
+                pos = event.pos
+            if pos is None:
+                continue
+            collides = self.collides_with(pos)
+            if collides:
+                transformed_pos = (
+                    pos[0] - self.screen_pos[0],
+                    pos[1] - self.screen_pos[1],
+                )
+            else:
+                transformed_pos = None
+
+            for child in self.children:
+                child.events(events, transformed_pos)
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if collides:
+                    self.focus = True
+                else:
+                    self.focus = False
+
+            elif event.type == pygame.MOUSEBUTTONUP:
+                if not hasattr(self, "on_click"):
+                    continue
+
+                if not consumed and self.focus and collides:
+                    self.on_click(*transformed_pos)
+                    event.consumed = True
+                self.focus = False
 
     @property
     def visible(self):
         # TODO get rid of is_visible
         return self.is_visible
+
+    def collides_with(self, pos: tuple[int, int]) -> bool:
+        return (
+            self.box is not None
+            and self.visible
+            and pygame.Rect(self.box).collidepoint(pos[0], pos[1])
+        )
 
     def render(self, *args, **kwargs) -> Surface:
         surface = pygame.font.SysFont("monospace", 25).render(

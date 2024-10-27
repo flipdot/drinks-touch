@@ -77,7 +77,7 @@ class MouseOverlay(BaseOverlay):
                 self.mouse_pos = event.pos
                 if self.mouse_pressed:
                     self.mouse_path.append(event.pos)
-            elif event.type == pygame.MOUSEBUTTONDOWN:
+            elif event.type == pygame.MOUSEBUTTONUP:
                 self.click_pos = event.pos
                 self.reset()
 

@@ -108,7 +108,7 @@ class WaitScanScreen(Screen):
 
         self.objects.append(
             VBox(
-                elements=[
+                [
                     Label(
                         text="∑ = {}".format(total_balance_fmt),
                         size=25,
@@ -155,11 +155,10 @@ class WaitScanScreen(Screen):
 
         self.objects.append(
             HBox(
+                bottom_right_buttons,
                 pos=(480, 795),
                 align_right=True,
                 align_bottom=True,
-                elements=bottom_right_buttons,
-                right_to_left=True,
                 gap=5,
                 padding=(0, 5),
             )

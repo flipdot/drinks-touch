@@ -1,4 +1,4 @@
-from config import COLORS
+import config
 from .base_elm import BaseElm
 
 import contextlib
@@ -12,25 +12,34 @@ pygame.font.init()
 class Label(BaseElm):
     _font_cache = {}
 
-    def __init__(self, *args, **kwargs):
-        self.font_face = kwargs.get("font", "sans serif")
-        self.size = kwargs.get("size", 50)
-        self.max_width = kwargs.get("max_width", None)
-        # if True, pos marks top-right instead of top-left corner
-        self.align_right = kwargs.get("align_right", False)
-        self.text = kwargs.get("text", "<Label>")
-        self.color = kwargs.get("color", COLORS["infragelb"])
-        self.bg_color = kwargs.get("bg_color", None)
-        self.border_color = kwargs.get("border_color", None)
-        self.border_width = kwargs.get("border_width", 0)
-        self.padding = kwargs.get("padding", 0)
-        self.blink_frequency = kwargs.get("blink_frequency", 0)
+    def __init__(
+        self,
+        children: list["BaseElm"] | None = None,
+        text="<Label>",
+        font=config.FONTS["sans serif"],
+        size=35,
+        color=config.COLORS["infragelb"],
+        bg_color=None,
+        border_color=None,
+        border_width=0,
+        blink_frequency=0,
+        max_width=None,
+        *args,
+        **kwargs,
+    ):
+        self.size = size
+        self.max_width = max_width
+        self.text = text
+        self.color = color
+        self.bg_color = bg_color
+        self.border_color = border_color
+        self.border_width = border_width
+        self.blink_frequency = blink_frequency
 
         self.frame_counter = 0
-        pos = kwargs.pop("pos", (0, 0))
-        super().__init__(pos, self.size, self.size, *args, **kwargs)
+        super().__init__(children, height=self.size, width=self.size, *args, **kwargs)
 
-        self.font = Label.get_font(self.font_face, self.size)
+        self.font = Label.get_font(font, self.size)
 
     @classmethod
     def get_font(cls, font_face, size):
