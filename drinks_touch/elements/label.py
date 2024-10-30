@@ -68,8 +68,8 @@ class Label(BaseElm):
         if not self.bg_color:
             return
         size = (
-            area.width + 2 * self.padding,
-            area.height + 2 * self.padding,
+            area.width + self.padding_left + self.padding_right,
+            area.height + self.padding_top + self.padding_bottom,
         )
         surface = pygame.Surface(size, pygame.SRCALPHA)
         surface.fill(self.bg_color)

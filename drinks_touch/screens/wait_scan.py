@@ -171,7 +171,7 @@ class WaitScanScreen(Screen):
             self.objects.append(
                 Label(
                     text=f"Update available: {CheckForUpdatesTask.newest_version_sha_short}",
-                    size=25,
+                    size=15,
                     pos=(480, 800),
                     align_right=True,
                     align_bottom=True,
