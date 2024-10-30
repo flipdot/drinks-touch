@@ -44,13 +44,6 @@ class HBox(BaseElm):
             + self.padding_bottom
         )
 
-    # def on_click(self, x, y):
-    #     for obj in self.elements:
-    #         if pygame.Rect(obj.box).collidepoint(x, y):
-    #             if hasattr(obj, "on_click"):
-    #                 obj.on_click(x - obj.pos[0], y - obj.pos[1])
-    #             break
-
     def render_debug(self) -> pygame.Surface:
         surface = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
         surface.fill((0, 0, 255, 100))
