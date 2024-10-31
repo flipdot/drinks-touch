@@ -22,8 +22,8 @@ DEBUG_UI_ELEMENTS = os.environ.get("DEBUG_UI_ELEMENTS", "False") in [
 ]
 
 COLORS = {
-    "infragelb": (246, 198, 0),
-    "disabled": (50, 50, 50),
+    "infragelb": (246, 198, 0, 255),
+    "disabled": (50, 50, 50, 255),
 }
 
 if bn := os.environ.get("BUILD_NUMBER"):

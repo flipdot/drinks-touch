@@ -96,13 +96,13 @@ class BaseElm(object):
             for child in self.children:
                 child.events(events, transformed_pos)
 
-            if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if collides:
                     self.focus = True
                 else:
                     self.focus = False
 
-            elif event.type == pygame.MOUSEBUTTONUP:
+            elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                 if not hasattr(self, "on_click"):
                     continue
 

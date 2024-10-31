@@ -39,7 +39,6 @@ class MouseOverlay(BaseOverlay):
             return
         if radius_inner >= radius_outer:
             return
-        # pygame.draw.circle(self.screen, self.color, self.click_pos, radius)
         for angel in range(0, 360, 30):
             start_pos = (
                 self.click_pos[0] + radius_inner * math.cos(math.radians(angel)),
@@ -49,8 +48,6 @@ class MouseOverlay(BaseOverlay):
                 self.click_pos[0] + radius_outer * math.cos(math.radians(angel)),
                 self.click_pos[1] + radius_outer * math.sin(math.radians(angel)),
             )
-            # pygame.draw.circle(self.screen, (255, 0, 255), start_pos, 1)
-            # pygame.draw.circle(self.screen, (0, 255, 0), end_pos, 1)
             pygame.draw.line(
                 self.screen,
                 self.color,
@@ -66,7 +63,17 @@ class MouseOverlay(BaseOverlay):
 
     def _render_mouse_path(self):
         if len(self.mouse_path) > 2:
-            pygame.draw.lines(self.screen, self.color, False, self.mouse_path, 1)
+            last_pos = self.mouse_path[0][1]
+            new_mouse_path = []
+            surface = pygame.Surface(self.screen.get_size(), pygame.SRCALPHA)
+            for i, (color, pos) in enumerate(self.mouse_path):
+                pygame.draw.line(surface, color, last_pos, pos, 1)
+                color = (color[0], color[1], color[2], max(0, color[3] - 30))
+                if color[3] > 0:
+                    new_mouse_path.append((color, pos))
+                last_pos = pos
+            self.mouse_path = new_mouse_path
+            self.screen.blit(surface, (0, 0))
 
     def events(self, events):
         self.mouse_pressed = pygame.mouse.get_pressed()[0]
@@ -76,8 +83,8 @@ class MouseOverlay(BaseOverlay):
             if event.type == pygame.MOUSEMOTION:
                 self.mouse_pos = event.pos
                 if self.mouse_pressed:
-                    self.mouse_path.append(event.pos)
-            elif event.type == pygame.MOUSEBUTTONUP:
+                    self.mouse_path.append((self.color, event.pos))
+            elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                 self.click_pos = event.pos
                 self.reset()
 
