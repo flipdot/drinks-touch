@@ -42,18 +42,18 @@ class WaitScanScreen(Screen):
         self.scanned_info = [
             self.barcode_label,
             Button(
-                pos=(50, 600),
+                pos=(50, 450),
                 text="drink buchen",
                 size=52,
                 on_click=self.set_member,
             ),
             Button(
-                pos=(50, 700),
+                pos=(50, 550),
                 text="Nur Statistik",
                 on_click=self.stat_drink,
             ),
             Button(
-                pos=(350, 700),
+                pos=(350, 550),
                 text="nope",
                 on_click=self.btn_reset,
             ),

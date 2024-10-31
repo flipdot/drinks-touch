@@ -57,12 +57,12 @@ class GitLogScreen(Screen):
                         [
                             Label(
                                 text=f"{commit.date.strftime('%Y-%m-%d %H:%M:%S')} {commit.author}",
-                                size=25,
+                                size=15,
                                 color=color,
                             ),
                             Label(
                                 text=commit.title,
-                                size=15,
+                                size=10,
                                 color=color,
                             ),
                         ]
