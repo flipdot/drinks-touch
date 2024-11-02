@@ -269,9 +269,9 @@ class ProfileScreen(Screen):
             return
         self.processing.text = f"Gescannt: {barcode}"
         self.processing.is_visible = True
-        user = Users.get_by_id_card(barcode)
-        if user:
-            ScreenManager.get_instance().set_active(ProfileScreen(self.screen, user))
+        account = Account.query.filter(Account.id_card == barcode).first()
+        if account:
+            ScreenManager.get_instance().set_active(ProfileScreen(self.screen, account))
             self.processing.is_visible = False
             return
         drink = get_by_ean(barcode)
