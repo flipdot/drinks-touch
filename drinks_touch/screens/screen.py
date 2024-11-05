@@ -1,5 +1,3 @@
-import pygame
-
 import config
 from elements.base_elm import BaseElm
 from screens.screen_manager import ScreenManager
@@ -24,26 +22,6 @@ class Screen(object):
     def events(self, events):
         for obj in self.objects:
             obj.events(events)
-            for event in events:
-                if "consumed" in event.dict and event.consumed:
-                    continue
-
-                if event.type == pygame.MOUSEBUTTONUP:
-                    if not hasattr(obj, "on_click"):
-                        continue
-                    pos = event.pos
-
-                    if (
-                        obj.box is not None
-                        and obj.visible
-                        and pygame.Rect(obj.box).collidepoint(pos[0], pos[1])
-                    ):
-                        transformed_pos = (
-                            pos[0] - obj.screen_pos[0],
-                            pos[1] - obj.screen_pos[1],
-                        )
-                        obj.on_click(*transformed_pos)
-                        event.consumed = True
 
     @staticmethod
     def back():

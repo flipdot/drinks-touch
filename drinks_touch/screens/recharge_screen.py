@@ -79,16 +79,16 @@ class RechargeScreen(Screen):
                 size=30,
                 on_click=partial(self.verify_payment, 50),
             ),
-            Label(text="Wirf Geld in die Kasse,", pos=(30, 100), size=50),
-            Label(text="und drück den passenden", pos=(30, 150), size=50),
-            Label(text="Knopf.", pos=(30, 200), size=50),
+            Label(text="Wirf Geld in die Kasse,", pos=(30, 100), size=40),
+            Label(text="und drück den passenden", pos=(30, 150), size=40),
+            Label(text="Knopf.", pos=(30, 200), size=40),
             Image(src=qr_file, pos=(70, 470), size=(300, 330)),
         ]
         self.objects.extend(self.select_objects)
 
         self.verify_objects = [
-            Label(text="Hast du", pos=(30, 150), size=55),
-            Label(text="in die Kasse geworfen?", pos=(30, 250), size=55),
+            Label(text="Hast du", pos=(30, 150), size=35),
+            Label(text="in die Kasse geworfen?", pos=(30, 250), size=35),
             Button(
                 text="Ja",
                 pos=(250, 400),
@@ -96,7 +96,7 @@ class RechargeScreen(Screen):
                 on_click=self.save_payment,
             ),
         ]
-        self.verify_amount = Label(text="EUR X", pos=(30, 200), size=60)
+        self.verify_amount = Label(text="EUR X", pos=(30, 200), size=50)
         self.verify_objects.append(self.verify_amount)
 
     def back(self):

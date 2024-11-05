@@ -42,18 +42,18 @@ class WaitScanScreen(Screen):
         self.scanned_info = [
             self.barcode_label,
             Button(
-                pos=(50, 600),
+                pos=(50, 450),
                 text="drink buchen",
                 size=52,
                 on_click=self.set_member,
             ),
             Button(
-                pos=(50, 700),
+                pos=(50, 550),
                 text="Nur Statistik",
                 on_click=self.stat_drink,
             ),
             Button(
-                pos=(350, 700),
+                pos=(350, 550),
                 text="nope",
                 on_click=self.btn_reset,
             ),
@@ -108,7 +108,7 @@ class WaitScanScreen(Screen):
 
         self.objects.append(
             VBox(
-                elements=[
+                [
                     Label(
                         text="∑ = {}".format(total_balance_fmt),
                         size=25,
@@ -155,11 +155,10 @@ class WaitScanScreen(Screen):
 
         self.objects.append(
             HBox(
+                bottom_right_buttons,
                 pos=(480, 795),
                 align_right=True,
                 align_bottom=True,
-                elements=bottom_right_buttons,
-                right_to_left=True,
                 gap=5,
                 padding=(0, 5),
             )
@@ -172,7 +171,7 @@ class WaitScanScreen(Screen):
             self.objects.append(
                 Label(
                     text=f"Update available: {CheckForUpdatesTask.newest_version_sha_short}",
-                    size=25,
+                    size=15,
                     pos=(480, 800),
                     align_right=True,
                     align_bottom=True,

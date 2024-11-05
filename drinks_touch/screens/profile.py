@@ -62,7 +62,7 @@ class ProfileScreen(Screen):
             Label(
                 text=self.account.name,
                 pos=(30, 120),
-                size=70,
+                size=40,
                 max_width=335 - 30 - 10,  # balance.x - self.x - margin
             )
         )
@@ -71,24 +71,24 @@ class ProfileScreen(Screen):
             Label(
                 text="Guthaben",
                 pos=(330, 120),
-                size=30,
+                size=20,
             )
         )
 
         self.label_verbrauch = Label(
             text="Bisheriger Verbrauch:",
             pos=(30, 180),
-            size=30,
+            size=15,
         )
         self.label_aufladungen = Label(
             text="Aufladungen:",
             pos=(30, 180),
-            size=30,
+            size=15,
         )
 
         self.processing = Label(
             text="Moment bitte...",
-            size=40,
+            size=20,
             pos=(150, 750),
         )
         self.processing.is_visible = False
@@ -98,7 +98,6 @@ class ProfileScreen(Screen):
             pos=(200, 50),
             speed=1 / 30.0,
             on_elapsed=self.time_elapsed,
-            click_func=self.btn_home,
         )
         self.objects.append(self.timeout)
         self.timeout.start()
@@ -106,14 +105,14 @@ class ProfileScreen(Screen):
         drink = DrinksManager.get_instance().get_selected_drink()
         self.drink_info = Label(
             text=drink["name"] if drink else "",
-            size=60,
+            size=30,
             pos=(30, 630),
         )
 
         self.zuordnen = Button(
             text="Trinken",
             pos=(30, 690),
-            size=50,
+            size=40,
             on_click=self.save_drink,
         )
         self.btn_aufladungen = Button(
@@ -129,13 +128,13 @@ class ProfileScreen(Screen):
         self.btn_abbrechen = Button(
             text="Abbrechen",
             pos=(290, 700),
-            size=30,
+            size=20,
             on_click=self.btn_home,
         )
         self.btn_aufladen = Button(
             text="Jetzt Aufladen",
             pos=(210, 700),
-            size=30,
+            size=20,
             on_click=functools.partial(
                 self.goto, RechargeScreen(self.screen, self.account)
             ),
@@ -214,7 +213,7 @@ class ProfileScreen(Screen):
             if date != prev_date:
                 prev_date = date
                 self.elements_aufladungen.append(
-                    Label(text=date, size=35, pos=(x, y + 15))
+                    Label(text=date, size=30, pos=(x, y + 15))
                 )
                 y += 45
             count_width = 120
@@ -223,7 +222,7 @@ class ProfileScreen(Screen):
                 Label(
                     text=time_text,
                     pos=(x + 10, y),
-                    size=45,
+                    size=25,
                     max_width=480 - x - margin_right - count_width,
                 )
             )
@@ -233,6 +232,7 @@ class ProfileScreen(Screen):
                     align_right=True,
                     pos=(480 - margin_right, y - 5),
                     max_width=count_width,
+                    size=25,
                 )
             )
             y += 35

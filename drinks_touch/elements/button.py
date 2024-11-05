@@ -10,6 +10,7 @@ with contextlib.redirect_stdout(None):
 class Button(BaseElm):
     def __init__(
         self,
+        children: list["BaseElm"] | None = None,
         font=FONTS["monospace"],
         size=30,
         text=None,
@@ -27,7 +28,7 @@ class Button(BaseElm):
     ):
         from . import Label
 
-        super().__init__(pos, size, size, *args, padding=padding, **kwargs)
+        super().__init__(children, pos, size, size, *args, padding=padding, **kwargs)
 
         self.size = size
         self.color = color
@@ -44,14 +45,6 @@ class Button(BaseElm):
             )
         self.inner = inner
 
-        self.clicking = False
-
-    def pre_click(self):
-        self.clicking = True
-
-    def post_click(self):
-        self.clicking = False
-
     def render(self, *args, **kwargs) -> pygame.Surface:
         inner = self.inner.render(*args, **kwargs)
 
@@ -64,7 +57,7 @@ class Button(BaseElm):
         self.height = size[1]
 
         surface = pygame.Surface(size, pygame.SRCALPHA)
-        if self.clicking:
+        if self.focus:
             surface.fill(tuple(c * 0.7 for c in self.color), (0, 0, *size))
 
         if inner is not None:
@@ -75,8 +68,4 @@ class Button(BaseElm):
     def on_click(self, x, y):
         if self.on_click_handler is None:
             raise NotImplementedError("No on_click handler defined")
-        self.pre_click()
-        try:
-            self.on_click_handler()
-        finally:
-            self.post_click()
+        self.on_click_handler()

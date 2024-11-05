@@ -1,6 +1,6 @@
 import math
 
-from config import COLORS
+import config
 from .base_elm import BaseElm
 
 import contextlib
@@ -10,16 +10,31 @@ with contextlib.redirect_stdout(None):
 
 
 class Progress(BaseElm):
-    def __init__(self, pos=None, *args, **kwargs):
-        self.size = kwargs.get("size", 50)
-        self.color = kwargs.get("color", COLORS["infragelb"])
-        self.tick = kwargs.get("tick", self.__default_tick)
-        self.speed = kwargs.get("speed", 1 / 4.0)  # 4 secs
-        self.on_elapsed = kwargs.get("on_elapsed", None)
+    def __init__(
+        self,
+        children: list["BaseElm"] | None = None,
+        pos=None,
+        size=50,
+        color=config.COLORS["infragelb"],
+        tick=None,
+        speed=1 / 4.0,  # 4 secs
+        on_elapsed=None,
+        *args,
+        **kwargs,
+    ):
+        self.size = size
+        self.color = color
+        if tick is None:
+            tick = self.__default_tick
+        self.tick = tick
+        self.speed = speed
+        self.on_elapsed = on_elapsed
         self.value = 0
         self.is_running = False
 
-        super(Progress, self).__init__(pos, self.size, self.size, *args, **kwargs)
+        super(Progress, self).__init__(
+            children, pos, self.size, self.size, *args, **kwargs
+        )
         self.start()
 
     def start(self):

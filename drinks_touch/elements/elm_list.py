@@ -4,8 +4,15 @@ from .base_elm import BaseElm
 
 
 class ElmList(BaseElm):
-    def __init__(self, height, width, pos=(0, 0), **kwargs):
-        super().__init__(pos, height, width)
+    def __init__(
+        self,
+        children: list["BaseElm"] | None = None,
+        height=None,
+        width=None,
+        pos=(0, 0),
+        **kwargs
+    ):
+        super().__init__(children, pos, height, width)
         self.pos = pos
         self.elm_margin = kwargs.get("elm_margin", 5)
         self.max_elm_count = kwargs.get("max_elm_count", 10)
