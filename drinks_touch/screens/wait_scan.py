@@ -3,6 +3,7 @@ import functools
 import logging
 
 import config
+from database.models import Account
 from database.models.scan_event import ScanEvent
 from database.storage import get_session
 from drinks.drinks import get_by_ean
@@ -13,7 +14,6 @@ from elements.vbox import VBox
 from screens.new_id_screen import NewIDScreen
 from screens.profile import ProfileScreen
 from tasks import CheckForUpdatesTask
-from users.users import Users
 from .git.main_screen import GitMainScreen
 from .main import MainScreen
 from .screen import Screen
@@ -209,9 +209,9 @@ class WaitScanScreen(Screen):
             return
         self.processing.text = f"Gescannt: {barcode}"
         self.processing.is_visible = True
-        user = Users.get_by_id_card(barcode)
-        if user:
-            ScreenManager.get_instance().set_active(ProfileScreen(self.screen, user))
+        account = Account.query.filter(Account.id_card == barcode).first()
+        if account:
+            ScreenManager.get_instance().set_active(ProfileScreen(self.screen, account))
             self.processing.is_visible = False
             return
         drink = get_by_ean(barcode)
