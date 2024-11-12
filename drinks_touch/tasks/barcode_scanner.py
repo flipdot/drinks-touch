@@ -11,6 +11,7 @@ import logging
 
 import config
 from env import is_pi
+from tasks.run_cmd import CheckoutAndRestartTask
 
 logger = logging.getLogger(__name__)
 
@@ -55,6 +56,12 @@ class BarcodeWorker:
     @staticmethod
     def on_barcode(barcode):
         screen = ScreenManager.get_instance().get_active()
+
+        if barcode == "RESTART":
+            from screens.tasks_screen import TasksScreen
+
+            screen.goto(TasksScreen(screen.screen, [CheckoutAndRestartTask("master")]))
+            return
 
         if hasattr(screen, "on_barcode"):
             screen.on_barcode(barcode)
