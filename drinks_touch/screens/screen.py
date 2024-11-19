@@ -15,6 +15,7 @@ class Screen:
         self.width = width
         self.height = height
         self.objects: list[BaseElm] = []
+        self.on_create()
 
     def render(self, dt):
         surface = pygame.Surface((self.width, self.height))
@@ -42,7 +43,7 @@ class Screen:
         ScreenManager.get_instance().go_back()
 
     @staticmethod
-    def goto(screen, *args, **kwargs):
+    def goto(screen: "Screen", *args, **kwargs):
         ScreenManager.get_instance().set_active(screen, *args, **kwargs)
 
     # lifecycle inspired by https://developer.android.com/guide/components/activities/activity-lifecycle
