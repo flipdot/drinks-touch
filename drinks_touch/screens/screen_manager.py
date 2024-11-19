@@ -1,7 +1,11 @@
 import pygame
 
 from screen import get_screen_surface
-from screens.screen import Screen
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from screens.screen import Screen
 
 
 class ScreenManager:
@@ -24,7 +28,7 @@ class ScreenManager:
         self.current_screen = screen
         screen.on_start(*args, **kwargs)
 
-    def get_active(self) -> Screen:
+    def get_active(self) -> "Screen":
         return self.current_screen
 
     def go_back(self):
