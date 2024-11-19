@@ -13,8 +13,8 @@ from .screen import Screen
 
 
 class MainScreen(Screen):
-    def __init__(self, screen):
-        super().__init__(screen)
+    def __init__(self):
+        super().__init__()
         self.timeout = None
 
     def on_start(self, *args, **kwargs):
@@ -70,7 +70,7 @@ class MainScreen(Screen):
         from .screen_manager import ScreenManager
 
         screen_manager = ScreenManager.get_instance()
-        screen_manager.set_active(NamesScreen(self.screen, param))
+        screen_manager.set_active(NamesScreen(param))
 
     @staticmethod
     def home():
@@ -89,7 +89,7 @@ class MainScreen(Screen):
             return
         account = Account.query.filter(Account.id_card == barcode).first()
         if account:
-            ScreenManager.get_instance().set_active(ProfileScreen(self.screen, account))
+            ScreenManager.get_instance().set_active(ProfileScreen(account))
 
     @staticmethod
     def __get_pos(i):

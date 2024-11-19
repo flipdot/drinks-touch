@@ -30,7 +30,6 @@ class GitMainScreen(Screen):
                         on_click=functools.partial(
                             self.goto,
                             TasksScreen(
-                                self.screen,
                                 tasks=[UpdateAndRestartTask()],
                             ),
                         ),
@@ -42,14 +41,14 @@ class GitMainScreen(Screen):
                                 text="Downgrade",
                                 on_click=functools.partial(
                                     self.goto,
-                                    GitLogScreen(self.screen, branch="master"),
+                                    GitLogScreen(branch="master"),
                                 ),
                                 size=25,
                             ),
                             Button(
                                 text="Branches",
                                 on_click=functools.partial(
-                                    self.goto, GitBranchScreen(self.screen)
+                                    self.goto, GitBranchScreen()
                                 ),
                                 size=25,
                             ),
@@ -58,7 +57,6 @@ class GitMainScreen(Screen):
                                 on_click=functools.partial(
                                     self.goto,
                                     TasksScreen(
-                                        self.screen,
                                         tasks=[GitFetchTask()],
                                         box_height=600,
                                     ),

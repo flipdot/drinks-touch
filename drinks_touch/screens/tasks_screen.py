@@ -15,8 +15,8 @@ def discover_tasks():
 
 
 class TasksScreen(Screen):
-    def __init__(self, screen, tasks: list[BaseTask] | None = None, box_height=None):
-        super().__init__(screen)
+    def __init__(self, tasks: list[BaseTask] | None = None, box_height=None):
+        super().__init__()
         self.finished = False
 
         if tasks:
@@ -57,8 +57,9 @@ class TasksScreen(Screen):
             task.start()
 
     def render(self, *args, **kwargs):
-        super(TasksScreen, self).render(*args, **kwargs)
+        res = super(TasksScreen, self).render(*args, **kwargs)
         self.check_task_completion()
+        return res
 
     @property
     def all_tasks_finished(self):

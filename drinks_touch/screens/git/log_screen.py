@@ -30,8 +30,8 @@ class Commit:
 
 class GitLogScreen(Screen):
 
-    def __init__(self, *args, branch: str, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, branch: str):
+        super().__init__()
 
         self.branch = branch
         self.repository = Repository(config.REPO_PATH)
@@ -113,4 +113,4 @@ class GitLogScreen(Screen):
         if commit.date < DATE_SINCE_GITSCREEN:
             logger.info("Can't checkout commits before Git screen was introduced.")
             return
-        self.goto(TasksScreen(self.screen, [CheckoutAndRestartTask(commit.sha)]))
+        self.goto(TasksScreen([CheckoutAndRestartTask(commit.sha)]))

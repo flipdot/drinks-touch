@@ -17,8 +17,8 @@ from .screen_manager import ScreenManager
 
 
 class NewIDScreen(Screen):
-    def __init__(self, screen):
-        super(NewIDScreen, self).__init__(screen)
+    def __init__(self):
+        super().__init__()
 
         self.objects.append(
             Button(
@@ -112,7 +112,7 @@ class NewIDScreen(Screen):
             self.print_png(png)
             self.progress.on_elapsed = self.time_elapsed
             self.progress.stop()
-            ScreenManager.get_instance().set_active(ProfileScreen(self.screen, user))
+            ScreenManager.get_instance().set_active(ProfileScreen(user))
         except Exception as e:
             self.message.text = "Fehler: " + str(e)
             self.progress.value = 0

@@ -3,10 +3,12 @@ import pygame
 import config
 import math
 
+from screen import get_screen_surface
+
 
 class BaseOverlay:
-    def __init__(self, screen):
-        self.screen = screen
+    def __init__(self):
+        self.screen = get_screen_surface()
 
     def render(self, dt):
         pass
@@ -16,8 +18,8 @@ class BaseOverlay:
 
 
 class MouseOverlay(BaseOverlay):
-    def __init__(self, screen):
-        super().__init__(screen)
+    def __init__(self):
+        super().__init__()
         self.mouse_pos = (0, 0)
         self.click_pos = (0, 0)
         self.mouse_path = []
@@ -55,6 +57,9 @@ class MouseOverlay(BaseOverlay):
                 end_pos,
                 width=3,
             )
+            if config.DEBUG_UI_ELEMENTS:
+                pygame.draw.circle(self.screen, (255, 0, 255), start_pos, 3)
+                pygame.draw.circle(self.screen, (0, 255, 255), end_pos, 3)
 
     def _render_mouse_pos(self):
         if not self.mouse_pressed:

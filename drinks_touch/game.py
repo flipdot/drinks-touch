@@ -16,7 +16,6 @@ from database.storage import init_db, Session
 from drinks.drinks_manager import DrinksManager
 from notifications.notification import send_low_balances, send_summaries
 from overlays import MouseOverlay
-from screen import get_screen
 from screens.screen_manager import ScreenManager
 from screens.tasks_screen import TasksScreen
 from stats.stats import run as stats_send
@@ -95,7 +94,6 @@ def main(argv):
         stats_send()
         return 0
 
-    screen = get_screen()
     clock = pygame.time.Clock()
 
     drinks_manager = DrinksManager()
@@ -105,14 +103,14 @@ def main(argv):
     global overlays
     overlays.extend(
         [
-            MouseOverlay(screen),
+            MouseOverlay(),
         ]
     )
-    screen_manager = ScreenManager(screen)
+    screen_manager = ScreenManager()
     ScreenManager.set_instance(screen_manager)
 
     screen_manager.set_default()
-    screen_manager.set_active(TasksScreen(screen))
+    screen_manager.set_active(TasksScreen())
 
     init_db()
 
@@ -137,10 +135,7 @@ def main(argv):
         dt = clock.tick(config.FPS) / 1000.0
         t += dt
 
-        current_screen = screen_manager.get_active()
-
-        screen.fill((0, 0, 0))
-        current_screen.render(dt)
+        screen_manager.render(dt)
         for overlay in overlays:
             overlay.render(dt)
 

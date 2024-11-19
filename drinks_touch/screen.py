@@ -2,6 +2,9 @@ import logging
 import os
 
 import contextlib
+from functools import cache
+
+from pygame import Surface
 
 import config
 
@@ -11,17 +14,23 @@ with contextlib.redirect_stdout(None):
 logger = logging.getLogger(__name__)
 
 
-def get_screen():
+class NoVideoDriverException(Exception):
+    pass
+
+
+@cache
+def get_screen_surface() -> Surface:
+    """
+    Surface that is being rendered to the screen
+    """
     try:
         screen = __get_screen_framebuffer()
-    except Exception:
-        logger.exception("Falling back to regular xserver")
+    except NoVideoDriverException:
         screen = __get_screen_xserver()
-
     return screen
 
 
-def __get_screen_xserver():
+def __get_screen_xserver() -> Surface:
     size = 480, 800
     # https://www.pygame.org/docs/ref/display.html?highlight=set_mode#pygame.display.set_mode
     pygame.init()
@@ -37,7 +46,7 @@ def __get_screen_xserver():
     return screen
 
 
-def __get_screen_framebuffer():
+def __get_screen_framebuffer() -> Surface:
     # Ininitializes a new pygame screen using the framebuffer
     # Based on "Python GUI in Linux frame buffer"
     # http://www.karoltomala.com/blog/?p=679
@@ -63,7 +72,7 @@ def __get_screen_framebuffer():
         break
 
     if not found:
-        raise Exception("No suitable video driver found!")
+        raise NoVideoDriverException("No suitable video driver found!")
     logger.info("Using SDL_VIDEODRIVER %s", os.environ["SDL_VIDEODRIVER"])
 
     size = (pygame.display.Info().current_w, pygame.display.Info().current_h)

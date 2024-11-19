@@ -12,8 +12,8 @@ from .screen_manager import ScreenManager
 
 
 class NamesScreen(Screen):
-    def __init__(self, screen, char):
-        super().__init__(screen)
+    def __init__(self, char):
+        super().__init__()
         self.char = char
         self.timeout = None
 
@@ -58,15 +58,13 @@ class NamesScreen(Screen):
             btn_ypos = 90
             i_y = i % btns_y
             i_x = i // btns_y
-            x = i_x * (self.screen.get_width() / num_cols)
+            x = i_x * (self.width / num_cols)
             y = i_y * btn_ypos
             self.objects.append(
                 Button(
                     text=account.name,
                     pos=(xoff + x, y + yoff),
-                    on_click=functools.partial(
-                        self.goto, ProfileScreen(self.screen, account)
-                    ),
+                    on_click=functools.partial(self.goto, ProfileScreen(account)),
                     padding=20,
                 )
             )
@@ -84,4 +82,4 @@ class NamesScreen(Screen):
             return
         account = Account.query.filter(Account.id_card == barcode).first()
         if account:
-            self.goto(ProfileScreen(self.screen, account))
+            self.goto(ProfileScreen(account))

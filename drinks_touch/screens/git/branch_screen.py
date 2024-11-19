@@ -12,17 +12,15 @@ from screens.screen import Screen
 
 class GitBranchScreen(Screen):
 
-    def __init__(self, screen):
-        super().__init__(screen)
+    def __init__(self):
+        super().__init__()
         self.repository = Repository(config.REPO_PATH)
 
     def on_start(self, *args, **kwargs):
         branch_buttons = [
             Button(
                 text=branch,
-                on_click=functools.partial(
-                    self.goto, GitLogScreen(self.screen, branch=branch)
-                ),
+                on_click=functools.partial(self.goto, GitLogScreen(branch=branch)),
                 size=20,
             )
             for branch in self.get_branches()

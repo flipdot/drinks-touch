@@ -9,8 +9,8 @@ from .screen import Screen
 
 
 class EnterPinScreen(Screen):
-    def __init__(self, screen, user):
-        super(EnterPinScreen, self).__init__(screen)
+    def __init__(self, user):
+        super().__init__()
         self.user = user
 
         self.objects.append(
@@ -105,7 +105,7 @@ class EnterPinScreen(Screen):
 
         from .screen_manager import ScreenManager
 
-        ScreenManager.get_instance().set_active(ProfileScreen(self.screen, self.user))
+        ScreenManager.get_instance().set_active(ProfileScreen(self.user))
 
     def get_pin(self):
         return self.input.text[: len(self.input.text) - 1]
@@ -114,7 +114,7 @@ class EnterPinScreen(Screen):
         from .screen_manager import ScreenManager
 
         screen_manager = ScreenManager.get_instance()
-        screen_manager.set_active(ProfileScreen(self.screen, param))
+        screen_manager.set_active(ProfileScreen(param))
 
     def on_barcode(self, barcode):
         for c in barcode:

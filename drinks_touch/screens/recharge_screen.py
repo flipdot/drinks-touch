@@ -15,8 +15,8 @@ from .success import SuccessScreen
 
 
 class RechargeScreen(Screen):
-    def __init__(self, screen, account: Account):
-        super(RechargeScreen, self).__init__(screen)
+    def __init__(self, account: Account):
+        super().__init__()
 
         self.account = account
         self.payment_amount = 0

@@ -26,8 +26,8 @@ logger = logging.getLogger(__name__)
 
 
 class WaitScanScreen(Screen):
-    def __init__(self, screen):
-        super().__init__(screen)
+    def __init__(self):
+        super().__init__()
         self.barcode_label = None
         self.scanned_info = []
         self.empty_info = []
@@ -138,17 +138,13 @@ class WaitScanScreen(Screen):
                 ),
                 color=color,
                 on_click=(
-                    (
-                        lambda: ScreenManager.get_instance().set_active(
-                            GitMainScreen(self.screen)
-                        )
-                    )
+                    (lambda: ScreenManager.get_instance().set_active(GitMainScreen()))
                     if config.GIT_REPO_AVAILABLE
                     else None
                 ),
             ),
             Button(
-                on_click=functools.partial(self.goto, TasksScreen(self.screen)),
+                on_click=functools.partial(self.goto, TasksScreen()),
                 inner=RefreshIcon(),
             ),
         ]
@@ -211,7 +207,7 @@ class WaitScanScreen(Screen):
         self.processing.is_visible = True
         account = Account.query.filter(Account.id_card == barcode).first()
         if account:
-            ScreenManager.get_instance().set_active(ProfileScreen(self.screen, account))
+            ScreenManager.get_instance().set_active(ProfileScreen(account))
             self.processing.is_visible = False
             return
         drink = get_by_ean(barcode)
@@ -222,7 +218,7 @@ class WaitScanScreen(Screen):
         self.timeout.start()
 
     def set_member(self):
-        main = MainScreen(self.screen)
+        main = MainScreen()
         ScreenManager.get_instance().set_active(main)
         self.reset(False)
 
@@ -240,7 +236,7 @@ class WaitScanScreen(Screen):
         self.reset()
 
     def btn_new_id(self):
-        new_id = NewIDScreen(self.screen)
+        new_id = NewIDScreen()
         ScreenManager.get_instance().set_active(new_id)
 
     def reset(self, reset_drink=True):
