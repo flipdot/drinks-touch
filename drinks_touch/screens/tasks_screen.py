@@ -46,8 +46,8 @@ class TasksScreen(Screen):
             ),
             VBox(progress_bars, gap=10, pos=(5, 80)),
             Button(
-                text="Abbrechen / Zurück",
-                pos=(5, 795),
+                text="Abbrechen",
+                pos=(5, 755),
                 align_bottom=True,
                 on_click=self.cancel_tasks,
             ),
@@ -69,7 +69,7 @@ class TasksScreen(Screen):
         if not self.finished and self.all_tasks_finished:
             self.objects.append(
                 Progress(
-                    pos=(475, 795),
+                    pos=(475, 755),
                     speed=1 / 10,
                     align_right=True,
                     align_bottom=True,

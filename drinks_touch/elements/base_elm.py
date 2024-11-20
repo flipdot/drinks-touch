@@ -77,39 +77,38 @@ class BaseElm(object):
     def box(self):
         return self.screen_pos + (self.width, self.height)
 
-    def events(self, events, pos=None):
-        for event in events:
-            consumed = "consumed" in event.dict and event.consumed
-            if pos is None and hasattr(event, "pos"):
-                pos = event.pos
-            if pos is None:
-                continue
-            collides = self.collides_with(pos)
+    def event(self, event, pos=None):
+        consumed = "consumed" in event.dict and event.consumed
+        if pos is None and hasattr(event, "pos"):
+            pos = event.pos
+        if pos is None:
+            return
+        collides = self.collides_with(pos)
+        if collides:
+            transformed_pos = (
+                pos[0] - self.screen_pos[0],
+                pos[1] - self.screen_pos[1],
+            )
+        else:
+            transformed_pos = None
+
+        for child in self.children:
+            child.event(event, transformed_pos)
+
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             if collides:
-                transformed_pos = (
-                    pos[0] - self.screen_pos[0],
-                    pos[1] - self.screen_pos[1],
-                )
+                self.focus = True
             else:
-                transformed_pos = None
-
-            for child in self.children:
-                child.events(events, transformed_pos)
-
-            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                if collides:
-                    self.focus = True
-                else:
-                    self.focus = False
-
-            elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
-                if not hasattr(self, "on_click"):
-                    continue
-
-                if not consumed and self.focus and collides:
-                    self.on_click(*transformed_pos)
-                    event.consumed = True
                 self.focus = False
+
+        elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+            if not hasattr(self, "on_click"):
+                return
+
+            if not consumed and self.focus and collides:
+                self.on_click(*transformed_pos)
+                event.consumed = True
+            self.focus = False
 
     @property
     def visible(self):

@@ -46,7 +46,7 @@ if config.LOGLEVEL == logging.DEBUG:
 
 event_queue = queue.Queue()
 overlays = []
-screen_manager = None
+screen_manager: ScreenManager | None = None
 
 
 def handle_events():
@@ -60,11 +60,7 @@ def handle_events():
                 break
         for overlay in overlays:
             overlay.events(events)
-        current_screen = screen_manager.get_active()
-        try:
-            current_screen.events(events)
-        except Exception:
-            logging.exception("handling events:")
+        screen_manager.events(events)
 
 
 def stats_loop():

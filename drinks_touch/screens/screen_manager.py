@@ -1,5 +1,7 @@
 import pygame
 
+from config import FONTS
+from elements import Button
 from screen import get_screen_surface
 
 from typing import TYPE_CHECKING
@@ -10,11 +12,21 @@ if TYPE_CHECKING:
 
 class ScreenManager:
     instance = None
+    MENU_BAR_HEIGHT = 65
 
     def __init__(self):
         self.current_screen = None
         self.surface = get_screen_surface()
-        self.screen_history = []
+        self.screen_history: list[Screen] = []
+        self.objects = [
+            Button(
+                text=" ‹ ",
+                pos=(5, 5),
+                on_click=self.go_back,
+                font=FONTS["monospace"],
+                size=30,
+            )
+        ]
 
     def set_default(self):
         from screens.wait_scan import WaitScanScreen
@@ -43,7 +55,12 @@ class ScreenManager:
     def reset_history(self):
         self.screen_history = []
 
+    @property
+    def menu_bar_visible(self):
+        return len(self.screen_history) > 1
+
     def render(self, dt):
+        self.surface.fill((0, 0, 0))
         current_screen = self.get_active()
         surface, debug_surface = current_screen.render(dt)
         if surface is not None:
@@ -51,13 +68,33 @@ class ScreenManager:
         if debug_surface is not None:
             self.surface.blit(debug_surface, (0, 0), special_flags=pygame.BLEND_ADD)
 
-        if len(self.screen_history) > 1:
-            back_surface = pygame.Surface((100, 50))
-            back_surface.fill((255, 0, 255))
-            back_surface.blit(
-                pygame.font.Font(None, 30).render("Back", True, (0, 0, 0)), (10, 10)
+        if self.menu_bar_visible:
+            menu_bar = pygame.Surface((self.surface.get_width(), self.MENU_BAR_HEIGHT))
+            menu_bar.fill((40, 40, 40))
+            for obj in self.objects:
+                obj_surface = obj.render(dt)
+                menu_bar.blit(obj_surface, obj.screen_pos)
+            # back_surface = pygame.Surface((100, 50))
+            # back_surface.fill((255, 0, 255))
+            # back_surface.blit(
+            #     pygame.font.Font(None, 30).render("Back", True, (0, 0, 0)), (10, 10)
+            # )
+            self.surface.blit(
+                menu_bar, (0, self.surface.get_height() - menu_bar.get_height())
             )
-            self.surface.blit(back_surface, (0, self.surface.get_height() - 50))
+
+    def events(self, events):
+        screen = self.get_active()
+        for event in events:
+            if self.menu_bar_visible and hasattr(event, "pos"):
+                transformed_pos = (
+                    event.pos[0],
+                    event.pos[1] - self.surface.get_height() + self.MENU_BAR_HEIGHT,
+                )
+                for obj in self.objects:
+                    obj.event(event, transformed_pos)
+            screen.event(event)
+            # screen.events(events)
 
     @staticmethod
     def get_instance():

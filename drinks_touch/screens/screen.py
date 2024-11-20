@@ -34,9 +34,9 @@ class Screen:
                         debug_surface.blit(obj_debug_surface, o.screen_pos)
         return surface, debug_surface
 
-    def events(self, events):
+    def event(self, event):
         for obj in self.objects:
-            obj.events(events)
+            obj.event(event)
 
     @staticmethod
     def back():
