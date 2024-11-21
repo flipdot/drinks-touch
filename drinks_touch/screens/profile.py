@@ -117,23 +117,23 @@ class ProfileScreen(Screen):
         )
         self.btn_aufladungen = Button(
             text="Aufladungen",
-            pos=(30, 700),
+            pos=(30, 680),
             on_click=self.show_aufladungen,
         )
         self.btn_drinks = Button(
             text="Buchungen",
-            pos=(20, 700),
+            pos=(20, 680),
             on_click=self.show_drinks,
         )
         self.btn_abbrechen = Button(
             text="Abbrechen",
-            pos=(290, 700),
+            pos=(290, 680),
             size=20,
             on_click=self.btn_home,
         )
         self.btn_aufladen = Button(
             text="Jetzt Aufladen",
-            pos=(210, 700),
+            pos=(210, 680),
             size=20,
             on_click=functools.partial(self.goto, RechargeScreen(self.account)),
         )
