@@ -78,7 +78,6 @@ class BaseElm(object):
         return self.screen_pos + (self.width, self.height)
 
     def event(self, event, pos=None):
-        consumed = "consumed" in event.dict and event.consumed
         if pos is None and hasattr(event, "pos"):
             pos = event.pos
         if pos is None:
@@ -98,6 +97,7 @@ class BaseElm(object):
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             if collides:
                 self.focus = True
+                event.consumed = True
             else:
                 self.focus = False
 
@@ -105,7 +105,7 @@ class BaseElm(object):
             if not hasattr(self, "on_click"):
                 return
 
-            if not consumed and self.focus and collides:
+            if self.focus and collides:
                 self.on_click(*transformed_pos)
                 event.consumed = True
             self.focus = False

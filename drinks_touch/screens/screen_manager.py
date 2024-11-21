@@ -92,7 +92,11 @@ class ScreenManager:
                     event.pos[1] - self.surface.get_height() + self.MENU_BAR_HEIGHT,
                 )
                 for obj in self.objects:
+                    if getattr(event, "consumed", False):
+                        continue
                     obj.event(event, transformed_pos)
+            if getattr(event, "consumed", False):
+                continue
             screen.event(event)
             # screen.events(events)
 
