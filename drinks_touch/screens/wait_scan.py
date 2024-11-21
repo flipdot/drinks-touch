@@ -72,25 +72,8 @@ class WaitScanScreen(Screen):
                 on_click=self.btn_new_id,
             ),
         ]
-
-        self.objects.append(Image(pos=(30, 20)))
-
-        self.objects.append(
-            Label(
-                text="Scanne dein Getränk",
-                pos=(60, 240),
-            )
-        )
-        self.objects.append(
-            Label(
-                text="oder deine ID-Card :)",
-                pos=(70, 280),
-            )
-        )
-
         self.processing = Label(text="Moment bitte...", size=40, pos=(80, 350))
         self.processing.is_visible = False
-        self.objects.append(self.processing)
         sql = text(
             """
             SELECT SUM(amount) - (
@@ -105,23 +88,6 @@ class WaitScanScreen(Screen):
         except Exception:
             logger.exception("sql error while getting total money amount")
             total_balance_fmt = "(SQL Error)"
-
-        self.objects.append(
-            VBox(
-                [
-                    Label(
-                        text="∑ = {}".format(total_balance_fmt),
-                        size=25,
-                    ),
-                    Label(
-                        text=f"Build: {config.BUILD_NUMBER}",
-                        size=20,
-                    ),
-                ],
-                pos=(5, 800),
-                align_bottom=True,
-            )
-        )
 
         color = (
             config.COLORS["infragelb"]
@@ -148,8 +114,38 @@ class WaitScanScreen(Screen):
                 inner=RefreshIcon(),
             ),
         ]
+        self.timeout = Progress(
+            pos=(400, 500),
+            size=100,
+            speed=1 / 10.0,
+            on_elapsed=self.time_elapsed,
+        )
 
-        self.objects.append(
+        self.objects = [
+            Image(pos=(30, 20)),
+            Label(
+                text="Scanne dein Getränk",
+                pos=(60, 240),
+            ),
+            Label(
+                text="oder deine ID-Card :)",
+                pos=(70, 280),
+            ),
+            self.processing,
+            VBox(
+                [
+                    Label(
+                        text="∑ = {}".format(total_balance_fmt),
+                        size=25,
+                    ),
+                    Label(
+                        text=f"Build: {config.BUILD_NUMBER}",
+                        size=20,
+                    ),
+                ],
+                pos=(5, 800),
+                align_bottom=True,
+            ),
             HBox(
                 bottom_right_buttons,
                 pos=(480, 795),
@@ -157,8 +153,10 @@ class WaitScanScreen(Screen):
                 align_bottom=True,
                 gap=5,
                 padding=(0, 5),
-            )
-        )
+            ),
+            self.timeout,
+        ]
+
         if (
             CheckForUpdatesTask.newest_version_sha_short
             and CheckForUpdatesTask.newest_version_sha_short not in config.BUILD_NUMBER
@@ -177,14 +175,6 @@ class WaitScanScreen(Screen):
                     blink_frequency=60,
                 )
             )
-
-        self.timeout = Progress(
-            pos=(400, 500),
-            size=100,
-            speed=1 / 10.0,
-            on_elapsed=self.time_elapsed,
-        )
-        self.objects.append(self.timeout)
 
         for o in self.scanned_info + self.empty_info:
             self.objects.append(o)
