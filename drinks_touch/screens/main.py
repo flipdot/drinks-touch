@@ -49,15 +49,6 @@ class MainScreen(Screen):
                 )
             )
             i += 1
-
-        self.objects.append(
-            Button(
-                text="Abbrechen",
-                pos=(150, 700),
-                size=30,
-                on_click=self.home,
-            )
-        )
         self.timeout = Progress(
             pos=(380, 715),
             speed=1 / 15.0,
