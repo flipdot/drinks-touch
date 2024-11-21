@@ -3,7 +3,7 @@ import math
 import pygame.draw
 
 import config
-from config import COLORS, FONTS
+from config import Color, FONTS
 from elements.base_elm import BaseElm
 
 
@@ -40,7 +40,7 @@ class ProgressBar(BaseElm):
         )
         self.max_lines = math.floor(box_height / 15)
 
-        self.color = COLORS["infragelb"]
+        self.color = Color.PRIMARY
         self.percent = None
         self.tick = 0
         self.font = pygame.font.SysFont("sans serif", 25)
@@ -74,17 +74,17 @@ class ProgressBar(BaseElm):
         return self._width
 
     def success(self):
-        self.color = (0, 255, 0)
+        self.color = Color.SUCCESS
         if self.percent is None:
             self.percent = 1
 
     def fail(self):
-        self.color = (255, 0, 0)
+        self.color = Color.ERROR
         if self.percent is None:
             self.percent = 1
 
     def reset(self):
-        self.color = COLORS["infragelb"]
+        self.color = Color.PRIMARY
         self.percent = None
 
     def render(self, dt, *args, **kwargs) -> pygame.Surface:
@@ -108,14 +108,14 @@ class ProgressBar(BaseElm):
         return surface
 
     def _render_label(self) -> pygame.Surface:
-        label = self.font.render(self.label, 1, self.color)
+        label = self.font.render(self.label, 1, self.color.value)
         return label
 
     def _render_textbox(self) -> pygame.Surface:
         surface = pygame.Surface((self.width, self.text_height), pygame.SRCALPHA)
         pygame.draw.rect(
             surface,
-            self.color,
+            self.color.value,
             (
                 0,
                 0,
@@ -139,7 +139,7 @@ class ProgressBar(BaseElm):
         last_lines = lines[-self.max_lines :]
 
         for i, line in enumerate(last_lines):
-            text = self.font_mono.render(line, 1, config.COLORS["infragelb"])
+            text = self.font_mono.render(line, 1, config.Color.PRIMARY.value)
             surface.blit(
                 text,
                 (
@@ -153,14 +153,14 @@ class ProgressBar(BaseElm):
         surface = pygame.Surface((self.width, self.bar_height), pygame.SRCALPHA)
         pygame.draw.rect(
             surface,
-            self.color,
+            self.color.value,
             (0, 0, self.width, self.bar_height),
             width=2,
         )
         if self.percent is not None:
             pygame.draw.rect(
                 surface,
-                self.color,
+                self.color.value,
                 (
                     0,
                     0,
@@ -180,7 +180,7 @@ class ProgressBar(BaseElm):
 
             pygame.draw.rect(
                 surface,
-                self.color,
+                self.color.value,
                 (x, y, width, self.bar_height),
             )
         return surface

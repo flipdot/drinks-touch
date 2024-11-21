@@ -15,7 +15,7 @@ class Progress(BaseElm):
         children: list["BaseElm"] | None = None,
         pos=None,
         size=50,
-        color=config.COLORS["infragelb"],
+        color=config.Color.PRIMARY,
         tick=None,
         speed=1 / 4.0,  # 4 secs
         on_elapsed=None,
@@ -66,7 +66,7 @@ class Progress(BaseElm):
             end = start + self.value * 2 * math.pi
             pygame.draw.arc(
                 surface,
-                self.color,
+                self.color.value,
                 (0, 0, self.width, self.height),
                 start,
                 end,

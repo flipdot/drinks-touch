@@ -90,9 +90,7 @@ class WaitScanScreen(Screen):
             total_balance_fmt = "(SQL Error)"
 
         color = (
-            config.COLORS["infragelb"]
-            if config.GIT_REPO_AVAILABLE
-            else config.COLORS["disabled"]
+            config.Color.PRIMARY if config.GIT_REPO_AVAILABLE else config.Color.DISABLED
         )
         bottom_right_buttons = [
             Button(
@@ -169,7 +167,7 @@ class WaitScanScreen(Screen):
                     pos=(480, 800),
                     align_right=True,
                     align_bottom=True,
-                    color=(0, 0, 0),
+                    color=config.Color.BLACK,
                     bg_color=(255, 255, 255),
                     padding=5,
                     blink_frequency=60,

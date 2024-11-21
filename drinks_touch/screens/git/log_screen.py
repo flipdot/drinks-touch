@@ -47,7 +47,7 @@ class GitLogScreen(Screen):
                         size=15,
                         color=(
                             color := (
-                                config.COLORS["infragelb"]
+                                config.Color.PRIMARY
                                 if commit.date >= DATE_SINCE_GITSCREEN
                                 else config.COLORS["disabled"]
                             )

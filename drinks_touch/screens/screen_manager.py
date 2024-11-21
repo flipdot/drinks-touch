@@ -1,6 +1,6 @@
 import pygame
 
-from config import FONTS
+from config import FONTS, Color
 from elements import Button
 from screen import get_screen_surface
 
@@ -70,7 +70,11 @@ class ScreenManager:
 
         if self.menu_bar_visible:
             menu_bar = pygame.Surface((self.surface.get_width(), self.MENU_BAR_HEIGHT))
-            menu_bar.fill((40, 40, 40))
+            # menu_bar.fill((40, 40, 40))
+            # draw top border
+            pygame.draw.line(
+                menu_bar, Color.PRIMARY.value, (0, 0), (menu_bar.get_width(), 0)
+            )
             for obj in self.objects:
                 obj_surface = obj.render(dt)
                 menu_bar.blit(obj_surface, obj.screen_pos)

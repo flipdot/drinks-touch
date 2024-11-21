@@ -1,11 +1,14 @@
 import pygame
 
+from config import Color
 from .base import BaseIcon
 
 
 class SvgIcon(BaseIcon):
 
-    def __init__(self, path, pos=None, color=None, width=None, height=None):
+    def __init__(
+        self, path, pos=None, color: Color | None = None, width=None, height=None
+    ):
         """
         If one of width or height is set and the other is None, the other
         will be calculated to keep the aspect ratio.
@@ -14,7 +17,7 @@ class SvgIcon(BaseIcon):
         self.path = path
         image = pygame.image.load(self.path).convert_alpha()
         if color:
-            image.fill(color, special_flags=pygame.BLEND_RGBA_MIN)
+            image.fill(color.value, special_flags=pygame.BLEND_RGBA_MIN)
 
         if width and height is None:
             aspect_ratio = image.get_width() / image.get_height()

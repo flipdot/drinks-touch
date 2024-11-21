@@ -23,7 +23,7 @@ class MouseOverlay(BaseOverlay):
         self.mouse_pos = (0, 0)
         self.click_pos = (0, 0)
         self.mouse_path = []
-        self.color = config.COLORS["infragelb"]
+        self.color = config.Color.PRIMARY
         self.tick = 0
         self.mouse_pressed = False
 
@@ -52,7 +52,7 @@ class MouseOverlay(BaseOverlay):
             )
             pygame.draw.line(
                 self.screen,
-                self.color,
+                self.color.value,
                 start_pos,
                 end_pos,
                 width=3,
@@ -64,7 +64,7 @@ class MouseOverlay(BaseOverlay):
     def _render_mouse_pos(self):
         if not self.mouse_pressed:
             return
-        pygame.draw.circle(self.screen, self.color, self.mouse_pos, 5)
+        pygame.draw.circle(self.screen, self.color.value, self.mouse_pos, 5)
 
     def _render_mouse_path(self):
         if len(self.mouse_path) > 2:
@@ -88,7 +88,7 @@ class MouseOverlay(BaseOverlay):
             if event.type == pygame.MOUSEMOTION:
                 self.mouse_pos = event.pos
                 if self.mouse_pressed:
-                    self.mouse_path.append((self.color, event.pos))
+                    self.mouse_path.append((self.color.value, event.pos))
             elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                 self.click_pos = event.pos
                 self.reset()

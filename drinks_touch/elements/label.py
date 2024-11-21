@@ -18,7 +18,7 @@ class Label(BaseElm):
         text="<Label>",
         font=config.FONTS["sans serif"],
         size=35,
-        color=config.COLORS["infragelb"],
+        color: config.Color = config.Color.PRIMARY,
         bg_color=None,
         border_color=None,
         border_width=0,
@@ -27,6 +27,7 @@ class Label(BaseElm):
         *args,
         **kwargs,
     ):
+        assert isinstance(color, config.Color)
         self.size = size
         self.max_width = max_width
         self.text = text
@@ -76,7 +77,7 @@ class Label(BaseElm):
         return surface
 
     def _build_text(self):
-        elm = self.font.render(self.text, 1, self.color)
+        elm = self.font.render(self.text, 1, self.color.value)
         cutx = 0
         pos = self.pos
         if self.align_right:

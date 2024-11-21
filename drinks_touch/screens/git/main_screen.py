@@ -20,7 +20,7 @@ class GitMainScreen(Screen):
             SvgIcon(
                 "drinks_touch/static/images/git-full.svg",
                 pos=(10, 20),
-                color=config.COLORS["infragelb"],
+                color=config.Color.PRIMARY,
                 height=36,
             ),
             VBox(
