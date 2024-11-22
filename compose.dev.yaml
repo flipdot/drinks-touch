@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: "postgres:17.1"
+    image: "postgres:17.2"
     environment:
       POSTGRES_USER: drinks
       POSTGRES_PASSWORD: drinks
