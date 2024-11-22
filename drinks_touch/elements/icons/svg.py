@@ -1,7 +1,21 @@
+import io
+
 import pygame
 
 from config import Color
 from .base import BaseIcon
+
+
+def load_and_scale_svg(filename, scale):
+    svg_string = open(filename, "rt").read()
+    start = svg_string.find("<svg")
+    if start > 0:
+        svg_string = (
+            svg_string[: start + 4]
+            + f' transform="scale({scale})"'
+            + svg_string[start + 4 :]
+        )
+    return pygame.image.load(io.BytesIO(svg_string.encode()))
 
 
 class SvgIcon(BaseIcon):
@@ -16,6 +30,7 @@ class SvgIcon(BaseIcon):
         super().__init__(pos=pos)
         self.path = path
         image = pygame.image.load(self.path).convert_alpha()
+        # image = load_and_scale_svg(self.path, 2)
         if color:
             image.fill(color.value, special_flags=pygame.BLEND_RGBA_MIN)
 
@@ -27,11 +42,13 @@ class SvgIcon(BaseIcon):
             width = int(height / aspect_ratio)
 
         if width and height:
-            self.image = pygame.transform.scale(image, (width, height))
+            self.image = pygame.transform.smoothscale(image, (width, height))
             self.width = width
             self.height = height
         else:
             self.image = image
+            self.width = image.get_width()
+            self.height = image.get_height()
 
     def draw(self, surface):
         surface.blit(self.image, (0, 0))

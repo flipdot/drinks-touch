@@ -31,12 +31,8 @@ class Color(enum.Enum):
     ERROR = (255, 0, 0, 255)
     SUCCESS = (0, 255, 0, 255)
     BLACK = (0, 0, 0, 255)
+    BACKGROUND = (15, 15, 20, 255)
 
-
-# COLORS = {
-#     "infragelb": (246, 198, 0, 255),
-#     "disabled": (50, 50, 50, 255),
-# }
 
 if bn := os.environ.get("BUILD_NUMBER"):
     BUILD_NUMBER = bn

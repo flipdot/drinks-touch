@@ -4,8 +4,8 @@ from sqlalchemy import func
 
 from database.models import Account
 from database.storage import Session
+from elements import SvgIcon
 from elements.button import Button
-from elements.image import Image
 from elements.label import Label
 from elements.progress import Progress
 from .names import NamesScreen
@@ -19,7 +19,13 @@ class MainScreen(Screen):
 
     def on_start(self, *args, **kwargs):
         self.objects = []
-        self.objects.append(Image(pos=(30, 20)))
+        self.objects.append(
+            SvgIcon(
+                "drinks_touch/resources/images/flipdot.svg",
+                width=400,
+                pos=(40, 20),
+            ),
+        )
 
         self.objects.append(Label(text="member auswählen", pos=(65, 250), size=40))
 

@@ -8,7 +8,7 @@ from database.models.scan_event import ScanEvent
 from database.storage import get_session
 from drinks.drinks import get_by_ean
 from drinks.drinks_manager import DrinksManager
-from elements import RefreshIcon, SvgIcon, Progress, Label, Image, Button
+from elements import RefreshIcon, SvgIcon, Progress, Label, Button
 from elements.hbox import HBox
 from elements.vbox import VBox
 from screens.new_id_screen import NewIDScreen
@@ -120,7 +120,11 @@ class WaitScanScreen(Screen):
         )
 
         self.objects = [
-            Image(pos=(30, 20)),
+            SvgIcon(
+                "drinks_touch/resources/images/flipdot.svg",
+                width=400,
+                pos=(40, 20),
+            ),
             Label(
                 text="Scanne dein Getränk",
                 pos=(60, 240),

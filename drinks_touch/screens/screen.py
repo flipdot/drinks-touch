@@ -1,6 +1,7 @@
 import pygame
 
 import config
+from config import Color
 from elements.base_elm import BaseElm
 from screen import get_screen_surface
 from screens.screen_manager import ScreenManager
@@ -22,6 +23,7 @@ class Screen:
 
     def render(self, dt):
         surface = pygame.Surface((self.width, self.height))
+        surface.fill(Color.BACKGROUND.value)
         if config.DEBUG_UI_ELEMENTS:
             debug_surface = pygame.Surface((self.width, self.height))
         else:
@@ -47,7 +49,6 @@ class Screen:
 
     @staticmethod
     def goto(screen: "Screen", *args, **kwargs):
-        print(f"Going to {screen}")
         ScreenManager.get_instance().set_active(screen, *args, **kwargs)
 
     # lifecycle inspired by https://developer.android.com/guide/components/activities/activity-lifecycle

@@ -44,12 +44,12 @@ class GitLogScreen(Screen):
                     Button(
                         text=f"Checkout {commit.sha[:7]}",
                         on_click=functools.partial(self.checkout, commit),
-                        size=15,
+                        size=20,
                         color=(
                             color := (
                                 config.Color.PRIMARY
                                 if commit.date >= DATE_SINCE_GITSCREEN
-                                else config.COLORS["disabled"]
+                                else config.Color.DISABLED
                             )
                         ),
                     ),
@@ -69,7 +69,7 @@ class GitLogScreen(Screen):
                     ),
                 ]
             )
-            for commit in self.get_commits(12)
+            for commit in self.get_commits(11)
         ]
         self.objects = [
             Label(

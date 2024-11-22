@@ -39,7 +39,6 @@ class ScreenManager:
         if current_screen is not None:
             current_screen.on_stop()
         self.screen_history.append(screen)
-        print(self.screen_history)
         screen.on_start(*args, **kwargs)
 
     def get_active(self) -> "Screen | None":
@@ -57,11 +56,11 @@ class ScreenManager:
         self.screen_history = []
 
     @property
-    def menu_bar_visible(self):
+    def nav_bar_visible(self):
         return len(self.screen_history) > 1
 
     def render(self, dt):
-        self.surface.fill((0, 0, 0))
+        self.surface.fill(Color.BACKGROUND.value)
         current_screen = self.get_active()
         surface, debug_surface = current_screen.render(dt)
         if surface is not None:
@@ -69,9 +68,9 @@ class ScreenManager:
         if debug_surface is not None:
             self.surface.blit(debug_surface, (0, 0), special_flags=pygame.BLEND_ADD)
 
-        if self.menu_bar_visible:
+        if self.nav_bar_visible:
             menu_bar = pygame.Surface((self.surface.get_width(), self.MENU_BAR_HEIGHT))
-            # menu_bar.fill((40, 40, 40))
+            menu_bar.fill(Color.BACKGROUND.value)
             # draw top border
             pygame.draw.line(
                 menu_bar, Color.PRIMARY.value, (0, 0), (menu_bar.get_width(), 0)
@@ -91,7 +90,7 @@ class ScreenManager:
     def events(self, events):
         screen = self.get_active()
         for event in events:
-            if self.menu_bar_visible and hasattr(event, "pos"):
+            if self.nav_bar_visible and hasattr(event, "pos"):
                 transformed_pos = (
                     event.pos[0],
                     event.pos[1] - self.surface.get_height() + self.MENU_BAR_HEIGHT,
