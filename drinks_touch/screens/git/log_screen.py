@@ -77,14 +77,6 @@ class GitLogScreen(Screen):
                 pos=(10, 20),
                 size=36,
             ),
-            Button(
-                text="BACK",
-                pos=(5, 795),
-                on_click=self.back,
-                align_bottom=True,
-                font=config.FONTS["monospace"],
-                size=30,
-            ),
             VBox(
                 commit_buttons,
                 pos=(10, 70),

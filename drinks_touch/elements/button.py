@@ -45,6 +45,9 @@ class Button(BaseElm):
             )
         self.inner = inner
 
+    def __repr__(self):
+        return f"<Button {self.inner.text}>"
+
     def render(self, *args, **kwargs) -> pygame.Surface:
         inner = self.inner.render(*args, **kwargs)
 

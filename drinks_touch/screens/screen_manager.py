@@ -39,6 +39,7 @@ class ScreenManager:
         if current_screen is not None:
             current_screen.on_stop()
         self.screen_history.append(screen)
+        print(self.screen_history)
         screen.on_start(*args, **kwargs)
 
     def get_active(self) -> "Screen | None":

@@ -32,14 +32,6 @@ class GitBranchScreen(Screen):
                 pos=(10, 20),
                 size=36,
             ),
-            Button(
-                text="BACK",
-                pos=(5, 795),
-                on_click=self.back,
-                align_bottom=True,
-                font=config.FONTS["monospace"],
-                size=30,
-            ),
             VBox(branch_buttons, gap=5, pos=(10, 80)),
         ]
 
