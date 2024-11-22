@@ -62,6 +62,8 @@ class Button(BaseElm):
         surface = pygame.Surface(size, pygame.SRCALPHA)
         if self.focus:
             surface.fill(tuple(c * 0.7 for c in self.color.value), (0, 0, *size))
+        else:
+            surface.fill(Color.BUTTON_BACKGROUND.value, (0, 0, *size))
 
         if inner is not None:
             surface.blit(inner, (self.padding_left, self.padding_top))

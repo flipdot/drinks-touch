@@ -70,7 +70,7 @@ class ScreenManager:
 
         if self.nav_bar_visible:
             menu_bar = pygame.Surface((self.surface.get_width(), self.MENU_BAR_HEIGHT))
-            menu_bar.fill(Color.BACKGROUND.value)
+            menu_bar.fill(Color.NAVBAR_BACKGROUND.value)
             # draw top border
             pygame.draw.line(
                 menu_bar, Color.PRIMARY.value, (0, 0), (menu_bar.get_width(), 0)

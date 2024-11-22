@@ -31,7 +31,9 @@ class Color(enum.Enum):
     ERROR = (255, 0, 0, 255)
     SUCCESS = (0, 255, 0, 255)
     BLACK = (0, 0, 0, 255)
-    BACKGROUND = (15, 15, 20, 255)
+    BACKGROUND = (15, 15, 18, 255)
+    NAVBAR_BACKGROUND = (5, 5, 5, 255)
+    BUTTON_BACKGROUND = (0, 0, 0, 255)
 
 
 if bn := os.environ.get("BUILD_NUMBER"):
