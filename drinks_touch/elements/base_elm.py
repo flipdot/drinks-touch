@@ -2,7 +2,7 @@ import pygame
 from pygame import Surface
 
 
-class BaseElm(object):
+class BaseElm:
     def __init__(
         self,
         children: list["BaseElm"] | None = None,

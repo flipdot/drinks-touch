@@ -40,7 +40,9 @@ class Screen:
         return surface, debug_surface
 
     def event(self, event):
-        for obj in self.objects:
+        for obj in self.objects[::-1]:
+            if getattr(event, "consumed", False):
+                break
             obj.event(event)
 
     @staticmethod
