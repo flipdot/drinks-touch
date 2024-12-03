@@ -40,19 +40,11 @@ class ProfileScreen(Screen):
 
     def on_start(self, *args, **kwargs):
         self.objects = []
-        self.objects.append(
-            Button(
-                text="BACK",
-                pos=(30, 30),
-                font=FONTS["monospace"],
-                on_click=self.back,
-            )
-        )
 
         self.objects.append(
             Button(
                 text="ID card",
-                pos=(340, 30),
+                pos=(300, 30),
                 font=FONTS["monospace"],
                 on_click=self.id_card,
             )
@@ -61,7 +53,7 @@ class ProfileScreen(Screen):
         self.objects.append(
             Label(
                 text=self.account.name,
-                pos=(30, 120),
+                pos=(30, 30),
                 size=40,
                 max_width=335 - 30 - 10,  # balance.x - self.x - margin
             )
@@ -70,7 +62,7 @@ class ProfileScreen(Screen):
         self.objects.append(
             Label(
                 text="Guthaben",
-                pos=(330, 120),
+                pos=(300, 120),
                 size=20,
             )
         )
@@ -106,12 +98,12 @@ class ProfileScreen(Screen):
         self.drink_info = Label(
             text=drink["name"] if drink else "",
             size=30,
-            pos=(30, 630),
+            pos=(30, 580),
         )
 
         self.zuordnen = Button(
             text="Trinken",
-            pos=(30, 690),
+            pos=(30, 640),
             size=40,
             on_click=self.save_drink,
         )
@@ -140,9 +132,9 @@ class ProfileScreen(Screen):
 
         self.objects.extend(
             [
-                Label(text=f"{self.account.balance} €", pos=(335, 145), size=40),
+                Label(text=f"{self.account.balance} €", pos=(300, 145), size=40),
                 Label(
-                    text="Seite wird refaktoriert.",
+                    text="Seite wird überarbeitet.",
                     pos=(30, 300),
                     size=30,
                 ),
@@ -155,6 +147,11 @@ class ProfileScreen(Screen):
                     text="aber leider leer :)",
                     pos=(30, 400),
                     size=30,
+                ),
+                Label(
+                    text="Performance > Features",
+                    pos=(30, 450),
+                    size=40,
                 ),
             ]
         )
