@@ -1,3 +1,5 @@
+import functools
+
 import config
 from .base_elm import BaseElm
 
@@ -16,7 +18,7 @@ class Label(BaseElm):
         self,
         children: list["BaseElm"] | None = None,
         text="<Label>",
-        font=config.FONTS["sans serif"],
+        font: config.Font = config.Font.SANS_SERIF,
         size=35,
         color: config.Color = config.Color.PRIMARY,
         bg_color=None,
@@ -43,11 +45,9 @@ class Label(BaseElm):
         self.font = Label.get_font(font, self.size)
 
     @classmethod
-    def get_font(cls, font_face, size):
-        if (font_face, size) not in cls._font_cache:
-            font = pygame.font.SysFont(font_face, size)
-            cls._font_cache[(font_face, size)] = font
-        return cls._font_cache[(font_face, size)]
+    @functools.cache
+    def get_font(cls, font: config.Font, size):
+        return pygame.font.Font(font.value, size)
 
     def render(self, *args, **kwargs) -> pygame.Surface | None:
         self.frame_counter += 1

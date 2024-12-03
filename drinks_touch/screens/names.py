@@ -1,7 +1,7 @@
 import functools
 import math
 
-from config import FONTS
+from config import Font
 from database.models import Account
 from elements.button import Button
 from elements.label import Label
@@ -24,7 +24,7 @@ class NamesScreen(Screen):
                 text="BACK",
                 pos=(30, 30),
                 on_click=self.back,
-                font=FONTS["monospace"],
+                font=Font.MONOSPACE,
                 size=30,
             )
         )

@@ -1,6 +1,6 @@
 import functools
 
-from config import FONTS
+from config import Font
 from elements.button import Button
 from elements.label import Label
 from elements.progress import Progress
@@ -18,7 +18,7 @@ class EnterPinScreen(Screen):
                 text="BACK",
                 pos=(30, 30),
                 on_click=self.back,
-                font=FONTS["monospace"],
+                font=Font.MONOSPACE,
                 size=30,
             )
         )
@@ -36,7 +36,7 @@ class EnterPinScreen(Screen):
                 text="UNLOCK!",
                 pos=(100, 680),
                 on_click=self.btn_ok,
-                font=FONTS["monospace"],
+                font=Font.MONOSPACE,
                 size=70,
             )
         )
@@ -69,7 +69,7 @@ class EnterPinScreen(Screen):
             Button(
                 text="DEL",
                 pos=(200, 580),
-                font=FONTS["monospace"],
+                font=Font.MONOSPACE,
                 on_click=self.del_char,
                 size=50,
             )
@@ -84,7 +84,7 @@ class EnterPinScreen(Screen):
                 text=label,
                 pos=(cord_x, cord_y),
                 on_click=functools.partial(self.add_char, label),
-                font=FONTS["monospace"],
+                font=Font.MONOSPACE,
                 size=50,
                 force_width=width,
                 force_height=width,

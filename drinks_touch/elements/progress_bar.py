@@ -3,7 +3,7 @@ import math
 import pygame.draw
 
 import config
-from config import Color, FONTS
+from config import Color
 from elements.base_elm import BaseElm
 
 
@@ -44,7 +44,7 @@ class ProgressBar(BaseElm):
         self.percent = None
         self.tick = 0
         self.font = pygame.font.SysFont("sans serif", 25)
-        self.font_mono = pygame.font.SysFont(FONTS["monospace"], 15)
+        self.font_mono = pygame.font.Font(config.Font.MONOSPACE.value, 15)
 
     @property
     def pos_label(self):

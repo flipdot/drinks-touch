@@ -3,7 +3,7 @@ import functools
 
 from sqlalchemy.sql import text
 
-from config import FONTS
+from config import Font
 from database.models import Account
 from database.models.scan_event import ScanEvent
 from database.storage import get_session
@@ -45,7 +45,7 @@ class ProfileScreen(Screen):
             Button(
                 text="ID card",
                 pos=(300, 30),
-                font=FONTS["monospace"],
+                font=Font.MONOSPACE,
                 on_click=self.id_card,
             )
         )

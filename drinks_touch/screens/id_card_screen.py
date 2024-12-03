@@ -3,7 +3,7 @@ import time
 import subprocess
 from pystrich.code128 import Code128Encoder
 
-from config import FONTS
+from config import Font
 from database.models import Account
 from drinks.drinks import get_by_ean
 from drinks.drinks_manager import DrinksManager
@@ -30,7 +30,7 @@ class IDCardScreen(Screen):
             Button(
                 text="BACK",
                 pos=(30, 30),
-                font=FONTS["monospace"],
+                font=Font.MONOSPACE,
                 on_click=self.back,
                 size=30,
             )

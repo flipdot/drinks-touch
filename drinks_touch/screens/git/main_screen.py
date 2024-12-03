@@ -75,7 +75,7 @@ class GitMainScreen(Screen):
                 pos=(5, 795),
                 on_click=self.back,
                 align_bottom=True,
-                font=config.FONTS["monospace"],
+                font=config.Font.MONOSPACE,
                 size=30,
             ),
         ]

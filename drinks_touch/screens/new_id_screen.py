@@ -4,7 +4,7 @@ from io import BytesIO
 from functools import partial
 from pystrich.code128 import Code128Encoder
 
-from config import FONTS
+from config import Font
 from database.models.recharge_event import RechargeEvent
 from database.storage import get_session
 from elements.button import Button
@@ -24,7 +24,7 @@ class NewIDScreen(Screen):
             Button(
                 text="BACK",
                 pos=(30, 30),
-                font=FONTS["monospace"],
+                font=Font.MONOSPACE,
                 on_click=self.back,
                 size=30,
             )

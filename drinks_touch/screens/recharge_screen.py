@@ -1,6 +1,6 @@
 from functools import partial
 
-from config import FONTS
+from config import Font
 from database.models import Account
 from database.models.recharge_event import RechargeEvent
 from database.storage import get_session
@@ -31,7 +31,7 @@ class RechargeScreen(Screen):
             Button(
                 text="BACK",
                 pos=(30, 30),
-                font=FONTS["monospace"],
+                font=Font.MONOSPACE,
                 on_click=self.back,
                 size=30,
             )

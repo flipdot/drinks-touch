@@ -92,7 +92,11 @@ WEBSERVER_PORT = os.environ.get("WEBSERVER_PORT", 5002)
 
 FPS = 30
 
-FONTS = {"monospace": "DejaVu Sans Mono", "sans serif": "DejaVu Sans"}
+
+class Font(enum.Enum):
+    MONOSPACE = "drinks_touch/static/fonts/DejaVuSansMono.ttf"
+    SANS_SERIF = "drinks_touch/static/fonts/DejaVuSans.ttf"
+
 
 LOGLEVEL = os.environ.get("LOGLEVEL", "WARNING")
 

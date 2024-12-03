@@ -1,4 +1,4 @@
-from config import FONTS, Color
+from config import Color, Font
 from .base_elm import BaseElm
 
 import contextlib
@@ -11,7 +11,7 @@ class Button(BaseElm):
     def __init__(
         self,
         children: list["BaseElm"] | None = None,
-        font=FONTS["monospace"],
+        font: Font = Font.MONOSPACE,
         size=30,
         text=None,
         color=Color.PRIMARY,

@@ -1,6 +1,6 @@
 import pygame
 
-from config import FONTS, Color
+from config import Color, Font
 from elements import Button
 from screen import get_screen_surface
 
@@ -23,7 +23,7 @@ class ScreenManager:
                 text=" ‹ ",
                 pos=(5, 5),
                 on_click=self.go_back,
-                font=FONTS["monospace"],
+                font=Font.MONOSPACE,
                 size=30,
             )
         ]
