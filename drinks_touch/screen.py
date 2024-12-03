@@ -78,7 +78,10 @@ def __get_screen_framebuffer() -> Surface:
     size = (pygame.display.Info().current_w, pygame.display.Info().current_h)
     logger.info("Framebuffer size: %d x %d" % (size[0], size[1]))
     flags = pygame.SCALED | pygame.FULLSCREEN | pygame.NOFRAME
-    return pygame.display.set_mode((0, 0), flags)
+    try:
+        return pygame.display.set_mode((0, 0), flags)
+    except Exception as e:
+        raise NoVideoDriverException("Could not set video mode") from e
     # # Clear the screen to start
     # self.screen.fill((0, 0, 0))
     # # Initialise font support
