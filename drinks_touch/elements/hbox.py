@@ -1,5 +1,6 @@
 import pygame
 
+from config import Color
 from elements.base_elm import BaseElm
 
 
@@ -25,6 +26,10 @@ class HBox(BaseElm):
             element_surface = element.render(*args, **kwargs)
             surface.blit(element_surface, element.pos)
             x += element.width + self.gap
+        if self.focus:
+            pygame.draw.rect(
+                surface, Color.PRIMARY.value, (0, 0, self.width, self.height), 1
+            )
         return surface
 
     @property
