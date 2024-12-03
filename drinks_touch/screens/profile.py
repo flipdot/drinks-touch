@@ -138,6 +138,29 @@ class ProfileScreen(Screen):
             on_click=functools.partial(self.goto, RechargeScreen(self.account)),
         )
 
+        self.objects.extend(
+            [
+                Label(text=f"{self.account.balance} €", pos=(335, 145), size=40),
+                Label(
+                    text="Seite wird refaktoriert.",
+                    pos=(30, 300),
+                    size=30,
+                ),
+                Label(
+                    text="Jetzt ist sie performant,",
+                    pos=(30, 350),
+                    size=30,
+                ),
+                Label(
+                    text="aber leider leer :)",
+                    pos=(30, 400),
+                    size=30,
+                ),
+            ]
+        )
+
+        return
+
         self.elements_aufladungen = [
             self.btn_drinks,
             self.label_aufladungen,
@@ -148,10 +171,6 @@ class ProfileScreen(Screen):
             self.elements_drinks.extend([self.zuordnen, self.drink_info])
         else:
             self.elements_drinks.append(self.btn_aufladungen)
-
-        self.objects.append(
-            Label(text=str(self.account.balance), pos=(335, 145), size=40)
-        )
 
         drinks = self.get_stats(limit=12)
         for i, drinks in enumerate(drinks):
