@@ -21,8 +21,8 @@ from .success import SuccessScreen
 
 
 class ProfileScreen(Screen):
-    def __init__(self, screen, account: Account):
-        super().__init__(screen)
+    def __init__(self, account: Account):
+        super().__init__()
 
         self.account = account
         self.label_verbrauch = None
@@ -117,27 +117,25 @@ class ProfileScreen(Screen):
         )
         self.btn_aufladungen = Button(
             text="Aufladungen",
-            pos=(30, 700),
+            pos=(30, 680),
             on_click=self.show_aufladungen,
         )
         self.btn_drinks = Button(
             text="Buchungen",
-            pos=(20, 700),
+            pos=(20, 680),
             on_click=self.show_drinks,
         )
         self.btn_abbrechen = Button(
             text="Abbrechen",
-            pos=(290, 700),
+            pos=(290, 680),
             size=20,
             on_click=self.btn_home,
         )
         self.btn_aufladen = Button(
             text="Jetzt Aufladen",
-            pos=(210, 700),
+            pos=(210, 680),
             size=20,
-            on_click=functools.partial(
-                self.goto, RechargeScreen(self.screen, self.account)
-            ),
+            on_click=functools.partial(self.goto, RechargeScreen(self.account)),
         )
 
         self.elements_aufladungen = [
@@ -256,7 +254,6 @@ class ProfileScreen(Screen):
         screen_manager = ScreenManager.get_instance()
         screen_manager.set_active(
             SuccessScreen(
-                self.screen,
                 self.account,
                 drink,
                 "getrunken: %s" % drink["name"],
@@ -271,7 +268,7 @@ class ProfileScreen(Screen):
         self.processing.is_visible = True
         account = Account.query.filter(Account.id_card == barcode).first()
         if account:
-            ScreenManager.get_instance().set_active(ProfileScreen(self.screen, account))
+            ScreenManager.get_instance().set_active(ProfileScreen(account))
             self.processing.is_visible = False
             return
         drink = get_by_ean(barcode)
@@ -288,7 +285,7 @@ class ProfileScreen(Screen):
 
     def id_card(self):
         screen_manager = ScreenManager.get_instance()
-        screen_manager.set_active(IDCardScreen(self.screen, self.account))
+        screen_manager.set_active(IDCardScreen(self.account))
 
     @staticmethod
     def home():

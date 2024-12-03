@@ -15,8 +15,8 @@ from .screen_manager import ScreenManager
 
 
 class IDCardScreen(Screen):
-    def __init__(self, screen, account: Account):
-        super().__init__(screen)
+    def __init__(self, account: Account):
+        super().__init__()
 
         self.account = account
         self.timeout = None
@@ -125,8 +125,6 @@ class IDCardScreen(Screen):
             from .profile import ProfileScreen
 
             DrinksManager.get_instance().set_selected_drink(drink)
-            ScreenManager.get_instance().set_active(
-                ProfileScreen(self.screen, self.account)
-            )
+            ScreenManager.get_instance().set_active(ProfileScreen(self.account))
             return
         self.set_id(barcode)

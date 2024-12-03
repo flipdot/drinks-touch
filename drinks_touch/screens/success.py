@@ -9,8 +9,8 @@ from .screen import Screen
 
 
 class SuccessScreen(Screen):
-    def __init__(self, screen, account: Account, drink, text, session):
-        super().__init__(screen)
+    def __init__(self, account: Account, drink, text, session):
+        super().__init__()
 
         self.account = account
         self.text = text

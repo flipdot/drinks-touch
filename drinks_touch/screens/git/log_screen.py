@@ -30,8 +30,8 @@ class Commit:
 
 class GitLogScreen(Screen):
 
-    def __init__(self, *args, branch: str, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, branch: str):
+        super().__init__()
 
         self.branch = branch
         self.repository = Repository(config.REPO_PATH)
@@ -44,12 +44,12 @@ class GitLogScreen(Screen):
                     Button(
                         text=f"Checkout {commit.sha[:7]}",
                         on_click=functools.partial(self.checkout, commit),
-                        size=15,
+                        size=20,
                         color=(
                             color := (
-                                config.COLORS["infragelb"]
+                                config.Color.PRIMARY
                                 if commit.date >= DATE_SINCE_GITSCREEN
-                                else config.COLORS["disabled"]
+                                else config.Color.DISABLED
                             )
                         ),
                     ),
@@ -69,21 +69,13 @@ class GitLogScreen(Screen):
                     ),
                 ]
             )
-            for commit in self.get_commits(12)
+            for commit in self.get_commits(11)
         ]
         self.objects = [
             Label(
                 text=f"git log {self.branch}",
                 pos=(10, 20),
                 size=36,
-            ),
-            Button(
-                text="BACK",
-                pos=(5, 795),
-                on_click=self.back,
-                align_bottom=True,
-                font=config.FONTS["monospace"],
-                size=30,
             ),
             VBox(
                 commit_buttons,
@@ -113,4 +105,4 @@ class GitLogScreen(Screen):
         if commit.date < DATE_SINCE_GITSCREEN:
             logger.info("Can't checkout commits before Git screen was introduced.")
             return
-        self.goto(TasksScreen(self.screen, [CheckoutAndRestartTask(commit.sha)]))
+        self.goto(TasksScreen([CheckoutAndRestartTask(commit.sha)]))

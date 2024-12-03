@@ -8,7 +8,7 @@ from database.models.scan_event import ScanEvent
 from database.storage import get_session
 from drinks.drinks import get_by_ean
 from drinks.drinks_manager import DrinksManager
-from elements import RefreshIcon, SvgIcon, Progress, Label, Image, Button
+from elements import RefreshIcon, SvgIcon, Progress, Label, Button
 from elements.hbox import HBox
 from elements.vbox import VBox
 from screens.new_id_screen import NewIDScreen
@@ -26,8 +26,8 @@ logger = logging.getLogger(__name__)
 
 
 class WaitScanScreen(Screen):
-    def __init__(self, screen):
-        super().__init__(screen)
+    def __init__(self):
+        super().__init__()
         self.barcode_label = None
         self.scanned_info = []
         self.empty_info = []
@@ -72,25 +72,8 @@ class WaitScanScreen(Screen):
                 on_click=self.btn_new_id,
             ),
         ]
-
-        self.objects.append(Image(pos=(30, 20)))
-
-        self.objects.append(
-            Label(
-                text="Scanne dein Getränk",
-                pos=(60, 240),
-            )
-        )
-        self.objects.append(
-            Label(
-                text="oder deine ID-Card :)",
-                pos=(70, 280),
-            )
-        )
-
         self.processing = Label(text="Moment bitte...", size=40, pos=(80, 350))
         self.processing.is_visible = False
-        self.objects.append(self.processing)
         sql = text(
             """
             SELECT SUM(amount) - (
@@ -106,7 +89,51 @@ class WaitScanScreen(Screen):
             logger.exception("sql error while getting total money amount")
             total_balance_fmt = "(SQL Error)"
 
-        self.objects.append(
+        color = (
+            config.Color.PRIMARY if config.GIT_REPO_AVAILABLE else config.Color.DISABLED
+        )
+        bottom_right_buttons = [
+            Button(
+                text=None,
+                inner=SvgIcon(
+                    "drinks_touch/static/images/git.svg",
+                    color=color,
+                    height=36,
+                ),
+                color=color,
+                on_click=(
+                    (lambda: ScreenManager.get_instance().set_active(GitMainScreen()))
+                    if config.GIT_REPO_AVAILABLE
+                    else None
+                ),
+            ),
+            Button(
+                on_click=functools.partial(self.goto, TasksScreen()),
+                inner=RefreshIcon(),
+            ),
+        ]
+        self.timeout = Progress(
+            pos=(400, 500),
+            size=100,
+            speed=1 / 10.0,
+            on_elapsed=self.time_elapsed,
+        )
+
+        self.objects = [
+            SvgIcon(
+                "drinks_touch/resources/images/flipdot.svg",
+                width=400,
+                pos=(40, 20),
+            ),
+            Label(
+                text="Scanne dein Getränk",
+                pos=(60, 240),
+            ),
+            Label(
+                text="oder deine ID-Card :)",
+                pos=(70, 280),
+            ),
+            self.processing,
             VBox(
                 [
                     Label(
@@ -120,40 +147,7 @@ class WaitScanScreen(Screen):
                 ],
                 pos=(5, 800),
                 align_bottom=True,
-            )
-        )
-
-        color = (
-            config.COLORS["infragelb"]
-            if config.GIT_REPO_AVAILABLE
-            else config.COLORS["disabled"]
-        )
-        bottom_right_buttons = [
-            Button(
-                text=None,
-                inner=SvgIcon(
-                    "drinks_touch/static/images/git.svg",
-                    color=color,
-                    height=36,
-                ),
-                color=color,
-                on_click=(
-                    (
-                        lambda: ScreenManager.get_instance().set_active(
-                            GitMainScreen(self.screen)
-                        )
-                    )
-                    if config.GIT_REPO_AVAILABLE
-                    else None
-                ),
             ),
-            Button(
-                on_click=functools.partial(self.goto, TasksScreen(self.screen)),
-                inner=RefreshIcon(),
-            ),
-        ]
-
-        self.objects.append(
             HBox(
                 bottom_right_buttons,
                 pos=(480, 795),
@@ -161,8 +155,10 @@ class WaitScanScreen(Screen):
                 align_bottom=True,
                 gap=5,
                 padding=(0, 5),
-            )
-        )
+            ),
+            self.timeout,
+        ]
+
         if (
             CheckForUpdatesTask.newest_version_sha_short
             and CheckForUpdatesTask.newest_version_sha_short not in config.BUILD_NUMBER
@@ -175,20 +171,12 @@ class WaitScanScreen(Screen):
                     pos=(480, 800),
                     align_right=True,
                     align_bottom=True,
-                    color=(0, 0, 0),
+                    color=config.Color.BLACK,
                     bg_color=(255, 255, 255),
                     padding=5,
                     blink_frequency=60,
                 )
             )
-
-        self.timeout = Progress(
-            pos=(400, 500),
-            size=100,
-            speed=1 / 10.0,
-            on_elapsed=self.time_elapsed,
-        )
-        self.objects.append(self.timeout)
 
         for o in self.scanned_info + self.empty_info:
             self.objects.append(o)
@@ -211,7 +199,7 @@ class WaitScanScreen(Screen):
         self.processing.is_visible = True
         account = Account.query.filter(Account.id_card == barcode).first()
         if account:
-            ScreenManager.get_instance().set_active(ProfileScreen(self.screen, account))
+            ScreenManager.get_instance().set_active(ProfileScreen(account))
             self.processing.is_visible = False
             return
         drink = get_by_ean(barcode)
@@ -222,7 +210,7 @@ class WaitScanScreen(Screen):
         self.timeout.start()
 
     def set_member(self):
-        main = MainScreen(self.screen)
+        main = MainScreen()
         ScreenManager.get_instance().set_active(main)
         self.reset(False)
 
@@ -240,7 +228,7 @@ class WaitScanScreen(Screen):
         self.reset()
 
     def btn_new_id(self):
-        new_id = NewIDScreen(self.screen)
+        new_id = NewIDScreen()
         ScreenManager.get_instance().set_active(new_id)
 
     def reset(self, reset_drink=True):

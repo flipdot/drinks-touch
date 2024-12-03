@@ -15,8 +15,8 @@ from .success import SuccessScreen
 
 
 class RechargeScreen(Screen):
-    def __init__(self, screen, account: Account):
-        super(RechargeScreen, self).__init__(screen)
+    def __init__(self, account: Account):
+        super().__init__()
 
         self.account = account
         self.payment_amount = 0
@@ -57,32 +57,32 @@ class RechargeScreen(Screen):
         self.select_objects = [
             Button(
                 text="EUR 5",
-                pos=(30, 300),
+                pos=(30, 250),
                 size=30,
                 on_click=partial(self.verify_payment, 5),
             ),
             Button(
                 text="EUR 10",
-                pos=(250, 300),
+                pos=(250, 250),
                 size=30,
                 on_click=partial(self.verify_payment, 10),
             ),
             Button(
                 text="EUR 20",
-                pos=(30, 400),
+                pos=(30, 350),
                 size=30,
                 on_click=partial(self.verify_payment, 20),
             ),
             Button(
                 text="EUR 50",
-                pos=(250, 400),
+                pos=(250, 350),
                 size=30,
                 on_click=partial(self.verify_payment, 50),
             ),
             Label(text="Wirf Geld in die Kasse,", pos=(30, 100), size=40),
             Label(text="und drück den passenden", pos=(30, 150), size=40),
             Label(text="Knopf.", pos=(30, 200), size=40),
-            Image(src=qr_file, pos=(70, 470), size=(300, 330)),
+            Image(src=qr_file, pos=(70, 420), size=(300, 330)),
         ]
         self.objects.extend(self.select_objects)
 
@@ -139,7 +139,6 @@ class RechargeScreen(Screen):
         screen_manager = ScreenManager.get_instance()
         screen_manager.set_active(
             SuccessScreen(
-                self.screen,
                 self.account,
                 None,
                 "EUR %s aufgeladen" % self.payment_amount,

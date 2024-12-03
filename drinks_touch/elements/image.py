@@ -7,9 +7,7 @@ with contextlib.redirect_stdout(None):
 
 
 class Image(BaseElm):
-    def __init__(
-        self, src="drinks_touch/resources/images/test.jpg", size=None, *args, **kwargs
-    ):
+    def __init__(self, src, size=None, *args, **kwargs):
         self.src = src
         self.size = size
         self.img = pygame.image.load(self.src).convert_alpha()

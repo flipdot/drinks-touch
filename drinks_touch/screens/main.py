@@ -4,8 +4,8 @@ from sqlalchemy import func
 
 from database.models import Account
 from database.storage import Session
+from elements import SvgIcon
 from elements.button import Button
-from elements.image import Image
 from elements.label import Label
 from elements.progress import Progress
 from .names import NamesScreen
@@ -13,13 +13,19 @@ from .screen import Screen
 
 
 class MainScreen(Screen):
-    def __init__(self, screen):
-        super().__init__(screen)
+    def __init__(self):
+        super().__init__()
         self.timeout = None
 
     def on_start(self, *args, **kwargs):
         self.objects = []
-        self.objects.append(Image(pos=(30, 20)))
+        self.objects.append(
+            SvgIcon(
+                "drinks_touch/resources/images/flipdot.svg",
+                width=400,
+                pos=(40, 20),
+            ),
+        )
 
         self.objects.append(Label(text="member auswählen", pos=(65, 250), size=40))
 
@@ -49,15 +55,6 @@ class MainScreen(Screen):
                 )
             )
             i += 1
-
-        self.objects.append(
-            Button(
-                text="Abbrechen",
-                pos=(150, 700),
-                size=30,
-                on_click=self.home,
-            )
-        )
         self.timeout = Progress(
             pos=(380, 715),
             speed=1 / 15.0,
@@ -70,7 +67,7 @@ class MainScreen(Screen):
         from .screen_manager import ScreenManager
 
         screen_manager = ScreenManager.get_instance()
-        screen_manager.set_active(NamesScreen(self.screen, param))
+        screen_manager.set_active(NamesScreen(param))
 
     @staticmethod
     def home():
@@ -89,7 +86,7 @@ class MainScreen(Screen):
             return
         account = Account.query.filter(Account.id_card == barcode).first()
         if account:
-            ScreenManager.get_instance().set_active(ProfileScreen(self.screen, account))
+            ScreenManager.get_instance().set_active(ProfileScreen(account))
 
     @staticmethod
     def __get_pos(i):

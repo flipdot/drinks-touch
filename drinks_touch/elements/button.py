@@ -1,4 +1,4 @@
-from config import FONTS, COLORS
+from config import FONTS, Color
 from .base_elm import BaseElm
 
 import contextlib
@@ -14,7 +14,7 @@ class Button(BaseElm):
         font=FONTS["monospace"],
         size=30,
         text=None,
-        color=COLORS["infragelb"],
+        color=Color.PRIMARY,
         on_click=None,
         force_width=None,
         force_height=None,
@@ -45,6 +45,13 @@ class Button(BaseElm):
             )
         self.inner = inner
 
+    def __repr__(self):
+        if hasattr(self.inner, "text"):
+            text = self.inner.text
+        else:
+            text = str(self.inner)
+        return f"<Button {text}>"
+
     def render(self, *args, **kwargs) -> pygame.Surface:
         inner = self.inner.render(*args, **kwargs)
 
@@ -58,11 +65,13 @@ class Button(BaseElm):
 
         surface = pygame.Surface(size, pygame.SRCALPHA)
         if self.focus:
-            surface.fill(tuple(c * 0.7 for c in self.color), (0, 0, *size))
+            surface.fill(tuple(c * 0.7 for c in self.color.value), (0, 0, *size))
+        else:
+            surface.fill(Color.BUTTON_BACKGROUND.value, (0, 0, *size))
 
         if inner is not None:
             surface.blit(inner, (self.padding_left, self.padding_top))
-        pygame.draw.rect(surface, self.color, (0, 0, *size), 1)
+        pygame.draw.rect(surface, self.color.value, (0, 0, *size), 1)
         return surface
 
     def on_click(self, x, y):

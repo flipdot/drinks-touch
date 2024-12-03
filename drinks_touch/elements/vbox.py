@@ -1,5 +1,6 @@
 import pygame
 
+from config import Color
 from elements.base_elm import BaseElm
 
 
@@ -25,6 +26,10 @@ class VBox(BaseElm):
             element_surface = element.render(*args, **kwargs)
             surface.blit(element_surface, element.pos)
             y += element.height + self.gap
+        if self.focus:
+            pygame.draw.rect(
+                surface, Color.PRIMARY.value, (0, 0, self.width, self.height), 1
+            )
         return surface
 
     @property
@@ -43,13 +48,6 @@ class VBox(BaseElm):
             + self.padding_top
             + self.padding_bottom
         )
-
-    def on_click(self, x, y):
-        for obj in self.children:
-            if pygame.Rect(obj.box).collidepoint(x, y):
-                if hasattr(obj, "on_click"):
-                    obj.on_click(x - obj.pos[0], y - obj.pos[1])
-                break
 
     def render_debug(self) -> pygame.Surface:
         surface = pygame.Surface((self.width, self.height), pygame.SRCALPHA)

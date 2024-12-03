@@ -1,4 +1,4 @@
-from elements import Label, Button, Progress
+from elements import Label, Progress
 from inspect import getmembers, isclass
 import tasks as tasks_module
 from elements.vbox import VBox
@@ -15,8 +15,8 @@ def discover_tasks():
 
 
 class TasksScreen(Screen):
-    def __init__(self, screen, tasks: list[BaseTask] | None = None, box_height=None):
-        super().__init__(screen)
+    def __init__(self, tasks: list[BaseTask] | None = None, box_height=None):
+        super().__init__()
         self.finished = False
 
         if tasks:
@@ -45,20 +45,19 @@ class TasksScreen(Screen):
                 pos=(5, 5),
             ),
             VBox(progress_bars, gap=10, pos=(5, 80)),
-            Button(
-                text="Abbrechen / Zurück",
-                pos=(5, 795),
-                align_bottom=True,
-                on_click=self.cancel_tasks,
-            ),
         ]
 
         for task in self.tasks:
             task.start()
 
+    def on_stop(self, *args, **kwargs):
+        for task in self.tasks:
+            task.kill()
+
     def render(self, *args, **kwargs):
-        super(TasksScreen, self).render(*args, **kwargs)
+        res = super(TasksScreen, self).render(*args, **kwargs)
         self.check_task_completion()
+        return res
 
     @property
     def all_tasks_finished(self):
@@ -68,7 +67,7 @@ class TasksScreen(Screen):
         if not self.finished and self.all_tasks_finished:
             self.objects.append(
                 Progress(
-                    pos=(475, 795),
+                    pos=(475, 725),
                     speed=1 / 10,
                     align_right=True,
                     align_bottom=True,
@@ -76,12 +75,6 @@ class TasksScreen(Screen):
                 )
             )
             self.finished = True
-
-    def cancel_tasks(self):
-        if self.all_tasks_finished:
-            self.back()
-        for task in self.tasks:
-            task.kill()
 
     def on_barcode(self, barcode):
         for task in self.tasks:

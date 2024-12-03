@@ -1,3 +1,4 @@
+import enum
 import os
 from datetime import timedelta
 from pathlib import Path
@@ -21,10 +22,19 @@ DEBUG_UI_ELEMENTS = os.environ.get("DEBUG_UI_ELEMENTS", "False") in [
     "yes",
 ]
 
-COLORS = {
-    "infragelb": (246, 198, 0, 255),
-    "disabled": (50, 50, 50, 255),
-}
+_INFRAGELB = (246, 198, 0, 255)
+
+
+class Color(enum.Enum):
+    PRIMARY = _INFRAGELB
+    DISABLED = (50, 50, 50, 255)
+    ERROR = (255, 0, 0, 255)
+    SUCCESS = (0, 255, 0, 255)
+    BLACK = (0, 0, 0, 255)
+    BACKGROUND = (30, 30, 26, 255)
+    NAVBAR_BACKGROUND = (5, 5, 5, 255)
+    BUTTON_BACKGROUND = (0, 0, 0, 255)
+
 
 if bn := os.environ.get("BUILD_NUMBER"):
     BUILD_NUMBER = bn
