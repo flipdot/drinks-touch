@@ -153,14 +153,12 @@ class ProfileScreen(Screen):
             Label(text=str(self.account.balance), pos=(335, 145), size=40)
         )
 
-        drinks = self.get_stats()
+        drinks = self.get_stats(limit=12)
         for i, drinks in enumerate(drinks):
             x = 30
             if i == 11:
                 self.elements_drinks.append(Label(text="...", pos=(x, 210 + (i * 35))))
-                continue
-            if i > 11:
-                continue
+                break
             ean_text = get_by_ean(drinks["name"])["name"]
             count_width = 80
             margin_right = 10
@@ -312,7 +310,7 @@ class ProfileScreen(Screen):
         self.objects.extend(self.elements_drinks)
         self.timeout.start()
 
-    def get_stats(self):
+    def get_stats(self, limit=None):
         session = get_session()
         sql = text(
             """
@@ -321,11 +319,12 @@ class ProfileScreen(Screen):
             WHERE user_id = :userid
             GROUP BY barcode
             ORDER by count DESC
+            LIMIT :limit
         """
         )
         result = (
             session.connection()
-            .execute(sql, {"userid": self.account.ldap_id})
+            .execute(sql, {"userid": self.account.ldap_id, "limit": limit})
             .fetchall()
         )
 
