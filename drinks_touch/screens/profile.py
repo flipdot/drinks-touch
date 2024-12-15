@@ -156,6 +156,8 @@ class ProfileScreen(Screen):
             ]
         )
 
+        if drink:
+            self.objects.extend([self.zuordnen, self.drink_info])
         return
 
         self.elements_aufladungen = [
@@ -164,9 +166,9 @@ class ProfileScreen(Screen):
             self.btn_aufladen,
         ]
         self.elements_drinks = [self.label_verbrauch, self.btn_abbrechen]
-        if drink:
-            self.elements_drinks.extend([self.zuordnen, self.drink_info])
-        else:
+        # if drink:
+        #     self.elements_drinks.extend([self.zuordnen, self.drink_info])
+        if not drink:
             self.elements_drinks.append(self.btn_aufladungen)
 
         drinks = self.get_stats(limit=12)
