@@ -83,6 +83,7 @@ def __get_screen_framebuffer() -> Surface:
     try:
         return pygame.display.set_mode((0, 0), flags)
     except Exception as e:
+        logger.info(e)
         raise NoVideoDriverException("Could not set video mode") from e
     # # Clear the screen to start
     # self.screen.fill((0, 0, 0))
