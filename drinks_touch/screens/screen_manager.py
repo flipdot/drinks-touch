@@ -1,7 +1,7 @@
 import pygame
 
 from config import Color, Font
-from elements import Button
+from elements import Button, Progress
 from screen import get_screen_surface
 
 from typing import TYPE_CHECKING
@@ -18,6 +18,11 @@ class ScreenManager:
         self.current_screen = None
         self.surface = get_screen_surface()
         self.screen_history: list[Screen] = []
+        self.timeout_widget = Progress(
+            pos=(425, 10),
+            speed=1 / 5.0,
+            on_elapsed=lambda: self.set_default(),
+        )
         self.objects = [
             Button(
                 text=" ‹ ",
@@ -25,8 +30,20 @@ class ScreenManager:
                 on_click=self.go_back,
                 font=Font.MONOSPACE,
                 size=30,
-            )
+            ),
+            self.timeout_widget,
         ]
+
+    def set_idle_timeout(self, timeout: int):
+        """
+        Go to the home screen after `timeout` seconds of inactivity.
+        Pass 0 if no automatic timeout should occur.
+        """
+        if timeout == 0:
+            self.timeout_widget.stop()
+            return
+        self.timeout_widget.speed = 1 / timeout
+        self.timeout_widget.start()
 
     def set_default(self):
         from screens.wait_scan import WaitScanScreen
@@ -40,6 +57,7 @@ class ScreenManager:
             current_screen.on_stop()
         self.screen_history.append(screen)
         screen.on_start(*args, **kwargs)
+        self.set_idle_timeout(screen.idle_timeout)
 
     def get_active(self) -> "Screen | None":
         if len(self.screen_history) == 0:
@@ -47,10 +65,14 @@ class ScreenManager:
         return self.screen_history[-1]
 
     def go_back(self):
-        self.get_active().on_stop()
-        self.get_active().on_destroy()
+        prev_screen = self.get_active()
+        prev_screen.on_stop()
+        prev_screen.on_destroy()
         self.screen_history.pop()
-        self.get_active().on_start()
+
+        new_active_screen = self.get_active()
+        new_active_screen.on_start()
+        self.set_idle_timeout(new_active_screen.idle_timeout)
 
     def reset_history(self):
         self.screen_history = []
@@ -89,7 +111,11 @@ class ScreenManager:
 
     def events(self, events):
         screen = self.get_active()
+        if pygame.mouse.get_pressed()[0]:
+            self.set_idle_timeout(0)
         for event in events:
+            if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+                self.set_idle_timeout(screen.idle_timeout)
             if self.nav_bar_visible and hasattr(event, "pos"):
                 transformed_pos = (
                     event.pos[0],
@@ -105,7 +131,7 @@ class ScreenManager:
             # screen.events(events)
 
     @staticmethod
-    def get_instance():
+    def get_instance() -> "ScreenManager":
         return ScreenManager.instance
 
     @staticmethod

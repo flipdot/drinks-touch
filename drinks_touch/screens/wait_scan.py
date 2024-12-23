@@ -26,6 +26,8 @@ logger = logging.getLogger(__name__)
 
 
 class WaitScanScreen(Screen):
+    idle_timeout = 0
+
     def __init__(self):
         super().__init__()
         self.barcode_label = None

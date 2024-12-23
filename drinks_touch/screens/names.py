@@ -5,10 +5,8 @@ from config import Font
 from database.models import Account
 from elements.button import Button
 from elements.label import Label
-from elements.progress import Progress
 from screens.profile import ProfileScreen
 from .screen import Screen
-from .screen_manager import ScreenManager
 
 
 class NamesScreen(Screen):
@@ -28,14 +26,6 @@ class NamesScreen(Screen):
                 size=30,
             )
         )
-
-        self.timeout = Progress(
-            pos=(200, 50),
-            speed=1 / 15.0,
-            on_elapsed=self.time_elapsed,
-        )
-        self.objects.append(self.timeout)
-        self.timeout.start()
 
         self.objects.append(
             Label(
@@ -69,13 +59,6 @@ class NamesScreen(Screen):
                 )
             )
             i += 1
-
-    @staticmethod
-    def home():
-        ScreenManager.get_instance().set_default()
-
-    def time_elapsed(self):
-        self.home()
 
     def on_barcode(self, barcode):
         if not barcode:

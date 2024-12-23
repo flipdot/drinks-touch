@@ -11,7 +11,6 @@ from drinks.drinks import get_by_ean
 from drinks.drinks_manager import DrinksManager
 from elements.button import Button
 from elements.label import Label
-from elements.progress import Progress
 from screens.recharge_screen import RechargeScreen
 from users.users import Users
 from .id_card_screen import IDCardScreen
@@ -21,6 +20,8 @@ from .success import SuccessScreen
 
 
 class ProfileScreen(Screen):
+    idle_timeout = 20
+
     def __init__(self, account: Account):
         super().__init__()
 
@@ -28,7 +29,6 @@ class ProfileScreen(Screen):
         self.label_verbrauch = None
         self.label_aufladungen = None
         self.processing = None
-        self.timeout = None
         self.drink_info = None
         self.zuordnen = None
         self.btn_aufladungen = None
@@ -86,14 +86,6 @@ class ProfileScreen(Screen):
         self.processing.is_visible = False
         self.objects.append(self.processing)
 
-        self.timeout = Progress(
-            pos=(200, 50),
-            speed=1 / 30.0,
-            on_elapsed=self.time_elapsed,
-        )
-        self.objects.append(self.timeout)
-        self.timeout.start()
-
         drink = DrinksManager.get_instance().get_selected_drink()
         self.drink_info = Label(
             text=drink["name"] if drink else "",
@@ -121,7 +113,7 @@ class ProfileScreen(Screen):
             text="Abbrechen",
             pos=(290, 680),
             size=20,
-            on_click=self.btn_home,
+            on_click=self.back,
         )
         self.btn_aufladen = Button(
             text="Jetzt Aufladen",
@@ -153,6 +145,7 @@ class ProfileScreen(Screen):
                     pos=(30, 450),
                     size=40,
                 ),
+                self.btn_aufladen,
             ]
         )
 
@@ -297,36 +290,20 @@ class ProfileScreen(Screen):
         if self.btn_drinks in self.objects:
             self.objects.remove(self.btn_drinks)
         self.processing.is_visible = False
-        self.timeout.start()
 
     def id_card(self):
         screen_manager = ScreenManager.get_instance()
         screen_manager.set_active(IDCardScreen(self.account))
 
-    @staticmethod
-    def home():
-        from .screen_manager import ScreenManager
-
-        screen_manager = ScreenManager.get_instance()
-        screen_manager.set_default()
-
-    def btn_home(self):
-        self.home()
-
-    def time_elapsed(self):
-        self.home()
-
     def show_aufladungen(self):
         for d in self.elements_drinks:
             self.objects.remove(d)
         self.objects.extend(self.elements_aufladungen)
-        self.timeout.start()
 
     def show_drinks(self):
         for d in self.elements_aufladungen:
             self.objects.remove(d)
         self.objects.extend(self.elements_drinks)
-        self.timeout.start()
 
     def get_stats(self, limit=None):
         session = get_session()

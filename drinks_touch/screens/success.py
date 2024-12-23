@@ -1,14 +1,14 @@
 import os
 
 from database.models import Account
-from elements.button import Button
 from elements.label import Label
-from elements.progress import Progress
 from notifications.notification import send_drink
 from .screen import Screen
 
 
 class SuccessScreen(Screen):
+    idle_timeout = 5
+
     def __init__(self, account: Account, drink, text, session):
         super().__init__()
 
@@ -31,18 +31,6 @@ class SuccessScreen(Screen):
             )
         )
 
-        self.objects.append(
-            Button(
-                text="OK",
-                pos=(50, 600),
-                size=50,
-                on_click=self.btn_home,
-            )
-        )
-
-        self.progress = Progress(pos=(400, 500), size=80, on_elapsed=self.home)
-        self.objects.append(self.progress)
-        self.progress.start()
         balance = self.account.balance
         if balance >= 0:
             sound = "smb_coin.wav"
@@ -57,13 +45,3 @@ class SuccessScreen(Screen):
 
         if self.drink:
             send_drink(self.account, self.drink, True)
-
-    @staticmethod
-    def home():
-        from .screen_manager import ScreenManager
-
-        screen_manager = ScreenManager.get_instance()
-        screen_manager.set_default()
-
-    def btn_home(self):
-        self.home()

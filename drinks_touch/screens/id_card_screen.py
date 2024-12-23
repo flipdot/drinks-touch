@@ -9,7 +9,6 @@ from drinks.drinks import get_by_ean
 from drinks.drinks_manager import DrinksManager
 from elements.button import Button
 from elements.label import Label
-from elements.progress import Progress
 from .screen import Screen
 from .screen_manager import ScreenManager
 
@@ -21,7 +20,6 @@ class IDCardScreen(Screen):
         self.account = account
         self.timeout = None
         self.id_label = None
-        self.progress = None
 
     def on_start(self, *args, **kwargs):
         self.objects = []
@@ -35,14 +33,6 @@ class IDCardScreen(Screen):
                 size=30,
             )
         )
-
-        self.timeout = Progress(
-            pos=(200, 50),
-            speed=1 / 15.0,
-            on_elapsed=self.time_elapsed,
-        )
-        self.objects.append(self.timeout)
-        self.timeout.start()
 
         self.objects.append(
             Button(
@@ -58,7 +48,10 @@ class IDCardScreen(Screen):
         self.objects.append(Label(text="Momentan zugeordnet:", pos=(30, 300)))
 
         self.id_label = Label(
-            text=self.account.id_card, pos=(50, 400), size=70, font="Serif"
+            text=self.account.id_card,
+            pos=(50, 400),
+            size=70,
+            font=Font.SANS_SERIF,
         )
         self.objects.append(self.id_label)
 
@@ -82,9 +75,6 @@ class IDCardScreen(Screen):
                 on_click=self.print_id,
             )
         )
-        self.progress = Progress(pos=(200, 720), speed=1 / 15.0)
-        self.progress.stop()
-        self.objects.append(self.progress)
 
     @staticmethod
     def home():
@@ -92,9 +82,6 @@ class IDCardScreen(Screen):
 
         screen_manager = ScreenManager.get_instance()
         screen_manager.set_default()
-
-    def time_elapsed(self):
-        self.home()
 
     def btn_home(self):
         self.home()
@@ -107,7 +94,6 @@ class IDCardScreen(Screen):
         self.set_id(None)
 
     def print_id(self):
-        self.progress.start()
         if not self.account.id_card:
             self.set_id("fd_" + bytes.decode(self.account.name))
         enc = Code128Encoder(str(self.account.id_card))

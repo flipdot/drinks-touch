@@ -1,13 +1,11 @@
 from functools import partial
 
-from config import Font
 from database.models import Account
 from database.models.recharge_event import RechargeEvent
 from database.storage import get_session
 from elements.button import Button
 from elements.image import Image
 from elements.label import Label
-from elements.progress import Progress
 from users.qr import make_sepa_qr
 from .screen import Screen
 from .screen_manager import ScreenManager
@@ -20,30 +18,12 @@ class RechargeScreen(Screen):
 
         self.account = account
         self.payment_amount = 0
-        self.timeout = None
         self.select_objects = []
         self.verify_objects = []
         self.verify_amount = None
 
     def on_start(self, *args, **kwargs):
         self.objects = []
-        self.objects.append(
-            Button(
-                text="BACK",
-                pos=(30, 30),
-                font=Font.MONOSPACE,
-                on_click=self.back,
-                size=30,
-            )
-        )
-
-        self.timeout = Progress(
-            pos=(200, 50),
-            speed=1 / 30.0,
-            on_elapsed=self.time_elapsed,
-        )
-        self.objects.append(self.timeout)
-        self.timeout.start()
 
         qr_file = make_sepa_qr(
             20,
