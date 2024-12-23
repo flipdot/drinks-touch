@@ -25,13 +25,15 @@ def get_screen_surface() -> Surface:
     """
     try:
         screen = __get_screen_framebuffer()
-    except NoVideoDriverException:
+    except NoVideoDriverException as e:
+        logger.info(e)
+        logger.warning("Could not get framebuffer screen, trying xserver")
         screen = __get_screen_xserver()
     return screen
 
 
 def __get_screen_xserver() -> Surface:
-    size = 480, 800
+    size = 720, 1280  # 480, 800
     # https://www.pygame.org/docs/ref/display.html?highlight=set_mode#pygame.display.set_mode
     pygame.init()
 
