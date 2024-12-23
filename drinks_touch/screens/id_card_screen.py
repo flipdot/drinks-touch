@@ -26,16 +26,6 @@ class IDCardScreen(Screen):
 
         self.objects.append(
             Button(
-                text="BACK",
-                pos=(30, 30),
-                font=Font.MONOSPACE,
-                on_click=self.back,
-                size=30,
-            )
-        )
-
-        self.objects.append(
-            Button(
                 text="Reset",
                 pos=(350, 30),
                 size=30,

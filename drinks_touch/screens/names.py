@@ -1,7 +1,6 @@
 import functools
 import math
 
-from config import Font
 from database.models import Account
 from elements.button import Button
 from elements.label import Label
@@ -17,15 +16,6 @@ class NamesScreen(Screen):
 
     def on_start(self, *args, **kwargs):
         self.objects = []
-        self.objects.append(
-            Button(
-                text="BACK",
-                pos=(30, 30),
-                on_click=self.back,
-                font=Font.MONOSPACE,
-                size=30,
-            )
-        )
 
         self.objects.append(
             Label(

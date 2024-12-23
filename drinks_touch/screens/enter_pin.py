@@ -14,16 +14,6 @@ class EnterPinScreen(Screen):
 
         self.objects.append(
             Button(
-                text="BACK",
-                pos=(30, 30),
-                on_click=self.back,
-                font=Font.MONOSPACE,
-                size=30,
-            )
-        )
-
-        self.objects.append(
-            Button(
                 text="UNLOCK!",
                 pos=(100, 680),
                 on_click=self.btn_ok,

@@ -70,14 +70,6 @@ class GitMainScreen(Screen):
                 pos=(5, 300),
                 gap=15,
             ),
-            Button(
-                text="BACK",
-                pos=(5, 795),
-                on_click=self.back,
-                align_bottom=True,
-                font=config.Font.MONOSPACE,
-                size=30,
-            ),
         ]
 
     def update_and_restart(self):
