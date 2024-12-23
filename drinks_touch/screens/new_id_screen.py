@@ -4,7 +4,6 @@ from io import BytesIO
 from functools import partial
 from pystrich.code128 import Code128Encoder
 
-from config import Font
 from database.models.recharge_event import RechargeEvent
 from database.storage import get_session
 from elements.button import Button
@@ -19,16 +18,6 @@ from .screen_manager import ScreenManager
 class NewIDScreen(Screen):
     def __init__(self):
         super().__init__()
-
-        self.objects.append(
-            Button(
-                text="BACK",
-                pos=(30, 30),
-                font=Font.MONOSPACE,
-                on_click=self.back,
-                size=30,
-            )
-        )
 
         self.timeout = Progress(
             pos=(200, 50),

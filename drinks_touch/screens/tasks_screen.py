@@ -1,9 +1,10 @@
-from elements import Label, Progress
+from elements import Label
 from inspect import getmembers, isclass
 import tasks as tasks_module
 from elements.vbox import VBox
 from tasks.base import BaseTask
 from .screen import Screen
+from .screen_manager import ScreenManager
 
 
 def discover_tasks():
@@ -15,6 +16,8 @@ def discover_tasks():
 
 
 class TasksScreen(Screen):
+    idle_timeout = 0
+
     def __init__(self, tasks: list[BaseTask] | None = None, box_height=None):
         super().__init__()
         self.finished = False
@@ -65,15 +68,8 @@ class TasksScreen(Screen):
 
     def check_task_completion(self):
         if not self.finished and self.all_tasks_finished:
-            self.objects.append(
-                Progress(
-                    pos=(475, 725),
-                    speed=1 / 10,
-                    align_right=True,
-                    align_bottom=True,
-                    on_elapsed=self.back,
-                )
-            )
+            self.idle_timeout = 5
+            ScreenManager.get_instance().set_idle_timeout(self.idle_timeout)
             self.finished = True
 
     def on_barcode(self, barcode):

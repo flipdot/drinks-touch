@@ -7,7 +7,6 @@ from database.storage import Session
 from elements import SvgIcon
 from elements.button import Button
 from elements.label import Label
-from elements.progress import Progress
 from .names import NamesScreen
 from .screen import Screen
 
@@ -55,28 +54,12 @@ class MainScreen(Screen):
                 )
             )
             i += 1
-        self.timeout = Progress(
-            pos=(380, 715),
-            speed=1 / 15.0,
-            on_elapsed=self.time_elapsed,
-        )
-        self.objects.append(self.timeout)
-        self.timeout.start()
 
     def switch_to_screen(self, param):
         from .screen_manager import ScreenManager
 
         screen_manager = ScreenManager.get_instance()
         screen_manager.set_active(NamesScreen(param))
-
-    @staticmethod
-    def home():
-        from .screen_manager import ScreenManager
-
-        ScreenManager.get_instance().set_default()
-
-    def time_elapsed(self):
-        self.home()
 
     def on_barcode(self, barcode):
         from .screen_manager import ScreenManager

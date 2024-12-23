@@ -8,6 +8,9 @@ from screens.screen_manager import ScreenManager
 
 
 class Screen:
+
+    idle_timeout = 10
+
     def __init__(self, width=None, height=None):
         if width is None or height is None:
             screen_surface = get_screen_surface()

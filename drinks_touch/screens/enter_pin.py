@@ -3,7 +3,6 @@ import functools
 from config import Font
 from elements.button import Button
 from elements.label import Label
-from elements.progress import Progress
 from screens.profile import ProfileScreen
 from .screen import Screen
 
@@ -12,24 +11,6 @@ class EnterPinScreen(Screen):
     def __init__(self, user):
         super().__init__()
         self.user = user
-
-        self.objects.append(
-            Button(
-                text="BACK",
-                pos=(30, 30),
-                on_click=self.back,
-                font=Font.MONOSPACE,
-                size=30,
-            )
-        )
-
-        self.timeout = Progress(
-            pos=(200, 50),
-            speed=1 / 15.0,
-            on_elapsed=self.time_elapsed,
-        )
-        self.objects.append(self.timeout)
-        self.timeout.start()
 
         self.objects.append(
             Button(
@@ -119,12 +100,3 @@ class EnterPinScreen(Screen):
     def on_barcode(self, barcode):
         for c in barcode:
             self.add_char(c)
-
-    @staticmethod
-    def home():
-        from .screen_manager import ScreenManager
-
-        ScreenManager.get_instance().set_default()
-
-    def time_elapsed(self):
-        self.home()
