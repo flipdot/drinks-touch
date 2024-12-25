@@ -20,7 +20,7 @@ class NamesScreen(Screen):
         self.objects.append(
             Label(
                 text="Wer bist du?",
-                pos=(20, 110),
+                pos=(5, 5),
             )
         )
 

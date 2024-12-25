@@ -31,7 +31,7 @@ def get_screen_surface() -> Surface:
 
 
 def __get_screen_xserver() -> Surface:
-    size = 480, 800
+    size = config.SCREEN_WIDTH, config.SCREEN_HEIGHT
     # https://www.pygame.org/docs/ref/display.html?highlight=set_mode#pygame.display.set_mode
     pygame.init()
 

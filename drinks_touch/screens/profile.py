@@ -3,6 +3,7 @@ import functools
 
 from sqlalchemy.sql import text
 
+import config
 from config import Font
 from database.models import Account
 from database.models.scan_event import ScanEvent
@@ -11,6 +12,7 @@ from drinks.drinks import get_by_ean
 from drinks.drinks_manager import DrinksManager
 from elements.button import Button
 from elements.label import Label
+from elements.vbox import VBox
 from screens.recharge_screen import RechargeScreen
 from users.users import Users
 from .id_card_screen import IDCardScreen
@@ -39,33 +41,41 @@ class ProfileScreen(Screen):
         self.elements_drinks = []
 
     def on_start(self, *args, **kwargs):
-        self.objects = []
-
-        self.objects.append(
-            Button(
-                text="ID card",
-                pos=(300, 30),
-                font=Font.MONOSPACE,
-                on_click=self.id_card,
-            )
-        )
-
-        self.objects.append(
+        self.objects = [
             Label(
                 text=self.account.name,
-                pos=(30, 30),
-                size=40,
-                max_width=335 - 30 - 10,  # balance.x - self.x - margin
-            )
-        )
-
-        self.objects.append(
-            Label(
-                text="Guthaben",
-                pos=(300, 120),
-                size=20,
-            )
-        )
+                pos=(5, 5),
+                # size=40,
+                # max_width=335 - 30 - 10,  # balance.x - self.x - margin
+            ),
+            VBox(
+                [
+                    Label(
+                        text="Guthaben",
+                        size=20,
+                    ),
+                    Label(
+                        text=f"{self.account.balance} €",
+                        size=40,
+                    ),
+                ],
+                pos=(config.SCREEN_WIDTH - 5, 5),
+                align_right=True,
+            ),
+            VBox(
+                [
+                    Button(
+                        text="ID card",
+                        pos=(300, 30),
+                        font=Font.MONOSPACE,
+                        on_click=functools.partial(
+                            self.goto, IDCardScreen(self.account)
+                        ),
+                    ),
+                ],
+                pos=(5, 70),
+            ),
+        ]
 
         self.label_verbrauch = Label(
             text="Bisheriger Verbrauch:",
@@ -124,7 +134,6 @@ class ProfileScreen(Screen):
 
         self.objects.extend(
             [
-                Label(text=f"{self.account.balance} €", pos=(300, 145), size=40),
                 Label(
                     text="Seite wird überarbeitet.",
                     pos=(30, 300),
@@ -290,10 +299,6 @@ class ProfileScreen(Screen):
         if self.btn_drinks in self.objects:
             self.objects.remove(self.btn_drinks)
         self.processing.is_visible = False
-
-    def id_card(self):
-        screen_manager = ScreenManager.get_instance()
-        screen_manager.set_active(IDCardScreen(self.account))
 
     def show_aufladungen(self):
         for d in self.elements_drinks:
