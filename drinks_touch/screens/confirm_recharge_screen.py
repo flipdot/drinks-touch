@@ -5,7 +5,6 @@ from elements import Label, Button
 from elements.hbox import HBox
 from elements.vbox import VBox
 from screens.screen import Screen
-from screens.screen_manager import ScreenManager
 from screens.success import SuccessScreen
 
 
@@ -71,8 +70,7 @@ class ConfirmRechargeScreen(Screen):
         session.commit()
 
         # TODO: replace instead of adding to history
-        screen_manager = ScreenManager.get_instance()
-        screen_manager.set_active(
+        self.goto(
             SuccessScreen(
                 self.account,
                 None,

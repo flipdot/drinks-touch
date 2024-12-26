@@ -69,6 +69,7 @@ class ConfirmPaymentScreen(Screen):
                     #     size=10,
                     # ),
                 ],
+                gap=15,
                 pos=(5, 200),
             ),
             Button(
@@ -80,6 +81,9 @@ class ConfirmPaymentScreen(Screen):
                 align_bottom=True,
             ),
         ]
+
+    def on_stop(self, *args, **kwargs):
+        DrinksManager.get_instance().set_selected_drink(None)
 
     def save_drink(self):
         session = get_session()
