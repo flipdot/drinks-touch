@@ -10,6 +10,8 @@ from screens.success import SuccessScreen
 
 class ConfirmRechargeScreen(Screen):
 
+    idle_timeout = 30
+
     def __init__(self, account, amount: int):
         super().__init__()
         self.account = account

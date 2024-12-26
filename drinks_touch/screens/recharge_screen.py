@@ -49,9 +49,8 @@ class RechargeScreen(Screen):
             ),
             VBox(
                 [
-                    Label(text="Wirf Bargeld in die Kasse,", size=30),
-                    Label(text="und drück den passenden", size=30),
-                    Label(text="Knopf.", size=30),
+                    Label(text="Wähle den Betrag,", size=30),
+                    Label(text="wirf Bargeld in die Kasse:", size=30),
                     HBox(
                         [
                             Button(
