@@ -1,4 +1,3 @@
-import datetime
 import functools
 
 from sqlalchemy.sql import text
@@ -6,7 +5,6 @@ from sqlalchemy.sql import text
 import config
 from config import Font
 from database.models import Account
-from database.models.scan_event import ScanEvent
 from database.storage import get_session
 from drinks.drinks import get_by_ean
 from drinks.drinks_manager import DrinksManager
@@ -15,10 +13,10 @@ from elements.label import Label
 from elements.vbox import VBox
 from screens.recharge_screen import RechargeScreen
 from users.users import Users
+from .confirm_payment_screen import ConfirmPaymentScreen
 from .id_card_screen import IDCardScreen
 from .screen import Screen
 from .screen_manager import ScreenManager
-from .success import SuccessScreen
 
 
 class ProfileScreen(Screen):
@@ -28,15 +26,10 @@ class ProfileScreen(Screen):
         super().__init__()
 
         self.account = account
-        self.label_verbrauch = None
-        self.label_aufladungen = None
         self.processing = None
         self.drink_info = None
         self.zuordnen = None
-        self.btn_aufladungen = None
-        self.btn_drinks = None
         self.btn_abbrechen = None
-        self.btn_aufladen = None
         self.elements_aufladungen = []
         self.elements_drinks = []
 
@@ -45,8 +38,6 @@ class ProfileScreen(Screen):
             Label(
                 text=self.account.name,
                 pos=(5, 5),
-                # size=40,
-                # max_width=335 - 30 - 10,  # balance.x - self.x - margin
             ),
             VBox(
                 [
@@ -64,29 +55,56 @@ class ProfileScreen(Screen):
             ),
             VBox(
                 [
+                    Label(
+                        text="Scanne eine",
+                        size=50,
+                    ),
+                    Label(
+                        text="Flasche",
+                        size=50,
+                    ),
+                    Label(text="oder wähle:", size=25),
+                ],
+                pos=(5, 100),
+            ),
+            VBox(
+                [
+                    Button(
+                        text="Buchungshistorie",
+                        on_click=functools.partial(
+                            self.alert,
+                            "Nicht implementiert",
+                        ),
+                        padding=20,
+                    ),
+                    Button(
+                        text="Aufladen",
+                        on_click=functools.partial(
+                            self.goto, RechargeScreen(self.account)
+                        ),
+                        padding=20,
+                    ),
+                    Button(
+                        text="Guthaben übertragen",
+                        on_click=functools.partial(
+                            self.alert,
+                            "Nicht implementiert",
+                        ),
+                        padding=20,
+                    ),
                     Button(
                         text="ID card",
-                        pos=(300, 30),
                         font=Font.MONOSPACE,
                         on_click=functools.partial(
                             self.goto, IDCardScreen(self.account)
                         ),
+                        padding=20,
                     ),
                 ],
-                pos=(5, 70),
+                pos=(5, 300),
+                gap=15,
             ),
         ]
-
-        self.label_verbrauch = Label(
-            text="Bisheriger Verbrauch:",
-            pos=(30, 180),
-            size=15,
-        )
-        self.label_aufladungen = Label(
-            text="Aufladungen:",
-            pos=(30, 180),
-            size=15,
-        )
 
         self.processing = Label(
             text="Moment bitte...",
@@ -103,71 +121,15 @@ class ProfileScreen(Screen):
             pos=(30, 580),
         )
 
-        self.zuordnen = Button(
-            text="Trinken",
-            pos=(30, 640),
-            size=40,
-            on_click=self.save_drink,
-        )
-        self.btn_aufladungen = Button(
-            text="Aufladungen",
-            pos=(30, 680),
-            on_click=self.show_aufladungen,
-        )
-        self.btn_drinks = Button(
-            text="Buchungen",
-            pos=(20, 680),
-            on_click=self.show_drinks,
-        )
-        self.btn_abbrechen = Button(
-            text="Abbrechen",
-            pos=(290, 680),
-            size=20,
-            on_click=self.back,
-        )
-        self.btn_aufladen = Button(
-            text="Jetzt Aufladen",
-            pos=(210, 680),
-            size=20,
-            on_click=functools.partial(self.goto, RechargeScreen(self.account)),
-        )
-
-        self.objects.extend(
-            [
-                Label(
-                    text="Seite wird überarbeitet.",
-                    pos=(30, 300),
-                    size=30,
-                ),
-                Label(
-                    text="Jetzt ist sie performant,",
-                    pos=(30, 350),
-                    size=30,
-                ),
-                Label(
-                    text="aber leider leer :)",
-                    pos=(30, 400),
-                    size=30,
-                ),
-                Label(
-                    text="Performance > Features",
-                    pos=(30, 450),
-                    size=40,
-                ),
-                self.btn_aufladen,
-            ]
-        )
-
         if drink:
-            self.objects.extend([self.zuordnen, self.drink_info])
+            self.goto(ConfirmPaymentScreen(self.account, drink))
+            # self.objects.extend([self.zuordnen, self.drink_info])
         return
 
         self.elements_aufladungen = [
             self.btn_drinks,
-            self.label_aufladungen,
-            self.btn_aufladen,
         ]
-        self.elements_drinks = [self.label_verbrauch, self.btn_abbrechen]
+        self.elements_drinks = [self.btn_abbrechen]
         # if drink:
         #     self.elements_drinks.extend([self.zuordnen, self.drink_info])
         if not drink:
@@ -253,32 +215,6 @@ class ProfileScreen(Screen):
             )
             y += 35
 
-    def save_drink(self):
-        session = get_session()
-        drink = DrinksManager.get_instance().get_selected_drink()
-        if not drink:
-            return
-        ev = ScanEvent(drink["ean"], self.account.ldap_id, datetime.datetime.now())
-        session.add(ev)
-        session.commit()
-        DrinksManager.get_instance().set_selected_drink(None)
-        Users.delete_if_nomoney(
-            {
-                "path": self.account.ldap_path,
-                "id": self.account.ldap_id,
-            }
-        )
-
-        screen_manager = ScreenManager.get_instance()
-        screen_manager.set_active(
-            SuccessScreen(
-                self.account,
-                drink,
-                "getrunken: %s" % drink["name"],
-                session,
-            )
-        )
-
     def on_barcode(self, barcode):
         if not barcode:
             return
@@ -291,13 +227,9 @@ class ProfileScreen(Screen):
             return
         drink = get_by_ean(barcode)
         DrinksManager.get_instance().set_selected_drink(drink)
+        if drink:
+            self.goto(ConfirmPaymentScreen(self.account, drink))
         self.drink_info.text = drink["name"]
-        if self.zuordnen not in self.objects:
-            self.objects.extend([self.zuordnen, self.drink_info])
-        if self.btn_aufladungen in self.objects:
-            self.objects.remove(self.btn_aufladungen)
-        if self.btn_drinks in self.objects:
-            self.objects.remove(self.btn_drinks)
         self.processing.is_visible = False
 
     def show_aufladungen(self):

@@ -1,7 +1,10 @@
 import os
 
+import config
 from database.models import Account
+from elements import Button
 from elements.label import Label
+from elements.vbox import VBox
 from notifications.notification import send_drink
 from .screen import Screen
 
@@ -9,7 +12,7 @@ from .screen import Screen
 class SuccessScreen(Screen):
     idle_timeout = 5
 
-    def __init__(self, account: Account, drink, text, session):
+    def __init__(self, account: Account, drink, text):
         super().__init__()
 
         self.account = account
@@ -18,18 +21,40 @@ class SuccessScreen(Screen):
 
     def on_start(self, *args, **kwargs):
 
-        self.objects = []
-        self.objects.append(Label(text="Danke,", pos=(30, 120), size=70))
-        self.objects.append(Label(text=self.account.name + "!", pos=(30, 170), size=70))
-        self.objects.append(Label(text=self.text, size=45, pos=(30, 250)))
-
-        self.objects.append(Label(text="Verbleibendes Guthaben: ", pos=(30, 350)))
-        self.objects.append(
+        self.objects = [
             Label(
-                text=f"{self.account.balance} EUR",
-                pos=(50, 400),
-            )
-        )
+                text=self.account.name,
+                pos=(5, 5),
+            ),
+            VBox(
+                [
+                    Label(
+                        text="Guthaben",
+                        size=20,
+                    ),
+                    Label(
+                        text=f"{self.account.balance} €",
+                        size=40,
+                    ),
+                ],
+                pos=(config.SCREEN_WIDTH - 5, 5),
+                align_right=True,
+            ),
+            VBox(
+                [
+                    Label(text="Danke!", size=70),
+                    Label(text=self.text, size=20),
+                ],
+                pos=(5, 100),
+            ),
+            Button(
+                text="OK",
+                on_click=self.home,
+                size=50,
+                pos=(200, config.SCREEN_HEIGHT - 100),
+                align_bottom=True,
+            ),
+        ]
 
         balance = self.account.balance
         if balance >= 0:
