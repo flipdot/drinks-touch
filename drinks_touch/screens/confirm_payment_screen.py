@@ -105,5 +105,6 @@ class ConfirmPaymentScreen(Screen):
                 self.account,
                 self.drink,
                 f"getrunken: {self.drink['name']}",
-            )
+            ),
+            replace=True,
         )

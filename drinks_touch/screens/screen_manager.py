@@ -1,5 +1,6 @@
 import pygame
 
+import config
 from config import Color, Font
 from elements import Button, Progress
 from screen import get_screen_surface
@@ -19,7 +20,8 @@ class ScreenManager:
         self.surface = get_screen_surface()
         self.screen_history: list[Screen] = []
         self.timeout_widget = Progress(
-            pos=(425, 10),
+            pos=(config.SCREEN_WIDTH - 5, 10),
+            align_right=True,
             speed=1 / 5.0,
             on_elapsed=lambda: self.set_default(),
         )
@@ -51,10 +53,14 @@ class ScreenManager:
         self.reset_history()
         self.set_active(WaitScanScreen())
 
-    def set_active(self, screen: "Screen", *args, **kwargs):
+    def set_active(
+        self, screen: "Screen", replace=False, replace_last_n=1, *args, **kwargs
+    ):
         current_screen = self.get_active()
         if current_screen is not None:
             current_screen.on_stop()
+        if replace:
+            self.screen_history = self.screen_history[:-replace_last_n]
         self.screen_history.append(screen)
         screen.on_start(*args, **kwargs)
         self.set_idle_timeout(screen.idle_timeout)

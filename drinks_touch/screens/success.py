@@ -57,7 +57,7 @@ class SuccessScreen(Screen):
         ]
 
         # TODO: Sound is currently not working, and happening synchronously,
-        #            therefore slowing down the UI
+        #            therefore could slow down the UI
         # self.play_sound()
 
         if self.drink:

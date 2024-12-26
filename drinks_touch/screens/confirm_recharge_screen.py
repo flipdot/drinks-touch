@@ -69,11 +69,12 @@ class ConfirmRechargeScreen(Screen):
         session.add(ev)
         session.commit()
 
-        # TODO: replace instead of adding to history
         self.goto(
             SuccessScreen(
                 self.account,
                 None,
                 f"{self.amount} € aufgeladen",
-            )
+            ),
+            replace=True,
+            replace_last_n=2,
         )
