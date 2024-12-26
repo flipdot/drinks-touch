@@ -56,6 +56,14 @@ class SuccessScreen(Screen):
             ),
         ]
 
+        # TODO: Sound is currently not working, and happening synchronously,
+        #            therefore slowing down the UI
+        # self.play_sound()
+
+        if self.drink:
+            send_drink(self.account, self.drink, True)
+
+    def play_sound(self):
         balance = self.account.balance
         if balance >= 0:
             sound = "smb_coin.wav"
@@ -63,10 +71,8 @@ class SuccessScreen(Screen):
             sound = "alarm.wav"
         else:
             sound = "smb_bowserfalls.wav"
+
         os.system(
             "ssh -o StrictHostKeyChecking=no pi@pixelfun aplay sounds/%s >/dev/null 2>&1 &"
             % sound
         )
-
-        if self.drink:
-            send_drink(self.account, self.drink, True)

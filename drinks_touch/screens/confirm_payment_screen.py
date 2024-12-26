@@ -87,10 +87,7 @@ class ConfirmPaymentScreen(Screen):
 
     def save_drink(self):
         session = get_session()
-        drink = DrinksManager.get_instance().get_selected_drink()
-        if not drink:
-            return
-        ev = ScanEvent(drink["ean"], self.account.ldap_id, datetime.datetime.now())
+        ev = ScanEvent(self.drink["ean"], self.account.ldap_id, datetime.datetime.now())
         session.add(ev)
         session.commit()
         DrinksManager.get_instance().set_selected_drink(None)
@@ -106,7 +103,7 @@ class ConfirmPaymentScreen(Screen):
         self.goto(
             SuccessScreen(
                 self.account,
-                drink,
-                f"getrunken: {drink['name']}",
+                self.drink,
+                f"getrunken: {self.drink['name']}",
             )
         )

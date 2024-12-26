@@ -184,6 +184,7 @@ class ProfileScreen(Screen):
                 elif helper == "DISPLAY":
                     time_text += " mit DISPLAY"
                 else:
+                    # TODO: this is the slow part because it queries LDAP
                     user = Users.get_by_id(aufladung.helper_user_id)
                     if user:
                         helper = user["name"]

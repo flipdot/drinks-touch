@@ -12,12 +12,12 @@ from email.mime.text import MIMEText
 from email.utils import formatdate, make_msgid
 from premailer import transform
 from sqlalchemy import text
+from sqlalchemy.exc import NoResultFound
 
 import config
 from database.models.account import Account
 from database.models.recharge_event import RechargeEvent
 from database.storage import Session
-from users.users import Users
 
 logger = logging.getLogger(__name__)
 
@@ -309,26 +309,26 @@ def format_drinks(drinks_consumed):
     return drinks_fmt
 
 
-def format_recharges(recharges):
-    """
-
-    :type recharges: list[RechargeEvent]
-    """
+def format_recharges(recharges: list[RechargeEvent]):
     recharges_fmt = (
         "\nAufladungen:\n" "    #                 datum     mit aufgeladen\n"
     )
 
     for i, event in enumerate(recharges):
         date = event.timestamp.strftime("%F %T Z")
-        mit = event.helper_user_id
+        four_eyes_id = event.helper_user_id
 
         try:
-            mit = Users.get_by_id(mit)["name"]
-        except Exception:
-            pass
+            four_eyes_account = Account.query.filter(
+                Account.ldap_id == four_eyes_id
+            ).one()
+        except NoResultFound:
+            four_eyes = four_eyes_id
+        else:
+            four_eyes = four_eyes_account.name
 
         amount = event.amount
-        recharges_fmt += "  % 3d % 15s %7s %10s\n" % (i, date, mit, amount)
+        recharges_fmt += "  % 3d % 15s %7s %10s\n" % (i, date, four_eyes, amount)
 
     return recharges_fmt
 
@@ -361,7 +361,7 @@ ORDER BY se.timestamp"""
     return drinks_consumed
 
 
-def get_recharges(account: Account):
+def get_recharges(account: Account) -> list[RechargeEvent]:
     query = (
         Session().query(RechargeEvent).filter(RechargeEvent.user_id == account.ldap_id)
     )
