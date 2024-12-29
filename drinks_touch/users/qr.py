@@ -16,6 +16,8 @@ iban = "DE07520503530001147713"
 def make_sepa_qr(
     amount, name, uid, pixel_width=10, border=4, color="black", bg="white"
 ):
+    # TODO: Support EPC-QR-Codes. See
+    #            https://community.tomorrow.one/t/support-fuer-alternative-qr-code-ueberweisungen/5196
     info = "".join(random.choices(string.ascii_lowercase, k=12))
     url = tx_url(uid, name, info, amount)
     qr = qrcode.QRCode(

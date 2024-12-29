@@ -15,6 +15,14 @@ class HBox(BaseElm):
         **kwargs,
     ):
         super().__init__(children, pos, 0, 0, *args, **kwargs)
+        if __debug__:
+            for child in children:
+                assert (
+                    not child.align_right
+                ), "Not implemented: align_right does not have an effect on an element in a HBox"
+                assert (
+                    not child.align_bottom
+                ), "Not implemented: align_bottom does not have an effect on an element in a HBox"
         self.pos = pos
         self.gap = gap
 

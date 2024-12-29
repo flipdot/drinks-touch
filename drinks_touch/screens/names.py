@@ -20,7 +20,7 @@ class NamesScreen(Screen):
         self.objects.append(
             Label(
                 text="Wer bist du?",
-                pos=(20, 110),
+                pos=(5, 5),
             )
         )
 
@@ -34,7 +34,7 @@ class NamesScreen(Screen):
         btns_y = 7
         num_cols = int(math.ceil(len(accounts) / float(btns_y)))
         for i, account in enumerate(accounts):
-            xoff, yoff = 30, 190
+            xoff, yoff = 5, 100
             btn_ypos = 90
             i_y = i % btns_y
             i_x = i // btns_y

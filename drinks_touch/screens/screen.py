@@ -19,6 +19,7 @@ class Screen:
         self.width = width
         self.height = height
         self.objects: list[BaseElm] = []
+        self._alert = None
         self.on_create()
 
     def __repr__(self):
@@ -40,9 +41,45 @@ class Screen:
                     obj_debug_surface = o.render_debug()
                     if obj_debug_surface is not None:
                         debug_surface.blit(obj_debug_surface, o.screen_pos)
+        if self._alert:
+            alert = self.render_alert()
+            surface.blit(alert, (0, 0))
+
         return surface, debug_surface
 
+    def render_alert(self) -> pygame.Surface:
+        alert_text_surface = pygame.font.Font(None, 30).render(
+            self._alert, True, (255, 0, 0)
+        )
+        padding = 10
+        alert_box = pygame.Surface(
+            (
+                alert_text_surface.get_width() + padding * 2,
+                alert_text_surface.get_height() + padding * 2,
+            ),
+            pygame.SRCALPHA,
+        )
+
+        alert_box.fill((255, 255, 255))
+        alert_box.blit(alert_text_surface, (padding, padding))
+
+        alert = pygame.Surface((self.width, config.SCREEN_HEIGHT), pygame.SRCALPHA)
+        alert.fill((0, 0, 0, 180))
+
+        alert.blit(
+            alert_box,
+            (
+                (self.width - alert_box.get_width()) // 2,
+                (config.SCREEN_HEIGHT - alert_box.get_height()) // 2,
+            ),
+        )
+        return alert
+
     def event(self, event):
+        if self._alert:
+            if event.type == pygame.MOUSEBUTTONUP:
+                self._alert = None
+            return
         for obj in self.objects[::-1]:
             if getattr(event, "consumed", False):
                 break
@@ -55,6 +92,13 @@ class Screen:
     @staticmethod
     def goto(screen: "Screen", *args, **kwargs):
         ScreenManager.get_instance().set_active(screen, *args, **kwargs)
+
+    @staticmethod
+    def home():
+        ScreenManager.get_instance().set_default()
+
+    def alert(self, text: str):
+        self._alert = text
 
     # lifecycle inspired by https://developer.android.com/guide/components/activities/activity-lifecycle
     # Not all yet implemented
