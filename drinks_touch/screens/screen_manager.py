@@ -16,6 +16,7 @@ class ScreenManager:
     MENU_BAR_HEIGHT = 65
 
     def __init__(self):
+        self.ts = 0
         self.current_screen = None
         self.surface = get_screen_surface()
         self.screen_history: list[Screen] = []
@@ -35,6 +36,7 @@ class ScreenManager:
             ),
             self.timeout_widget,
         ]
+        self.active_object = None
 
     def set_idle_timeout(self, timeout: int):
         """
@@ -88,6 +90,9 @@ class ScreenManager:
         return len(self.screen_history) > 1
 
     def render(self, dt):
+        self.ts += dt
+        if self.active_object:
+            self.active_object.ts += dt
         self.surface.fill(Color.BACKGROUND.value)
         current_screen = self.get_active()
         surface, debug_surface = current_screen.render(dt)
@@ -120,6 +125,7 @@ class ScreenManager:
         if pygame.mouse.get_pressed()[0]:
             self.set_idle_timeout(0)
         for event in events:
+            event_consumed = False
             if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                 self.set_idle_timeout(screen.idle_timeout)
             if self.nav_bar_visible and hasattr(event, "pos"):
@@ -128,12 +134,14 @@ class ScreenManager:
                     event.pos[1] - self.surface.get_height() + self.MENU_BAR_HEIGHT,
                 )
                 for obj in self.objects:
-                    if getattr(event, "consumed", False):
+                    if obj.event(event, transformed_pos):
+                        event_consumed = True
                         continue
-                    obj.event(event, transformed_pos)
-            if getattr(event, "consumed", False):
+            if event_consumed:
                 continue
-            screen.event(event)
+            if active_object := screen.event(event):
+                active_object.ts = 0
+                ScreenManager.get_instance().active_object = active_object
             # screen.events(events)
 
     @staticmethod

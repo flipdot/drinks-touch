@@ -75,15 +75,17 @@ class Screen:
         )
         return alert
 
-    def event(self, event):
+    def event(self, event) -> BaseElm | None:
         if self._alert:
             if event.type == pygame.MOUSEBUTTONUP:
                 self._alert = None
             return
         for obj in self.objects[::-1]:
-            if getattr(event, "consumed", False):
-                break
-            obj.event(event)
+            if consumed_by := obj.event(event):
+                #     and event.type == pygame.MOUSEBUTTONUP
+                #     and event.button == 1
+                # ):
+                return consumed_by
 
     @staticmethod
     def back():

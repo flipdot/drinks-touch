@@ -1,3 +1,4 @@
+from __future__ import annotations
 import pygame
 from pygame import Surface
 
@@ -17,6 +18,7 @@ class BaseElm:
     ):
         if pos is None:
             pos = (0, 0)
+        self.ts = 0
         self.pos = pos
         self._height = height
         self._width = width
@@ -77,7 +79,10 @@ class BaseElm:
     def box(self):
         return self.screen_pos + (self.width, self.height)
 
-    def event(self, event, pos=None):
+    def event(self, event, pos=None) -> "BaseElm" | None:
+        """
+        Returns the element that consumed the event
+        """
         if pos is None and hasattr(event, "pos"):
             pos = event.pos
         if pos is None:
@@ -89,24 +94,24 @@ class BaseElm:
         )
 
         for child in self.children:
-            if hasattr(event, "consumed") and event.consumed:
-                return
-            child.event(event, transformed_pos)
+            if consumed_by := child.event(event, transformed_pos):
+                return consumed_by
 
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             if collides:
                 self.focus = True
-                event.consumed = True
+                return self
             else:
                 self.focus = False
 
         elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
 
-            if self.focus and collides:
+            had_focus = self.focus
+            self.focus = False
+            if had_focus and collides:
                 if hasattr(self, "on_click"):
                     self.on_click(*transformed_pos)
-                event.consumed = True
-            self.focus = False
+                return self
 
     @property
     def visible(self):
@@ -120,9 +125,9 @@ class BaseElm:
             and pygame.Rect(self.box).collidepoint(pos[0], pos[1])
         )
 
-    def render(self, *args, **kwargs) -> Surface:
+    def render(self, *args, **kwargs) -> Surface | None:
         surface = pygame.font.SysFont("monospace", 25).render(
-            "Return surface in render()", 1, (255, 0, 255)
+            "Return surface or None in render()", 1, (255, 0, 255)
         )
         return surface
 
