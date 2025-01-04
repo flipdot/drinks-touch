@@ -17,6 +17,7 @@ from .confirm_payment_screen import ConfirmPaymentScreen
 from .id_card_screen import IDCardScreen
 from .screen import Screen
 from .screen_manager import ScreenManager
+from .transfer_balance_screen import TransferBalanceScreen
 
 
 class ProfileScreen(Screen):
@@ -85,10 +86,10 @@ class ProfileScreen(Screen):
                         padding=20,
                     ),
                     Button(
-                        text="Guthaben übertragen",
+                        text="Guthaben übertragen (WIP)",
                         on_click=functools.partial(
-                            self.alert,
-                            "Nicht implementiert",
+                            self.goto,
+                            TransferBalanceScreen(self.account),
                         ),
                         padding=20,
                     ),

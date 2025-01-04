@@ -16,6 +16,7 @@ class ScreenManager:
     MENU_BAR_HEIGHT = 65
 
     def __init__(self):
+        self.ts = 0
         self.current_screen = None
         self.surface = get_screen_surface()
         self.screen_history: list[Screen] = []
@@ -35,6 +36,7 @@ class ScreenManager:
             ),
             self.timeout_widget,
         ]
+        self.active_object = None
 
     def set_idle_timeout(self, timeout: int):
         """
@@ -88,6 +90,9 @@ class ScreenManager:
         return len(self.screen_history) > 1
 
     def render(self, dt):
+        self.ts += dt
+        if self.active_object:
+            self.active_object.ts += dt
         self.surface.fill(Color.BACKGROUND.value)
         current_screen = self.get_active()
         surface, debug_surface = current_screen.render(dt)
@@ -120,7 +125,14 @@ class ScreenManager:
         if pygame.mouse.get_pressed()[0]:
             self.set_idle_timeout(0)
         for event in events:
-            if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+            event_consumed = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                ScreenManager.get_instance().active_object = None
+            if (
+                event.type == pygame.MOUSEBUTTONUP
+                and event.button == 1
+                or event.type == pygame.KEYDOWN
+            ):
                 self.set_idle_timeout(screen.idle_timeout)
             if self.nav_bar_visible and hasattr(event, "pos"):
                 transformed_pos = (
@@ -128,13 +140,18 @@ class ScreenManager:
                     event.pos[1] - self.surface.get_height() + self.MENU_BAR_HEIGHT,
                 )
                 for obj in self.objects:
-                    if getattr(event, "consumed", False):
+                    if obj.event(event, transformed_pos):
+                        event_consumed = True
                         continue
-                    obj.event(event, transformed_pos)
-            if getattr(event, "consumed", False):
+            if event_consumed:
                 continue
-            screen.event(event)
-            # screen.events(events)
+            if active_object := screen.event(event):
+                active_object.ts = 0
+                ScreenManager.get_instance().active_object = active_object
+            if event.type == pygame.KEYDOWN and (
+                active_object := ScreenManager.get_instance().active_object
+            ):
+                active_object.key_event(event)
 
     @staticmethod
     def get_instance() -> "ScreenManager":

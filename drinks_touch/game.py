@@ -15,7 +15,7 @@ import env
 from database.storage import init_db, Session
 from drinks.drinks_manager import DrinksManager
 from notifications.notification import send_low_balances, send_summaries
-from overlays import MouseOverlay
+from overlays import MouseOverlay, BaseOverlay
 from screens.screen_manager import ScreenManager
 from screens.tasks_screen import TasksScreen
 from stats.stats import run as stats_send
@@ -45,7 +45,7 @@ if config.LOGLEVEL == logging.DEBUG:
     set_library_log_detail_level(EXTENDED)
 
 event_queue = queue.Queue()
-overlays = []
+overlays: list[BaseOverlay] = []
 screen_manager: ScreenManager | None = None
 
 
@@ -123,6 +123,8 @@ def main(argv):
 
     if env.is_pi():
         os.system("rsync -a sounds/ pi@pixelfun:sounds/ &")
+
+    pygame.key.set_repeat(500, 50)
 
     t = 0
     done = False
