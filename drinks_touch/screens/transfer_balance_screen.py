@@ -27,7 +27,8 @@ class TransferBalanceScreen(Screen):
                         size=20,
                     ),
                     InputField(
-                        input_type=InputType.NUMBER,
+                        input_type=InputType.POSITIVE_NUMBER,
+                        max_decimal_places=2,
                         width=config.SCREEN_WIDTH - 10,
                         height=50,
                     ),
@@ -51,6 +52,10 @@ class TransferBalanceScreen(Screen):
                     ),
                     Label(
                         text="    Theoretisch kannst du eine Tastatur anschließen :)",
+                        size=15,
+                    ),
+                    Label(
+                        text="- Auto-complete des Namens",
                         size=15,
                     ),
                     Label(
