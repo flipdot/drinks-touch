@@ -87,10 +87,6 @@ class ProfileScreen(Screen):
                     ),
                     Button(
                         text="Guthaben übertragen (WIP)",
-                        # on_click=functools.partial(
-                        #     self.alert,
-                        #     "Nicht implementiert",
-                        # ),
                         on_click=functools.partial(
                             self.goto,
                             TransferBalanceScreen(self.account),

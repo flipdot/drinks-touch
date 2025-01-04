@@ -82,9 +82,6 @@ class Screen:
             return
         for obj in self.objects[::-1]:
             if consumed_by := obj.event(event):
-                #     and event.type == pygame.MOUSEBUTTONUP
-                #     and event.button == 1
-                # ):
                 return consumed_by
 
     @staticmethod
