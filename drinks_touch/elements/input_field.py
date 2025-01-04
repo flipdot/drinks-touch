@@ -19,13 +19,14 @@ class InputType(enum.Enum):
     POSITIVE_NUMBER = "positive_number"
 
 
-NUMERIC = list(range(pygame.K_0, pygame.K_9 + 1))
-ALPHABET = list(range(pygame.K_a, pygame.K_z + 1)) + [
-    223,  # ß
-    228,  # ä
-    246,  # ö
-    252,  # ü
-]
+NUMERIC = "0123456789"
+ALPHABET = (
+    "abcdefghijklmnopqrstuvwxyz"
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    "àáâãäåæçèéêëìíîïðñòóôõöøùúûüýÿ"
+    "ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝ"
+    "ßẞ"
+)
 ALPHA_NUMERIC = NUMERIC + ALPHABET
 
 
@@ -33,21 +34,12 @@ class InputField(BaseElm):
 
     def __init__(self, *args, width, height, input_type=InputType.TEXT, **kwargs):
         if input_type in [InputType.NUMBER, InputType.POSITIVE_NUMBER]:
-            self.valid_chars = NUMERIC + [
-                pygame.K_PERIOD,
-                pygame.K_COMMA,
-            ]
+            self.valid_chars = NUMERIC + ".,"
             if input_type == InputType.NUMBER:
-                self.valid_chars.append(pygame.K_MINUS)
+                self.valid_chars += "-"
             self.max_decimal_places = kwargs.pop("max_decimal_places", None)
         elif input_type == InputType.TEXT:
-            self.valid_chars = ALPHA_NUMERIC + [
-                pygame.K_SPACE,
-                pygame.K_COMMA,
-                pygame.K_PERIOD,
-                pygame.K_MINUS,
-                pygame.K_UNDERSCORE,
-            ]
+            self.valid_chars = ALPHA_NUMERIC + " ,.-_"
 
         super().__init__(*args, **kwargs, width=width, height=height)
         self.input_type = input_type
@@ -83,21 +75,26 @@ class InputField(BaseElm):
     def key_event(self, event: pygame.event.Event):
         if event.key == pygame.K_BACKSPACE:
             self.text = self.text[:-1]
-        elif event.key in self.valid_chars:
-            char = event.unicode
-            if self.input_type in (InputType.NUMBER, InputType.POSITIVE_NUMBER):
-                if event.key == pygame.K_MINUS and self.text:
-                    # only allow minus at the start
+            return
+
+        char = event.unicode
+        if not char:
+            # not a printable character
+            return
+        if char not in self.valid_chars:
+            return
+        char = event.unicode
+        if self.input_type in (InputType.NUMBER, InputType.POSITIVE_NUMBER):
+            if char == "-" and self.text:
+                # only allow minus at the start
+                return
+            if char in ",.":
+                # only allow one decimal point, and convert comma to period
+                if "." in self.text:
                     return
-                if event.key in (pygame.K_PERIOD, pygame.K_COMMA):
-                    # only allow one decimal point, and convert comma to period
-                    if "." in self.text:
-                        return
-                    char = "."
-                if "." in self.text and self.max_decimal_places is not None:
-                    before_comma, _, after_comma = self.text.partition(".")
-                    if len(after_comma) >= self.max_decimal_places:
-                        return
-            self.text += char
-        else:
-            logger.info(f"Invalid key: {event.key}")
+                char = "."
+            if "." in self.text and self.max_decimal_places is not None:
+                before_comma, _, after_comma = self.text.partition(".")
+                if len(after_comma) >= self.max_decimal_places:
+                    return
+        self.text += char
