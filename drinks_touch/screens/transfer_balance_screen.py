@@ -40,6 +40,23 @@ class TransferBalanceScreen(Screen):
                         width=config.SCREEN_WIDTH - 10,
                         height=50,
                     ),
+                    Spacer(height=40),
+                    Label(
+                        text="Work in progress. Es fehlt:",
+                        size=15,
+                    ),
+                    Label(
+                        text="- On-Screen-Keyboard",
+                        size=15,
+                    ),
+                    Label(
+                        text="    Theoretisch kannst du eine Tastatur anschließen :)",
+                        size=15,
+                    ),
+                    Label(
+                        text="- Nächster Screen zum bestätigen",
+                        size=15,
+                    ),
                 ],
                 pos=(5, 100),
             ),

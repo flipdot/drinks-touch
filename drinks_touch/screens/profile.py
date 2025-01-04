@@ -86,7 +86,7 @@ class ProfileScreen(Screen):
                         padding=20,
                     ),
                     Button(
-                        text="Guthaben übertragen",
+                        text="Guthaben übertragen (WIP)",
                         # on_click=functools.partial(
                         #     self.alert,
                         #     "Nicht implementiert",

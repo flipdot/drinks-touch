@@ -124,6 +124,8 @@ def main(argv):
     if env.is_pi():
         os.system("rsync -a sounds/ pi@pixelfun:sounds/ &")
 
+    pygame.key.set_repeat(500, 50)
+
     t = 0
     done = False
 

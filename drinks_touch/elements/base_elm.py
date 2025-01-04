@@ -79,7 +79,7 @@ class BaseElm:
     def box(self):
         return self.screen_pos + (self.width, self.height)
 
-    def event(self, event, pos=None) -> "BaseElm" | None:
+    def event(self, event: pygame.event.Event, pos=None) -> "BaseElm" | None:
         """
         Returns the element that consumed the event
         """
@@ -112,6 +112,13 @@ class BaseElm:
                 if hasattr(self, "on_click"):
                     self.on_click(*transformed_pos)
                 return self
+
+    def key_event(self, event: pygame.event.Event):
+        """
+        Called when a keyboard key was pressed and the element is active
+        (active means: was clicked on before and therefore the ScreenManager
+        has set this element as active)
+        """
 
     @property
     def visible(self):

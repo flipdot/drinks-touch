@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import enum
 
 import pygame
@@ -16,7 +18,7 @@ class InputField(BaseElm):
 
     def __init__(self, *args, width, height, input_type=InputType.NUMBER, **kwargs):
         super().__init__(*args, **kwargs, width=width, height=height)
-        self.text = "hello world"
+        self.text = ""
 
     def render(self, *args, **kwargs):
         is_active = ScreenManager.get_instance().active_object is self
@@ -44,3 +46,11 @@ class InputField(BaseElm):
                     surface, Color.PRIMARY.value, (x, 5), (x, self.height - 5), 2
                 )
         return surface
+
+    def key_event(self, event: pygame.event.Event):
+        if event.key == pygame.K_BACKSPACE:
+            self.text = self.text[:-1]
+        elif event.key == pygame.K_RETURN:
+            self.text += "\n"
+        else:
+            self.text += event.unicode

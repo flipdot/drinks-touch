@@ -126,7 +126,13 @@ class ScreenManager:
             self.set_idle_timeout(0)
         for event in events:
             event_consumed = False
-            if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                ScreenManager.get_instance().active_object = None
+            if (
+                event.type == pygame.MOUSEBUTTONUP
+                and event.button == 1
+                or event.type == pygame.KEYDOWN
+            ):
                 self.set_idle_timeout(screen.idle_timeout)
             if self.nav_bar_visible and hasattr(event, "pos"):
                 transformed_pos = (
@@ -142,7 +148,10 @@ class ScreenManager:
             if active_object := screen.event(event):
                 active_object.ts = 0
                 ScreenManager.get_instance().active_object = active_object
-            # screen.events(events)
+            if event.type == pygame.KEYDOWN and (
+                active_object := ScreenManager.get_instance().active_object
+            ):
+                active_object.key_event(event)
 
     @staticmethod
     def get_instance() -> "ScreenManager":
