@@ -107,5 +107,7 @@ LOGLEVEL = os.environ.get("LOGLEVEL", "WARNING")
 FORCE_MAIL_TO_UID = os.environ.get("FORCE_MAIL_TO_UID", None)
 
 FULLSCREEN = os.environ.get("FULLSCREEN", "True") in ["True", "true", "1", "yes"]
-SCREEN_WIDTH = 480
-SCREEN_HEIGHT = 800
+
+# Yes, this is indeed the resolution of our shitty china display
+SCREEN_WIDTH = 486
+SCREEN_HEIGHT = 864
