@@ -22,7 +22,7 @@ def auto_complete_account_name(text, except_account: str):
         Account.query.filter(Account.name.ilike(f"{text}%"))
         .filter(Account.name != except_account)
         .order_by(Account.name)
-        .all()
+        .limit(5)
     )
     return [account.name for account in accounts]
 
