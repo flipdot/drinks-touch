@@ -120,6 +120,14 @@ class ScreenManager:
                 menu_bar, (0, self.surface.get_height() - menu_bar.get_height())
             )
 
+        if config.DEBUG_UI_ELEMENTS:
+            info = pygame.display.Info()
+            font = pygame.font.Font(None, 30)
+            text = font.render(
+                f"{info.current_w}x{info.current_h}", True, (255, 0, 255)
+            )
+            self.surface.blit(text, (0, 0))
+
     def events(self, events):
         screen = self.get_active()
         if pygame.mouse.get_pressed()[0]:
