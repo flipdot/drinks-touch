@@ -143,11 +143,15 @@ def main(argv):
         for e in events:
             e.t = t
             e.dt = dt
-            if e.type == pygame.QUIT or (
-                e.type == pygame.KEYDOWN and e.key == pygame.K_ESCAPE
-            ):
+            if e.type == pygame.QUIT:
                 done = True
                 break
+            if e.type == pygame.KEYDOWN and e.key == pygame.K_ESCAPE:
+                if screen_manager.active_object is None:
+                    done = True
+                    break
+                else:
+                    screen_manager.active_object = None
             event_queue.put(e, True)
 
     web_thread.terminate()

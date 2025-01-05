@@ -1,9 +1,30 @@
+import functools
+import logging
+
 import config
+from database.models import Account
 from elements import Label
 from elements.input_field import InputField, InputType
 from elements.spacer import Spacer
 from elements.vbox import VBox
 from screens.screen import Screen
+
+
+logger = logging.getLogger(__name__)
+
+
+# cache only the last call of the function,
+# because it is called in the render() function.
+# Still, we want to get fresh results every time the user changes the input.
+@functools.lru_cache(maxsize=1)
+def auto_complete_account_name(text, except_account: str):
+    accounts = (
+        Account.query.filter(Account.name.ilike(f"{text}%"))
+        .filter(Account.name != except_account)
+        .order_by(Account.name)
+        .all()
+    )
+    return [account.name for account in accounts]
 
 
 class TransferBalanceScreen(Screen):
@@ -23,6 +44,19 @@ class TransferBalanceScreen(Screen):
             VBox(
                 [
                     Label(
+                        text="An wen möchtest du Guthaben übertragen?",
+                        size=20,
+                    ),
+                    InputField(
+                        width=config.SCREEN_WIDTH - 10,
+                        height=50,
+                        auto_complete=lambda text: auto_complete_account_name(
+                            text, except_account=self.account.name
+                        ),
+                        only_auto_complete=True,
+                    ),
+                    Spacer(height=40),
+                    Label(
                         text="Wie viel Euro möchtest du übertragen?",
                         size=20,
                     ),
@@ -34,15 +68,6 @@ class TransferBalanceScreen(Screen):
                     ),
                     Spacer(height=20),
                     Label(
-                        text="An wen möchtest du Guthaben übertragen?",
-                        size=20,
-                    ),
-                    InputField(
-                        width=config.SCREEN_WIDTH - 10,
-                        height=50,
-                    ),
-                    Spacer(height=40),
-                    Label(
                         text="Work in progress. Es fehlt:",
                         size=15,
                     ),
@@ -52,10 +77,6 @@ class TransferBalanceScreen(Screen):
                     ),
                     Label(
                         text="    Theoretisch kannst du eine Tastatur anschließen :)",
-                        size=15,
-                    ),
-                    Label(
-                        text="- Auto-complete des Namens",
                         size=15,
                     ),
                     Label(
