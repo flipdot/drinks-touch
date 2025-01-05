@@ -61,7 +61,8 @@ class WaitScanScreen(Screen):
         ]
         self.empty_info = [
             Button(
-                pos=(115, 655),
+                pos=(115, config.SCREEN_HEIGHT - 100),
+                align_bottom=True,
                 size=45,
                 text="Benutzer",
                 on_click=self.set_member,
@@ -140,16 +141,17 @@ class WaitScanScreen(Screen):
                         size=20,
                     ),
                 ],
-                pos=(5, 800),
+                pos=(0, config.SCREEN_HEIGHT),
+                padding=(5, 5),
                 align_bottom=True,
             ),
             HBox(
                 bottom_right_buttons,
-                pos=(480, 795),
+                pos=(config.SCREEN_WIDTH, config.SCREEN_HEIGHT),
                 align_right=True,
                 align_bottom=True,
                 gap=5,
-                padding=(0, 5),
+                padding=(5, 5),
             ),
             self.timeout,
         ]
