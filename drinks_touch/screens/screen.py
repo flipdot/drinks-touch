@@ -41,6 +41,11 @@ class Screen:
                     obj_debug_surface = o.render_debug()
                     if obj_debug_surface is not None:
                         debug_surface.blit(obj_debug_surface, o.screen_pos)
+        for o in self.objects:
+            if o.visible:
+                obj_overlay_surface = o.render_overlay()
+                if obj_overlay_surface is not None:
+                    surface.blit(obj_overlay_surface, o.screen_pos)
         if self._alert:
             alert = self.render_alert()
             surface.blit(alert, (0, 0))

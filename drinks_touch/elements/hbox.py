@@ -1,5 +1,7 @@
 import pygame
+from pygame import Surface
 
+import config
 from config import Color
 from elements.base_elm import BaseElm
 
@@ -38,6 +40,19 @@ class HBox(BaseElm):
             pygame.draw.rect(
                 surface, Color.PRIMARY.value, (0, 0, self.width, self.height), 1
             )
+        return surface
+
+    def render_overlay(self, *args, **kwargs) -> Surface | None:
+        surface = pygame.Surface(
+            (config.SCREEN_WIDTH, config.SCREEN_HEIGHT), pygame.SRCALPHA
+        )
+        x = self.padding_left
+        for element in self.children:
+            element.pos = (x, self.padding_top)
+            element_surface = element.render_overlay(*args, **kwargs)
+            if element_surface:
+                surface.blit(element_surface, element.pos)
+            x += element.width + self.gap
         return surface
 
     @property

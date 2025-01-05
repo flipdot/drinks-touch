@@ -138,6 +138,9 @@ class BaseElm:
         )
         return surface
 
+    def render_overlay(self, *args, **kwargs) -> Surface | None:
+        return None
+
     def render_debug(self) -> pygame.Surface:
         w = self.width
         h = self.height
