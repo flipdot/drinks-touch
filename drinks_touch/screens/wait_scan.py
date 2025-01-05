@@ -11,7 +11,6 @@ from drinks.drinks_manager import DrinksManager
 from elements import RefreshIcon, SvgIcon, Progress, Label, Button
 from elements.hbox import HBox
 from elements.vbox import VBox
-from screens.new_id_screen import NewIDScreen
 from screens.profile import ProfileScreen
 from tasks import CheckForUpdatesTask
 from .git.main_screen import GitMainScreen
@@ -62,16 +61,10 @@ class WaitScanScreen(Screen):
         ]
         self.empty_info = [
             Button(
-                pos=(30, 655),
+                pos=(115, 655),
                 size=45,
                 text="Benutzer",
                 on_click=self.set_member,
-            ),
-            Button(
-                pos=(290, 690),
-                size=15,
-                text="Gutschein drucken",
-                on_click=self.btn_new_id,
             ),
         ]
         self.processing = Label(text="Moment bitte...", size=40, pos=(80, 350))
@@ -228,10 +221,6 @@ class WaitScanScreen(Screen):
 
     def btn_reset(self):
         self.reset()
-
-    def btn_new_id(self):
-        new_id = NewIDScreen()
-        ScreenManager.get_instance().set_active(new_id)
 
     def reset(self, reset_drink=True):
         if reset_drink:
