@@ -158,10 +158,6 @@ class KeyboardOverlay(BaseOverlay):
             pos = self.pos
 
         self.screen.blit(surface, pos)
-        # self.tick += dt
-        # self._render_click_animation()
-        # self._render_mouse_path()
-        # self._render_mouse_pos()
 
     def events(self, events: list[EventType]):
         if not self.visible:
