@@ -1,8 +1,10 @@
 import pygame
+from pygame.event import EventType
 
 import config
 from config import Color, Font
 from elements import Button, Progress
+from elements.base_elm import BaseElm
 from screen import get_screen_surface
 
 from typing import TYPE_CHECKING
@@ -36,7 +38,7 @@ class ScreenManager:
             ),
             self.timeout_widget,
         ]
-        self.active_object = None
+        self.active_object: BaseElm | None = None
 
     def set_idle_timeout(self, timeout: int):
         """
@@ -64,6 +66,7 @@ class ScreenManager:
         if replace:
             self.screen_history = self.screen_history[:-replace_last_n]
         self.screen_history.append(screen)
+        self.active_object = None
         screen.on_start(*args, **kwargs)
         self.set_idle_timeout(screen.idle_timeout)
 
@@ -77,6 +80,8 @@ class ScreenManager:
         prev_screen.on_stop()
         prev_screen.on_destroy()
         self.screen_history.pop()
+
+        self.active_object = None
 
         new_active_screen = self.get_active()
         new_active_screen.on_start()
@@ -128,34 +133,46 @@ class ScreenManager:
             )
             self.surface.blit(text, (0, 0))
 
-    def events(self, events):
+    def events(self, events: list[EventType]):
         screen = self.get_active()
         if pygame.mouse.get_pressed()[0]:
             self.set_idle_timeout(0)
         for event in events:
-            event_consumed = False
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                ScreenManager.get_instance().active_object = None
             if (
                 event.type == pygame.MOUSEBUTTONUP
                 and event.button == 1
                 or event.type == pygame.KEYDOWN
             ):
                 self.set_idle_timeout(screen.idle_timeout)
+            if event.dict.get("consumed"):
+                # Don't process events that have already been consumed.
+                # But still reset the idle timeout, so that the screen doesn't
+                # disappear while the user is interacting with it.
+                # This is why the idle timeout is set before this check.
+                continue
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                ScreenManager.get_instance().active_object = None
             if self.nav_bar_visible and hasattr(event, "pos"):
+                # Handle clicks on the navbar itself.
+                # This is why we need to calculate the transformed_pos,
+                # because the event.pos is relative to the whole screen,
+                # and the navbar is placed at the bottom of the screen.
                 transformed_pos = (
                     event.pos[0],
                     event.pos[1] - self.surface.get_height() + self.MENU_BAR_HEIGHT,
                 )
                 for obj in self.objects:
                     if obj.event(event, transformed_pos):
-                        event_consumed = True
+                        event.dict["consumed"] = True
                         continue
-            if event_consumed:
+            if event.dict.get("consumed"):
                 continue
+
+            # Handle clicks on screen objects
             if active_object := screen.event(event):
                 active_object.ts = 0
                 ScreenManager.get_instance().active_object = active_object
+
             if event.type == pygame.KEYDOWN and (
                 active_object := ScreenManager.get_instance().active_object
             ):
