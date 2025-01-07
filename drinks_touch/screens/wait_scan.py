@@ -165,7 +165,7 @@ class WaitScanScreen(Screen):
                 Label(
                     text=f"Update available: {CheckForUpdatesTask.newest_version_sha_short}",
                     size=15,
-                    pos=(480, 800),
+                    pos=(config.SCREEN_WIDTH, config.SCREEN_HEIGHT),
                     align_right=True,
                     align_bottom=True,
                     color=config.Color.BLACK,
