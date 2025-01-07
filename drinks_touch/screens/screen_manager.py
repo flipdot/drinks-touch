@@ -3,7 +3,7 @@ from pygame.event import EventType
 
 import config
 from config import Color, Font
-from elements import Button, Progress
+from elements import Button, Progress, Label
 from elements.base_elm import BaseElm
 from screen import get_screen_surface
 
@@ -28,13 +28,23 @@ class ScreenManager:
             speed=1 / 5.0,
             on_elapsed=lambda: self.set_default(),
         )
-        self.objects = [
+        self.default_objects = [
             Button(
                 text=" ‹ ",
                 pos=(5, 5),
                 on_click=self.go_back,
                 font=Font.MONOSPACE,
                 size=30,
+            ),
+            self.timeout_widget,
+        ]
+        self.active_keyboard_objects: list[BaseElm] = [
+            Label(
+                text=" v ",
+                pos=(23, 20),
+                # on_click=self.hide_keyboard,
+                font=Font.MONOSPACE,
+                size=20,
             ),
             self.timeout_widget,
         ]
@@ -75,6 +85,9 @@ class ScreenManager:
             return None
         return self.screen_history[-1]
 
+    def hide_keyboard(self):
+        self.active_object = None
+
     def go_back(self):
         prev_screen = self.get_active()
         prev_screen.on_stop()
@@ -113,7 +126,12 @@ class ScreenManager:
             pygame.draw.line(
                 menu_bar, Color.PRIMARY.value, (0, 0), (menu_bar.get_width(), 0)
             )
-            for obj in self.objects:
+            obj_list = (
+                self.active_keyboard_objects
+                if self._keyboard_visible
+                else self.default_objects
+            )
+            for obj in obj_list:
                 obj_surface = obj.render(dt)
                 menu_bar.blit(obj_surface, obj.screen_pos)
             # back_surface = pygame.Surface((100, 50))
@@ -150,7 +168,7 @@ class ScreenManager:
                 # disappear while the user is interacting with it.
                 # This is why the idle timeout is set before this check.
                 continue
-            if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.type == pygame.MOUSEBUTTONUP:
                 ScreenManager.get_instance().active_object = None
             if self.nav_bar_visible and hasattr(event, "pos"):
                 # Handle clicks on the navbar itself.
@@ -161,7 +179,12 @@ class ScreenManager:
                     event.pos[0],
                     event.pos[1] - self.surface.get_height() + self.MENU_BAR_HEIGHT,
                 )
-                for obj in self.objects:
+                obj_list = (
+                    self.active_keyboard_objects
+                    if self._keyboard_visible
+                    else self.default_objects
+                )
+                for obj in obj_list:
                     if obj.event(event, transformed_pos):
                         event.dict["consumed"] = True
                         continue
@@ -185,3 +208,9 @@ class ScreenManager:
     @staticmethod
     def set_instance(instance):
         ScreenManager.instance = instance
+
+    @property
+    def _keyboard_visible(self):
+        if self.active_object:
+            return self.active_object.keyboard_settings["enabled"]
+        return False
