@@ -31,12 +31,20 @@ class KeyboardOverlay(BaseOverlay):
         self._anim_start_pos = pygame.Vector2(
             0, self.screen.get_height() - self.height * 0.9
         )
-        self.objects: list[BaseElm] = [
-            Label(
-                text="Keyboard",
-                pos=(0, 0),
-            )
-        ]
+        self.layouts: dict[KeyboardLayout, list[BaseElm]] = {
+            KeyboardLayout.DEFAULT: [
+                Label(
+                    text="Keyboard (default layout)",
+                    pos=(0, 0),
+                )
+            ],
+            KeyboardLayout.NUMERIC: [
+                Label(
+                    text="Keyboard (numeric layout)",
+                    pos=(0, 0),
+                )
+            ],
+        }
         self.clock = 0
 
     def render(self, dt):
@@ -49,7 +57,7 @@ class KeyboardOverlay(BaseOverlay):
         )
         surface.fill((0, 0, 0, 255))
 
-        for obj in self.objects:
+        for obj in self.layout:
             obj_surface = obj.render(dt)
             if obj_surface is not None:
                 surface.blit(obj_surface, obj.screen_pos)
@@ -88,7 +96,7 @@ class KeyboardOverlay(BaseOverlay):
                 )
                 if self.collides_with(transformed_pos):
                     event.dict["consumed"] = True
-                    for obj in self.objects[::-1]:
+                    for obj in self.layout:
                         if consumed_by := obj.event(event, transformed_pos):
                             return consumed_by
 
@@ -99,3 +107,11 @@ class KeyboardOverlay(BaseOverlay):
     def visible(self):
         if obj := self.screen_manager.active_object:
             return obj.keyboard_settings["enabled"]
+
+    @property
+    def settings(self):
+        return self.screen_manager.active_object.keyboard_settings
+
+    @property
+    def layout(self):
+        return self.layouts[self.settings["layout"]]

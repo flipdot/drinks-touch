@@ -66,7 +66,7 @@ class InputField(BaseElm):
 
     @property
     def keyboard_settings(self):
-        if self.input_type == InputType.NUMBER:
+        if self.input_type in (InputType.NUMBER, InputType.POSITIVE_NUMBER):
             layout = KeyboardLayout.NUMERIC
         else:
             layout = KeyboardLayout.DEFAULT
