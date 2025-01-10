@@ -1,25 +1,16 @@
 import pygame
+from pygame.event import EventType
 
 import config
 import math
 
-from screen import get_screen_surface
-
-
-class BaseOverlay:
-    def __init__(self):
-        self.screen = get_screen_surface()
-
-    def render(self, dt):
-        pass
-
-    def events(self, events):
-        pass
+from screens.screen_manager import ScreenManager
+from .base import BaseOverlay
 
 
 class MouseOverlay(BaseOverlay):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, screen_manager: ScreenManager):
+        super().__init__(screen_manager)
         self.mouse_pos = (0, 0)
         self.click_pos = (0, 0)
         self.mouse_path = []
@@ -80,7 +71,7 @@ class MouseOverlay(BaseOverlay):
             self.mouse_path = new_mouse_path
             self.screen.blit(surface, (0, 0))
 
-    def events(self, events):
+    def events(self, events: list[EventType]):
         self.mouse_pressed = pygame.mouse.get_pressed()[0]
         if not self.mouse_pressed:
             self.mouse_path = []

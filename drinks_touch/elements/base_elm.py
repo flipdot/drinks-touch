@@ -51,6 +51,12 @@ class BaseElm:
             self.padding_left = padding[3]
 
     @property
+    def keyboard_settings(self):
+        return {
+            "enabled": False,
+        }
+
+    @property
     def height(self):
         return self._height
 
@@ -125,7 +131,7 @@ class BaseElm:
         # TODO get rid of is_visible
         return self.is_visible
 
-    def collides_with(self, pos: tuple[int, int]) -> bool:
+    def collides_with(self, pos: tuple[float, float]) -> bool:
         return (
             self.box is not None
             and self.visible

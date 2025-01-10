@@ -16,6 +16,7 @@ from database.storage import init_db, Session
 from drinks.drinks_manager import DrinksManager
 from notifications.notification import send_low_balances, send_summaries
 from overlays import MouseOverlay, BaseOverlay
+from overlays.keyboard import KeyboardOverlay
 from screens.screen_manager import ScreenManager
 from screens.tasks_screen import TasksScreen
 from stats.stats import run as stats_send
@@ -58,8 +59,9 @@ def handle_events():
                 events.append(event_queue.get(block))
             except queue.Empty:
                 break
-        for overlay in overlays:
+        for overlay in overlays[::-1]:
             overlay.events(events)
+
         screen_manager.events(events)
 
 
@@ -97,16 +99,18 @@ def main(argv):
 
     global screen_manager
     global overlays
-    overlays.extend(
-        [
-            MouseOverlay(),
-        ]
-    )
     screen_manager = ScreenManager()
     ScreenManager.set_instance(screen_manager)
 
     screen_manager.set_default()
     screen_manager.set_active(TasksScreen())
+
+    overlays.extend(
+        [
+            KeyboardOverlay(screen_manager),
+            MouseOverlay(screen_manager),
+        ]
+    )
 
     init_db()
 

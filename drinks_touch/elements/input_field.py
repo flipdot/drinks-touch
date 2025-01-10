@@ -7,6 +7,7 @@ import pygame
 
 from config import Color, Font
 from elements.base_elm import BaseElm
+from overlays.keyboard import KeyboardLayout
 from screens.screen_manager import ScreenManager
 
 
@@ -62,6 +63,14 @@ class InputField(BaseElm):
         self.auto_complete = auto_complete
         self.only_auto_complete = only_auto_complete
         self.text = ""
+
+    @property
+    def keyboard_settings(self):
+        if self.input_type in (InputType.NUMBER, InputType.POSITIVE_NUMBER):
+            layout = KeyboardLayout.NUMERIC
+        else:
+            layout = KeyboardLayout.DEFAULT
+        return {"enabled": True, "layout": layout}
 
     def render(self, *args, **kwargs):
         is_active = ScreenManager.get_instance().active_object is self
