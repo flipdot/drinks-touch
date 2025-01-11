@@ -146,10 +146,14 @@ class ScreenManager:
         if config.DEBUG_UI_ELEMENTS:
             info = pygame.display.Info()
             font = pygame.font.Font(None, 30)
-            text = font.render(
-                f"{info.current_w}x{info.current_h}", True, (255, 0, 255)
-            )
-            self.surface.blit(text, (0, 0))
+            for i, text in enumerate(
+                [
+                    f"{info.current_w}x{info.current_h}",
+                    f"active_object: {self.active_object}",
+                ]
+            ):
+                text_surface = font.render(text, True, (255, 0, 255))
+                self.surface.blit(text_surface, (0, i * 30))
 
     def events(self, events: list[EventType]):
         screen = self.get_active()
@@ -192,7 +196,9 @@ class ScreenManager:
                 continue
 
             # Handle clicks on screen objects
-            if active_object := screen.event(event):
+            if (
+                active_object := screen.event(event)
+            ) and not ScreenManager.get_instance().active_object:
                 active_object.ts = 0
                 ScreenManager.get_instance().active_object = active_object
 

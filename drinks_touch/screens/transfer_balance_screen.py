@@ -8,7 +8,7 @@ from elements.input_field import InputField, InputType
 from elements.spacer import Spacer
 from elements.vbox import VBox
 from screens.screen import Screen
-
+from screens.screen_manager import ScreenManager
 
 logger = logging.getLogger(__name__)
 
@@ -36,6 +36,10 @@ class TransferBalanceScreen(Screen):
         self.account = account
 
     def on_start(self, *args, **kwargs):
+        def focus(obj):
+            print("focus", obj)
+            ScreenManager.get_instance().active_object = obj
+
         self.objects = [
             Label(
                 text=self.account.name,
@@ -47,20 +51,21 @@ class TransferBalanceScreen(Screen):
                         text="An wen möchtest du Guthaben übertragen?",
                         size=20,
                     ),
-                    InputField(
+                    input_field_account_name := InputField(
                         width=config.SCREEN_WIDTH - 10,
                         height=50,
                         auto_complete=lambda text: auto_complete_account_name(
                             text, except_account=self.account.name
                         ),
                         only_auto_complete=True,
+                        on_complete=lambda _: focus(input_field_amount),
                     ),
                     Spacer(height=40),
                     Label(
                         text="Wie viel Euro möchtest du übertragen?",
                         size=20,
                     ),
-                    InputField(
+                    input_field_amount := InputField(
                         input_type=InputType.POSITIVE_NUMBER,
                         max_decimal_places=2,
                         width=config.SCREEN_WIDTH - 10,
@@ -87,3 +92,5 @@ class TransferBalanceScreen(Screen):
                 pos=(5, 100),
             ),
         ]
+
+        ScreenManager.get_instance().active_object = input_field_account_name

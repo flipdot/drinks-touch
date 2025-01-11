@@ -41,6 +41,7 @@ class InputField(BaseElm):
         input_type=InputType.TEXT,
         auto_complete: callable | None = None,
         only_auto_complete: bool = False,
+        on_complete: callable | None = None,
         **kwargs,
     ):
         """
@@ -50,6 +51,9 @@ class InputField(BaseElm):
         assert (
             not only_auto_complete or auto_complete
         ), "only_auto_complete requires auto_complete function"
+        assert (
+            not on_complete or auto_complete
+        ), "on_complete requires auto_complete function"
         if input_type in [InputType.NUMBER, InputType.POSITIVE_NUMBER]:
             self.valid_chars = NUMERIC + ".,"
             if input_type == InputType.NUMBER:
@@ -62,7 +66,11 @@ class InputField(BaseElm):
         self.input_type = input_type
         self.auto_complete = auto_complete
         self.only_auto_complete = only_auto_complete
+        self.on_complete = on_complete
         self.text = ""
+
+    def __repr__(self):
+        return f"<InputField {self.text}>"
 
     @property
     def keyboard_settings(self):
@@ -158,5 +166,6 @@ class InputField(BaseElm):
                 return
             if len(suggestions) == 1:
                 self.text = suggestions[0]
+                self.on_complete(self.text)
                 return
         self.text += char
