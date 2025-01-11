@@ -40,7 +40,6 @@ class TransferBalanceScreen(Screen):
 
     def on_start(self, *args, **kwargs):
         def focus(obj):
-            print("focus", obj)
             ScreenManager.instance.active_object = obj
 
         self.objects = [

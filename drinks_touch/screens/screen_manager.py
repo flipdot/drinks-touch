@@ -5,6 +5,7 @@ import config
 from config import Color, Font
 from elements import Button, Progress, Label
 from elements.base_elm import BaseElm
+from overlays.keyboard import KeyboardOverlay
 from screen import get_screen_surface
 
 from typing import TYPE_CHECKING
@@ -49,8 +50,19 @@ class ScreenManager:
             ),
             self.timeout_widget,
         ]
-        self.active_object: BaseElm | None = None
+        self.active_object = None
         ScreenManager.instance = self
+
+    @property
+    def active_object(self) -> BaseElm | None:
+        return self._active_object
+
+    @active_object.setter
+    def active_object(self, value: BaseElm | None):
+        self._active_object = value
+        if value is not None:
+            if settings := value.keyboard_settings:
+                KeyboardOverlay.instance.apply_settings(settings)
 
     def set_idle_timeout(self, timeout: int):
         """

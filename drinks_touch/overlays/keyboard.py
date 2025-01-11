@@ -10,7 +10,11 @@ from elements.hbox import HBox
 from elements.spacer import Spacer
 from elements.vbox import VBox
 from overlays import BaseOverlay
-from screens.screen_manager import ScreenManager
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from screens.screen_manager import ScreenManager
 
 
 class KeyboardLayout(enum.Enum):
@@ -21,8 +25,10 @@ class KeyboardLayout(enum.Enum):
 
 class KeyboardOverlay(BaseOverlay):
     ANIMATION_DURATION = 0.2
+    instance = None
 
-    def __init__(self, screen_manager: ScreenManager):
+    def __init__(self, screen_manager: "ScreenManager"):
+        assert KeyboardOverlay.instance is None, "KeyboardOverlay is a singleton"
         super().__init__(screen_manager)
         self.width = self.screen.get_width()
         self.height = 350
@@ -38,6 +44,7 @@ class KeyboardOverlay(BaseOverlay):
         )
 
         num_btn_size = 50
+        KeyboardOverlay.instance = self
 
         def make_num_btn(n: str):
             return Button(
@@ -309,8 +316,6 @@ class KeyboardOverlay(BaseOverlay):
         if not self.visible:
             self.clock = 0
             return
-        if self.screen_manager.active_object != self._settings_for_object:
-            self._apply_settings()
         self.clock += dt
         surface = pygame.Surface(
             (self.screen.get_width(), self.height), pygame.SRCALPHA
@@ -364,11 +369,8 @@ class KeyboardOverlay(BaseOverlay):
         if obj := self.screen_manager.active_object:
             return obj.keyboard_settings["enabled"]
 
-    def _apply_settings(self):
-        active_object = self.screen_manager.active_object
-        settings = active_object.keyboard_settings
+    def apply_settings(self, settings: dict):
         self.layout = self.layouts[settings.get("layout", KeyboardLayout.DEFAULT)]
-        self._settings_for_object = active_object
 
     def set_layout(self, layout: KeyboardLayout | None):
         self.layout = self.layouts[layout]
