@@ -17,14 +17,17 @@ logger = logging.getLogger(__name__)
 # because it is called in the render() function.
 # Still, we want to get fresh results every time the user changes the input.
 @functools.lru_cache(maxsize=1)
-def auto_complete_account_name(text, except_account: str):
+def auto_complete_account_name(text, except_account: str, limit=10):
     accounts = (
         Account.query.filter(Account.name.ilike(f"{text}%"))
         .filter(Account.name != except_account)
         .order_by(Account.name)
-        .limit(5)
+        .limit(limit + 1)
     )
-    return [account.name for account in accounts]
+    res = [account.name for account in accounts]
+    if len(res) == limit + 1:
+        res[-1] = "..."
+    return res
 
 
 class TransferBalanceScreen(Screen):

@@ -118,9 +118,9 @@ class InputField(BaseElm):
 
         suggestions = self.auto_complete(self.text)
         surface = pygame.Surface(
-            (self.width, self.height + len(suggestions) * self.height), pygame.SRCALPHA
+            (self.width, self.height + len(suggestions) * 20 + 5), pygame.SRCALPHA
         )
-        font = pygame.font.Font(Font.SANS_SERIF.value, self.height - 10)
+        font = pygame.font.Font(Font.SANS_SERIF.value, 20)
 
         if suggestions:
             if len(suggestions) == 1 and suggestions[0] == self.text:
@@ -129,9 +129,10 @@ class InputField(BaseElm):
                 (self.width, len(suggestions) * self.height)
             )
             for i, suggestion in enumerate(suggestions):
-                suggestion_text = font.render(suggestion, 1, Color.PRIMARY.value)
-                suggestion_surface.blit(suggestion_text, (5, i * self.height))
+                suggestion_text = font.render(suggestion, 1, Color.GREY.value)
+                suggestion_surface.blit(suggestion_text, (5, i * 20))
             surface.blit(suggestion_surface, (0, self.height))
+        surface.set_alpha(200)
         return surface
 
     def key_event(self, event: pygame.event.Event):
