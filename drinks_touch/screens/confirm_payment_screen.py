@@ -83,14 +83,14 @@ class ConfirmPaymentScreen(Screen):
         ]
 
     def on_stop(self, *args, **kwargs):
-        DrinksManager.get_instance().set_selected_drink(None)
+        DrinksManager.instance.set_selected_drink(None)
 
     def save_drink(self):
         session = get_session()
         ev = ScanEvent(self.drink["ean"], self.account.ldap_id, datetime.datetime.now())
         session.add(ev)
         session.commit()
-        DrinksManager.get_instance().set_selected_drink(None)
+        DrinksManager.instance.set_selected_drink(None)
         # Legacy: Delete a temp ldap user. They were only used for
         # Gutscheincodes
         # Users.delete_if_nomoney(

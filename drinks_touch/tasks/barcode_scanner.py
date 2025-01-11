@@ -55,7 +55,7 @@ class BarcodeWorker:
 
     @staticmethod
     def on_barcode(barcode):
-        screen = ScreenManager.get_instance().get_active()
+        screen = ScreenManager.instance.get_active()
 
         if barcode == "RESTART":
             from screens.tasks_screen import TasksScreen

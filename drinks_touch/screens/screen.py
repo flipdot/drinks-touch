@@ -91,15 +91,15 @@ class Screen:
 
     @staticmethod
     def back():
-        ScreenManager.get_instance().go_back()
+        ScreenManager.instance.go_back()
 
     @staticmethod
     def goto(screen: "Screen", *args, **kwargs):
-        ScreenManager.get_instance().set_active(screen, *args, **kwargs)
+        ScreenManager.instance.set_active(screen, *args, **kwargs)
 
     @staticmethod
     def home():
-        ScreenManager.get_instance().set_default()
+        ScreenManager.instance.set_default()
 
     def alert(self, text: str):
         self._alert = text

@@ -69,7 +69,7 @@ class TasksScreen(Screen):
     def check_task_completion(self):
         if not self.finished and self.all_tasks_finished:
             self.idle_timeout = 5
-            ScreenManager.get_instance().set_idle_timeout(self.idle_timeout)
+            ScreenManager.instance.set_idle_timeout(self.idle_timeout)
             self.finished = True
 
     def on_barcode(self, barcode):

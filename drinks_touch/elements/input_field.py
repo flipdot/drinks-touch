@@ -81,7 +81,7 @@ class InputField(BaseElm):
         return {"enabled": True, "layout": layout}
 
     def render(self, *args, **kwargs):
-        is_active = ScreenManager.get_instance().active_object is self
+        is_active = ScreenManager.instance.active_object is self
         surface = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
         pygame.draw.rect(
             surface, Color.NAVBAR_BACKGROUND.value, (0, 0, self.width, self.height)
@@ -112,7 +112,7 @@ class InputField(BaseElm):
     def render_overlay(self, *args, **kwargs):
         if not self.auto_complete:
             return
-        is_active = ScreenManager.get_instance().active_object is self
+        is_active = ScreenManager.instance.active_object is self
         if not is_active:
             return
 

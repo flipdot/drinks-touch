@@ -18,6 +18,7 @@ class ScreenManager:
     MENU_BAR_HEIGHT = 65
 
     def __init__(self):
+        assert ScreenManager.instance is None, "ScreenManager is a singleton"
         self.ts = 0
         self.current_screen = None
         self.surface = get_screen_surface()
@@ -49,6 +50,7 @@ class ScreenManager:
             self.timeout_widget,
         ]
         self.active_object: BaseElm | None = None
+        ScreenManager.instance = self
 
     def set_idle_timeout(self, timeout: int):
         """
@@ -173,7 +175,7 @@ class ScreenManager:
                 # This is why the idle timeout is set before this check.
                 continue
             if event.type == pygame.MOUSEBUTTONUP:
-                ScreenManager.get_instance().active_object = None
+                ScreenManager.instance.active_object = None
             if self.nav_bar_visible and hasattr(event, "pos"):
                 # Handle clicks on the navbar itself.
                 # This is why we need to calculate the transformed_pos,
@@ -198,22 +200,18 @@ class ScreenManager:
             # Handle clicks on screen objects
             if (
                 active_object := screen.event(event)
-            ) and not ScreenManager.get_instance().active_object:
+            ) and not ScreenManager.instance.active_object:
                 active_object.ts = 0
-                ScreenManager.get_instance().active_object = active_object
+                ScreenManager.instance.active_object = active_object
 
             if event.type == pygame.KEYDOWN and (
-                active_object := ScreenManager.get_instance().active_object
+                active_object := ScreenManager.instance.active_object
             ):
                 active_object.key_event(event)
 
     @staticmethod
     def get_instance() -> "ScreenManager":
         return ScreenManager.instance
-
-    @staticmethod
-    def set_instance(instance):
-        ScreenManager.instance = instance
 
     @property
     def _keyboard_visible(self):

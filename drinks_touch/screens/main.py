@@ -58,7 +58,7 @@ class MainScreen(Screen):
     def switch_to_screen(self, param):
         from .screen_manager import ScreenManager
 
-        screen_manager = ScreenManager.get_instance()
+        screen_manager = ScreenManager.instance
         screen_manager.set_active(NamesScreen(param))
 
     def on_barcode(self, barcode):
@@ -69,7 +69,7 @@ class MainScreen(Screen):
             return
         account = Account.query.filter(Account.id_card == barcode).first()
         if account:
-            ScreenManager.get_instance().set_active(ProfileScreen(account))
+            ScreenManager.instance.set_active(ProfileScreen(account))
 
     @staticmethod
     def __get_pos(i):

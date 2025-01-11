@@ -41,7 +41,7 @@ class TransferBalanceScreen(Screen):
     def on_start(self, *args, **kwargs):
         def focus(obj):
             print("focus", obj)
-            ScreenManager.get_instance().active_object = obj
+            ScreenManager.instance.active_object = obj
 
         self.objects = [
             Label(
@@ -88,4 +88,4 @@ class TransferBalanceScreen(Screen):
             ),
         ]
 
-        ScreenManager.get_instance().active_object = input_field_account_name
+        ScreenManager.instance.active_object = input_field_account_name
