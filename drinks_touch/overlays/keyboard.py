@@ -327,13 +327,10 @@ class KeyboardOverlay(BaseOverlay):
             if obj_surface is not None:
                 surface.blit(obj_surface, obj.screen_pos)
 
-        # full alpha (255) after ANIMATION_DURATION
-        alpha = min(255, int((self.clock / self.ANIMATION_DURATION) * 255))
-        surface.set_alpha(alpha)
-
-        # self.pos after ANIMATION_DURATION, interpolate
-        # from self._anim_start_pos to self.pos
         if self.clock < self.ANIMATION_DURATION:
+            alpha = int((self.clock / self.ANIMATION_DURATION) * 255)
+            surface.set_alpha(alpha)
+
             pos = self._anim_start_pos.lerp(
                 self.pos, self.clock / self.ANIMATION_DURATION
             )
