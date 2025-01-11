@@ -80,14 +80,6 @@ class TransferBalanceScreen(Screen):
                         size=15,
                     ),
                     Label(
-                        text="- On-Screen-Keyboard",
-                        size=15,
-                    ),
-                    Label(
-                        text="    Theoretisch kannst du eine Tastatur anschließen :)",
-                        size=15,
-                    ),
-                    Label(
                         text="- Nächster Screen zum bestätigen",
                         size=15,
                     ),
