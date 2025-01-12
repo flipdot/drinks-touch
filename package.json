@@ -5,7 +5,7 @@
   "repository": "https://github.com/flipdot/drinks-touch.git",
   "type": "module",
   "engines": {
-    "node": "22"
+    "node": "20"
   },
   "packageManager": "pnpm@9.15.2",
   "devDependencies": {
