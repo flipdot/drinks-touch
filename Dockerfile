@@ -23,7 +23,9 @@ RUN pnpm install --offline
 # TODO: try if slim or alpine versions work.
 FROM python:3.11.4-buster@sha256:3a19b4d6ce4402d11bb19aa11416e4a262a60a57707a5cda5787a81285df2666 AS development
 
-ENV PYTHONUNBUFFERED 1
+ENV PYTHONUNBUFFERED=1
+
+WORKDIR /srv/app/
 
 # old pygame dependency list
 #
@@ -45,13 +47,11 @@ RUN apt-get update && \
     \
     libsdl1.2-dev libfreetype6-dev libsdl-mixer1.2-dev libsdl-image1.2-dev libsdl-ttf2.0-dev libportmidi-dev && \
     \
-    rm -rf /var/lib/apt/lists/*
-RUN localedef -i de_DE -c -f UTF-8 -A /usr/share/locale/locale.alias de_DE.UTF-8
-RUN mkdir /srv/app/
-
-WORKDIR /srv/app/
-
-RUN pip install poetry==1.8.2
+    rm -rf /var/lib/apt/lists/* && \
+    \
+    localedef -i de_DE -c -f UTF-8 -A /usr/share/locale/locale.alias de_DE.UTF-8 && \
+    \
+    pip install poetry==1.8.2
 
 COPY ./docker/asound.conf /etc/asound.conf
 COPY ./docker/pip_extra-index-piwheels.conf /etc/pip.conf
