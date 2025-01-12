@@ -1,3 +1,23 @@
+FROM node:20.18.1-alpine AS base-image
+
+ENV CI=true
+
+WORKDIR /srv/app/
+
+RUN corepack enable
+
+
+FROM base-image AS prepare
+
+COPY ./pnpm-lock.yaml ./
+
+RUN pnpm fetch
+
+COPY ./ ./
+
+RUN pnpm install --offline
+
+
 ######################################################################
 # Stage name "development" is required for development with DargStack.
 # TODO: try if slim or alpine versions work.
@@ -36,6 +56,8 @@ RUN pip install poetry==1.8.2
 COPY ./docker/asound.conf /etc/asound.conf
 COPY ./docker/pip_extra-index-piwheels.conf /etc/pip.conf
 COPY ./poetry.lock ./pyproject.toml ./
+COPY --from=prepare /srv/app/package.json /dev/null
+
 RUN --mount=type=cache,target=/root/.cache/pypoetry/cache \
     --mount=type=cache,target=/root/.cache/pypoetry/artifacts \
     poetry install
