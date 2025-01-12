@@ -4,23 +4,31 @@ import functools
 import pygame
 from pygame.event import EventType
 
-from elements import Label, Button
+from elements import Button
 from elements.base_elm import BaseElm
 from elements.hbox import HBox
+from elements.spacer import Spacer
 from elements.vbox import VBox
 from overlays import BaseOverlay
-from screens.screen_manager import ScreenManager
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from screens.screen_manager import ScreenManager
 
 
 class KeyboardLayout(enum.Enum):
     DEFAULT = "default"
+    CAPS = "caps"
     NUMERIC = "numeric"
 
 
 class KeyboardOverlay(BaseOverlay):
     ANIMATION_DURATION = 0.2
+    instance = None
 
-    def __init__(self, screen_manager: ScreenManager):
+    def __init__(self, screen_manager: "ScreenManager"):
+        assert KeyboardOverlay.instance is None, "KeyboardOverlay is a singleton"
         super().__init__(screen_manager)
         self.width = self.screen.get_width()
         self.height = 350
@@ -30,13 +38,14 @@ class KeyboardOverlay(BaseOverlay):
             - self.height
             - self.screen_manager.MENU_BAR_HEIGHT,
         )
-        self._layout_override = None
+        self._key_button_map = {}
 
         self._anim_start_pos = pygame.Vector2(
             0, self.screen.get_height() - self.height * 0.9
         )
 
         num_btn_size = 50
+        KeyboardOverlay.instance = self
 
         def make_num_btn(n: str):
             return Button(
@@ -47,17 +56,179 @@ class KeyboardOverlay(BaseOverlay):
                 ),
             )
 
+        def key_btn(c: str):
+            keycode = getattr(pygame, f"K_{c.lower()}")
+            btn = Button(
+                text=f" {c} ",
+                size=23,
+                padding=(15, 0, 15),
+                on_click=functools.partial(self.press_key, keycode, c),
+            )
+            self._key_button_map[c] = btn
+            return btn
+
         self.layouts: dict[KeyboardLayout, list[BaseElm]] = {
             KeyboardLayout.DEFAULT: [
-                Label(
-                    text="Keyboard (default layout)",
+                VBox(
+                    [
+                        row_digits := HBox(
+                            [
+                                key_btn("1"),
+                                key_btn("2"),
+                                key_btn("3"),
+                                key_btn("4"),
+                                key_btn("5"),
+                                key_btn("6"),
+                                key_btn("7"),
+                                key_btn("8"),
+                                key_btn("9"),
+                                key_btn("0"),
+                            ]
+                        ),
+                        HBox(
+                            [
+                                key_btn("q"),
+                                key_btn("w"),
+                                key_btn("e"),
+                                key_btn("r"),
+                                key_btn("t"),
+                                key_btn("z"),
+                                key_btn("u"),
+                                key_btn("i"),
+                                key_btn("o"),
+                                key_btn("p"),
+                            ]
+                        ),
+                        HBox(
+                            [
+                                Spacer(width=15),
+                                key_btn("a"),
+                                key_btn("s"),
+                                key_btn("d"),
+                                key_btn("f"),
+                                key_btn("g"),
+                                key_btn("h"),
+                                key_btn("j"),
+                                key_btn("k"),
+                                key_btn("l"),
+                            ]
+                        ),
+                        HBox(
+                            [
+                                Button(
+                                    text=" ⇧ ",
+                                    size=23,
+                                    padding=(15, 0, 15),
+                                    on_click=functools.partial(
+                                        self.set_layout, KeyboardLayout.CAPS
+                                    ),
+                                ),
+                                key_btn("y"),
+                                key_btn("x"),
+                                key_btn("c"),
+                                key_btn("v"),
+                                key_btn("b"),
+                                key_btn("n"),
+                                key_btn("m"),
+                                Button(
+                                    text=" ← ",
+                                    size=23,
+                                    padding=15,
+                                    on_click=functools.partial(
+                                        self.press_key, pygame.K_BACKSPACE
+                                    ),
+                                ),
+                            ]
+                        ),
+                        row_spacebar := HBox(
+                            [
+                                Button(
+                                    text="123",
+                                    size=23,
+                                    padding=15,
+                                    on_click=functools.partial(
+                                        self.set_layout, KeyboardLayout.NUMERIC
+                                    ),
+                                ),
+                                Spacer(width=58),
+                                Button(
+                                    text=" ",
+                                    size=23,
+                                    padding=(15, 86, 15),
+                                    on_click=functools.partial(
+                                        self.press_key, pygame.K_SPACE, " "
+                                    ),
+                                ),
+                            ]
+                        ),
+                    ],
                     pos=(0, 0),
+                    padding=10,
                 ),
-                Button(
-                    text="123",
-                    pos=(0, self.height - 75),
-                    size=40,
-                    on_click=functools.partial(self.set_layout, KeyboardLayout.NUMERIC),
+            ],
+            KeyboardLayout.CAPS: [
+                VBox(
+                    [
+                        row_digits,
+                        HBox(
+                            [
+                                key_btn("Q"),
+                                key_btn("W"),
+                                key_btn("E"),
+                                key_btn("R"),
+                                key_btn("T"),
+                                key_btn("Z"),
+                                key_btn("U"),
+                                key_btn("I"),
+                                key_btn("O"),
+                                key_btn("P"),
+                            ]
+                        ),
+                        HBox(
+                            [
+                                Spacer(width=15),
+                                key_btn("A"),
+                                key_btn("S"),
+                                key_btn("D"),
+                                key_btn("F"),
+                                key_btn("G"),
+                                key_btn("H"),
+                                key_btn("J"),
+                                key_btn("K"),
+                                key_btn("L"),
+                            ]
+                        ),
+                        HBox(
+                            [
+                                Button(
+                                    text=" ⇧ ",
+                                    size=23,
+                                    padding=(15, 0, 15),
+                                    on_click=functools.partial(
+                                        self.set_layout, KeyboardLayout.DEFAULT
+                                    ),
+                                ),
+                                key_btn("Y"),
+                                key_btn("X"),
+                                key_btn("C"),
+                                key_btn("V"),
+                                key_btn("B"),
+                                key_btn("N"),
+                                key_btn("M"),
+                                Button(
+                                    text=" ← ",
+                                    size=23,
+                                    padding=15,
+                                    on_click=functools.partial(
+                                        self.press_key, pygame.K_BACKSPACE
+                                    ),
+                                ),
+                            ]
+                        ),
+                        row_spacebar,
+                    ],
+                    pos=(0, 0),
+                    padding=10,
                 ),
             ],
             KeyboardLayout.NUMERIC: [
@@ -123,7 +294,14 @@ class KeyboardOverlay(BaseOverlay):
                 ),
             ],
         }
+        self.layout = self.layouts[KeyboardLayout.DEFAULT]
         self.clock = 0
+        self._settings_for_object = None
+
+    def set_keys_disabled(self, disabled_characters: str):
+        chars = disabled_characters.lower()
+        for key, btn in self._key_button_map.items():
+            btn.disabled = key.lower() in chars
 
     def press_key(self, key: int, char: str | None = None):
         event = pygame.event.Event(pygame.KEYDOWN, key=key, unicode=char)
@@ -144,13 +322,10 @@ class KeyboardOverlay(BaseOverlay):
             if obj_surface is not None:
                 surface.blit(obj_surface, obj.screen_pos)
 
-        # full alpha (255) after ANIMATION_DURATION
-        alpha = min(255, int((self.clock / self.ANIMATION_DURATION) * 255))
-        surface.set_alpha(alpha)
-
-        # self.pos after ANIMATION_DURATION, interpolate
-        # from self._anim_start_pos to self.pos
         if self.clock < self.ANIMATION_DURATION:
+            alpha = int((self.clock / self.ANIMATION_DURATION) * 255)
+            surface.set_alpha(alpha)
+
             pos = self._anim_start_pos.lerp(
                 self.pos, self.clock / self.ANIMATION_DURATION
             )
@@ -161,7 +336,6 @@ class KeyboardOverlay(BaseOverlay):
 
     def events(self, events: list[EventType]):
         if not self.visible:
-            self.set_layout(None)
             return False
         # check if click is inside keyboard
         for event in events:
@@ -187,15 +361,9 @@ class KeyboardOverlay(BaseOverlay):
         if obj := self.screen_manager.active_object:
             return obj.keyboard_settings["enabled"]
 
-    @property
-    def settings(self):
-        return self.screen_manager.active_object.keyboard_settings
-
-    @property
-    def layout(self):
-        if self._layout_override:
-            return self.layouts[self._layout_override]
-        return self.layouts[self.settings["layout"]]
+    def apply_settings(self, settings: dict):
+        self.layout = self.layouts[settings.get("layout", KeyboardLayout.DEFAULT)]
+        KeyboardOverlay.instance.set_keys_disabled("")
 
     def set_layout(self, layout: KeyboardLayout | None):
-        self._layout_override = layout
+        self.layout = self.layouts[layout]

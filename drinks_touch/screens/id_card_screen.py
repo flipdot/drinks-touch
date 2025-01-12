@@ -70,7 +70,7 @@ class IDCardScreen(Screen):
     def home():
         from .screen_manager import ScreenManager
 
-        screen_manager = ScreenManager.get_instance()
+        screen_manager = ScreenManager.instance
         screen_manager.set_default()
 
     def btn_home(self):
@@ -100,7 +100,7 @@ class IDCardScreen(Screen):
         if drink and ("tags" not in drink or "unknown" not in drink["tags"]):
             from .profile import ProfileScreen
 
-            DrinksManager.get_instance().set_selected_drink(drink)
-            ScreenManager.get_instance().set_active(ProfileScreen(self.account))
+            DrinksManager.instance.set_selected_drink(drink)
+            ScreenManager.instance.set_active(ProfileScreen(self.account))
             return
         self.set_id(barcode)

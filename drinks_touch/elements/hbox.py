@@ -34,7 +34,8 @@ class HBox(BaseElm):
         for element in self.children:
             element.pos = (x, self.padding_top)
             element_surface = element.render(*args, **kwargs)
-            surface.blit(element_surface, element.pos)
+            if element_surface:
+                surface.blit(element_surface, element.pos)
             x += element.width + self.gap
         if self.focus:
             pygame.draw.rect(

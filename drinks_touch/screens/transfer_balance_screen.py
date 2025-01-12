@@ -1,14 +1,18 @@
 import functools
 import logging
 
+from sqlalchemy import func
+
 import config
 from database.models import Account
+from database.storage import Session
 from elements import Label
 from elements.input_field import InputField, InputType
 from elements.spacer import Spacer
 from elements.vbox import VBox
+from overlays.keyboard import KeyboardOverlay
 from screens.screen import Screen
-
+from screens.screen_manager import ScreenManager
 
 logger = logging.getLogger(__name__)
 
@@ -17,14 +21,35 @@ logger = logging.getLogger(__name__)
 # because it is called in the render() function.
 # Still, we want to get fresh results every time the user changes the input.
 @functools.lru_cache(maxsize=1)
-def auto_complete_account_name(text, except_account: str):
+def auto_complete_account_name(text, except_account: str, limit=10):
     accounts = (
         Account.query.filter(Account.name.ilike(f"{text}%"))
         .filter(Account.name != except_account)
         .order_by(Account.name)
-        .limit(5)
+        .limit(limit + 1)
     )
-    return [account.name for account in accounts]
+    res = [account.name for account in accounts]
+    if len(res) == limit + 1:
+        res[-1] = "..."
+
+    if len(res) >= 1:
+        n_char = len(text) + 1
+        query = (
+            Session()
+            .query(
+                func.upper(func.substr(Account.name, n_char, 1)).label("n_char"),
+                func.count(Account.id),
+            )
+            .filter(Account.name.ilike(f"{text}%"))
+            .group_by("n_char")
+            .order_by("n_char")
+            .all()
+        )
+        disabled_characters = "1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        for char, _ in query:
+            disabled_characters = disabled_characters.replace(char, "")
+        KeyboardOverlay.instance.set_keys_disabled(disabled_characters)
+    return res
 
 
 class TransferBalanceScreen(Screen):
@@ -36,6 +61,9 @@ class TransferBalanceScreen(Screen):
         self.account = account
 
     def on_start(self, *args, **kwargs):
+        def focus(obj):
+            ScreenManager.instance.active_object = obj
+
         self.objects = [
             Label(
                 text=self.account.name,
@@ -47,20 +75,21 @@ class TransferBalanceScreen(Screen):
                         text="An wen möchtest du Guthaben übertragen?",
                         size=20,
                     ),
-                    InputField(
+                    input_field_account_name := InputField(
                         width=config.SCREEN_WIDTH - 10,
                         height=50,
                         auto_complete=lambda text: auto_complete_account_name(
                             text, except_account=self.account.name
                         ),
                         only_auto_complete=True,
+                        on_complete=lambda _: focus(input_field_amount),
                     ),
                     Spacer(height=40),
                     Label(
                         text="Wie viel Euro möchtest du übertragen?",
                         size=20,
                     ),
-                    InputField(
+                    input_field_amount := InputField(
                         input_type=InputType.POSITIVE_NUMBER,
                         max_decimal_places=2,
                         width=config.SCREEN_WIDTH - 10,
@@ -72,14 +101,6 @@ class TransferBalanceScreen(Screen):
                         size=15,
                     ),
                     Label(
-                        text="- On-Screen-Keyboard",
-                        size=15,
-                    ),
-                    Label(
-                        text="    Theoretisch kannst du eine Tastatur anschließen :)",
-                        size=15,
-                    ),
-                    Label(
                         text="- Nächster Screen zum bestätigen",
                         size=15,
                     ),
@@ -87,3 +108,5 @@ class TransferBalanceScreen(Screen):
                 pos=(5, 100),
             ),
         ]
+
+        ScreenManager.instance.active_object = input_field_account_name

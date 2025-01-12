@@ -94,13 +94,11 @@ def main(argv):
 
     clock = pygame.time.Clock()
 
-    drinks_manager = DrinksManager()
-    DrinksManager.set_instance(drinks_manager)
+    DrinksManager()
 
     global screen_manager
     global overlays
     screen_manager = ScreenManager()
-    ScreenManager.set_instance(screen_manager)
 
     screen_manager.set_default()
     screen_manager.set_active(TasksScreen())

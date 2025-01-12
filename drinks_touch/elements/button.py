@@ -15,6 +15,7 @@ class Button(BaseElm):
         size=30,
         text=None,
         color=Color.PRIMARY,
+        disabled_color=Color.DISABLED,
         on_click=None,
         force_width=None,
         force_height=None,
@@ -23,6 +24,7 @@ class Button(BaseElm):
         padding: (
             int | tuple[int, int] | tuple[int, int, int] | tuple[int, int, int, int]
         ) = 10,
+        disabled=False,
         *args,
         **kwargs,
     ):
@@ -32,6 +34,8 @@ class Button(BaseElm):
 
         self.size = size
         self.color = color
+        self._color = color
+        self._disabled_color = disabled_color
         self.on_click_handler = on_click
         self.force_width = force_width
         self.force_height = force_height
@@ -44,6 +48,20 @@ class Button(BaseElm):
                 color=color,
             )
         self.inner = inner
+        self.disabled = disabled
+
+    @property
+    def disabled(self) -> bool:
+        return self._disabled
+
+    @disabled.setter
+    def disabled(self, value: bool):
+        self._disabled = value
+        if value:
+            self.color = self._disabled_color
+        else:
+            self.color = self._color
+        self.inner.color = self.color
 
     def __repr__(self):
         if hasattr(self.inner, "text"):
@@ -75,6 +93,8 @@ class Button(BaseElm):
         return surface
 
     def on_click(self, x, y):
+        if self.disabled:
+            return
         if self.on_click_handler is None:
             raise NotImplementedError("No on_click handler defined")
         self.on_click_handler()

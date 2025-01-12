@@ -44,6 +44,9 @@ class Label(BaseElm):
 
         self.font = Label.get_font(font, self.size)
 
+    def __repr__(self):
+        return f"<Label {self.text}>"
+
     @classmethod
     @functools.cache
     def get_font(cls, font: config.Font, size):

@@ -115,7 +115,7 @@ class ProfileScreen(Screen):
         self.processing.is_visible = False
         self.objects.append(self.processing)
 
-        drink = DrinksManager.get_instance().get_selected_drink()
+        drink = DrinksManager.instance.get_selected_drink()
         self.drink_info = Label(
             text=drink["name"] if drink else "",
             size=30,
@@ -224,11 +224,11 @@ class ProfileScreen(Screen):
         self.processing.is_visible = True
         account = Account.query.filter(Account.id_card == barcode).first()
         if account:
-            ScreenManager.get_instance().set_active(ProfileScreen(account))
+            ScreenManager.instance.set_active(ProfileScreen(account))
             self.processing.is_visible = False
             return
         drink = get_by_ean(barcode)
-        DrinksManager.get_instance().set_selected_drink(drink)
+        DrinksManager.instance.set_selected_drink(drink)
         if drink:
             self.goto(ConfirmPaymentScreen(self.account, drink))
         self.drink_info.text = drink["name"]

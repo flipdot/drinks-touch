@@ -5,6 +5,7 @@ import config
 from config import Color, Font
 from elements import Button, Progress, Label
 from elements.base_elm import BaseElm
+from overlays.keyboard import KeyboardOverlay
 from screen import get_screen_surface
 
 from typing import TYPE_CHECKING
@@ -18,6 +19,7 @@ class ScreenManager:
     MENU_BAR_HEIGHT = 65
 
     def __init__(self):
+        assert ScreenManager.instance is None, "ScreenManager is a singleton"
         self.ts = 0
         self.current_screen = None
         self.surface = get_screen_surface()
@@ -48,7 +50,19 @@ class ScreenManager:
             ),
             self.timeout_widget,
         ]
-        self.active_object: BaseElm | None = None
+        self.active_object = None
+        ScreenManager.instance = self
+
+    @property
+    def active_object(self) -> BaseElm | None:
+        return self._active_object
+
+    @active_object.setter
+    def active_object(self, value: BaseElm | None):
+        self._active_object = value
+        if value is not None:
+            if settings := value.keyboard_settings:
+                KeyboardOverlay.instance.apply_settings(settings)
 
     def set_idle_timeout(self, timeout: int):
         """
@@ -146,10 +160,14 @@ class ScreenManager:
         if config.DEBUG_UI_ELEMENTS:
             info = pygame.display.Info()
             font = pygame.font.Font(None, 30)
-            text = font.render(
-                f"{info.current_w}x{info.current_h}", True, (255, 0, 255)
-            )
-            self.surface.blit(text, (0, 0))
+            for i, text in enumerate(
+                [
+                    f"{info.current_w}x{info.current_h}",
+                    f"active_object: {self.active_object}",
+                ]
+            ):
+                text_surface = font.render(text, True, (255, 0, 255))
+                self.surface.blit(text_surface, (0, i * 30))
 
     def events(self, events: list[EventType]):
         screen = self.get_active()
@@ -169,7 +187,7 @@ class ScreenManager:
                 # This is why the idle timeout is set before this check.
                 continue
             if event.type == pygame.MOUSEBUTTONUP:
-                ScreenManager.get_instance().active_object = None
+                ScreenManager.instance.active_object = None
             if self.nav_bar_visible and hasattr(event, "pos"):
                 # Handle clicks on the navbar itself.
                 # This is why we need to calculate the transformed_pos,
@@ -192,22 +210,20 @@ class ScreenManager:
                 continue
 
             # Handle clicks on screen objects
-            if active_object := screen.event(event):
+            if (
+                active_object := screen.event(event)
+            ) and not ScreenManager.instance.active_object:
                 active_object.ts = 0
-                ScreenManager.get_instance().active_object = active_object
+                ScreenManager.instance.active_object = active_object
 
             if event.type == pygame.KEYDOWN and (
-                active_object := ScreenManager.get_instance().active_object
+                active_object := ScreenManager.instance.active_object
             ):
                 active_object.key_event(event)
 
     @staticmethod
     def get_instance() -> "ScreenManager":
         return ScreenManager.instance
-
-    @staticmethod
-    def set_instance(instance):
-        ScreenManager.instance = instance
 
     @property
     def _keyboard_visible(self):

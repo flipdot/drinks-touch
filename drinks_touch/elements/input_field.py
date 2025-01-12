@@ -41,6 +41,7 @@ class InputField(BaseElm):
         input_type=InputType.TEXT,
         auto_complete: callable | None = None,
         only_auto_complete: bool = False,
+        on_complete: callable | None = None,
         **kwargs,
     ):
         """
@@ -50,6 +51,9 @@ class InputField(BaseElm):
         assert (
             not only_auto_complete or auto_complete
         ), "only_auto_complete requires auto_complete function"
+        assert (
+            not on_complete or auto_complete
+        ), "on_complete requires auto_complete function"
         if input_type in [InputType.NUMBER, InputType.POSITIVE_NUMBER]:
             self.valid_chars = NUMERIC + ".,"
             if input_type == InputType.NUMBER:
@@ -62,7 +66,11 @@ class InputField(BaseElm):
         self.input_type = input_type
         self.auto_complete = auto_complete
         self.only_auto_complete = only_auto_complete
+        self.on_complete = on_complete
         self.text = ""
+
+    def __repr__(self):
+        return f"<InputField {self.text}>"
 
     @property
     def keyboard_settings(self):
@@ -73,7 +81,7 @@ class InputField(BaseElm):
         return {"enabled": True, "layout": layout}
 
     def render(self, *args, **kwargs):
-        is_active = ScreenManager.get_instance().active_object is self
+        is_active = ScreenManager.instance.active_object is self
         surface = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
         pygame.draw.rect(
             surface, Color.NAVBAR_BACKGROUND.value, (0, 0, self.width, self.height)
@@ -104,15 +112,15 @@ class InputField(BaseElm):
     def render_overlay(self, *args, **kwargs):
         if not self.auto_complete:
             return
-        is_active = ScreenManager.get_instance().active_object is self
+        is_active = ScreenManager.instance.active_object is self
         if not is_active:
             return
 
         suggestions = self.auto_complete(self.text)
         surface = pygame.Surface(
-            (self.width, self.height + len(suggestions) * self.height), pygame.SRCALPHA
+            (self.width, self.height + len(suggestions) * 20 + 5), pygame.SRCALPHA
         )
-        font = pygame.font.Font(Font.SANS_SERIF.value, self.height - 10)
+        font = pygame.font.Font(Font.SANS_SERIF.value, 20)
 
         if suggestions:
             if len(suggestions) == 1 and suggestions[0] == self.text:
@@ -121,9 +129,10 @@ class InputField(BaseElm):
                 (self.width, len(suggestions) * self.height)
             )
             for i, suggestion in enumerate(suggestions):
-                suggestion_text = font.render(suggestion, 1, Color.PRIMARY.value)
-                suggestion_surface.blit(suggestion_text, (5, i * self.height))
+                suggestion_text = font.render(suggestion, 1, Color.GREY.value)
+                suggestion_surface.blit(suggestion_text, (5, i * 20))
             surface.blit(suggestion_surface, (0, self.height))
+        surface.set_alpha(200)
         return surface
 
     def key_event(self, event: pygame.event.Event):
@@ -158,5 +167,6 @@ class InputField(BaseElm):
                 return
             if len(suggestions) == 1:
                 self.text = suggestions[0]
+                self.on_complete(self.text)
                 return
         self.text += char

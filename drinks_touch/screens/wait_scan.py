@@ -98,7 +98,7 @@ class WaitScanScreen(Screen):
                 ),
                 color=color,
                 on_click=(
-                    (lambda: ScreenManager.get_instance().set_active(GitMainScreen()))
+                    (lambda: ScreenManager.instance.set_active(GitMainScreen()))
                     if config.GIT_REPO_AVAILABLE
                     else None
                 ),
@@ -196,11 +196,11 @@ class WaitScanScreen(Screen):
         self.processing.is_visible = True
         account = Account.query.filter(Account.id_card == barcode).first()
         if account:
-            ScreenManager.get_instance().set_active(ProfileScreen(account))
+            ScreenManager.instance.set_active(ProfileScreen(account))
             self.processing.is_visible = False
             return
         drink = get_by_ean(barcode)
-        DrinksManager.get_instance().set_selected_drink(drink)
+        DrinksManager.instance.set_selected_drink(drink)
         self.barcode_label.text = drink["name"]
         self.show_scanned_info(True)
         self.processing.is_visible = False
@@ -208,17 +208,17 @@ class WaitScanScreen(Screen):
 
     def set_member(self):
         main = MainScreen()
-        ScreenManager.get_instance().set_active(main)
+        ScreenManager.instance.set_active(main)
         self.reset(False)
 
     def stat_drink(self):
-        drink = DrinksManager.get_instance().get_selected_drink()
+        drink = DrinksManager.instance.get_selected_drink()
         if drink:
             session = get_session()
             ev = ScanEvent(drink["ean"], 0, datetime.datetime.now())
             session.add(ev)
             session.commit()
-            DrinksManager.get_instance().set_selected_drink(None)
+            DrinksManager.instance.set_selected_drink(None)
         self.reset()
 
     def btn_reset(self):
@@ -226,7 +226,7 @@ class WaitScanScreen(Screen):
 
     def reset(self, reset_drink=True):
         if reset_drink:
-            DrinksManager.get_instance().set_selected_drink(None)
+            DrinksManager.instance.set_selected_drink(None)
             self.timeout.stop()
 
         self.barcode_label.text = None
