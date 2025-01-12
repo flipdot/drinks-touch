@@ -1,12 +1,16 @@
 import functools
 import logging
 
+from sqlalchemy import func
+
 import config
 from database.models import Account
+from database.storage import Session
 from elements import Label
 from elements.input_field import InputField, InputType
 from elements.spacer import Spacer
 from elements.vbox import VBox
+from overlays.keyboard import KeyboardOverlay
 from screens.screen import Screen
 from screens.screen_manager import ScreenManager
 
@@ -27,6 +31,24 @@ def auto_complete_account_name(text, except_account: str, limit=10):
     res = [account.name for account in accounts]
     if len(res) == limit + 1:
         res[-1] = "..."
+
+    if len(res) >= 1:
+        n_char = len(text) + 1
+        query = (
+            Session()
+            .query(
+                func.upper(func.substr(Account.name, n_char, 1)).label("n_char"),
+                func.count(Account.id),
+            )
+            .filter(Account.name.ilike(f"{text}%"))
+            .group_by("n_char")
+            .order_by("n_char")
+            .all()
+        )
+        disabled_characters = "1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        for char, _ in query:
+            disabled_characters = disabled_characters.replace(char, "")
+        KeyboardOverlay.instance.set_keys_disabled(disabled_characters)
     return res
 
 

@@ -38,6 +38,7 @@ class KeyboardOverlay(BaseOverlay):
             - self.height
             - self.screen_manager.MENU_BAR_HEIGHT,
         )
+        self._key_button_map = {}
 
         self._anim_start_pos = pygame.Vector2(
             0, self.screen.get_height() - self.height * 0.9
@@ -57,18 +58,20 @@ class KeyboardOverlay(BaseOverlay):
 
         def key_btn(c: str):
             keycode = getattr(pygame, f"K_{c.lower()}")
-            return Button(
+            btn = Button(
                 text=f" {c} ",
                 size=23,
                 padding=(15, 0, 15),
                 on_click=functools.partial(self.press_key, keycode, c),
             )
+            self._key_button_map[c] = btn
+            return btn
 
         self.layouts: dict[KeyboardLayout, list[BaseElm]] = {
             KeyboardLayout.DEFAULT: [
                 VBox(
                     [
-                        HBox(
+                        row_digits := HBox(
                             [
                                 key_btn("1"),
                                 key_btn("2"),
@@ -166,20 +169,7 @@ class KeyboardOverlay(BaseOverlay):
             KeyboardLayout.CAPS: [
                 VBox(
                     [
-                        HBox(
-                            [
-                                key_btn("1"),
-                                key_btn("2"),
-                                key_btn("3"),
-                                key_btn("4"),
-                                key_btn("5"),
-                                key_btn("6"),
-                                key_btn("7"),
-                                key_btn("8"),
-                                key_btn("9"),
-                                key_btn("0"),
-                            ]
-                        ),
+                        row_digits,
                         HBox(
                             [
                                 key_btn("Q"),
@@ -308,6 +298,11 @@ class KeyboardOverlay(BaseOverlay):
         self.clock = 0
         self._settings_for_object = None
 
+    def set_keys_disabled(self, disabled_characters: str):
+        chars = disabled_characters.lower()
+        for key, btn in self._key_button_map.items():
+            btn.disabled = key.lower() in chars
+
     def press_key(self, key: int, char: str | None = None):
         event = pygame.event.Event(pygame.KEYDOWN, key=key, unicode=char)
         self.screen_manager.events([event])
@@ -368,6 +363,7 @@ class KeyboardOverlay(BaseOverlay):
 
     def apply_settings(self, settings: dict):
         self.layout = self.layouts[settings.get("layout", KeyboardLayout.DEFAULT)]
+        KeyboardOverlay.instance.set_keys_disabled("")
 
     def set_layout(self, layout: KeyboardLayout | None):
         self.layout = self.layouts[layout]
