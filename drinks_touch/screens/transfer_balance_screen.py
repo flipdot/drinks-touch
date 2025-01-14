@@ -12,6 +12,7 @@ from elements.input_field import InputField, InputType
 from elements.spacer import Spacer
 from elements.vbox import VBox
 from overlays.keyboard import KeyboardOverlay
+from screens.make_transfer_screen import MakeTransferScreen
 from screens.screen import Screen
 from screens.screen_manager import ScreenManager
 
@@ -58,7 +59,7 @@ class TransferBalanceScreen(Screen):
 
     idle_timeout = 60
 
-    def __init__(self, account):
+    def __init__(self, account: Account):
         super().__init__()
         self.account = account
         self.input_field_account_name = None
@@ -87,7 +88,7 @@ class TransferBalanceScreen(Screen):
                             text, except_account=self.account.name
                         ),
                         only_auto_complete=True,
-                        on_complete=lambda _: focus(input_field_amount),
+                        on_submit=lambda _: focus(input_field_amount),
                     ),
                     Spacer(height=40),
                     Label(
@@ -99,6 +100,7 @@ class TransferBalanceScreen(Screen):
                         max_decimal_places=2,
                         width=config.SCREEN_WIDTH - 10,
                         height=50,
+                        on_submit=lambda _: self.submit(),
                     ),
                     Spacer(height=20),
                     label_error_message := Label(
@@ -150,4 +152,4 @@ class TransferBalanceScreen(Screen):
 
         self.label_error_message.text = ""
 
-        # self.goto(...)
+        self.goto(MakeTransferScreen(self.account, account, amount_decimal))
