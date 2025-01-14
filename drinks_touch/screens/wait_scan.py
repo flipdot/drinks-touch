@@ -60,6 +60,13 @@ class WaitScanScreen(Screen):
             ),
         ]
         self.empty_info = [
+            VBox(
+                [
+                    Label(text="Benutze den Stylus", size=20),
+                    Label(text="denn er ist sehr gut", size=15),
+                ],
+                pos=(100, 500),
+            ),
             Button(
                 pos=(115, config.SCREEN_HEIGHT - 100),
                 align_bottom=True,
