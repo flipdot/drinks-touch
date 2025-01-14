@@ -10,6 +10,7 @@ from screens.screen_manager import ScreenManager
 class Screen:
 
     idle_timeout = 10
+    nav_bar_visible = True
 
     def __init__(self, width=None, height=None):
         if width is None or height is None:

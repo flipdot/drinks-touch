@@ -119,7 +119,9 @@ class ScreenManager:
 
     @property
     def nav_bar_visible(self):
-        return len(self.screen_history) > 1
+        if len(self.screen_history) <= 1:
+            return False
+        return self.get_active().nav_bar_visible
 
     def render(self, dt):
         self.ts += dt

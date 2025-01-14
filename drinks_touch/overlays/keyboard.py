@@ -144,19 +144,28 @@ class KeyboardOverlay(BaseOverlay):
                             [
                                 Button(
                                     text="123",
-                                    size=23,
+                                    size=40,
                                     padding=15,
                                     on_click=functools.partial(
                                         self.set_layout, KeyboardLayout.NUMERIC
                                     ),
                                 ),
-                                Spacer(width=58),
+                                Spacer(width=29),
                                 Button(
                                     text=" ",
                                     size=23,
                                     padding=(15, 86, 15),
                                     on_click=functools.partial(
                                         self.press_key, pygame.K_SPACE, " "
+                                    ),
+                                ),
+                                Spacer(width=58),
+                                Button(
+                                    text=" ↵ ",
+                                    size=23,
+                                    padding=15,
+                                    on_click=functools.partial(
+                                        self.press_key, pygame.K_RETURN
                                     ),
                                 ),
                             ]
@@ -260,15 +269,22 @@ class KeyboardOverlay(BaseOverlay):
                                 make_num_btn("7"),
                                 make_num_btn("8"),
                                 make_num_btn("9"),
-                            ]
-                        ),
-                        HBox(
-                            [
                                 Button(
                                     text=" - ",
                                     size=num_btn_size,
                                     on_click=functools.partial(
                                         self.press_key, pygame.K_MINUS, "-"
+                                    ),
+                                ),
+                            ]
+                        ),
+                        HBox(
+                            [
+                                Button(
+                                    text="abc",
+                                    size=num_btn_size,
+                                    on_click=functools.partial(
+                                        self.set_layout, KeyboardLayout.DEFAULT
                                     ),
                                 ),
                                 make_num_btn("0"),
@@ -280,10 +296,10 @@ class KeyboardOverlay(BaseOverlay):
                                     ),
                                 ),
                                 Button(
-                                    text="abc",
+                                    text=" ↵ ",
                                     size=num_btn_size,
                                     on_click=functools.partial(
-                                        self.set_layout, KeyboardLayout.DEFAULT
+                                        self.press_key, pygame.K_RETURN
                                     ),
                                 ),
                             ]
