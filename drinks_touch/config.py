@@ -28,7 +28,7 @@ _INFRAGELB = (246, 198, 0, 255)
 class Color(enum.Enum):
     PRIMARY = _INFRAGELB
     GREY = (200, 200, 200, 255)
-    DISABLED = (50, 50, 50, 255)
+    DISABLED = (100, 100, 100, 255)
     ERROR = (255, 0, 0, 255)
     SUCCESS = (0, 255, 0, 255)
     BLACK = (0, 0, 0, 255)
