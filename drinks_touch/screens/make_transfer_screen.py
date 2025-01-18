@@ -2,12 +2,14 @@ import math
 from decimal import Decimal
 from enum import Enum
 
+import pygame
 from pygame import Vector2
 from pygame.mixer import Sound
 
 import config
 from database.models import Account
 from elements import Label, Animation, Image
+from elements.base_elm import BaseElm
 from screens.screen import Screen
 from screens.screen_manager import ScreenManager
 
@@ -111,6 +113,12 @@ class MakeTransferScreen(Screen):
             self.q_box_off,
             self.animation_coin,
         ]
+
+    def event(self, event) -> BaseElm | None:
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
+            ScreenManager.instance.set_default()
+            return None
+        return super().event(event)
 
     def render(self, dt):
         self.clock += dt
