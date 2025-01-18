@@ -3,6 +3,7 @@ from decimal import Decimal
 from enum import Enum
 
 from pygame import Vector2
+from pygame.mixer import Sound
 
 import config
 from database.models import Account
@@ -95,6 +96,7 @@ class MakeTransferScreen(Screen):
             visible=False,
         )
         self.animation_phase = AnimationPhase.WALK_IN
+        self.sound_coin = Sound("drinks_touch/resources/sounds/smb_coin.wav")
 
     def on_start(self, *args, **kwargs):
         self.objects = [
@@ -129,13 +131,14 @@ class MakeTransferScreen(Screen):
                 self.mario_stand.visible = False
                 self.mario_jump.visible = True
                 self.q_box_pos = self.q_box_start_pos
-                self.jump_counter += 1
             elif self.animation_phase == AnimationPhase.JUMP_DOWN:
+                self.jump_counter += 1
                 if self.jump_counter >= self.amount:
                     self.q_box_on.visible = False
                     self.q_box_off.visible = True
                 self.animation_coin.visible = True
                 self.coin_pos = self.coin_start_pos
+                self.sound_coin.play()
             elif self.animation_phase == AnimationPhase.STAND:
                 self.mario_jump.visible = False
                 self.mario_stand.visible = True

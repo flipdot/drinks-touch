@@ -127,6 +127,9 @@ def main(argv):
         os.system("rsync -a sounds/ pi@pixelfun:sounds/ &")
 
     pygame.key.set_repeat(500, 50)
+    # Works on my machine without sound init.
+    # Keeping this here as a reminder should it fail on the pi
+    # pygame.mixer.init()
 
     t = 0
     done = False
