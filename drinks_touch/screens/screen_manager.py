@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 
 
 class ScreenManager:
-    instance = None
+    instance: "ScreenManager" = None
     MENU_BAR_HEIGHT = 65
 
     def __init__(self):
@@ -126,7 +126,7 @@ class ScreenManager:
     def render(self, dt):
         self.ts += dt
         if self.active_object:
-            self.active_object.ts += dt
+            self.active_object.ts_active += dt
         self.surface.fill(Color.BACKGROUND.value)
         current_screen = self.get_active()
         surface, debug_surface = current_screen.render(dt)
@@ -215,7 +215,7 @@ class ScreenManager:
             if (
                 active_object := screen.event(event)
             ) and not ScreenManager.instance.active_object:
-                active_object.ts = 0
+                active_object.ts_active = 0
                 ScreenManager.instance.active_object = active_object
 
             if event.type == pygame.KEYDOWN and (

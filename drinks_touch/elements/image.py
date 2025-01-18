@@ -7,22 +7,20 @@ with contextlib.redirect_stdout(None):
 
 
 class Image(BaseElm):
-    def __init__(self, src, size=None, *args, **kwargs):
+    def __init__(self, src, size=None, scale_smooth=True, *args, **kwargs):
         self.src = src
         self.size = size
         self.img = pygame.image.load(self.src).convert_alpha()
 
         if size:
-            self.img = pygame.transform.smoothscale(self.img, size)
-        super(Image, self).__init__(*args, **kwargs)
+            if scale_smooth:
+                self.img = pygame.transform.smoothscale(self.img, size)
+            else:
+                self.img = pygame.transform.scale(self.img, size)
 
-    @property
-    def width(self):
-        return self.img.get_width()
-
-    @property
-    def height(self):
-        return self.img.get_height()
+        super().__init__(
+            *args, height=self.img.get_height(), width=self.img.get_width(), **kwargs
+        )
 
     def render(self, *args, **kwargs) -> pygame.Surface:
         return self.img

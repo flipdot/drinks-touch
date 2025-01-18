@@ -99,7 +99,7 @@ class InputField(BaseElm):
             )
 
             # blinking cursor
-            if self.ts // 1 % 2 == 0:
+            if self.ts_active // 1 % 2 == 0:
                 x = text_surface.get_width() + 5
                 pygame.draw.line(
                     surface, Color.PRIMARY.value, (x, 5), (x, self.height - 5), 2

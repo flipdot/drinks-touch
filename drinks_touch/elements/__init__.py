@@ -4,3 +4,4 @@ from .progress import Progress
 from .image import Image
 from .icons.refresh import RefreshIcon
 from .icons.svg import SvgIcon
+from .animation import Animation

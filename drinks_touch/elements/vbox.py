@@ -33,6 +33,8 @@ class VBox(BaseElm):
         y = self.padding_top
         for element in self.children:
             element.pos = (self.padding_left, y)
+            if not element.visible:
+                continue
             element_surface = element.render(*args, **kwargs)
             if element_surface:
                 surface.blit(element_surface, element.pos)

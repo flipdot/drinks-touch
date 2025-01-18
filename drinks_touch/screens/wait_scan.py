@@ -76,7 +76,7 @@ class WaitScanScreen(Screen):
             ),
         ]
         self.processing = Label(text="Moment bitte...", size=40, pos=(80, 350))
-        self.processing.is_visible = False
+        self.processing.visible = False
         sql = text(
             """
             SELECT SUM(amount) - (
@@ -192,25 +192,25 @@ class WaitScanScreen(Screen):
 
     def show_scanned_info(self, show):
         for o in self.scanned_info:
-            o.is_visible = show
+            o.visible = show
         for o in self.empty_info:
-            o.is_visible = not show
+            o.visible = not show
 
     def on_barcode(self, barcode):
         if not barcode:
             return
         self.processing.text = f"Gescannt: {barcode}"
-        self.processing.is_visible = True
+        self.processing.visible = True
         account = Account.query.filter(Account.id_card == barcode).first()
         if account:
             ScreenManager.instance.set_active(ProfileScreen(account))
-            self.processing.is_visible = False
+            self.processing.visible = False
             return
         drink = get_by_ean(barcode)
         DrinksManager.instance.set_selected_drink(drink)
         self.barcode_label.text = drink["name"]
         self.show_scanned_info(True)
-        self.processing.is_visible = False
+        self.processing.visible = False
         self.timeout.start()
 
     def set_member(self):

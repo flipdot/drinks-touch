@@ -12,17 +12,18 @@ class BaseElm:
         width=None,
         align_right=False,
         align_bottom=False,
+        visible=True,
         padding: (
             int | tuple[int, int] | tuple[int, int, int] | tuple[int, int, int, int]
         ) = 0,
     ):
         if pos is None:
             pos = (0, 0)
-        self.ts = 0
+        self.ts_active = 0
         self.pos = pos
         self._height = height
         self._width = width
-        self.is_visible = True
+        self.visible = visible
         self.align_right = align_right
         self.align_bottom = align_bottom
         self.focus = False
@@ -125,11 +126,6 @@ class BaseElm:
         (active means: was clicked on before and therefore the ScreenManager
         has set this element as active)
         """
-
-    @property
-    def visible(self):
-        # TODO get rid of is_visible
-        return self.is_visible
 
     def collides_with(self, pos: tuple[float, float]) -> bool:
         return (
