@@ -22,6 +22,7 @@ class AnimationPhase(Enum):
 class MakeTransferScreen(Screen):
     MARIO_SIZE = Vector2(16, 16) * 5
     Q_BOX_SIZE = MARIO_SIZE
+    COIN_SIZE = Q_BOX_SIZE
     DURATIONS = {
         AnimationPhase.WALK_IN: 2,
         AnimationPhase.JUMP_UP: 0.3,
@@ -49,11 +50,21 @@ class MakeTransferScreen(Screen):
             self.mario_pos.y - self.MARIO_SIZE.y * 3,
         )
         self.q_box_pos = self.q_box_start_pos
+        self.coin_start_pos = self.q_box_start_pos - Vector2(0, self.Q_BOX_SIZE.y)
+        self.coin_pos = self.coin_start_pos
         self.animation_mario_walk = Animation(
             "drinks_touch/resources/images/mario/walk/frame{0}.png",
             n_frames=3,
             size=self.MARIO_SIZE,
             pos=self.mario_pos,
+            scale_smooth=False,
+        )
+        self.animation_coin = Animation(
+            "drinks_touch/resources/images/coin/frame{0}.png",
+            n_frames=4,
+            size=self.COIN_SIZE,
+            pos=self.coin_pos,
+            visible=False,
             scale_smooth=False,
         )
         self.mario_jump = Image(
@@ -96,6 +107,7 @@ class MakeTransferScreen(Screen):
             self.mario_stand,
             self.q_box_on,
             self.q_box_off,
+            self.animation_coin,
         ]
 
     def render(self, dt):
@@ -122,10 +134,13 @@ class MakeTransferScreen(Screen):
                 if self.jump_counter >= self.amount:
                     self.q_box_on.visible = False
                     self.q_box_off.visible = True
+                self.animation_coin.visible = True
+                self.coin_pos = self.coin_start_pos
             elif self.animation_phase == AnimationPhase.STAND:
                 self.mario_jump.visible = False
                 self.mario_stand.visible = True
                 self.q_box_pos = self.q_box_start_pos
+                self.animation_coin.visible = False
             elif self.animation_phase == AnimationPhase.WALK_OUT:
                 self.mario_stand.visible = False
                 self.mario_jump.visible = False
@@ -145,6 +160,7 @@ class MakeTransferScreen(Screen):
         self.mario_stand.pos = self.mario_pos
         self.q_box_on.pos = self.q_box_pos
         self.q_box_off.pos = self.q_box_pos
+        self.animation_coin.pos = self.coin_pos
 
         return super().render(dt)
 
@@ -172,6 +188,14 @@ class MakeTransferScreen(Screen):
                 math.pi * 0.5 * self.clock / self.DURATIONS[AnimationPhase.JUMP_DOWN]
             ),
         )
+
+        coin_to_pos = self.coin_start_pos - Vector2(0, self.COIN_SIZE.y * 3)
+
+        self.coin_pos = self.coin_start_pos.lerp(
+            coin_to_pos,
+            self.clock / self.DURATIONS[AnimationPhase.JUMP_DOWN],
+        )
+
         # Within the duration that mario needs to reach the ground,
         # the ?-Block should jump up half of its height and then fall back
         # down to its original position
