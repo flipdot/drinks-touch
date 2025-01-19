@@ -1,4 +1,4 @@
-import os
+from pygame.mixer import Sound
 
 import config
 from database.models import Account
@@ -56,9 +56,7 @@ class SuccessScreen(Screen):
             ),
         ]
 
-        # TODO: Sound is currently not working, and happening synchronously,
-        #            therefore could slow down the UI
-        # self.play_sound()
+        self.play_sound()
 
         if self.drink:
             send_drink(self.account, self.drink, True)
@@ -66,13 +64,17 @@ class SuccessScreen(Screen):
     def play_sound(self):
         balance = self.account.balance
         if balance >= 0:
-            sound = "smb_coin.wav"
+            filename = "smb_coin.wav"
         elif balance < -10:
-            sound = "alarm.wav"
+            filename = "alarm.wav"
         else:
-            sound = "smb_bowserfalls.wav"
+            filename = "smb_bowserfalls.wav"
 
-        os.system(
-            "ssh -o StrictHostKeyChecking=no pi@pixelfun aplay sounds/%s >/dev/null 2>&1 &"
-            % sound
-        )
+        # local sound
+        Sound(f"drinks_touch/resources/sounds/{filename}").play()
+
+        # remote sound - remote pi currently not available
+        # os.system(
+        #     "ssh -o StrictHostKeyChecking=no pi@pixelfun aplay sounds/%s >/dev/null 2>&1 &"
+        #     % filename
+        # )

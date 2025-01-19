@@ -10,6 +10,7 @@ from screens.screen_manager import ScreenManager
 class Screen:
 
     idle_timeout = 10
+    nav_bar_visible = True
 
     def __init__(self, width=None, height=None):
         if width is None or height is None:
@@ -33,14 +34,15 @@ class Screen:
         else:
             debug_surface = None
         for o in self.objects:
-            if o.visible:
-                obj_surface = o.render(dt)
-                if obj_surface is not None:
-                    surface.blit(obj_surface, o.screen_pos)
-                if config.DEBUG_UI_ELEMENTS:
-                    obj_debug_surface = o.render_debug()
-                    if obj_debug_surface is not None:
-                        debug_surface.blit(obj_debug_surface, o.screen_pos)
+            if not o.visible:
+                continue
+            obj_surface = o.render(dt)
+            if obj_surface is not None:
+                surface.blit(obj_surface, o.screen_pos)
+            if config.DEBUG_UI_ELEMENTS:
+                obj_debug_surface = o.render_debug()
+                if obj_debug_surface is not None:
+                    debug_surface.blit(obj_debug_surface, o.screen_pos)
         for o in self.objects:
             if o.visible:
                 obj_overlay_surface = o.render_overlay()

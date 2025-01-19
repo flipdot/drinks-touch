@@ -8,6 +8,7 @@ from database.models import Account
 from database.storage import get_session
 from drinks.drinks import get_by_ean
 from drinks.drinks_manager import DrinksManager
+from elements import Image
 from elements.button import Button
 from elements.label import Label
 from elements.vbox import VBox
@@ -86,7 +87,7 @@ class ProfileScreen(Screen):
                         padding=20,
                     ),
                     Button(
-                        text="Guthaben übertragen (WIP)",
+                        text="Guthaben übertragen",
                         on_click=functools.partial(
                             self.goto,
                             TransferBalanceScreen(self.account),
@@ -105,6 +106,10 @@ class ProfileScreen(Screen):
                 pos=(5, 300),
                 gap=15,
             ),
+            Image(
+                src="drinks_touch/resources/images/new-text.png",
+                pos=(330, 370),
+            ),
         ]
 
         self.processing = Label(
@@ -112,7 +117,7 @@ class ProfileScreen(Screen):
             size=20,
             pos=(150, 750),
         )
-        self.processing.is_visible = False
+        self.processing.visible = False
         self.objects.append(self.processing)
 
         drink = DrinksManager.instance.get_selected_drink()
@@ -221,18 +226,18 @@ class ProfileScreen(Screen):
         if not barcode:
             return
         self.processing.text = f"Gescannt: {barcode}"
-        self.processing.is_visible = True
+        self.processing.visible = True
         account = Account.query.filter(Account.id_card == barcode).first()
         if account:
             ScreenManager.instance.set_active(ProfileScreen(account))
-            self.processing.is_visible = False
+            self.processing.visible = False
             return
         drink = get_by_ean(barcode)
         DrinksManager.instance.set_selected_drink(drink)
         if drink:
             self.goto(ConfirmPaymentScreen(self.account, drink))
         self.drink_info.text = drink["name"]
-        self.processing.is_visible = False
+        self.processing.visible = False
 
     def show_aufladungen(self):
         for d in self.elements_drinks:

@@ -41,7 +41,7 @@ class InputField(BaseElm):
         input_type=InputType.TEXT,
         auto_complete: callable | None = None,
         only_auto_complete: bool = False,
-        on_complete: callable | None = None,
+        on_submit: callable | None = None,
         **kwargs,
     ):
         """
@@ -51,9 +51,6 @@ class InputField(BaseElm):
         assert (
             not only_auto_complete or auto_complete
         ), "only_auto_complete requires auto_complete function"
-        assert (
-            not on_complete or auto_complete
-        ), "on_complete requires auto_complete function"
         if input_type in [InputType.NUMBER, InputType.POSITIVE_NUMBER]:
             self.valid_chars = NUMERIC + ".,"
             if input_type == InputType.NUMBER:
@@ -66,7 +63,7 @@ class InputField(BaseElm):
         self.input_type = input_type
         self.auto_complete = auto_complete
         self.only_auto_complete = only_auto_complete
-        self.on_complete = on_complete
+        self.on_submit = on_submit
         self.text = ""
 
     def __repr__(self):
@@ -102,7 +99,7 @@ class InputField(BaseElm):
             )
 
             # blinking cursor
-            if self.ts // 1 % 2 == 0:
+            if self.ts_active // 1 % 2 == 0:
                 x = text_surface.get_width() + 5
                 pygame.draw.line(
                     surface, Color.PRIMARY.value, (x, 5), (x, self.height - 5), 2
@@ -140,6 +137,11 @@ class InputField(BaseElm):
             self.text = self.text[:-1]
             return
 
+        if event.key == pygame.K_RETURN:
+            if self.on_submit:
+                self.on_submit(self.text)
+            return
+
         char = event.unicode
         if not char:
             # not a printable character
@@ -167,6 +169,6 @@ class InputField(BaseElm):
                 return
             if len(suggestions) == 1:
                 self.text = suggestions[0]
-                self.on_complete(self.text)
+                self.on_submit(self.text)
                 return
         self.text += char
