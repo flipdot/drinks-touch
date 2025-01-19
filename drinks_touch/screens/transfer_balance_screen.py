@@ -78,6 +78,20 @@ class TransferBalanceScreen(Screen):
             VBox(
                 [
                     Label(
+                        text="Guthaben",
+                        size=20,
+                    ),
+                    Label(
+                        text=f"{self.account.balance} €",
+                        size=40,
+                    ),
+                ],
+                pos=(config.SCREEN_WIDTH - 5, 5),
+                align_right=True,
+            ),
+            VBox(
+                [
+                    Label(
                         text="An wen möchtest du Guthaben übertragen?",
                         size=20,
                     ),
