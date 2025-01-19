@@ -1,10 +1,13 @@
 import datetime
 
+import pygame
+
 import config
 from database.models import ScanEvent
 from database.storage import get_session
 from drinks.drinks_manager import DrinksManager
 from elements import Label, Button
+from elements.base_elm import BaseElm
 from elements.spacer import Spacer
 from elements.vbox import VBox
 from screens.screen import Screen
@@ -73,9 +76,8 @@ class ConfirmPaymentScreen(Screen):
             ),
         ]
 
-    def on_barcode(self, barcode: str):
-        if not barcode:
-            # enter was pressed
+    def event(self, event) -> BaseElm | None:
+        if event.type == pygame.KEYUP and event.key == pygame.K_RETURN:
             self.save_drink()
 
     def on_stop(self, *args, **kwargs):

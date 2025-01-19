@@ -1,8 +1,10 @@
+import pygame
 from pygame.mixer import Sound
 
 import config
 from database.models import Account
 from elements import Button
+from elements.base_elm import BaseElm
 from elements.label import Label
 from elements.vbox import VBox
 from notifications.notification import send_drink
@@ -60,6 +62,11 @@ class SuccessScreen(Screen):
 
         if self.drink:
             send_drink(self.account, self.drink, True)
+
+    def event(self, event) -> BaseElm | None:
+        if event.type == pygame.KEYUP and event.key == pygame.K_RETURN:
+            self.home()
+        return
 
     def play_sound(self):
         balance = self.account.balance
