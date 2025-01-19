@@ -7,9 +7,12 @@ from pygame import Vector2
 from pygame.mixer import Sound
 
 import config
-from database.models import Account
+from database.models import Account, RechargeEvent
+from database.storage import Session
 from elements import Label, Animation, Image
 from elements.base_elm import BaseElm
+from elements.spacer import Spacer
+from elements.vbox import VBox
 from screens.screen import Screen
 from screens.screen_manager import ScreenManager
 
@@ -39,7 +42,16 @@ class MakeTransferScreen(Screen):
     def __init__(self, account: Account, to_account: Account, amount: Decimal):
         super().__init__()
         self.account = account
+        self.to_account = to_account
+        if not isinstance(amount, Decimal):
+            raise ValueError("Amount must be a Decimal")
+        if amount <= 0:
+            raise ValueError("Amount must be greater than 0")
         self.amount = amount
+        self.balance_from = account.balance
+        self.balance_to = to_account.balance
+
+        self._transfer_balance()
 
         self.clock = 0
         self.jump_counter = 0
@@ -97,14 +109,54 @@ class MakeTransferScreen(Screen):
             scale_smooth=False,
             visible=False,
         )
+        self.label_amount_from = Label(
+            text=f"{self.balance_from:.2f} €",
+        )
+        self.label_amount_to = Label(
+            text=f"{self.balance_to:.2f} €",
+        )
         self.animation_phase = AnimationPhase.WALK_IN
         self.sound_coin = Sound("drinks_touch/resources/sounds/smb_coin.wav")
+
+    def _transfer_balance(self):
+        session = Session()
+        positive_charge = RechargeEvent(
+            self.to_account.ldap_id, self.account.name, self.amount
+        )
+        negative_charge = RechargeEvent(
+            self.account.ldap_id, self.to_account.name, -self.amount
+        )
+        session.add(negative_charge)
+        session.add(positive_charge)
+        session.commit()
 
     def on_start(self, *args, **kwargs):
         self.objects = [
             Label(
                 text=self.account.name,
                 pos=(5, 5),
+            ),
+            VBox(
+                [
+                    self.label_amount_from,
+                    Label(
+                        text=self.account.name,
+                        size=20,
+                    ),
+                ],
+                pos=(25, config.SCREEN_HEIGHT / 2 - 50),
+            ),
+            Spacer(width=20),
+            VBox(
+                [
+                    self.label_amount_to,
+                    Label(
+                        text=self.to_account.name,
+                        size=20,
+                    ),
+                ],
+                pos=(config.SCREEN_WIDTH - 25, config.SCREEN_HEIGHT / 2 - 50),
+                align_right=True,
             ),
             self.animation_mario_walk,
             self.mario_jump,
@@ -141,9 +193,17 @@ class MakeTransferScreen(Screen):
                 self.q_box_pos = self.q_box_start_pos
             elif self.animation_phase == AnimationPhase.JUMP_DOWN:
                 self.jump_counter += 1
+                self.balance_from -= 1
+                self.balance_to += 1
                 if self.jump_counter >= self.amount:
                     self.q_box_on.visible = False
                     self.q_box_off.visible = True
+                    diff = Decimal(self.jump_counter) - self.amount
+                    self.balance_from += diff
+                    self.balance_to -= diff
+
+                self.label_amount_from.text = f"{self.balance_from:.2f} €"
+                self.label_amount_to.text = f"{self.balance_to:.2f} €"
                 self.animation_coin.visible = True
                 self.coin_pos = self.coin_start_pos
                 self.sound_coin.play()
