@@ -104,6 +104,9 @@ class ScreenManager:
 
     def go_back(self):
         prev_screen = self.get_active()
+        if prev_screen.show_alert:
+            prev_screen.show_alert = False
+            return
         prev_screen.on_stop()
         prev_screen.on_destroy()
         self.screen_history.pop()

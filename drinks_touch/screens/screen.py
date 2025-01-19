@@ -118,6 +118,15 @@ class Screen:
     def alert(self, text: str):
         self._alert = text
 
+    @property
+    def show_alert(self):
+        return self._alert is not None
+
+    @show_alert.setter
+    def show_alert(self, value):
+        if not value:
+            self._alert = None
+
     # lifecycle inspired by https://developer.android.com/guide/components/activities/activity-lifecycle
     # Not all yet implemented
 
