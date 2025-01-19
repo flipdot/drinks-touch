@@ -73,5 +73,8 @@ class TasksScreen(Screen):
             self.finished = True
 
     def on_barcode(self, barcode):
+        if not barcode:
+            ScreenManager.instance.go_back()
+            return
         for task in self.tasks:
             task.on_barcode(barcode)
