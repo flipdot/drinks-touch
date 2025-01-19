@@ -73,6 +73,11 @@ class ConfirmPaymentScreen(Screen):
             ),
         ]
 
+    def on_barcode(self, barcode: str):
+        if not barcode:
+            # enter was pressed
+            self.save_drink()
+
     def on_stop(self, *args, **kwargs):
         DrinksManager.instance.set_selected_drink(None)
 
