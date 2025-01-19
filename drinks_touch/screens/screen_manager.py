@@ -147,7 +147,7 @@ class ScreenManager:
             )
             obj_list = (
                 self.active_keyboard_objects
-                if self._keyboard_visible
+                if self.keyboard_visible
                 else self.default_objects
             )
             for obj in obj_list:
@@ -205,7 +205,7 @@ class ScreenManager:
                 )
                 obj_list = (
                     self.active_keyboard_objects
-                    if self._keyboard_visible
+                    if self.keyboard_visible
                     else self.default_objects
                 )
                 for obj in obj_list:
@@ -232,7 +232,7 @@ class ScreenManager:
         return ScreenManager.instance
 
     @property
-    def _keyboard_visible(self):
+    def keyboard_visible(self):
         if self.active_object:
             return self.active_object.keyboard_settings["enabled"]
         return False

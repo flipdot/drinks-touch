@@ -32,6 +32,11 @@ class SearchAccountScreen(Screen):
         ]
         ScreenManager.instance.active_object = input_field_account_name
 
+    def render(self, dt):
+        if not ScreenManager.instance.keyboard_visible:
+            self.back()
+        return super().render(dt)
+
     def select_account(self, text: str):
         account = Account.query.filter(Account.name == text).first()
         if account:
