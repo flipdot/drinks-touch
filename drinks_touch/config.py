@@ -95,8 +95,8 @@ FPS = 30
 
 
 class Font(enum.Enum):
-    MONOSPACE = "drinks_touch/static/fonts/DejaVuSansMono.ttf"
-    SANS_SERIF = "drinks_touch/static/fonts/DejaVuSans.ttf"
+    MONOSPACE = "drinks_touch/resources/fonts/DejaVuSansMono.ttf"
+    SANS_SERIF = "drinks_touch/resources/fonts/DejaVuSans.ttf"
 
 
 LOGLEVEL = os.environ.get("LOGLEVEL", "WARNING")

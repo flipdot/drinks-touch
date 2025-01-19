@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 # because it is called in the render() function.
 # Still, we want to get fresh results every time the user changes the input.
 @functools.lru_cache(maxsize=1)
-def auto_complete_account_name(text, except_account: str, limit=10):
+def auto_complete_account_name(text, except_account: str | None = None, limit=10):
     accounts = (
         Account.query.filter(Account.name.ilike(f"{text}%"))
         .filter(Account.name != except_account)

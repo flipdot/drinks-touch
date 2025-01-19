@@ -20,6 +20,7 @@ from .screen import Screen
 from .screen_manager import ScreenManager
 from sqlalchemy.sql import text
 
+from .search_account import SearchAccountScreen
 from .tasks_screen import TasksScreen
 
 logger = logging.getLogger(__name__)
@@ -70,12 +71,24 @@ class WaitScanScreen(Screen):
                 ],
                 pos=(50, 350),
             ),
-            Button(
-                pos=(115, config.SCREEN_HEIGHT - 100),
+            HBox(
+                [
+                    Button(
+                        size=45,
+                        text="Benutzer",
+                        on_click=self.set_member,
+                    ),
+                    Button(
+                        text=None,
+                        inner=SvgIcon(
+                            "drinks_touch/resources/images/magnifying-glass.svg",
+                            height=53,
+                        ),
+                        on_click=functools.partial(self.goto, SearchAccountScreen()),
+                    ),
+                ],
+                pos=(80, config.SCREEN_HEIGHT - 100),
                 align_bottom=True,
-                size=45,
-                text="Benutzer",
-                on_click=self.set_member,
             ),
         ]
         self.processing = Label(text="Moment bitte...", size=40, pos=(80, 350))
@@ -102,7 +115,7 @@ class WaitScanScreen(Screen):
             Button(
                 text=None,
                 inner=SvgIcon(
-                    "drinks_touch/static/images/git.svg",
+                    "drinks_touch/resources/images/git.svg",
                     color=color,
                     height=36,
                 ),

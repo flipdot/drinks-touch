@@ -18,7 +18,7 @@ class GitMainScreen(Screen):
 
         self.objects = [
             SvgIcon(
-                "drinks_touch/static/images/git-full.svg",
+                "drinks_touch/resources/images/git-full.svg",
                 pos=(10, 20),
                 color=config.Color.PRIMARY,
                 height=36,
