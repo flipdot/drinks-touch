@@ -5,6 +5,7 @@ from database.models import ScanEvent
 from database.storage import get_session
 from drinks.drinks_manager import DrinksManager
 from elements import Label, Button
+from elements.spacer import Spacer
 from elements.vbox import VBox
 from screens.screen import Screen
 from screens.success import SuccessScreen
@@ -16,16 +17,6 @@ class ConfirmPaymentScreen(Screen):
         super().__init__()
         self.account = account
         self.drink = drink
-
-    def btn_confirm(self):
-        self.account.balance -= self.drink["price"]
-        self.goto(
-            SuccessScreen(
-                self.account,
-                self.drink,
-                f"getrunken: {self.drink['name']}",
-            )
-        )
 
     def on_start(self):
         self.objects = [
@@ -55,19 +46,19 @@ class ConfirmPaymentScreen(Screen):
             VBox(
                 [
                     Label(
-                        text=f"Getränk: {self.drink['name']}",
+                        text=self.drink["name"],
+                        size=30,
                     ),
+                    Spacer(height=20),
                     Label(
                         text="Preis: 1 €",
+                        size=50,
                     ),
+                    Spacer(height=10),
                     Label(
                         text=f"EAN: {self.drink['ean']}",
                         size=20,
                     ),
-                    # Label(
-                    #     text=str(self.drink),
-                    #     size=10,
-                    # ),
                 ],
                 gap=15,
                 pos=(5, 200),

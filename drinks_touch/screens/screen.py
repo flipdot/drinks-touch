@@ -91,7 +91,7 @@ class Screen:
         for obj in self.objects[::-1]:
             if consumed_by := obj.event(event):
                 return consumed_by
-        if event.type == pygame.KEYDOWN:
+        if event.type == pygame.KEYUP:
             if event.key == pygame.K_RETURN:
                 self.on_barcode(self._keyboard_input)
                 self._keyboard_input = ""
@@ -108,8 +108,8 @@ class Screen:
         ScreenManager.instance.go_back()
 
     @staticmethod
-    def goto(screen: "Screen", *args, **kwargs):
-        ScreenManager.instance.set_active(screen, *args, **kwargs)
+    def goto(screen: "Screen", replace=False, *args, **kwargs):
+        ScreenManager.instance.set_active(screen, replace=replace, *args, **kwargs)
 
     @staticmethod
     def home():
