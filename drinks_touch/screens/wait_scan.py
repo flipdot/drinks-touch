@@ -10,6 +10,7 @@ from drinks.drinks import get_by_ean
 from drinks.drinks_manager import DrinksManager
 from elements import RefreshIcon, SvgIcon, Progress, Label, Button
 from elements.hbox import HBox
+from elements.spacer import Spacer
 from elements.vbox import VBox
 from screens.profile import ProfileScreen
 from tasks import CheckForUpdatesTask
@@ -64,8 +65,10 @@ class WaitScanScreen(Screen):
                 [
                     Label(text="Benutze den Stylus", size=20),
                     Label(text="denn er ist sehr gut", size=15),
+                    Spacer(height=20),
+                    Label(text="Der Handscanner geht jetzt auch!", size=25),
                 ],
-                pos=(100, 500),
+                pos=(50, 350),
             ),
             Button(
                 pos=(115, config.SCREEN_HEIGHT - 100),
