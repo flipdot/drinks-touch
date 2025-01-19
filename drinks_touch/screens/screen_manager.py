@@ -185,6 +185,7 @@ class ScreenManager:
                 or event.type == pygame.KEYDOWN
             ):
                 self.set_idle_timeout(screen.idle_timeout)
+                screen.show_alert = False
             if event.dict.get("consumed"):
                 # Don't process events that have already been consumed.
                 # But still reset the idle timeout, so that the screen doesn't
