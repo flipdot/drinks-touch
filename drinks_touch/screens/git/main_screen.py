@@ -1,6 +1,8 @@
 import functools
 import subprocess
 
+from pygame.mixer import Sound
+
 import config
 from elements import Button, SvgIcon
 from elements.hbox import HBox
@@ -15,6 +17,15 @@ from tasks import GitFetchTask, UpdateAndRestartTask
 class GitMainScreen(Screen):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.soundcheck = False
+        self.clock = 0
+        self.sound = Sound("drinks_touch/resources/sounds/smb_pipe.wav")
+
+        self.soundcheck_button = Button(
+            text="Soundcheck",
+            on_click=self.toggle_soundcheck,
+            size=25,
+        )
 
         self.objects = [
             SvgIcon(
@@ -66,11 +77,26 @@ class GitMainScreen(Screen):
                         ],
                         gap=15,
                     ),
+                    self.soundcheck_button,
                 ],
                 pos=(5, 300),
                 gap=15,
             ),
         ]
+
+    def toggle_soundcheck(self):
+        self.soundcheck = not self.soundcheck
+        if self.soundcheck:
+            self.soundcheck_button.text = "Soundcheck aus"
+        else:
+            self.soundcheck_button.text = "Soundcheck"
+
+    def render(self, dt):
+        self.clock += dt
+        if self.soundcheck and self.clock > 1.5:
+            self.sound.play()
+            self.clock = 0
+        return super().render(dt)
 
     def update_and_restart(self):
         # git checkout master

@@ -51,6 +51,14 @@ class Button(BaseElm):
         self.disabled = disabled
 
     @property
+    def text(self):
+        return self.inner.text
+
+    @text.setter
+    def text(self, value):
+        self.inner.text = value
+
+    @property
     def disabled(self) -> bool:
         return self._disabled
 
