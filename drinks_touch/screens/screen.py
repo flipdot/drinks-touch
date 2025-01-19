@@ -22,6 +22,7 @@ class Screen:
         self.objects: list[BaseElm] = []
         self._alert = None
         self.on_create()
+        self._keyboard_input = ""
 
     def __repr__(self):
         return f"<{self.__class__.__name__}>"
@@ -90,6 +91,17 @@ class Screen:
         for obj in self.objects[::-1]:
             if consumed_by := obj.event(event):
                 return consumed_by
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_RETURN:
+                self.on_barcode(self._keyboard_input)
+                self._keyboard_input = ""
+            elif event.key == pygame.K_BACKSPACE:
+                self._keyboard_input = self._keyboard_input[:-1]
+            else:
+                self._keyboard_input += event.unicode
+
+    def on_barcode(self, barcode: str):
+        pass
 
     @staticmethod
     def back():

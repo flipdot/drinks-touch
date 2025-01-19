@@ -1,10 +1,7 @@
-import select
 import threading
 
 from screens.screen_manager import ScreenManager
 from tasks.base import BaseTask
-
-import sys
 
 import serial
 import logging
@@ -46,8 +43,6 @@ class BarcodeWorker:
         BarcodeWorker.killed = False
         if is_pi():
             BarcodeWorker._read_from_serial()
-        else:
-            BarcodeWorker._read_from_stdin()
 
     @staticmethod
     def kill():
@@ -63,32 +58,7 @@ class BarcodeWorker:
             screen.goto(TasksScreen(screen.screen, [CheckoutAndRestartTask("master")]))
             return
 
-        if hasattr(screen, "on_barcode"):
-            screen.on_barcode(barcode)
-
-    @staticmethod
-    def _read_from_stdin():
-        """
-        Read from stdin to simulate barcode scanner input
-        """
-        logger.info("Enter EAN here to simulate scanned barcode!")
-
-        while not BarcodeWorker.killed:
-            try:
-                if select.select(
-                    [
-                        sys.stdin,
-                    ],
-                    [],
-                    [],
-                    5.0,
-                )[0]:
-                    line = sys.stdin.readline().strip().upper()
-                    BarcodeWorker.on_barcode(line)
-                else:
-                    logger.debug("No input available")
-            except Exception:
-                logger.exception("Caught exception in barcode handler...")
+        screen.on_barcode(barcode)
 
     @staticmethod
     def _read_from_serial():
