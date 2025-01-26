@@ -250,7 +250,7 @@ class TetrisScreen(Screen):
         self.reserve_block_type = self.load_reserve_block()
         self.reserve_block_used = False
         self.board = self.load_board()
-        self.current_block = self.spawn_block()
+        self.current_block: Block | None = self.spawn_block()
 
         self.objects = [
             HBox(
@@ -330,6 +330,8 @@ class TetrisScreen(Screen):
     def use_reserve_block(self):
         if self.reserve_block_used:
             return
+        if not self.current_block:
+            return
         new_block = self.spawn_block(self.reserve_block_type)
         self.reserve_block_type = self.current_block.shape.block_type
         self.current_block = new_block
@@ -339,14 +341,45 @@ class TetrisScreen(Screen):
         if self.t - self.last_tick < 1:
             return
         self.last_tick = self.t
+
+        if self.current_block is None:
+            self.clear_lines()
+            self.current_block = self.spawn_block()
+            self.reserve_block_used = False
+            return
+
         if not self.current_block.fall():
             self.current_block.lock()
             if self.current_block.overlapping:
                 # TODO: game over
                 self.board = self.load_board()
-            self.current_block = self.spawn_block()
-            self.reserve_block_used = False
+
+            if self.any_row_is_full():
+                self.current_block = None
+            else:
+                self.current_block = self.spawn_block()
+                self.reserve_block_used = False
             # self.load_scores()
+
+    def any_row_is_full(self):
+        for row in self.board:
+            if self.row_is_full(row):
+                return True
+        return False
+
+    def clear_lines(self):
+        for y, row in enumerate(self.board):
+            if self.row_is_full(row):
+                self.board.pop(y)
+                self.board.insert(0, [Cell.EMPTY for _ in range(self.BOARD_WIDTH)])
+                self.board[0][-1] = Cell.WALL
+                self.board[0][0] = Cell.WALL
+
+    @staticmethod
+    def row_is_full(row: list[Cell]) -> bool:
+        return all(cell != Cell.EMPTY for cell in row) and not all(
+            cell == Cell.WALL for cell in row
+        )
 
     def render(self, dt):
         self.t += dt
@@ -360,15 +393,33 @@ class TetrisScreen(Screen):
                 v.elementwise() * self.SPRITE_RESOLUTION * self.SCALE,
             )
 
-        for x in range(self.BOARD_WIDTH):
-            for y in range(self.BOARD_HEIGHT):
+        for y in range(self.BOARD_HEIGHT):
+            row_is_full = self.row_is_full(self.board[y])
+            for x in range(self.BOARD_WIDTH):
                 blit(x, y, self.board[y][x].sprite)
+            if row_is_full:
+                if math.sin(self.t * 15) < 0:
+                    pygame.draw.rect(
+                        surface,
+                        Color.PRIMARY.value,
+                        (
+                            self.SPRITE_RESOLUTION.x * self.SCALE,
+                            y * self.SPRITE_RESOLUTION.y * self.SCALE,
+                            (self.BOARD_WIDTH - 2)
+                            * self.SPRITE_RESOLUTION.x
+                            * self.SCALE,
+                            self.SPRITE_RESOLUTION.y * self.SCALE,
+                        ),
+                    )
 
-        current_block = self.current_block.render(self.sprites)
-        surface.blit(
-            current_block,
-            self.current_block.pos.elementwise() * self.SPRITE_RESOLUTION * self.SCALE,
-        )
+        if self.current_block:
+            current_block = self.current_block.render(self.sprites)
+            surface.blit(
+                current_block,
+                self.current_block.pos.elementwise()
+                * self.SPRITE_RESOLUTION
+                * self.SCALE,
+            )
 
         scoreboard = self.render_gameinfo()
         surface.blit(scoreboard, (config.SCREEN_WIDTH - scoreboard.get_width(), 0))
@@ -528,9 +579,13 @@ class TetrisScreen(Screen):
         self.load_sprites()
 
     def on_left(self):
+        if not self.current_block:
+            return
         self.current_block.move(Direction.LEFT)
 
     def on_rotate_counterclockwise(self):
+        if not self.current_block:
+            return
         self.current_block.rotate(clockwise=False)
 
     def on_down(self):
@@ -538,9 +593,13 @@ class TetrisScreen(Screen):
             self.last_tick = self.t
 
     def on_rotate_clockwise(self):
+        if not self.current_block:
+            return
         self.current_block.rotate(clockwise=True)
 
     def on_right(self):
+        if not self.current_block:
+            return
         self.current_block.move(Direction.RIGHT)
 
     def event(self, event):
