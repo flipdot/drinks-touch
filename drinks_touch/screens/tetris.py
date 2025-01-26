@@ -1,4 +1,5 @@
 import enum
+import math
 import random
 
 import pygame
@@ -56,7 +57,7 @@ class Cell(enum.Enum):
         }[self]
 
 
-class Shapes:
+class Shape:
     def __init__(self, block_type: BlockType):
         self.block_type = block_type
 
@@ -134,7 +135,7 @@ class Direction(enum.Enum):
 
 class Block:
 
-    def __init__(self, shape: Shapes, pos: Vector2, board: list[list[Cell]]):
+    def __init__(self, shape: Shape, pos: Vector2, board: list[list[Cell]]):
         self.shape = shape
         self.pos = pos
         self.board = board
@@ -220,7 +221,8 @@ class TetrisScreen(Screen):
         self.scores: list[tuple[Account, int, int]] = []
         self.score = 0
         self.highscore = 0
-        self.reserve_block = random.choice(list(BlockType))  # TODO: persist
+        self.reserve_block_type = self.load_reserve_block()
+        self.reserve_block_used = False
         self.board = self.load_board()
         self.current_block = self.spawn_block()
 
@@ -256,9 +258,11 @@ class TetrisScreen(Screen):
         ]
         self.load_scores()
 
-    def spawn_block(self) -> Block:
+    def spawn_block(self, block_type: None | BlockType = None) -> Block:
+        if not block_type:
+            block_type = random.choice(list(BlockType))
         return Block(
-            shape=Shapes(random.choice(list(BlockType))),
+            shape=Shape(block_type),
             pos=Vector2(self.BOARD_WIDTH // 2 - 1, 0),
             board=self.board,
         )
@@ -281,6 +285,10 @@ class TetrisScreen(Screen):
         ]
         return with_walls
 
+    def load_reserve_block(self) -> BlockType:
+        # TODO: store this in the database
+        return random.choice(list(BlockType))
+
     def load_scores(self):
         # dummy values for now as long as we don't have a database table
         import random
@@ -293,6 +301,14 @@ class TetrisScreen(Screen):
         self.score = random.randint(1, 1000)
         self.highscore = self.score + random.randint(1, 1000)
 
+    def use_reserve_block(self):
+        if self.reserve_block_used:
+            return
+        new_block = self.spawn_block(self.reserve_block_type)
+        self.reserve_block_type = self.current_block.shape.block_type
+        self.current_block = new_block
+        self.reserve_block_used = True
+
     def tick(self):
         if self.t - self.last_tick < 1:
             return
@@ -303,6 +319,7 @@ class TetrisScreen(Screen):
                 # TODO: game over
                 self.board = self.load_board()
             self.current_block = self.spawn_block()
+            self.reserve_block_used = False
             # self.load_scores()
 
     def render(self, dt):
@@ -329,6 +346,7 @@ class TetrisScreen(Screen):
 
         scoreboard = self.render_gameinfo()
         surface.blit(scoreboard, (config.SCREEN_WIDTH - scoreboard.get_width(), 0))
+
         return surface, debug_surface
 
     def render_gameinfo(self) -> pygame.Surface:
@@ -379,12 +397,13 @@ class TetrisScreen(Screen):
             border_radius=20,
         )
 
-        # debug to see all blocks
-        blocks = list(BlockType)
-        self.reserve_block = blocks[int(self.t * 3 % len(blocks))]
-
-        reserve_shape = Shapes(self.reserve_block)
+        reserve_shape = Shape(self.reserve_block_type)
         reserve_surface = reserve_shape.render(self.sprites)
+        if self.reserve_block_used:
+            alpha = 20 + abs(math.sin(self.t * 2)) * 150
+        else:
+            alpha = 255
+        reserve_surface.set_alpha(alpha)
         surface.blit(
             reserve_surface,
             reserve_bg_pos
@@ -395,8 +414,9 @@ class TetrisScreen(Screen):
         )
 
         text_font = pygame.font.Font(config.Font.MONOSPACE.value, 16)
-        text_surface = text_font.render("Tauschen", 1, Color.BLACK.value)
-        surface.blit(text_surface, (45, 125))
+        if not self.reserve_block_used:
+            text_surface = text_font.render("Tauschen", 1, Color.BLACK.value)
+            surface.blit(text_surface, (45, 125))
         return surface
 
     def render_score(self, width: float) -> pygame.Surface:
@@ -498,8 +518,21 @@ class TetrisScreen(Screen):
         self.current_block.move(Direction.RIGHT)
 
     def event(self, event):
+
+        # check if reserve block was clicked
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            pos = pygame.mouse.get_pos()
+            x = self.BOARD_WIDTH * self.SPRITE_RESOLUTION.x * self.SCALE + 10
+            y = 10
+            w = 180
+            h = 160
+            if x <= pos[0] <= x + w and y <= pos[1] <= y + h:
+                self.use_reserve_block()
+                return
+
         if event.type != pygame.KEYDOWN:
             return super().event(event)
+
         if event.key == pygame.K_LEFT:
             self.on_left()
         elif event.key == pygame.K_RIGHT:
@@ -510,6 +543,8 @@ class TetrisScreen(Screen):
             self.on_rotate_clockwise()
         elif event.key == pygame.K_DOWN:
             self.on_rotate_counterclockwise()
+        elif event.key == pygame.K_r:
+            self.use_reserve_block()
         else:
             return super().event(event)
 
