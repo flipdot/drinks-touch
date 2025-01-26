@@ -21,20 +21,115 @@ def lighten(color: Color, factor: float) -> Vector3:
 
 
 class BlockType(enum.Enum):
-    I = 0  # noqa: E741
-    J = 1
-    L = 2
-    S = 3
-    T = 4
-    Z = 5
-    O = 6  # noqa: E741
+    I = 1  # noqa: E741
+    J = 2
+    L = 3
+    S = 4
+    T = 5
+    Z = 6
+    O = 7  # noqa: E741
+
+
+class Cell(enum.Enum):
+    EMPTY = 0
+    I = 1  # noqa: E741
+    J = 2
+    L = 3
+    S = 4
+    T = 5
+    Z = 6
+    O = 7  # noqa: E741
+    WALL = 8
+
+    @property
+    def sprite(self):
+        return {
+            Cell.EMPTY: "bg-empty",
+            Cell.I: "block-i",
+            Cell.J: "block-j",
+            Cell.L: "block-l",
+            Cell.S: "block-s",
+            Cell.T: "block-t",
+            Cell.Z: "block-z",
+            Cell.O: "block-o",
+            Cell.WALL: "bg-bricks",
+        }[self]
+
+
+class Shapes:
+    def __init__(self, block_type: BlockType):
+        self.block_type = block_type
+
+        if block_type == BlockType.I:
+            self.matrix = [
+                [Cell.I, Cell.I, Cell.I, Cell.I],
+            ]
+        elif block_type == BlockType.J:
+            self.matrix = [
+                [Cell.J, Cell.J, Cell.J],
+                [Cell.EMPTY, Cell.EMPTY, Cell.J],
+            ]
+        elif block_type == BlockType.L:
+            self.matrix = [
+                [Cell.L, Cell.L, Cell.L],
+                [Cell.L, Cell.EMPTY, Cell.EMPTY],
+            ]
+        elif block_type == BlockType.S:
+            self.matrix = [
+                [Cell.EMPTY, Cell.S, Cell.S],
+                [Cell.S, Cell.S, Cell.EMPTY],
+            ]
+        elif block_type == BlockType.T:
+            self.matrix = [
+                [Cell.T, Cell.T, Cell.T],
+                [Cell.EMPTY, Cell.T, Cell.EMPTY],
+            ]
+        elif block_type == BlockType.Z:
+            self.matrix = [
+                [Cell.Z, Cell.Z, Cell.EMPTY],
+                [Cell.EMPTY, Cell.Z, Cell.Z],
+            ]
+        elif block_type == BlockType.O:
+            self.matrix = [
+                [Cell.O, Cell.O],
+                [Cell.O, Cell.O],
+            ]
+
+    def rotate(self, clockwise: bool):
+        if self.block_type == BlockType.O:
+            return
+        if clockwise:
+            self.matrix = list(zip(*self.matrix[::-1]))
+        else:
+            self.matrix = list(zip(*self.matrix))[::-1]
+
+    def render(self, sprites: dict[str, pygame.Surface]) -> pygame.Surface:
+        matrix_size = Vector2(len(self.matrix[0]), len(self.matrix))
+        size = Vector2(
+            matrix_size.elementwise()
+            * TetrisScreen.SPRITE_RESOLUTION
+            * TetrisScreen.SCALE
+        )
+        surface = pygame.Surface(size, pygame.SRCALPHA)
+        for y, row in enumerate(self.matrix):
+            for x, cell in enumerate(row):
+                if cell == Cell.EMPTY:
+                    continue
+                pos = Vector2(x, y)
+                surface.blit(
+                    sprites[cell.sprite],
+                    pos.elementwise()
+                    * TetrisScreen.SPRITE_RESOLUTION
+                    * TetrisScreen.SCALE,
+                )
+        return surface
 
 
 class TetrisScreen(Screen):
     nav_bar_visible = False
     SCALE = 1.5
-    BOARD_WIDTH = 10
-    BOARD_HEIGHT = 30
+    BOARD_WIDTH = 12
+    BOARD_HEIGHT = 32
     SPRITE_RESOLUTION = Vector2(16, 16)
 
     def __init__(self, account: Account):
@@ -49,6 +144,7 @@ class TetrisScreen(Screen):
         self.score = 0
         self.highscore = 0
         self.reserve_block = random.choice(list(BlockType))
+        self.board = self.load_board()
 
         self.objects = [
             HBox(
@@ -82,6 +178,20 @@ class TetrisScreen(Screen):
         ]
         self.load_scores()
 
+    def load_board(self) -> list[list[Cell]]:
+        empty = [
+            [random.choice(list(Cell)) for _ in range(self.BOARD_WIDTH)]
+            for _ in range(self.BOARD_HEIGHT)
+        ]
+        with_walls = [
+            [
+                Cell.WALL if x in (0, self.BOARD_WIDTH - 1) else c
+                for x, c in enumerate(r)
+            ]
+            for r in empty
+        ]
+        return with_walls
+
     def load_scores(self):
         # dummy values for now as long as we don't have a database table
         import random
@@ -99,43 +209,15 @@ class TetrisScreen(Screen):
         surface, debug_surface = super().render(dt)
 
         def blit(x: int, y: int, sprite_name: str):
-            x += 1
-            v = Vector2(x, self.BOARD_HEIGHT - y)
+            v = Vector2(x, self.BOARD_HEIGHT - y - 1)
             surface.blit(
                 self.sprites[sprite_name],
                 v.elementwise() * self.SPRITE_RESOLUTION * self.SCALE,
             )
 
-        v = Vector2(self.BOARD_WIDTH, self.BOARD_HEIGHT) + Vector2(2, 2)
-        pygame.draw.rect(
-            surface,
-            Color.PRIMARY.value,
-            (
-                0,
-                0,
-                *(v.elementwise() * self.SPRITE_RESOLUTION * self.SCALE),
-            ),
-        )
-        for x in range(-1, self.BOARD_WIDTH + 1):
-            for y in range(-1, self.BOARD_HEIGHT + 1):
-                if x < 0 or x >= self.BOARD_WIDTH or y < 0 or y >= self.BOARD_HEIGHT:
-                    blit(x, y, "bg-bricks")
-                if y == 0:
-                    if x == 0:
-                        blit(x, y, "block-i")
-                    elif x == 1:
-                        blit(x, y, "block-j")
-                    elif x == 2:
-                        blit(x, y, "block-l")
-                    elif x == 3:
-                        blit(x, y, "block-s")
-                    elif x == 4:
-                        blit(x, y, "block-t")
-                    elif x == 5:
-                        blit(x, y, "block-z")
-                    elif x == 6:
-                        blit(x, y, "block-o")
-        surface.blit(self.sprites["bg-bricks"], (0, 0))
+        for x in range(self.BOARD_WIDTH):
+            for y in range(self.BOARD_HEIGHT):
+                blit(x, y, self.board[y][x].sprite)
         scoreboard = self.render_gameinfo()
         surface.blit(scoreboard, (config.SCREEN_WIDTH - scoreboard.get_width(), 0))
         return surface, debug_surface
@@ -143,9 +225,9 @@ class TetrisScreen(Screen):
     def render_gameinfo(self) -> pygame.Surface:
         w = (
             config.SCREEN_WIDTH
-            - (self.BOARD_WIDTH + 2) * self.SPRITE_RESOLUTION.x * self.SCALE
+            - self.BOARD_WIDTH * self.SPRITE_RESOLUTION.x * self.SCALE
         )
-        h = (self.BOARD_HEIGHT + 2) * self.SPRITE_RESOLUTION.y * self.SCALE
+        h = self.BOARD_HEIGHT * self.SPRITE_RESOLUTION.y * self.SCALE
         size = Vector2(w, h)
         surface = pygame.Surface(size)
         surface.fill(darken(Color.PRIMARY, 0.8))
@@ -173,16 +255,34 @@ class TetrisScreen(Screen):
             surface,
             darken(Color.PRIMARY, 0.3),
             (0, 0, size.x, size.y),
+            border_radius=10,
         )
 
         title_font = pygame.font.Font(config.Font.MONOSPACE.value, 20)
         title_surface = title_font.render("RESERVE", 1, Color.BLACK.value)
         surface.blit(title_surface, (5, 10))
 
+        reserve_bg_pos = Vector2(30, 40)
         pygame.draw.rect(
             surface,
             Color.PRIMARY.value,
-            (20, 40, size.x - 40, 80),
+            (*reserve_bg_pos, size.x - 60, 80),
+            border_radius=20,
+        )
+
+        # debug to see all blocks
+        blocks = list(BlockType)
+        self.reserve_block = blocks[int(self.t * 3 % len(blocks))]
+
+        reserve_shape = Shapes(self.reserve_block)
+        reserve_surface = reserve_shape.render(self.sprites)
+        surface.blit(
+            reserve_surface,
+            reserve_bg_pos
+            + Vector2(
+                (size.x - 60 - reserve_surface.get_width()) // 2,
+                (80 - reserve_surface.get_height()) // 2,
+            ),
         )
 
         text_font = pygame.font.Font(config.Font.MONOSPACE.value, 16)
@@ -198,6 +298,7 @@ class TetrisScreen(Screen):
             surface,
             darken(Color.PRIMARY, 0.3),
             (0, 0, size.x, size.y),
+            border_radius=10,
         )
 
         title_font = pygame.font.Font(config.Font.MONOSPACE.value, 20)
@@ -224,10 +325,11 @@ class TetrisScreen(Screen):
             surface,
             darken(Color.PRIMARY, 0.3),
             (0, 0, size.x, size.y),
+            border_radius=10,
         )
 
         title_font = pygame.font.Font(config.Font.MONOSPACE.value, 20)
-        text_surface = title_font.render("SCORES", 1, Color.BLACK.value)
+        text_surface = title_font.render("PLAYERS", 1, Color.BLACK.value)
 
         label_font = pygame.font.Font(config.Font.MONOSPACE.value, 11)
         lines_label = label_font.render("lines", 1, Color.BLACK.value)
@@ -287,6 +389,7 @@ class TetrisScreen(Screen):
 
     def load_sprites(self):
         sprite_names = [
+            "bg-empty",
             "bg-bricks",
             "block-o",
             "block-i",
