@@ -22,31 +22,41 @@ def lighten(color: Color, factor: float) -> Vector3:
 
 
 class BlockType(enum.Enum):
-    I = 1  # noqa: E741
     J = 2
     L = 3
     S = 4
     T = 5
     Z = 6
     O = 7  # noqa: E741
+    I = 8  # noqa: E741
 
 
 class Cell(enum.Enum):
     EMPTY = 0
-    I = 1  # noqa: E741
     J = 2
     L = 3
     S = 4
     T = 5
     Z = 6
     O = 7  # noqa: E741
-    WALL = 8
+    I_H1 = 8
+    I_H2 = 9
+    I_H3 = 10
+    I_V1 = 11
+    I_V2 = 12
+    I_V3 = 13
+    WALL = 14
 
     @property
     def sprite(self):
         return {
             Cell.EMPTY: "bg-empty",
-            Cell.I: "block-i",
+            Cell.I_H1: "block-i_h1",
+            Cell.I_H2: "block-i_h2",
+            Cell.I_H3: "block-i_h3",
+            Cell.I_V1: "block-i_v1",
+            Cell.I_V2: "block-i_v2",
+            Cell.I_V3: "block-i_v3",
             Cell.J: "block-j",
             Cell.L: "block-l",
             Cell.S: "block-s",
@@ -64,7 +74,7 @@ class Shape:
         if block_type == BlockType.I:
             self.matrix = [
                 [Cell.EMPTY, Cell.EMPTY, Cell.EMPTY, Cell.EMPTY],
-                [Cell.I, Cell.I, Cell.I, Cell.I],
+                [Cell.I_H1, Cell.I_H2, Cell.I_H2, Cell.I_H3],
                 [Cell.EMPTY, Cell.EMPTY, Cell.EMPTY, Cell.EMPTY],
             ]
         elif block_type == BlockType.J:
@@ -100,6 +110,22 @@ class Shape:
 
     def rotate(self, clockwise: bool):
         if self.block_type == BlockType.O:
+            return
+        if self.block_type == BlockType.I:
+            is_horizontal = self.matrix[1][1] == Cell.I_H2
+            if is_horizontal:
+                self.matrix = [
+                    [Cell.EMPTY, Cell.I_V1, Cell.EMPTY],
+                    [Cell.EMPTY, Cell.I_V2, Cell.EMPTY],
+                    [Cell.EMPTY, Cell.I_V2, Cell.EMPTY],
+                    [Cell.EMPTY, Cell.I_V3, Cell.EMPTY],
+                ]
+            else:
+                self.matrix = [
+                    [Cell.EMPTY, Cell.EMPTY, Cell.EMPTY, Cell.EMPTY],
+                    [Cell.I_H1, Cell.I_H2, Cell.I_H2, Cell.I_H3],
+                    [Cell.EMPTY, Cell.EMPTY, Cell.EMPTY, Cell.EMPTY],
+                ]
             return
         if clockwise:
             self.matrix = list(zip(*self.matrix[::-1]))
@@ -553,7 +579,12 @@ class TetrisScreen(Screen):
             "bg-empty",
             "bg-bricks",
             "block-o",
-            "block-i",
+            "block-i_h1",
+            "block-i_h2",
+            "block-i_h3",
+            "block-i_v1",
+            "block-i_v2",
+            "block-i_v3",
             "block-j",
             "block-l",
             "block-s",
