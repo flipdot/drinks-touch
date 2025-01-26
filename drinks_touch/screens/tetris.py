@@ -125,6 +125,62 @@ class Shapes:
         return surface
 
 
+class Direction(enum.Enum):
+    LEFT = -1
+    RIGHT = 1
+
+
+class Block:
+
+    def __init__(self, shape: Shapes, pos: Vector2, board: list[list[Cell]]):
+        self.shape = shape
+        self.pos = pos
+        self.board = board
+        self.locked = False
+        self.overlapping = False
+
+    def render(self, sprites: dict[str, pygame.Surface]) -> pygame.Surface:
+        return self.shape.render(sprites)
+
+    def move(self, direction: Direction):
+        assert not self.locked, "Block is already locked"
+        self.pos.x += direction.value
+        if self.collides():
+            self.pos.x -= direction.value
+
+    def fall(self):
+        """
+        Returns False if the block could not fall further
+        """
+        assert not self.locked, "Block is already locked"
+        self.pos.y += 1
+        if self.collides():
+            self.pos.y -= 1
+            return False
+        return True
+
+    def lock(self):
+        for y, row in enumerate(self.shape.matrix):
+            for x, cell in enumerate(row):
+                if cell == Cell.EMPTY:
+                    continue
+                pos = self.pos + Vector2(x, y)
+                if self.board[int(pos.y)][int(pos.x)] != Cell.EMPTY:
+                    self.overlapping = True
+                self.board[int(pos.y)][int(pos.x)] = cell
+        self.locked = True
+
+    def collides(self) -> bool:
+        for y, row in enumerate(self.shape.matrix):
+            for x, cell in enumerate(row):
+                if cell == Cell.EMPTY:
+                    continue
+                pos = self.pos + Vector2(x, y)
+                if self.board[int(pos.y)][int(pos.x)] != Cell.EMPTY:
+                    return True
+        return False
+
+
 class TetrisScreen(Screen):
     nav_bar_visible = False
     SCALE = 1.5
@@ -138,13 +194,15 @@ class TetrisScreen(Screen):
 
         super().__init__()
         self.t = 0
+        self.last_tick = 0
         self.account = account
         self.sprites = {}
         self.scores: list[tuple[Account, int, int]] = []
         self.score = 0
         self.highscore = 0
-        self.reserve_block = random.choice(list(BlockType))
+        self.reserve_block = random.choice(list(BlockType))  # TODO: persist
         self.board = self.load_board()
+        self.current_block = self.spawn_block()
 
         self.objects = [
             HBox(
@@ -178,17 +236,28 @@ class TetrisScreen(Screen):
         ]
         self.load_scores()
 
+    def spawn_block(self) -> Block:
+        return Block(
+            shape=Shapes(random.choice(list(BlockType))),
+            pos=Vector2(self.BOARD_WIDTH // 2 - 1, 0),
+            board=self.board,
+        )
+
     def load_board(self) -> list[list[Cell]]:
         empty = [
-            [random.choice(list(Cell)) for _ in range(self.BOARD_WIDTH)]
+            [Cell.EMPTY for _ in range(self.BOARD_WIDTH)]
             for _ in range(self.BOARD_HEIGHT)
         ]
         with_walls = [
             [
-                Cell.WALL if x in (0, self.BOARD_WIDTH - 1) else c
+                (
+                    Cell.WALL
+                    if x in (0, self.BOARD_WIDTH - 1) or y == self.BOARD_HEIGHT - 1
+                    else c
+                )
                 for x, c in enumerate(r)
             ]
-            for r in empty
+            for y, r in enumerate(empty)
         ]
         return with_walls
 
@@ -204,12 +273,25 @@ class TetrisScreen(Screen):
         self.score = random.randint(1, 1000)
         self.highscore = self.score + random.randint(1, 1000)
 
+    def tick(self):
+        if self.t - self.last_tick < 1:
+            return
+        self.last_tick = self.t
+        if not self.current_block.fall():
+            self.current_block.lock()
+            if self.current_block.overlapping:
+                # TODO: game over
+                self.board = self.load_board()
+            self.current_block = self.spawn_block()
+            # self.load_scores()
+
     def render(self, dt):
         self.t += dt
+        self.tick()
         surface, debug_surface = super().render(dt)
 
         def blit(x: int, y: int, sprite_name: str):
-            v = Vector2(x, self.BOARD_HEIGHT - y - 1)
+            v = Vector2(x, y)
             surface.blit(
                 self.sprites[sprite_name],
                 v.elementwise() * self.SPRITE_RESOLUTION * self.SCALE,
@@ -218,6 +300,13 @@ class TetrisScreen(Screen):
         for x in range(self.BOARD_WIDTH):
             for y in range(self.BOARD_HEIGHT):
                 blit(x, y, self.board[y][x].sprite)
+
+        current_block = self.current_block.render(self.sprites)
+        surface.blit(
+            current_block,
+            self.current_block.pos.elementwise() * self.SPRITE_RESOLUTION * self.SCALE,
+        )
+
         scoreboard = self.render_gameinfo()
         surface.blit(scoreboard, (config.SCREEN_WIDTH - scoreboard.get_width(), 0))
         return surface, debug_surface
@@ -373,19 +462,36 @@ class TetrisScreen(Screen):
         self.load_sprites()
 
     def on_left(self):
-        pass
+        self.current_block.move(Direction.LEFT)
 
     def on_rotate_counterclockwise(self):
         pass
 
     def on_down(self):
-        pass
+        while self.current_block.fall():
+            self.last_tick = self.t
 
     def on_rotate_clockwise(self):
         pass
 
     def on_right(self):
-        pass
+        self.current_block.move(Direction.RIGHT)
+
+    def event(self, event):
+        if event.type != pygame.KEYDOWN:
+            return super().event(event)
+        if event.key == pygame.K_LEFT:
+            self.on_left()
+        elif event.key == pygame.K_RIGHT:
+            self.on_right()
+        elif event.key == pygame.K_RETURN or event.key == pygame.K_SPACE:
+            self.on_down()
+        elif event.key == pygame.K_UP:
+            self.on_rotate_clockwise()
+        elif event.key == pygame.K_DOWN:
+            self.on_rotate_counterclockwise()
+        else:
+            return super().event(event)
 
     def load_sprites(self):
         sprite_names = [
