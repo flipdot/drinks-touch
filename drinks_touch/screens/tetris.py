@@ -62,7 +62,9 @@ class Shapes:
 
         if block_type == BlockType.I:
             self.matrix = [
+                [Cell.EMPTY, Cell.EMPTY, Cell.EMPTY, Cell.EMPTY],
                 [Cell.I, Cell.I, Cell.I, Cell.I],
+                [Cell.EMPTY, Cell.EMPTY, Cell.EMPTY, Cell.EMPTY],
             ]
         elif block_type == BlockType.J:
             self.matrix = [
@@ -142,11 +144,11 @@ class Block:
     def render(self, sprites: dict[str, pygame.Surface]) -> pygame.Surface:
         return self.shape.render(sprites)
 
-    def move(self, direction: Direction):
+    def move(self, direction: Direction, *, factor=1):
         assert not self.locked, "Block is already locked"
-        self.pos.x += direction.value
+        self.pos.x += direction.value * factor
         if self.collides():
-            self.pos.x -= direction.value
+            self.pos.x -= direction.value * factor
 
     def fall(self):
         """
@@ -170,12 +172,30 @@ class Block:
                 self.board[int(pos.y)][int(pos.x)] = cell
         self.locked = True
 
+    def rotate(self, clockwise: bool):
+        assert not self.locked, "Block is already locked"
+        self.shape.rotate(clockwise)
+        if self.collides():
+            # Try to move the block to the left or right
+            for i in range(2):
+                self.move(Direction.RIGHT, factor=(i + 1))
+                if not self.collides():
+                    return
+            for i in range(2):
+                self.move(Direction.LEFT, factor=(i + 1))
+                if not self.collides():
+                    return
+            # If it still collides, revert rotation
+            self.shape.rotate(not clockwise)
+
     def collides(self) -> bool:
         for y, row in enumerate(self.shape.matrix):
             for x, cell in enumerate(row):
                 if cell == Cell.EMPTY:
                     continue
                 pos = self.pos + Vector2(x, y)
+                if pos.x < 0 or pos.x >= len(self.board[0]) or pos.y >= len(self.board):
+                    return True
                 if self.board[int(pos.y)][int(pos.x)] != Cell.EMPTY:
                     return True
         return False
@@ -465,14 +485,14 @@ class TetrisScreen(Screen):
         self.current_block.move(Direction.LEFT)
 
     def on_rotate_counterclockwise(self):
-        pass
+        self.current_block.rotate(clockwise=False)
 
     def on_down(self):
         while self.current_block.fall():
             self.last_tick = self.t
 
     def on_rotate_clockwise(self):
-        pass
+        self.current_block.rotate(clockwise=True)
 
     def on_right(self):
         self.current_block.move(Direction.RIGHT)
