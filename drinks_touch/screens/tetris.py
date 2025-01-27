@@ -1,9 +1,11 @@
 import enum
+import functools
 import math
 import random
 
 import pygame
 from pygame import Vector2, Vector3
+from pygame.mixer import Sound
 
 import config
 from config import Color
@@ -199,21 +201,23 @@ class Block:
                 self.board[int(pos.y)][int(pos.x)] = cell
         self.locked = True
 
-    def rotate(self, clockwise: bool):
+    def rotate(self, clockwise: bool) -> bool:
         assert not self.locked, "Block is already locked"
         self.shape.rotate(clockwise)
-        if self.collides():
-            # Try to move the block to the left or right
-            for i in range(2):
-                self.move(Direction.RIGHT, factor=(i + 1))
-                if not self.collides():
-                    return
-            for i in range(2):
-                self.move(Direction.LEFT, factor=(i + 1))
-                if not self.collides():
-                    return
-            # If it still collides, revert rotation
-            self.shape.rotate(not clockwise)
+        if not self.collides():
+            return True
+        # Try to move the block to the left or right
+        for i in range(2):
+            self.move(Direction.RIGHT, factor=(i + 1))
+            if not self.collides():
+                return True
+        for i in range(2):
+            self.move(Direction.LEFT, factor=(i + 1))
+            if not self.collides():
+                return True
+        # If it still collides, revert rotation
+        self.shape.rotate(not clockwise)
+        return False
 
     def collides(self) -> bool:
         for y, row in enumerate(self.shape.matrix):
@@ -251,6 +255,20 @@ class TetrisScreen(Screen):
         self.reserve_block_used = False
         self.board = self.load_board()
         self.current_block: Block | None = self.spawn_block()
+        self.sounds = {
+            name: Sound(f"drinks_touch/resources/sounds/tetris/{name}.wav")
+            for name in [
+                "move-block",
+                "line-clear",
+                "4-line-clear",
+                "lock-block",
+                "rotate-block",
+                "use-reserve",
+                "block-fall",
+                "block-to-bottom",
+                "game-over",
+            ]
+        }
 
         self.objects = [
             HBox(
@@ -261,7 +279,7 @@ class TetrisScreen(Screen):
                     ),
                     Button(
                         inner=icon("rotate-counterclockwise"),
-                        on_click=self.on_rotate_counterclockwise,
+                        on_click=functools.partial(self.on_rotate, clockwise=False),
                     ),
                     Button(
                         inner=icon("arrow-down-long"),
@@ -269,7 +287,7 @@ class TetrisScreen(Screen):
                     ),
                     Button(
                         inner=icon("rotate-clockwise"),
-                        on_click=self.on_rotate_clockwise,
+                        on_click=functools.partial(self.on_rotate, clockwise=True),
                     ),
                     Button(
                         inner=icon("arrow-right"),
@@ -336,6 +354,7 @@ class TetrisScreen(Screen):
         self.reserve_block_type = self.current_block.shape.block_type
         self.current_block = new_block
         self.reserve_block_used = True
+        self.sounds["use-reserve"].play()
 
     def tick(self):
         if self.t - self.last_tick < 1:
@@ -350,22 +369,31 @@ class TetrisScreen(Screen):
 
         if not self.current_block.fall():
             self.current_block.lock()
+            self.sounds["lock-block"].play()
             if self.current_block.overlapping:
                 # TODO: game over
+                self.sounds["game-over"].play()
                 self.board = self.load_board()
 
-            if self.any_row_is_full():
+            if n := self.count_full_rows():
                 self.current_block = None
+                if n == 4:
+                    self.sounds["4-line-clear"].play()
+                else:
+                    self.sounds["line-clear"].play()
             else:
                 self.current_block = self.spawn_block()
                 self.reserve_block_used = False
             # self.load_scores()
+        else:
+            self.sounds["block-fall"].play()
 
-    def any_row_is_full(self):
+    def count_full_rows(self) -> int:
+        n = 0
         for row in self.board:
             if self.row_is_full(row):
-                return True
-        return False
+                n += 1
+        return n
 
     def clear_lines(self):
         for y, row in enumerate(self.board):
@@ -582,25 +610,27 @@ class TetrisScreen(Screen):
         if not self.current_block:
             return
         self.current_block.move(Direction.LEFT)
-
-    def on_rotate_counterclockwise(self):
-        if not self.current_block:
-            return
-        self.current_block.rotate(clockwise=False)
+        self.sounds["move-block"].play()
 
     def on_down(self):
+        play_sound = False
         while self.current_block.fall():
             self.last_tick = self.t
+            play_sound = True
+        if play_sound:
+            self.sounds["block-to-bottom"].play()
 
-    def on_rotate_clockwise(self):
+    def on_rotate(self, clockwise: bool):
         if not self.current_block:
             return
-        self.current_block.rotate(clockwise=True)
+        if self.current_block.rotate(clockwise=clockwise):
+            self.sounds["rotate-block"].play()
 
     def on_right(self):
         if not self.current_block:
             return
         self.current_block.move(Direction.RIGHT)
+        self.sounds["move-block"].play()
 
     def event(self, event):
 
@@ -625,9 +655,9 @@ class TetrisScreen(Screen):
         elif event.key == pygame.K_RETURN or event.key == pygame.K_SPACE:
             self.on_down()
         elif event.key == pygame.K_UP:
-            self.on_rotate_clockwise()
+            self.on_rotate(clockwise=True)
         elif event.key == pygame.K_DOWN:
-            self.on_rotate_counterclockwise()
+            self.on_rotate(clockwise=False)
         elif event.key == pygame.K_r:
             self.use_reserve_block()
         else:
