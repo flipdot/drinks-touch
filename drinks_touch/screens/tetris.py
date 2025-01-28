@@ -255,6 +255,7 @@ class TetrisScreen(Screen):
         self.reserve_block_used = False
         self.board = self.load_board()
         self.current_block: Block | None = self.spawn_block()
+        self.game_over = False
         self.sounds = {
             name: Sound(f"drinks_touch/resources/sounds/tetris/{name}.wav")
             for name in [
@@ -346,9 +347,12 @@ class TetrisScreen(Screen):
         self.highscore = self.score + random.randint(1, 1000)
 
     def use_reserve_block(self):
-        if self.reserve_block_used:
-            return
-        if not self.current_block:
+        if (
+            self.game_over
+            or not self.current_block
+            or self.current_block.locked
+            or self.reserve_block_used
+        ):
             return
         new_block = self.spawn_block(self.reserve_block_type)
         self.reserve_block_type = self.current_block.shape.block_type
@@ -357,11 +361,14 @@ class TetrisScreen(Screen):
         self.sounds["use-reserve"].play()
 
     def tick(self):
-        if self.t - self.last_tick < 1:
+        if self.t - self.last_tick < 0.2:
             return
         self.last_tick = self.t
 
-        if self.current_block is None:
+        if self.game_over:
+            return
+
+        if not self.current_block:
             self.clear_lines()
             self.current_block = self.spawn_block()
             self.reserve_block_used = False
@@ -371,9 +378,8 @@ class TetrisScreen(Screen):
             self.current_block.lock()
             self.sounds["lock-block"].play()
             if self.current_block.overlapping:
-                # TODO: game over
-                self.sounds["game-over"].play()
-                self.board = self.load_board()
+                self.end_game()
+                return
 
             if n := self.count_full_rows():
                 self.current_block = None
@@ -384,9 +390,15 @@ class TetrisScreen(Screen):
             else:
                 self.current_block = self.spawn_block()
                 self.reserve_block_used = False
-            # self.load_scores()
         else:
-            self.sounds["block-fall"].play()
+            pass
+            # self.sounds["block-fall"].play()
+
+    def end_game(self):
+        self.sounds["game-over"].play()
+        # self.current_block = None
+        self.game_over = True
+        # self.board = self.load_board()
 
     def count_full_rows(self) -> int:
         n = 0
@@ -447,6 +459,31 @@ class TetrisScreen(Screen):
                 self.current_block.pos.elementwise()
                 * self.SPRITE_RESOLUTION
                 * self.SCALE,
+            )
+
+        if self.game_over:
+            w = 200
+            h = 100
+            x = (self.BOARD_WIDTH * self.SPRITE_RESOLUTION.x * self.SCALE) // 2 - w // 2
+            y = (
+                self.BOARD_HEIGHT * self.SPRITE_RESOLUTION.y * self.SCALE
+            ) // 2 - h // 2
+
+            pygame.draw.rect(
+                surface,
+                darken(Color.PRIMARY, 0.8),
+                (x, y, w, h),
+                border_radius=10,
+            )
+
+            font = pygame.font.Font(config.Font.MONOSPACE.value, 20)
+            text_surface = font.render("GAME OVER", 1, Color.PRIMARY.value)
+            surface.blit(
+                text_surface,
+                (
+                    x + (w - text_surface.get_width()) // 2,
+                    y + (h - text_surface.get_height()) // 2,
+                ),
             )
 
         scoreboard = self.render_gameinfo()
@@ -607,12 +644,14 @@ class TetrisScreen(Screen):
         self.load_sprites()
 
     def on_left(self):
-        if not self.current_block:
+        if self.game_over or not self.current_block:
             return
         self.current_block.move(Direction.LEFT)
         self.sounds["move-block"].play()
 
     def on_down(self):
+        if self.game_over or not self.current_block:
+            return
         play_sound = False
         while self.current_block.fall():
             self.last_tick = self.t
@@ -621,13 +660,13 @@ class TetrisScreen(Screen):
             self.sounds["block-to-bottom"].play()
 
     def on_rotate(self, clockwise: bool):
-        if not self.current_block:
+        if self.game_over or not self.current_block:
             return
         if self.current_block.rotate(clockwise=clockwise):
             self.sounds["rotate-block"].play()
 
     def on_right(self):
-        if not self.current_block:
+        if self.game_over or not self.current_block:
             return
         self.current_block.move(Direction.RIGHT)
         self.sounds["move-block"].play()
