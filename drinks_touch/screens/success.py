@@ -66,7 +66,8 @@ class SuccessScreen(Screen):
     def event(self, event) -> BaseElm | None:
         if event.type == pygame.KEYUP and event.key == pygame.K_RETURN:
             self.home()
-        return
+        else:
+            return super().event(event)
 
     def play_sound(self):
         balance = self.account.balance

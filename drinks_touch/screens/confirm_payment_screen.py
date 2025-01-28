@@ -79,6 +79,8 @@ class ConfirmPaymentScreen(Screen):
     def event(self, event) -> BaseElm | None:
         if event.type == pygame.KEYUP and event.key == pygame.K_RETURN:
             self.save_drink()
+        else:
+            return super().event(event)
 
     def on_stop(self, *args, **kwargs):
         DrinksManager.instance.set_selected_drink(None)

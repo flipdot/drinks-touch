@@ -104,6 +104,12 @@ class WaitScanScreen(Screen):
                     Label(text="denn er ist sehr gut", size=15),
                     Spacer(height=20),
                     Label(text="Der Handscanner geht jetzt auch!", size=25),
+                    Spacer(height=10),
+                    Label(
+                        text="Der TRINKEN Button geht wieder!",
+                        size=25,
+                    ),
+                    Label(text="Upsidupsi sorry fürs kaputt machen", size=15),
                 ],
                 pos=(50, 350),
             ),
