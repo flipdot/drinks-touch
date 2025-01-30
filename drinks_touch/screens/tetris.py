@@ -251,9 +251,11 @@ class TetrisScreen(Screen):
         self.scores: list[tuple[Account, int, int]] = []
         self.score = 0
         self.highscore = 0
+        self.lines = 0
         self.reserve_block_type = self.load_reserve_block()
         self.reserve_block_used = False
         self.board = self.load_board()
+        self.level = self.load_level()
         self.current_block: Block | None = self.spawn_block()
         self.game_over = False
         self.sounds = {
@@ -312,6 +314,10 @@ class TetrisScreen(Screen):
             board=self.board,
         )
 
+    def load_level(self) -> int:
+        # level 0 - 20
+        return 0
+
     def load_board(self) -> list[list[Cell]]:
         empty = [
             [Cell.EMPTY for _ in range(self.BOARD_WIDTH)]
@@ -343,8 +349,9 @@ class TetrisScreen(Screen):
             lines = random.randint(1, 10)
             blocks = random.randint(1, 100)
             self.scores.append((account, lines, blocks))
-        self.score = random.randint(1, 1000)
-        self.highscore = self.score + random.randint(1, 1000)
+        self.score = 0
+        self.lines = 0
+        self.highscore = 0
 
     def use_reserve_block(self):
         if (
@@ -361,7 +368,8 @@ class TetrisScreen(Screen):
         self.sounds["use-reserve"].play()
 
     def tick(self):
-        if self.t - self.last_tick < 0.2:
+        time_per_block_fall = 1 / (self.level + 1)
+        if self.t - self.last_tick < time_per_block_fall:
             return
         self.last_tick = self.t
 
@@ -408,12 +416,35 @@ class TetrisScreen(Screen):
         return n
 
     def clear_lines(self):
+        cleared_lines = 0
         for y, row in enumerate(self.board):
             if self.row_is_full(row):
                 self.board.pop(y)
                 self.board.insert(0, [Cell.EMPTY for _ in range(self.BOARD_WIDTH)])
                 self.board[0][-1] = Cell.WALL
                 self.board[0][0] = Cell.WALL
+                cleared_lines += 1
+        self.add_score(cleared_lines)
+
+    def add_score(self, lines: int):
+        if lines == 0:
+            return
+        if lines == 1:
+            base_points = 40
+        elif lines == 2:
+            base_points = 100
+        elif lines == 3:
+            base_points = 300
+        elif lines == 4:
+            base_points = 1200
+        else:
+            assert False, "How did you clear more than 4 lines?"
+
+        self.score += base_points * (self.level + 1)
+        self.lines += lines
+        self.highscore = max(self.highscore, self.score)
+        if self.level * 10 < self.lines and self.level < 20:
+            self.level += 1
 
     @staticmethod
     def row_is_full(row: list[Cell]) -> bool:
@@ -572,20 +603,29 @@ class TetrisScreen(Screen):
             border_radius=10,
         )
 
-        title_font = pygame.font.Font(config.Font.MONOSPACE.value, 20)
-        title_score_surface = title_font.render("SCORE", 1, Color.BLACK.value)
-        title_highscore_surface = title_font.render("HIGHSCORE", 1, Color.BLACK.value)
-        score_font = pygame.font.Font(config.Font.MONOSPACE.value, 16)
-
-        score_surface = score_font.render(str(self.score), 1, Color.BLACK.value)
-        highscore_surface = score_font.render(str(self.highscore), 1, Color.BLACK.value)
-
-        surface.blit(title_score_surface, (5, 10))
-        surface.blit(score_surface, (size.x - score_surface.get_width() - 5, 35))
-        surface.blit(title_highscore_surface, (5, 60))
-        surface.blit(
-            highscore_surface, (size.x - highscore_surface.get_width() - 5, 85)
+        font = pygame.font.Font(config.Font.MONOSPACE.value, 20)
+        title_level_surface = font.render("LEVEL", 1, Color.BLACK.value)
+        title_lines_surface = font.render("LINES", 1, Color.BLACK.value)
+        score_surface = font.render(f"SCORE {self.score:8}", 1, Color.BLACK.value)
+        highscore_surface = font.render(
+            f"HIGHS. {self.highscore:7}", 1, Color.BLACK.value
         )
+
+        level_surface = font.render(f"{self.level:5}", 1, Color.BLACK.value)
+        lines_surface = font.render(str(self.lines), 1, Color.BLACK.value)
+
+        surface.blit(title_level_surface, (5, 5))
+        surface.blit(
+            title_lines_surface, (width - title_lines_surface.get_width() - 5, 5)
+        )
+        surface.blit(level_surface, (5, 25))
+        surface.blit(lines_surface, (width - lines_surface.get_width() - 5, 25))
+        surface.blit(score_surface, (5, 50))
+        surface.blit(highscore_surface, (5, 75))
+        # surface.blit(title_highscore_surface, (5, 65))
+        # surface.blit(
+        #     highscore_surface, (size.x - highscore_surface.get_width() - 5, 85)
+        # )
         return surface
 
     def render_scoreboard(self, width: float) -> pygame.Surface:
