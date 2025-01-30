@@ -219,17 +219,27 @@ class Block:
         self.shape.rotate(not clockwise)
         return False
 
-    def collides(self) -> bool:
+    def collides(self, p: None | Vector2 = None) -> bool:
+        if p is None:
+            p = self.pos
         for y, row in enumerate(self.shape.matrix):
             for x, cell in enumerate(row):
                 if cell == Cell.EMPTY:
                     continue
-                pos = self.pos + Vector2(x, y)
+                pos = p + Vector2(x, y)
                 if pos.x < 0 or pos.x >= len(self.board[0]) or pos.y >= len(self.board):
                     return True
                 if self.board[int(pos.y)][int(pos.x)] != Cell.EMPTY:
                     return True
         return False
+
+    @property
+    def shadow_pos(self) -> Vector2:
+        pos = self.pos.copy()
+        while not self.collides(pos):
+            pos.y += 1
+        pos.y -= 1
+        return pos
 
 
 class TetrisScreen(Screen):
@@ -484,9 +494,17 @@ class TetrisScreen(Screen):
                     )
 
         if self.current_block:
-            current_block = self.current_block.render(self.sprites)
+            current_block_surface = self.current_block.render(self.sprites)
+            shadow_surface = current_block_surface.copy()
+            shadow_surface.fill((0, 0, 0, 100), special_flags=pygame.BLEND_RGBA_MULT)
+            shadow_pos = self.current_block.shadow_pos
             surface.blit(
-                current_block,
+                shadow_surface,
+                shadow_pos.elementwise() * self.SPRITE_RESOLUTION * self.SCALE,
+            )
+
+            surface.blit(
+                current_block_surface,
                 self.current_block.pos.elementwise()
                 * self.SPRITE_RESOLUTION
                 * self.SCALE,
