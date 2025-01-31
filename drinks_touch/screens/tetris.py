@@ -259,6 +259,7 @@ class TetrisScreen(Screen):
         self.account = account
         self.sprites = {}
         self.scores: list[tuple[Account, int, int]] = []
+        self.all_time_scores: list[tuple[Account, int, int]] = []
         self.score = 0
         self.highscore = 0
         self.lines = 0
@@ -355,10 +356,11 @@ class TetrisScreen(Screen):
         import random
 
         self.scores = []
-        for i, account in enumerate(Account.query.limit(20)):
+        for i, account in enumerate(Account.query.limit(9)):
             lines = random.randint(1, 10)
             blocks = random.randint(1, 100)
             self.scores.append((account, lines, blocks))
+            self.all_time_scores.append((account, lines, blocks))
         self.score = 0
         self.lines = 0
         self.highscore = 0
@@ -453,7 +455,7 @@ class TetrisScreen(Screen):
         self.score += base_points * (self.level + 1)
         self.lines += lines
         self.highscore = max(self.highscore, self.score)
-        if self.level * 10 < self.lines and self.level < 20:
+        if (self.level + 1) * 10 < self.lines and self.level < 20:
             self.level += 1
 
     @staticmethod
@@ -559,8 +561,12 @@ class TetrisScreen(Screen):
             size.elementwise() * Vector2(0.05, 0.25),
         )
         surface.blit(
-            self.render_scoreboard(size.x * 0.9),
-            size.elementwise() * Vector2(0.05, 0.43),
+            self.render_scoreboard(size.x * 0.9, "GAME", self.scores),
+            size.elementwise() * Vector2(0.05, 0.42),
+        )
+        surface.blit(
+            self.render_scoreboard(size.x * 0.9, "ALLTIME", self.all_time_scores),
+            size.elementwise() * Vector2(0.05, 0.71),
         )
 
         return surface
@@ -638,16 +644,18 @@ class TetrisScreen(Screen):
         )
         surface.blit(level_surface, (5, 25))
         surface.blit(lines_surface, (width - lines_surface.get_width() - 5, 25))
-        surface.blit(score_surface, (5, 50))
-        surface.blit(highscore_surface, (5, 75))
+        surface.blit(score_surface, (5, 60))
+        surface.blit(highscore_surface, (5, 85))
         # surface.blit(title_highscore_surface, (5, 65))
         # surface.blit(
         #     highscore_surface, (size.x - highscore_surface.get_width() - 5, 85)
         # )
         return surface
 
-    def render_scoreboard(self, width: float) -> pygame.Surface:
-        size = Vector2(width, 430)
+    def render_scoreboard(
+        self, width: float, title: str, scores: list[tuple[Account, int, int]]
+    ) -> pygame.Surface:
+        size = Vector2(width, 210)
         surface = pygame.Surface(size, pygame.SRCALPHA)
 
         pygame.draw.rect(
@@ -658,7 +666,7 @@ class TetrisScreen(Screen):
         )
 
         title_font = pygame.font.Font(config.Font.MONOSPACE.value, 20)
-        text_surface = title_font.render("PLAYERS", 1, Color.BLACK.value)
+        text_surface = title_font.render(title, 1, Color.BLACK.value)
 
         label_font = pygame.font.Font(config.Font.MONOSPACE.value, 11)
         lines_label = label_font.render("lines", 1, Color.BLACK.value)
@@ -671,7 +679,7 @@ class TetrisScreen(Screen):
 
         surface.blit(text_surface, (5, 10))
         row_font = pygame.font.Font(config.Font.MONOSPACE.value, 13)
-        for i, row in enumerate(self.scores):
+        for i, row in enumerate(scores):
             account, lines, blocks = row
             if account == self.account:
                 text_color = Color.PRIMARY.value

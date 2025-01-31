@@ -105,7 +105,7 @@ def main(argv):
 
     screen_manager.set_default()
     # screen_manager.set_active(TasksScreen())
-    screen_manager.set_active(TetrisScreen(Account.query.all()[10]))
+    screen_manager.set_active(TetrisScreen(Account.query.all()[5]))
 
     overlays.extend(
         [
