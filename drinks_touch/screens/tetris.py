@@ -267,6 +267,7 @@ class TetrisScreen(Screen):
         self.reserve_block_used = False
         self.board = self.load_board()
         self.level = self.load_level()
+        self.next_blocks: list[BlockType] = self.load_next_blocks()
         self.current_block: Block | None = self.spawn_block()
         self.game_over = False
         self.sounds = {
@@ -318,7 +319,7 @@ class TetrisScreen(Screen):
 
     def spawn_block(self, block_type: None | BlockType = None) -> Block:
         if not block_type:
-            block_type = random.choice(list(BlockType))
+            block_type = self.draw_block()
         return Block(
             shape=Shape(block_type),
             pos=Vector2(self.BOARD_WIDTH // 2 - 1, 0),
@@ -328,6 +329,9 @@ class TetrisScreen(Screen):
     def load_level(self) -> int:
         # level 0 - 20
         return 0
+
+    def load_next_blocks(self) -> list[BlockType]:
+        return []
 
     def load_board(self) -> list[list[Cell]]:
         empty = [
@@ -364,6 +368,15 @@ class TetrisScreen(Screen):
         self.score = 0
         self.lines = 0
         self.highscore = 0
+
+    def draw_block(self, pop: bool = True) -> BlockType:
+        if len(self.next_blocks) == 0:
+            all_blocks = list(BlockType)
+            random.shuffle(all_blocks)
+            self.next_blocks = all_blocks
+        if pop:
+            return self.next_blocks.pop()
+        return self.next_blocks[-1]
 
     def use_reserve_block(self):
         if (
