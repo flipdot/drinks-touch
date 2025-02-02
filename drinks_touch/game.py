@@ -5,6 +5,7 @@ import locale
 import logging
 import os
 import queue
+import random
 import subprocess
 import sys
 import threading
@@ -107,7 +108,7 @@ def main(argv):
 
     screen_manager.set_default()
     # screen_manager.set_active(TasksScreen())
-    screen_manager.set_active(TetrisScreen(Account.query.all()[5]))
+    screen_manager.set_active(TetrisScreen(Account.query.all()[random.randint(0, 5)]))
 
     overlays.extend(
         [

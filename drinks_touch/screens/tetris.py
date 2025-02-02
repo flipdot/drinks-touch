@@ -1,5 +1,6 @@
 import enum
 import functools
+import json
 import logging
 import math
 import random
@@ -10,7 +11,7 @@ from pygame.mixer import Sound
 
 import config
 from config import Color
-from database.models import Account, TetrisPlayerScore, TetrisGame
+from database.models import Account, TetrisPlayer, TetrisGame
 from database.storage import Session
 from elements import Button, SvgIcon
 from elements.hbox import HBox
@@ -28,6 +29,23 @@ def lighten(color: Color, factor: float) -> Vector3:
     return Vector3(*color.value[:3]) * (1 - factor) + Vector3(255, 255, 255) * factor
 
 
+class TetrisJSONEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, Cell):
+            return [o.type, o.account_id]
+        return super().default(o)
+
+
+# class TetrisJSONDecoder(json.JSONDecoder):
+#     def __init__(self, *args, **kwargs):
+#         super().__init__(object_hook=self.object_hook, *args, **kwargs)
+#
+#     def object_hook(self, o):
+#         if len(o) == 2:
+#             return Cell(CellType(o[0]), o[1])
+#         return o
+
+
 class BlockType(enum.IntEnum):
     J = 2
     L = 3
@@ -38,7 +56,7 @@ class BlockType(enum.IntEnum):
     I = 8  # noqa: E741
 
 
-class Cell(enum.IntEnum):
+class CellType(enum.IntEnum):
     EMPTY = 0
     J = 2
     L = 3
@@ -57,21 +75,28 @@ class Cell(enum.IntEnum):
     @property
     def sprite(self):
         return {
-            Cell.EMPTY: "bg-empty",
-            Cell.I_H1: "block-i_h1",
-            Cell.I_H2: "block-i_h2",
-            Cell.I_H3: "block-i_h3",
-            Cell.I_V1: "block-i_v1",
-            Cell.I_V2: "block-i_v2",
-            Cell.I_V3: "block-i_v3",
-            Cell.J: "block-j",
-            Cell.L: "block-l",
-            Cell.S: "block-s",
-            Cell.T: "block-t",
-            Cell.Z: "block-z",
-            Cell.O: "block-o",
-            Cell.WALL: "bg-bricks",
+            CellType.EMPTY: "bg-empty",
+            CellType.I_H1: "block-i_h1",
+            CellType.I_H2: "block-i_h2",
+            CellType.I_H3: "block-i_h3",
+            CellType.I_V1: "block-i_v1",
+            CellType.I_V2: "block-i_v2",
+            CellType.I_V3: "block-i_v3",
+            CellType.J: "block-j",
+            CellType.L: "block-l",
+            CellType.S: "block-s",
+            CellType.T: "block-t",
+            CellType.Z: "block-z",
+            CellType.O: "block-o",
+            CellType.WALL: "bg-bricks",
         }[self]
+
+
+class Cell:
+
+    def __init__(self, celltype: CellType = CellType.EMPTY, account_id: int = -1):
+        self.type = celltype
+        self.account_id = account_id
 
 
 class Shape:
@@ -80,58 +105,58 @@ class Shape:
 
         if block_type == BlockType.I:
             self.matrix = [
-                [Cell.EMPTY, Cell.EMPTY, Cell.EMPTY, Cell.EMPTY],
-                [Cell.I_H1, Cell.I_H2, Cell.I_H2, Cell.I_H3],
-                [Cell.EMPTY, Cell.EMPTY, Cell.EMPTY, Cell.EMPTY],
+                [CellType.EMPTY, CellType.EMPTY, CellType.EMPTY, CellType.EMPTY],
+                [CellType.I_H1, CellType.I_H2, CellType.I_H2, CellType.I_H3],
+                [CellType.EMPTY, CellType.EMPTY, CellType.EMPTY, CellType.EMPTY],
             ]
         elif block_type == BlockType.J:
             self.matrix = [
-                [Cell.J, Cell.J, Cell.J],
-                [Cell.EMPTY, Cell.EMPTY, Cell.J],
+                [CellType.J, CellType.J, CellType.J],
+                [CellType.EMPTY, CellType.EMPTY, CellType.J],
             ]
         elif block_type == BlockType.L:
             self.matrix = [
-                [Cell.L, Cell.L, Cell.L],
-                [Cell.L, Cell.EMPTY, Cell.EMPTY],
+                [CellType.L, CellType.L, CellType.L],
+                [CellType.L, CellType.EMPTY, CellType.EMPTY],
             ]
         elif block_type == BlockType.S:
             self.matrix = [
-                [Cell.EMPTY, Cell.S, Cell.S],
-                [Cell.S, Cell.S, Cell.EMPTY],
+                [CellType.EMPTY, CellType.S, CellType.S],
+                [CellType.S, CellType.S, CellType.EMPTY],
             ]
         elif block_type == BlockType.T:
             self.matrix = [
-                [Cell.T, Cell.T, Cell.T],
-                [Cell.EMPTY, Cell.T, Cell.EMPTY],
+                [CellType.T, CellType.T, CellType.T],
+                [CellType.EMPTY, CellType.T, CellType.EMPTY],
             ]
         elif block_type == BlockType.Z:
             self.matrix = [
-                [Cell.Z, Cell.Z, Cell.EMPTY],
-                [Cell.EMPTY, Cell.Z, Cell.Z],
+                [CellType.Z, CellType.Z, CellType.EMPTY],
+                [CellType.EMPTY, CellType.Z, CellType.Z],
             ]
         elif block_type == BlockType.O:
             self.matrix = [
-                [Cell.O, Cell.O],
-                [Cell.O, Cell.O],
+                [CellType.O, CellType.O],
+                [CellType.O, CellType.O],
             ]
 
     def rotate(self, clockwise: bool):
         if self.block_type == BlockType.O:
             return
         if self.block_type == BlockType.I:
-            is_horizontal = self.matrix[1][1] == Cell.I_H2
+            is_horizontal = self.matrix[1][1] == CellType.I_H2
             if is_horizontal:
                 self.matrix = [
-                    [Cell.EMPTY, Cell.I_V1, Cell.EMPTY],
-                    [Cell.EMPTY, Cell.I_V2, Cell.EMPTY],
-                    [Cell.EMPTY, Cell.I_V2, Cell.EMPTY],
-                    [Cell.EMPTY, Cell.I_V3, Cell.EMPTY],
+                    [CellType.EMPTY, CellType.I_V1, CellType.EMPTY],
+                    [CellType.EMPTY, CellType.I_V2, CellType.EMPTY],
+                    [CellType.EMPTY, CellType.I_V2, CellType.EMPTY],
+                    [CellType.EMPTY, CellType.I_V3, CellType.EMPTY],
                 ]
             else:
                 self.matrix = [
-                    [Cell.EMPTY, Cell.EMPTY, Cell.EMPTY, Cell.EMPTY],
-                    [Cell.I_H1, Cell.I_H2, Cell.I_H2, Cell.I_H3],
-                    [Cell.EMPTY, Cell.EMPTY, Cell.EMPTY, Cell.EMPTY],
+                    [CellType.EMPTY, CellType.EMPTY, CellType.EMPTY, CellType.EMPTY],
+                    [CellType.I_H1, CellType.I_H2, CellType.I_H2, CellType.I_H3],
+                    [CellType.EMPTY, CellType.EMPTY, CellType.EMPTY, CellType.EMPTY],
                 ]
             return
         if clockwise:
@@ -139,7 +164,9 @@ class Shape:
         else:
             self.matrix = list(zip(*self.matrix))[::-1]
 
-    def render(self, sprites: dict[str, pygame.Surface]) -> pygame.Surface:
+    def render(
+        self, sprites: dict[str, pygame.Surface], color: tuple[int, int, int]
+    ) -> pygame.Surface:
         matrix_size = Vector2(len(self.matrix[0]), len(self.matrix))
         size = Vector2(
             matrix_size.elementwise()
@@ -149,7 +176,7 @@ class Shape:
         surface = pygame.Surface(size, pygame.SRCALPHA)
         for y, row in enumerate(self.matrix):
             for x, cell in enumerate(row):
-                if cell == Cell.EMPTY:
+                if cell == CellType.EMPTY:
                     continue
                 pos = Vector2(x, y)
                 surface.blit(
@@ -157,6 +184,17 @@ class Shape:
                     pos.elementwise()
                     * TetrisScreen.SPRITE_RESOLUTION
                     * TetrisScreen.SCALE,
+                )
+                color_square = pygame.Surface(
+                    TetrisScreen.SPRITE_RESOLUTION.elementwise() * TetrisScreen.SCALE,
+                )
+                color_square.fill(color)
+                surface.blit(
+                    color_square,
+                    pos.elementwise()
+                    * TetrisScreen.SPRITE_RESOLUTION
+                    * TetrisScreen.SCALE,
+                    special_flags=pygame.BLEND_MULT,
                 )
         return surface
 
@@ -166,17 +204,47 @@ class Direction(enum.Enum):
     RIGHT = 1
 
 
+class Player:
+
+    def __init__(self, account: Account):
+        player = TetrisPlayer.query.filter_by(account_id=account.id).first()
+        if player is None:
+            player = TetrisPlayer(
+                account_id=account.id,
+                score=0,
+                blocks=0,
+                lines=0,
+                alltime_score=0,
+                alltime_blocks=0,
+                alltime_lines=0,
+            )
+            Session.add(player)
+            Session.commit()
+        self.score = player.score
+        self.blocks = player.blocks
+        self.lines = player.lines
+        self.alltime_score = player.alltime_score
+        self.alltime_blocks = player.alltime_blocks
+        self.alltime_lines = player.alltime_lines
+        self.account_id = account.id
+        self.color = (0, 255, 0)  # TODO: Allow each player to configure their color
+
+
 class Block:
 
-    def __init__(self, shape: Shape, pos: Vector2, board: list[list[Cell]]):
+    def __init__(
+        self, shape: Shape, pos: Vector2, board: list[list[Cell]], player: Player
+    ):
         self.shape = shape
         self.pos = pos
         self.board = board
         self.locked = False
         self.overlapping = False
+        self.player = player
 
     def render(self, sprites: dict[str, pygame.Surface]) -> pygame.Surface:
-        return self.shape.render(sprites)
+        color = self.player.color
+        return self.shape.render(sprites, color)
 
     def move(self, direction: Direction, *, factor=1):
         if self.locked:
@@ -201,13 +269,15 @@ class Block:
 
     def lock(self):
         for y, row in enumerate(self.shape.matrix):
-            for x, cell in enumerate(row):
-                if cell == Cell.EMPTY:
+            for x, celltype in enumerate(row):
+                if celltype == CellType.EMPTY:
                     continue
                 pos = self.pos + Vector2(x, y)
-                if self.board[int(pos.y)][int(pos.x)] != Cell.EMPTY:
+                if self.board[int(pos.y)][int(pos.x)].type != CellType.EMPTY:
                     self.overlapping = True
-                self.board[int(pos.y)][int(pos.x)] = cell
+                self.board[int(pos.y)][int(pos.x)] = Cell(
+                    celltype, self.player.account_id
+                )
         self.locked = True
 
     def rotate(self, clockwise: bool) -> bool:
@@ -235,12 +305,12 @@ class Block:
             p = self.pos
         for y, row in enumerate(self.shape.matrix):
             for x, cell in enumerate(row):
-                if cell == Cell.EMPTY:
+                if cell == CellType.EMPTY:
                     continue
                 pos = p + Vector2(x, y)
                 if pos.x < 0 or pos.x >= len(self.board[0]) or pos.y >= len(self.board):
                     return True
-                if self.board[int(pos.y)][int(pos.x)] != Cell.EMPTY:
+                if self.board[int(pos.y)][int(pos.x)].type != CellType.EMPTY:
                     return True
         return False
 
@@ -251,30 +321,6 @@ class Block:
             pos.y += 1
         pos.y -= 1
         return pos
-
-
-class Player:
-
-    def __init__(self, account: Account):
-        player = TetrisPlayerScore.query.filter_by(account_id=account.id).first()
-        if player is None:
-            player = TetrisPlayerScore(
-                account_id=account.id,
-                score=0,
-                blocks=0,
-                lines=0,
-                alltime_score=0,
-                alltime_blocks=0,
-                alltime_lines=0,
-            )
-            Session.add(player)
-            Session.commit()
-        self.score = player.score
-        self.blocks = player.blocks
-        self.lines = player.lines
-        self.alltime_score = player.alltime_score
-        self.alltime_blocks = player.alltime_blocks
-        self.alltime_lines = player.alltime_lines
 
 
 class TetrisScreen(Screen):
@@ -290,8 +336,8 @@ class TetrisScreen(Screen):
 
         super().__init__()
 
-        # if not TetrisPlayerScore.query.filter_by(account_id=account.id).first():
-        #     Session.add(TetrisPlayerScore(
+        # if not TetrisPlayer.query.filter_by(account_id=account.id).first():
+        #     Session.add(TetrisPlayer(
         #         account_id=account.id,
         #         score=0,
         #         blocks=0,
@@ -329,8 +375,8 @@ class TetrisScreen(Screen):
         self.board = self.load_board()
         self.level = self.load_level()
         self.next_blocks: list[BlockType] = self.load_next_blocks()
-        self.current_block: Block | None = self.spawn_block()
         self.current_player = Player(account)
+        self.current_block: Block | None = self.spawn_block()
         self.game_over = False
         self.sounds = {
             name: Sound(f"drinks_touch/resources/sounds/tetris/{name}.wav")
@@ -386,6 +432,7 @@ class TetrisScreen(Screen):
             shape=Shape(block_type),
             pos=Vector2(self.BOARD_WIDTH // 2 - 1, 0),
             board=self.board,
+            player=self.current_player,
         )
 
     def load_level(self) -> int:
@@ -408,19 +455,18 @@ class TetrisScreen(Screen):
     def load_board(self) -> list[list[Cell]]:
         game = TetrisGame.query.first()
         if game.board:
-            # convert json to Cell enum
-            return [[Cell(c) for c in row] for row in game.board]
+            # convert json to Cell with CellType enum
+            return [[Cell(CellType(c), p) for c, p in row] for row in game.board]
         return self.generate_empty_board()
 
     def generate_empty_board(self) -> list[list[Cell]]:
         empty = [
-            [Cell.EMPTY for _ in range(self.BOARD_WIDTH)]
-            for _ in range(self.BOARD_HEIGHT)
+            [Cell() for _ in range(self.BOARD_WIDTH)] for _ in range(self.BOARD_HEIGHT)
         ]
         with_walls = [
             [
                 (
-                    Cell.WALL
+                    Cell(CellType.WALL)
                     if x in (0, self.BOARD_WIDTH - 1) or y == self.BOARD_HEIGHT - 1
                     else c
                 )
@@ -434,24 +480,23 @@ class TetrisScreen(Screen):
         return TetrisGame.query.first().reserve_block
 
     def load_scores(self):
-        self.scores = []
-        self.all_time_scores = []
-        statement = (
-            Session()
-            .query(TetrisPlayerScore, Account)
-            .join(Account)
-            .order_by(TetrisPlayerScore.lines.desc(), TetrisPlayerScore.blocks.desc())
+        query = Session().query(TetrisPlayer, Account).join(Account)
+        self.scores = [
+            (account, score.lines, score.blocks)
+            for score, account in query.order_by(
+                TetrisPlayer.lines.desc(), TetrisPlayer.blocks.desc()
+            )
             .limit(10)
             .all()
-        )
-        for i, row in enumerate(statement):
-            score: TetrisPlayerScore
-            account: Account
-            score, account = row
-            self.scores.append((account, score.lines, score.blocks))
-            self.all_time_scores.append(
-                (account, score.alltime_lines, score.alltime_blocks)
+        ]
+        self.all_time_scores = [
+            (account, score.alltime_lines, score.alltime_blocks)
+            for score, account in query.order_by(
+                TetrisPlayer.alltime_lines.desc(), TetrisPlayer.alltime_blocks.desc()
             )
+            .limit(10)
+            .all()
+        ]
         game = TetrisGame.query.first()
         self.score = game.score
         self.highscore = game.highscore
@@ -544,9 +589,9 @@ class TetrisScreen(Screen):
         for y, row in enumerate(self.board):
             if self.row_is_full(row):
                 self.board.pop(y)
-                self.board.insert(0, [Cell.EMPTY for _ in range(self.BOARD_WIDTH)])
-                self.board[0][-1] = Cell.WALL
-                self.board[0][0] = Cell.WALL
+                self.board.insert(0, [Cell() for _ in range(self.BOARD_WIDTH)])
+                self.board[0][-1] = Cell(CellType.WALL)
+                self.board[0][0] = Cell(CellType.WALL)
                 cleared_lines += 1
         self.add_score(cleared_lines)
 
@@ -578,8 +623,8 @@ class TetrisScreen(Screen):
 
     @staticmethod
     def row_is_full(row: list[Cell]) -> bool:
-        return all(cell != Cell.EMPTY for cell in row) and not all(
-            cell == Cell.WALL for cell in row
+        return all(cell.type != CellType.EMPTY for cell in row) and not all(
+            cell.type == CellType.WALL for cell in row
         )
 
     def save_to_db(self):
@@ -589,13 +634,11 @@ class TetrisScreen(Screen):
             game.highscore = self.highscore
             game.level = self.level
             game.lines = self.lines
-            game.board = self.board
+            game.board = json.loads(json.dumps(self.board, cls=TetrisJSONEncoder))
             game.next_blocks = [b.value for b in self.next_blocks]
             game.reserve_block = self.reserve_block_type
 
-            player = TetrisPlayerScore.query.filter_by(
-                account_id=self.account.id
-            ).first()
+            player = TetrisPlayer.query.filter_by(account_id=self.account.id).first()
             player.score = self.current_player.score
             player.blocks = self.current_player.blocks
             player.lines = self.current_player.lines
@@ -617,11 +660,11 @@ class TetrisScreen(Screen):
                     TetrisGame.reserve_block: random.choice(list(BlockType)),
                 }
             )
-            TetrisPlayerScore.query.update(
+            TetrisPlayer.query.update(
                 {
-                    TetrisPlayerScore.score: 0,
-                    TetrisPlayerScore.blocks: 0,
-                    TetrisPlayerScore.lines: 0,
+                    TetrisPlayer.score: 0,
+                    TetrisPlayer.blocks: 0,
+                    TetrisPlayer.lines: 0,
                 }
             )
             Session.commit()
@@ -631,17 +674,38 @@ class TetrisScreen(Screen):
         self.tick()
         surface, debug_surface = super().render(dt)
 
-        def blit(x: int, y: int, sprite_name: str):
+        def blit(x: int, y: int, sprite_name: str, account_id: int):
             v = Vector2(x, y)
             surface.blit(
                 self.sprites[sprite_name],
                 v.elementwise() * self.SPRITE_RESOLUTION * self.SCALE,
             )
+            if self.current_player.account_id == account_id:
+                color = self.current_player.color
+            else:
+                color = Color.PRIMARY.value
+            color_square = pygame.Surface(
+                self.SPRITE_RESOLUTION.elementwise() * self.SCALE,
+            )
+            color_square.fill(color)
+            surface.blit(
+                color_square,
+                v.elementwise() * self.SPRITE_RESOLUTION * self.SCALE,
+                special_flags=pygame.BLEND_MULT,
+            )
+            # pygame.draw.rect(
+            #     surface,
+            #     (255, 255, 255, 50),
+            #     (
+            #         v.elementwise() * self.SPRITE_RESOLUTION * self.SCALE,
+            #         self.SPRITE_RESOLUTION * self.SCALE,
+            #     ),
+            # )
 
         for y in range(self.BOARD_HEIGHT):
             row_is_full = self.row_is_full(self.board[y])
             for x in range(self.BOARD_WIDTH):
-                blit(x, y, self.board[y][x].sprite)
+                blit(x, y, self.board[y][x].type.sprite, self.board[y][x].account_id)
             if row_is_full:
                 if math.sin(self.t * 15) < 0:
                     pygame.draw.rect(
@@ -757,7 +821,7 @@ class TetrisScreen(Screen):
         )
 
         reserve_shape = Shape(self.reserve_block_type)
-        reserve_surface = reserve_shape.render(self.sprites)
+        reserve_surface = reserve_shape.render(self.sprites, Color.PRIMARY.value)
         if self.reserve_block_used:
             alpha = 20 + abs(math.sin(self.t * 2)) * 150
         else:

@@ -15,7 +15,7 @@ class TetrisGame(Base):
     reserve_block = Column(Integer, nullable=False)
 
 
-class TetrisPlayerScore(Base):
+class TetrisPlayer(Base):
     __tablename__ = "tetris__player_score"
     account_id = Column(ForeignKey("account.id"), primary_key=True)
     score = Column(Integer, nullable=False)
