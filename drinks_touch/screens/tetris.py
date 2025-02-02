@@ -1,5 +1,6 @@
 import enum
 import functools
+import logging
 import math
 import random
 
@@ -14,6 +15,9 @@ from database.storage import Session
 from elements import Button, SvgIcon
 from elements.hbox import HBox
 from screens.screen import Screen
+
+
+logger = logging.getLogger(__name__)
 
 
 def darken(color: Color, factor: float) -> Vector3:
@@ -175,7 +179,9 @@ class Block:
         return self.shape.render(sprites)
 
     def move(self, direction: Direction, *, factor=1):
-        assert not self.locked, "Block is already locked"
+        if self.locked:
+            logger.warning("Block is already locked")
+            return
         self.pos.x += direction.value * factor
         if self.collides():
             self.pos.x -= direction.value * factor
@@ -184,7 +190,9 @@ class Block:
         """
         Returns False if the block could not fall further
         """
-        assert not self.locked, "Block is already locked"
+        if self.locked:
+            logger.warning("Block is already locked")
+            return
         self.pos.y += 1
         if self.collides():
             self.pos.y -= 1
@@ -203,7 +211,9 @@ class Block:
         self.locked = True
 
     def rotate(self, clockwise: bool) -> bool:
-        assert not self.locked, "Block is already locked"
+        if self.locked:
+            logger.warning("Block is already locked")
+            return
         self.shape.rotate(clockwise)
         if not self.collides():
             return True
@@ -519,6 +529,7 @@ class TetrisScreen(Screen):
         self.sounds["game-over"].play()
         # self.current_block = None
         self.game_over = True
+        self.reset_game_in_db()
         # self.board = self.load_board()
 
     def count_full_rows(self) -> int:
@@ -592,6 +603,27 @@ class TetrisScreen(Screen):
             player.alltime_blocks = self.current_player.alltime_blocks
             player.alltime_score = self.current_player.alltime_score
 
+            Session.commit()
+
+    def reset_game_in_db(self):
+        with Session.begin_nested():
+            TetrisGame.query.update(
+                {
+                    TetrisGame.score: 0,
+                    TetrisGame.level: 0,
+                    TetrisGame.lines: 0,
+                    TetrisGame.next_blocks: [],
+                    TetrisGame.board: self.generate_empty_board(),
+                    TetrisGame.reserve_block: random.choice(list(BlockType)),
+                }
+            )
+            TetrisPlayerScore.query.update(
+                {
+                    TetrisPlayerScore.score: 0,
+                    TetrisPlayerScore.blocks: 0,
+                    TetrisPlayerScore.lines: 0,
+                }
+            )
             Session.commit()
 
     def render(self, dt):
