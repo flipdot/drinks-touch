@@ -9,7 +9,8 @@ from pygame.mixer import Sound
 
 import config
 from config import Color
-from database.models import Account
+from database.models import Account, TetrisPlayerScore, TetrisGame
+from database.storage import Session
 from elements import Button, SvgIcon
 from elements.hbox import HBox
 from screens.screen import Screen
@@ -23,7 +24,7 @@ def lighten(color: Color, factor: float) -> Vector3:
     return Vector3(*color.value[:3]) * (1 - factor) + Vector3(255, 255, 255) * factor
 
 
-class BlockType(enum.Enum):
+class BlockType(enum.IntEnum):
     J = 2
     L = 3
     S = 4
@@ -33,7 +34,7 @@ class BlockType(enum.Enum):
     I = 8  # noqa: E741
 
 
-class Cell(enum.Enum):
+class Cell(enum.IntEnum):
     EMPTY = 0
     J = 2
     L = 3
@@ -242,6 +243,30 @@ class Block:
         return pos
 
 
+class Player:
+
+    def __init__(self, account: Account):
+        player = TetrisPlayerScore.query.filter_by(account_id=account.id).first()
+        if player is None:
+            player = TetrisPlayerScore(
+                account_id=account.id,
+                score=0,
+                blocks=0,
+                lines=0,
+                alltime_score=0,
+                alltime_blocks=0,
+                alltime_lines=0,
+            )
+            Session.add(player)
+            Session.commit()
+        self.score = player.score
+        self.blocks = player.blocks
+        self.lines = player.lines
+        self.alltime_score = player.alltime_score
+        self.alltime_blocks = player.alltime_blocks
+        self.alltime_lines = player.alltime_lines
+
+
 class TetrisScreen(Screen):
     nav_bar_visible = False
     SCALE = 1.5
@@ -254,6 +279,32 @@ class TetrisScreen(Screen):
             return SvgIcon(f"drinks_touch/resources/images/{filename}.svg", height=50)
 
         super().__init__()
+
+        # if not TetrisPlayerScore.query.filter_by(account_id=account.id).first():
+        #     Session.add(TetrisPlayerScore(
+        #         account_id=account.id,
+        #         score=0,
+        #         blocks=0,
+        #         lines=0,
+        #         alltime_score=0,
+        #         alltime_blocks=0,
+        #         alltime_lines=0,
+        #     ))
+        #     Session.commit()
+        if not TetrisGame.query.first():
+            Session.add(
+                TetrisGame(
+                    score=0,
+                    highscore=0,
+                    level=0,
+                    lines=0,
+                    next_blocks=[],
+                    board=[],
+                    reserve_block=random.choice(list(BlockType)),
+                )
+            )
+            Session.commit()
+
         self.t = 0
         self.last_tick = 0
         self.account = account
@@ -269,6 +320,7 @@ class TetrisScreen(Screen):
         self.level = self.load_level()
         self.next_blocks: list[BlockType] = self.load_next_blocks()
         self.current_block: Block | None = self.spawn_block()
+        self.current_player = Player(account)
         self.game_over = False
         self.sounds = {
             name: Sound(f"drinks_touch/resources/sounds/tetris/{name}.wav")
@@ -327,13 +379,30 @@ class TetrisScreen(Screen):
         )
 
     def load_level(self) -> int:
-        # level 0 - 20
+        game = TetrisGame.query.first()
+        if game.level:
+            return game.level
         return 0
 
     def load_next_blocks(self) -> list[BlockType]:
-        return []
+        game = TetrisGame.query.first()
+        if game.next_blocks:
+            return [BlockType(b) for b in game.next_blocks]
+        return self.generate_block_bag()
+
+    def generate_block_bag(self) -> list[BlockType]:
+        all_blocks = list(BlockType)
+        random.shuffle(all_blocks)
+        return all_blocks
 
     def load_board(self) -> list[list[Cell]]:
+        game = TetrisGame.query.first()
+        if game.board:
+            # convert json to Cell enum
+            return [[Cell(c) for c in row] for row in game.board]
+        return self.generate_empty_board()
+
+    def generate_empty_board(self) -> list[list[Cell]]:
         empty = [
             [Cell.EMPTY for _ in range(self.BOARD_WIDTH)]
             for _ in range(self.BOARD_HEIGHT)
@@ -352,30 +421,42 @@ class TetrisScreen(Screen):
         return with_walls
 
     def load_reserve_block(self) -> BlockType:
-        # TODO: store this in the database
-        return random.choice(list(BlockType))
+        return TetrisGame.query.first().reserve_block
 
     def load_scores(self):
-        # dummy values for now as long as we don't have a database table
-        import random
-
         self.scores = []
-        for i, account in enumerate(Account.query.limit(9)):
-            lines = random.randint(1, 10)
-            blocks = random.randint(1, 100)
-            self.scores.append((account, lines, blocks))
-            self.all_time_scores.append((account, lines, blocks))
-        self.score = 0
-        self.lines = 0
-        self.highscore = 0
+        self.all_time_scores = []
+        statement = (
+            Session()
+            .query(TetrisPlayerScore, Account)
+            .join(Account)
+            .order_by(TetrisPlayerScore.lines.desc(), TetrisPlayerScore.blocks.desc())
+            .limit(10)
+            .all()
+        )
+        for i, row in enumerate(statement):
+            score: TetrisPlayerScore
+            account: Account
+            score, account = row
+            self.scores.append((account, score.lines, score.blocks))
+            self.all_time_scores.append(
+                (account, score.alltime_lines, score.alltime_blocks)
+            )
+        game = TetrisGame.query.first()
+        self.score = game.score
+        self.highscore = game.highscore
+        self.level = game.level
+        self.lines = game.lines
+        # self.next_blocks = game.next_blocks
+        # self.board = game.board
 
     def draw_block(self, pop: bool = True) -> BlockType:
-        if len(self.next_blocks) == 0:
-            all_blocks = list(BlockType)
-            random.shuffle(all_blocks)
-            self.next_blocks = all_blocks
+        assert len(self.next_blocks) > 0, "No more blocks to draw"
         if pop:
-            return self.next_blocks.pop()
+            block = self.next_blocks.pop()
+            if len(self.next_blocks) == 0:
+                self.next_blocks = self.generate_block_bag()
+            return block
         return self.next_blocks[-1]
 
     def use_reserve_block(self):
@@ -402,10 +483,7 @@ class TetrisScreen(Screen):
             return
 
         if not self.current_block:
-            self.clear_lines()
-            self.current_block = self.spawn_block()
-            self.reserve_block_used = False
-            return
+            self.settle_block()
 
         if not self.current_block.fall():
             self.current_block.lock()
@@ -421,11 +499,21 @@ class TetrisScreen(Screen):
                 else:
                     self.sounds["line-clear"].play()
             else:
-                self.current_block = self.spawn_block()
-                self.reserve_block_used = False
+                self.settle_block()
         else:
             pass
             # self.sounds["block-fall"].play()
+
+    def settle_block(self):
+        self.clear_lines()
+        with Session.begin_nested():
+            self.current_player.blocks += 1
+            self.current_player.alltime_blocks += 1
+            self.save_to_db()
+        self.current_block = self.spawn_block()
+        self.load_scores()
+        # self.current_block = None
+        self.reserve_block_used = False
 
     def end_game(self):
         self.sounds["game-over"].play()
@@ -465,9 +553,15 @@ class TetrisScreen(Screen):
         else:
             assert False, "How did you clear more than 4 lines?"
 
-        self.score += base_points * (self.level + 1)
+        points = base_points * (self.level + 1)
+        self.score += points
         self.lines += lines
         self.highscore = max(self.highscore, self.score)
+
+        self.current_player.score += points
+        self.current_player.lines += lines
+        self.current_player.alltime_lines += lines
+
         if (self.level + 1) * 10 < self.lines and self.level < 20:
             self.level += 1
 
@@ -476,6 +570,29 @@ class TetrisScreen(Screen):
         return all(cell != Cell.EMPTY for cell in row) and not all(
             cell == Cell.WALL for cell in row
         )
+
+    def save_to_db(self):
+        with Session.begin_nested():
+            game = TetrisGame.query.first()
+            game.score = self.score
+            game.highscore = self.highscore
+            game.level = self.level
+            game.lines = self.lines
+            game.board = self.board
+            game.next_blocks = [b.value for b in self.next_blocks]
+            game.reserve_block = self.reserve_block_type
+
+            player = TetrisPlayerScore.query.filter_by(
+                account_id=self.account.id
+            ).first()
+            player.score = self.current_player.score
+            player.blocks = self.current_player.blocks
+            player.lines = self.current_player.lines
+            player.alltime_lines = self.current_player.alltime_lines
+            player.alltime_blocks = self.current_player.alltime_blocks
+            player.alltime_score = self.current_player.alltime_score
+
+            Session.commit()
 
     def render(self, dt):
         self.t += dt

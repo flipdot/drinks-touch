@@ -87,6 +87,8 @@ def stats_loop():
 def main(argv):
     locale.setlocale(locale.LC_ALL, "de_DE.UTF-8")
 
+    init_db()
+
     if "--webserver" in argv:
         run_webserver()
         return 0
@@ -113,8 +115,6 @@ def main(argv):
             MouseOverlay(screen_manager),
         ]
     )
-
-    init_db()
 
     # webserver needs to be a main thread #
     web_thread = subprocess.Popen([sys.argv[0], "--webserver"])
