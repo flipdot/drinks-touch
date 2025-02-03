@@ -13,7 +13,7 @@ import config
 from config import Color
 from database.models import Account, TetrisPlayer, TetrisGame
 from database.storage import Session
-from elements import Button, SvgIcon
+from elements import Button, SvgIcon, Progress
 from elements.hbox import HBox
 from screens.screen import Screen
 
@@ -329,6 +329,7 @@ class TetrisScreen(Screen):
     BOARD_WIDTH = 12
     BOARD_HEIGHT = 32
     SPRITE_RESOLUTION = Vector2(16, 16)
+    background_color = darken(Color.PRIMARY, 0.8)
 
     def __init__(self, account: Account):
         def icon(filename: str):
@@ -364,7 +365,7 @@ class TetrisScreen(Screen):
         self.t = 0
         self.last_tick = 0
         self.account = account
-        self.sprites = {}
+        self.sprites = self.load_sprites()
         self.scores: list[tuple[Account, int, int]] = []
         self.all_time_scores: list[tuple[Account, int, int]] = []
         self.score = 0
@@ -378,6 +379,7 @@ class TetrisScreen(Screen):
         self.current_player = Player(account)
         self.current_block: Block | None = self.spawn_block()
         self.game_over = False
+        self.move_ended = False
         self.sounds = {
             name: Sound(f"drinks_touch/resources/sounds/tetris/{name}.wav")
             for name in [
@@ -517,6 +519,7 @@ class TetrisScreen(Screen):
     def use_reserve_block(self):
         if (
             self.game_over
+            or self.move_ended
             or not self.current_block
             or self.current_block.locked
             or self.reserve_block_used
@@ -529,16 +532,24 @@ class TetrisScreen(Screen):
         self.sounds["use-reserve"].play()
 
     def tick(self):
-        time_per_block_fall = 1 / (self.level + 1)
-        if self.t - self.last_tick < time_per_block_fall:
-            return
-        self.last_tick = self.t
 
         if self.game_over:
             return
 
+        if self.move_ended:
+            return
+
         if not self.current_block:
+            if self.t - self.last_tick < 1.5:
+                return
+            self.last_tick = self.t
             self.settle_block()
+            return
+
+        time_per_block_fall = 1 / (self.level + 1)
+        if self.t - self.last_tick < time_per_block_fall:
+            return
+        self.last_tick = self.t
 
         if not self.current_block.fall():
             self.current_block.lock()
@@ -565,10 +576,26 @@ class TetrisScreen(Screen):
             self.current_player.blocks += 1
             self.current_player.alltime_blocks += 1
             self.save_to_db()
-        self.current_block = self.spawn_block()
         self.load_scores()
-        # self.current_block = None
         self.reserve_block_used = False
+        self.move_ended = True
+        self.current_block = None
+        # self.current_block = self.spawn_block()
+        self.remove_input_buttons()
+
+    def remove_input_buttons(self):
+        self.home()
+        self.objects = [
+            HBox(
+                [
+                    Progress(on_elapsed=self.home, size=70, speed=1 / 5.0),
+                ],
+                pos=(200, config.SCREEN_HEIGHT),
+                align_bottom=True,
+                padding=10,
+                gap=20,
+            )
+        ]
 
     def end_game(self):
         self.sounds["game-over"].play()
@@ -656,7 +683,9 @@ class TetrisScreen(Screen):
                     TetrisGame.level: 0,
                     TetrisGame.lines: 0,
                     TetrisGame.next_blocks: [],
-                    TetrisGame.board: self.generate_empty_board(),
+                    TetrisGame.board: json.loads(
+                        json.dumps(self.generate_empty_board(), cls=TetrisJSONEncoder)
+                    ),
                     TetrisGame.reserve_block: random.choice(list(BlockType)),
                 }
             )
@@ -907,7 +936,7 @@ class TetrisScreen(Screen):
         row_font = pygame.font.Font(config.Font.MONOSPACE.value, 13)
         for i, row in enumerate(scores):
             account, lines, blocks = row
-            if account == self.account:
+            if account.id == self.account.id:
                 text_color = Color.PRIMARY.value
                 pygame.draw.rect(
                     surface,
@@ -932,17 +961,14 @@ class TetrisScreen(Screen):
             surface.blit(text_surface, (5, 40 + i * 20))
         return surface
 
-    def on_start(self, *args, **kwargs):
-        self.load_sprites()
-
     def on_left(self):
-        if self.game_over or not self.current_block:
+        if self.game_over or self.move_ended or not self.current_block:
             return
         self.current_block.move(Direction.LEFT)
         self.sounds["move-block"].play()
 
     def on_down(self):
-        if self.game_over or not self.current_block:
+        if self.game_over or self.move_ended or not self.current_block:
             return
         play_sound = False
         while self.current_block.fall():
@@ -952,13 +978,13 @@ class TetrisScreen(Screen):
             self.sounds["block-to-bottom"].play()
 
     def on_rotate(self, clockwise: bool):
-        if self.game_over or not self.current_block:
+        if self.game_over or self.move_ended or not self.current_block:
             return
         if self.current_block.rotate(clockwise=clockwise):
             self.sounds["rotate-block"].play()
 
     def on_right(self):
-        if self.game_over or not self.current_block:
+        if self.game_over or self.move_ended or not self.current_block:
             return
         self.current_block.move(Direction.RIGHT)
         self.sounds["move-block"].play()
@@ -1012,7 +1038,7 @@ class TetrisScreen(Screen):
             "block-z",
         ]
 
-        self.sprites = {
+        return {
             x: pygame.transform.scale(
                 pygame.image.load(
                     f"drinks_touch/resources/images/tetris/{x}.png"

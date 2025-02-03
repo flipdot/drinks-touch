@@ -5,7 +5,6 @@ import locale
 import logging
 import os
 import queue
-import random
 import subprocess
 import sys
 import threading
@@ -13,7 +12,6 @@ import time
 
 import config
 import env
-from database.models import Account
 from database.storage import init_db, Session
 from drinks.drinks_manager import DrinksManager
 from notifications.notification import send_low_balances, send_summaries
@@ -22,7 +20,6 @@ from overlays.keyboard import KeyboardOverlay
 from screens.screen_manager import ScreenManager
 
 # from screens.tasks_screen import TasksScreen
-from screens.tetris import TetrisScreen
 from stats.stats import run as stats_send
 from users.sync import sync_recharges
 from webserver.webserver import run as run_webserver
@@ -108,7 +105,6 @@ def main(argv):
 
     screen_manager.set_default()
     # screen_manager.set_active(TasksScreen())
-    screen_manager.set_active(TetrisScreen(Account.query.all()[random.randint(0, 5)]))
 
     overlays.extend(
         [

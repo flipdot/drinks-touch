@@ -11,6 +11,7 @@ class Screen:
 
     idle_timeout = 10
     nav_bar_visible = True
+    background_color = Color.BACKGROUND.value
 
     def __init__(self, width=None, height=None):
         if width is None or height is None:
@@ -29,7 +30,7 @@ class Screen:
 
     def render(self, dt):
         surface = pygame.Surface((self.width, self.height))
-        surface.fill(Color.BACKGROUND.value)
+        surface.fill(self.background_color)
         if config.DEBUG_UI_ELEMENTS:
             debug_surface = pygame.Surface((self.width, self.height))
         else:
