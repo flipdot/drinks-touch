@@ -21,8 +21,12 @@ from screens.screen import Screen
 logger = logging.getLogger(__name__)
 
 
-def darken(color: Color, factor: float) -> Vector3:
-    return Vector3(*color.value[:3]) * (1 - factor)
+def darken(color: Color | tuple[int, int, int], factor: float) -> Vector3:
+    if isinstance(color, Color):
+        v = color.value[:3]
+    else:
+        v = color
+    return Vector3(*v) * (1 - factor)
 
 
 def lighten(color: Color, factor: float) -> Vector3:
@@ -488,15 +492,16 @@ class TetrisScreen(Screen):
             for score, account in query.order_by(
                 TetrisPlayer.lines.desc(), TetrisPlayer.blocks.desc()
             )
-            .limit(10)
+            # .limit(10)
             .all()
+            if score.blocks > 0
         ]
         self.all_time_scores = [
             (account, score.alltime_lines, score.alltime_blocks)
             for score, account in query.order_by(
                 TetrisPlayer.alltime_lines.desc(), TetrisPlayer.alltime_blocks.desc()
             )
-            .limit(10)
+            # .limit(10)
             .all()
         ]
         game = TetrisGame.query.first()
@@ -534,6 +539,20 @@ class TetrisScreen(Screen):
     def tick(self):
 
         if self.game_over:
+            if self.t - self.last_tick < 1.5:
+                return
+            self.last_tick = self.t
+            # cycle through the highscores by switching the current player
+            i = 0
+            for i, (account, _, _) in enumerate(self.scores):
+                if account.id == self.account.id:
+                    break
+            i -= 1
+            if i < 0:
+                i = len(self.scores) - 1
+            self.account = self.scores[i][0]
+            self.current_player = Player(self.scores[i][0])
+
             return
 
         if self.move_ended:
@@ -599,7 +618,7 @@ class TetrisScreen(Screen):
 
     def end_game(self):
         self.sounds["game-over"].play()
-        # self.current_block = None
+        self.current_block = None
         self.game_over = True
         self.reset_game_in_db()
         # self.board = self.load_board()
@@ -934,13 +953,23 @@ class TetrisScreen(Screen):
 
         surface.blit(text_surface, (5, 10))
         row_font = pygame.font.Font(config.Font.MONOSPACE.value, 13)
+
+        # only render the scores around the current player, so that they are always visible
+        current_player_index = 0
         for i, row in enumerate(scores):
             account, lines, blocks = row
-            if account.id == self.account.id:
+            if account.id == self.current_player.account_id:
+                current_player_index = i
+                break
+        scores = scores[max(0, current_player_index - 4) : current_player_index + 10]
+
+        for i, row in enumerate(scores):
+            account, lines, blocks = row
+            if account.id == self.current_player.account_id:
                 text_color = Color.PRIMARY.value
                 pygame.draw.rect(
                     surface,
-                    Color.BLACK.value,
+                    darken(self.current_player.color, 0.6),
                     (0, 40 + i * 20, size.x, 20),
                 )
             else:
@@ -955,8 +984,9 @@ class TetrisScreen(Screen):
                 end = start + 6
                 name = name[start:end]
 
+            pos = i + 1 + max(0, current_player_index - 4)
             text_surface = row_font.render(
-                f"{i+1:2}. {name:6} {blocks:4} {lines:4}", 1, text_color
+                f"{pos:2}. {name:6} {blocks:4} {lines:4}", 1, text_color
             )
             surface.blit(text_surface, (5, 40 + i * 20))
         return surface
