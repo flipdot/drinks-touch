@@ -16,11 +16,13 @@ class TetrisGame(Base):
 
 
 class TetrisPlayer(Base):
-    __tablename__ = "tetris__player_score"
+    __tablename__ = "tetris__players"
     account_id = Column(ForeignKey("account.id"), primary_key=True)
     score = Column(Integer, nullable=False)
     blocks = Column(Integer, nullable=False)
     lines = Column(Integer, nullable=False)
+    pixels = Column(Integer, nullable=False)
     alltime_score = Column(Integer, nullable=False)
     alltime_blocks = Column(Integer, nullable=False)
     alltime_lines = Column(Integer, nullable=False)
+    alltime_pixels = Column(Integer, nullable=False)

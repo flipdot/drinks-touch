@@ -4,6 +4,7 @@ import json
 import logging
 import math
 import random
+from collections import Counter
 
 import pygame
 from pygame import Vector2, Vector3
@@ -218,9 +219,11 @@ class Player:
                 score=0,
                 blocks=0,
                 lines=0,
+                pixels=0,
                 alltime_score=0,
                 alltime_blocks=0,
                 alltime_lines=0,
+                alltime_pixels=0,
             )
             Session.add(player)
             Session.commit()
@@ -375,6 +378,7 @@ class TetrisScreen(Screen):
         self.score = 0
         self.highscore = 0
         self.lines = 0
+        self.removed_pixels = Counter()
         self.reserve_block_type = self.load_reserve_block()
         self.reserve_block_used = False
         self.board = self.load_board()
@@ -488,18 +492,18 @@ class TetrisScreen(Screen):
     def load_scores(self):
         query = Session().query(TetrisPlayer, Account).join(Account)
         self.scores = [
-            (account, score.lines, score.blocks)
+            (account, score.blocks, score.pixels)
             for score, account in query.order_by(
-                TetrisPlayer.lines.desc(), TetrisPlayer.blocks.desc()
+                TetrisPlayer.pixels.desc(), TetrisPlayer.blocks.desc()
             )
             # .limit(10)
             .all()
             if score.blocks > 0
         ]
         self.all_time_scores = [
-            (account, score.alltime_lines, score.alltime_blocks)
+            (account, score.alltime_blocks, score.alltime_pixels)
             for score, account in query.order_by(
-                TetrisPlayer.alltime_lines.desc(), TetrisPlayer.alltime_blocks.desc()
+                TetrisPlayer.alltime_pixels.desc(), TetrisPlayer.alltime_blocks.desc()
             )
             # .limit(10)
             .all()
@@ -603,7 +607,7 @@ class TetrisScreen(Screen):
         self.remove_input_buttons()
 
     def remove_input_buttons(self):
-        self.home()
+        # self.home()
         self.objects = [
             HBox(
                 [
@@ -620,7 +624,7 @@ class TetrisScreen(Screen):
         self.sounds["game-over"].play()
         self.current_block = None
         self.game_over = True
-        self.reset_game_in_db()
+        # self.reset_game_in_db()
         # self.board = self.load_board()
 
     def count_full_rows(self) -> int:
@@ -631,17 +635,25 @@ class TetrisScreen(Screen):
         return n
 
     def clear_lines(self):
+        removed_pixels = Counter()
         cleared_lines = 0
         for y, row in enumerate(self.board):
             if self.row_is_full(row):
-                self.board.pop(y)
+                completed_row = self.board.pop(y)
+                for cell in completed_row:
+                    if cell.account_id == -1:
+                        # Skip wall cells
+                        continue
+                    removed_pixels[cell.account_id] += 1
                 self.board.insert(0, [Cell() for _ in range(self.BOARD_WIDTH)])
                 self.board[0][-1] = Cell(CellType.WALL)
                 self.board[0][0] = Cell(CellType.WALL)
                 cleared_lines += 1
-        self.add_score(cleared_lines)
+        self.add_score(cleared_lines, removed_pixels)
+        return removed_pixels
 
-    def add_score(self, lines: int):
+    def add_score(self, lines: int, removed_pixels: Counter[int]):
+        assert sum(removed_pixels.values()) == lines * (self.BOARD_WIDTH - 2)
         if lines == 0:
             return
         if lines == 1:
@@ -663,6 +675,8 @@ class TetrisScreen(Screen):
         self.current_player.score += points
         self.current_player.lines += lines
         self.current_player.alltime_lines += lines
+
+        self.removed_pixels += removed_pixels
 
         if (self.level + 1) * 10 < self.lines and self.level < 20:
             self.level += 1
@@ -692,7 +706,13 @@ class TetrisScreen(Screen):
             player.alltime_blocks = self.current_player.alltime_blocks
             player.alltime_score = self.current_player.alltime_score
 
+            for account_id, pixels in self.removed_pixels.items():
+                player = TetrisPlayer.query.filter_by(account_id=account_id).first()
+                player.pixels += pixels
+                player.alltime_pixels += pixels
+
             Session.commit()
+            self.removed_pixels.clear()
 
     def reset_game_in_db(self):
         with Session.begin_nested():
@@ -713,6 +733,7 @@ class TetrisScreen(Screen):
                     TetrisPlayer.score: 0,
                     TetrisPlayer.blocks: 0,
                     TetrisPlayer.lines: 0,
+                    TetrisPlayer.pixels: 0,
                 }
             )
             Session.commit()
@@ -943,12 +964,12 @@ class TetrisScreen(Screen):
         text_surface = title_font.render(title, 1, Color.BLACK.value)
 
         label_font = pygame.font.Font(config.Font.MONOSPACE.value, 11)
-        lines_label = label_font.render("lines", 1, Color.BLACK.value)
+        points_label = label_font.render("points", 1, Color.BLACK.value)
         blocks_label = label_font.render("blocks", 1, Color.BLACK.value)
 
-        lines_label = pygame.transform.rotate(lines_label, -45)
+        points_label = pygame.transform.rotate(points_label, -45)
         blocks_label = pygame.transform.rotate(blocks_label, -45)
-        surface.blit(lines_label, (size.x - 40, 3))
+        surface.blit(points_label, (size.x - 40, 3))
         surface.blit(blocks_label, (size.x - 80, 3))
 
         surface.blit(text_surface, (5, 10))
@@ -957,14 +978,14 @@ class TetrisScreen(Screen):
         # only render the scores around the current player, so that they are always visible
         current_player_index = 0
         for i, row in enumerate(scores):
-            account, lines, blocks = row
+            account, *_ = row
             if account.id == self.current_player.account_id:
                 current_player_index = i
                 break
         scores = scores[max(0, current_player_index - 4) : current_player_index + 10]
 
         for i, row in enumerate(scores):
-            account, lines, blocks = row
+            account, blocks, pixels = row
             if account.id == self.current_player.account_id:
                 text_color = Color.PRIMARY.value
                 pygame.draw.rect(
@@ -986,7 +1007,7 @@ class TetrisScreen(Screen):
 
             pos = i + 1 + max(0, current_player_index - 4)
             text_surface = row_font.render(
-                f"{pos:2}. {name:6} {blocks:4} {lines:4}", 1, text_color
+                f"{pos:2}. {name:6} {blocks:4} {pixels:4}", 1, text_color
             )
             surface.blit(text_surface, (5, 40 + i * 20))
         return surface
