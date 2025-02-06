@@ -4,12 +4,14 @@ ENV CI=true
 
 WORKDIR /srv/app/
 
-RUN corepack enable
+RUN npm install -g corepack@latest \
+    # TODO: remove (https://github.com/nodejs/corepack/issues/612)
+    && corepack enable
 
 
 FROM base-image AS prepare
 
-COPY ./pnpm-lock.yaml ./
+COPY ./pnpm-lock.yaml package.json ./
 
 RUN pnpm fetch
 
