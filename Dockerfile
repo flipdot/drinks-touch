@@ -9,7 +9,7 @@ RUN corepack enable
 
 FROM base-image AS prepare
 
-COPY ./pnpm-lock.yaml ./
+COPY ./pnpm-lock.yaml package.json ./
 
 RUN pnpm fetch
 
