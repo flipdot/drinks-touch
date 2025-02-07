@@ -1,4 +1,4 @@
-from sqlalchemy import Integer, Column, JSON, ForeignKey
+from sqlalchemy import Integer, Column, JSON, ForeignKey, String
 
 from database.storage import Base
 
@@ -26,3 +26,4 @@ class TetrisPlayer(Base):
     alltime_blocks = Column(Integer, nullable=False)
     alltime_lines = Column(Integer, nullable=False)
     alltime_pixels = Column(Integer, nullable=False)
+    color = Column(String(7), nullable=False)

@@ -47,14 +47,15 @@ class TetrisJSONEncoder(json.JSONEncoder):
         return super().default(o)
 
 
-# class TetrisJSONDecoder(json.JSONDecoder):
-#     def __init__(self, *args, **kwargs):
-#         super().__init__(object_hook=self.object_hook, *args, **kwargs)
-#
-#     def object_hook(self, o):
-#         if len(o) == 2:
-#             return Cell(CellType(o[0]), o[1])
-#         return o
+def rgb_to_hex(rgb: tuple[int, int, int]) -> str:
+    """Convert an (R, G, B) tuple to a hex string."""
+    return "#{:02X}{:02X}{:02X}".format(*rgb)
+
+
+def hex_to_rgb(hex_str: str) -> tuple[int, int, int]:
+    """Convert a hex string to an (R, G, B) tuple."""
+    hex_str = hex_str.lstrip("#")  # Remove '#' if present
+    return tuple(int(hex_str[i : i + 2], 16) for i in (0, 2, 4))
 
 
 class BlockType(enum.IntEnum):
@@ -220,6 +221,7 @@ class Player:
     def __init__(self, account: Account):
         player = TetrisPlayer.query.filter_by(account_id=account.id).first()
         if player is None:
+            # TODO: color choose dialog
             player = TetrisPlayer(
                 account_id=account.id,
                 score=0,
@@ -230,6 +232,7 @@ class Player:
                 alltime_blocks=0,
                 alltime_lines=0,
                 alltime_pixels=0,
+                color="#ff0000",
             )
             Session.add(player)
             Session.commit()
@@ -240,7 +243,7 @@ class Player:
         self.alltime_blocks = player.alltime_blocks
         self.alltime_lines = player.alltime_lines
         self.account_id = account.id
-        self.color = (0, 255, 0)  # TODO: Allow each player to configure their color
+        self.color = hex_to_rgb(player.color)
 
 
 class Block:
