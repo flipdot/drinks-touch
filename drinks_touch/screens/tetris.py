@@ -34,6 +34,12 @@ def lighten(color: Color, factor: float) -> Vector3:
     return Vector3(*color.value[:3]) * (1 - factor) + Vector3(255, 255, 255) * factor
 
 
+@functools.cache
+def get_name_for_account_id(account_id: int) -> str:
+    account = Account.query.get(account_id)
+    return account.name
+
+
 class TetrisJSONEncoder(json.JSONEncoder):
     def default(self, o):
         if isinstance(o, Cell):
@@ -379,6 +385,8 @@ class TetrisScreen(Screen):
         self.highscore = 0
         self.lines = 0
         self.removed_pixels = Counter()
+        self.scored_points = []
+        self.cleared_lines = 0
         self.reserve_block_type = self.load_reserve_block()
         self.reserve_block_used = False
         self.board = self.load_board()
@@ -607,7 +615,9 @@ class TetrisScreen(Screen):
         self.remove_input_buttons()
 
     def remove_input_buttons(self):
-        # self.home()
+        # leave screen quickly; debugging purposes
+        # if not self.scored_points:
+        #     self.home()
         self.objects = [
             HBox(
                 [
@@ -624,7 +634,7 @@ class TetrisScreen(Screen):
         self.sounds["game-over"].play()
         self.current_block = None
         self.game_over = True
-        # self.reset_game_in_db()
+        self.reset_game_in_db()
         # self.board = self.load_board()
 
     def count_full_rows(self) -> int:
@@ -677,6 +687,7 @@ class TetrisScreen(Screen):
         self.current_player.alltime_lines += lines
 
         self.removed_pixels += removed_pixels
+        self.cleared_lines = lines
 
         if (self.level + 1) * 10 < self.lines and self.level < 20:
             self.level += 1
@@ -706,12 +717,20 @@ class TetrisScreen(Screen):
             player.alltime_blocks = self.current_player.alltime_blocks
             player.alltime_score = self.current_player.alltime_score
 
+            scored_points = []
+
             for account_id, pixels in self.removed_pixels.items():
                 player = TetrisPlayer.query.filter_by(account_id=account_id).first()
-                player.pixels += pixels
-                player.alltime_pixels += pixels
+                if account_id == self.current_player.account_id:
+                    factor = self.cleared_lines
+                else:
+                    factor = 1
+                player.pixels += pixels * factor
+                player.alltime_pixels += pixels * factor
+                scored_points.append((account_id, pixels, pixels * factor))
 
             Session.commit()
+            self.scored_points = sorted(scored_points, key=lambda x: x[2], reverse=True)
             self.removed_pixels.clear()
 
     def reset_game_in_db(self):
@@ -831,6 +850,69 @@ class TetrisScreen(Screen):
                     y + (h - text_surface.get_height()) // 2,
                 ),
             )
+
+        if self.move_ended and self.scored_points:
+            w = 200
+            h = 30 * len(self.scored_points) + 10
+            x = self.SPRITE_RESOLUTION.x * self.SCALE + 4
+            y = (
+                self.BOARD_HEIGHT * self.SPRITE_RESOLUTION.y * self.SCALE
+            ) // 2 - h // 2
+
+            pygame.draw.rect(
+                surface,
+                darken(Color.PRIMARY, 0.8),
+                (x, y, w, h),
+                border_radius=10,
+            )
+
+            font = pygame.font.Font(config.Font.MONOSPACE.value, 16)
+            for i, (account_id, pixels, points) in enumerate(self.scored_points):
+                name = get_name_for_account_id(account_id)
+                if len(name) > 14:
+                    name = name[:13] + "…"
+                received_points = f"+{pixels}"
+                if self.current_player.account_id == account_id:
+                    color = self.current_player.color
+                else:
+                    color = Color.PRIMARY.value
+                text_surface = font.render(
+                    f"{name :14} {received_points:>3}",
+                    1,
+                    color,
+                )
+                surface.blit(
+                    text_surface,
+                    (
+                        x + 10,
+                        y + i * 30 + 10,
+                    ),
+                )
+                if self.current_player.account_id == account_id:
+                    factor = self.cleared_lines
+                    badge_x = x + w + 5
+                    badge_y = y + i * 30 + 5
+                    text_surface = font.render(
+                        f"×{factor}",
+                        1,
+                        self.current_player.color,
+                    )
+                    badge_w = text_surface.get_height() + 10
+                    badge_h = text_surface.get_width() + 10
+                    pygame.draw.rect(
+                        surface,
+                        darken(Color.PRIMARY, 0.8),
+                        (badge_x, badge_y, badge_w, badge_h),
+                        border_radius=5,
+                    )
+                    pygame.draw.rect(
+                        surface,
+                        self.current_player.color,
+                        (badge_x, badge_y, badge_w, badge_h),
+                        border_radius=5,
+                        width=2,
+                    )
+                    surface.blit(text_surface, (badge_x + 5, badge_y + 5))
 
         scoreboard = self.render_gameinfo()
         surface.blit(scoreboard, (config.SCREEN_WIDTH - scoreboard.get_width(), 0))
