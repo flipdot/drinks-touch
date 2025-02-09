@@ -31,8 +31,12 @@ def darken(color: Color | tuple[int, int, int], factor: float) -> Vector3:
     return Vector3(*v) * (1 - factor)
 
 
-def lighten(color: Color, factor: float) -> Vector3:
-    return Vector3(*color.value[:3]) * (1 - factor) + Vector3(255, 255, 255) * factor
+def lighten(color: Color | tuple[int, int, int], factor: float) -> Vector3:
+    if isinstance(color, Color):
+        v = color.value[:3]
+    else:
+        v = color
+    return Vector3(*v) * (1 - factor) + Vector3(255, 255, 255) * factor
 
 
 @functools.cache
@@ -668,7 +672,7 @@ class TetrisScreen(Screen):
         self.objects = [
             HBox(
                 [
-                    Progress(on_elapsed=self.home, size=70, speed=1 / 5.0),
+                    Progress(on_elapsed=self.home, size=70, speed=1 / 15.0),
                 ],
                 pos=(200, config.SCREEN_HEIGHT),
                 align_bottom=True,
@@ -828,6 +832,8 @@ class TetrisScreen(Screen):
                 color = self.current_player.color
             else:
                 color = Color.PRIMARY.value
+            if self.move_ended:
+                color = darken(color, 0.3)
             surface.blit(
                 self.sprites[sprite_name],
                 v.elementwise() * self.SPRITE_RESOLUTION * self.SCALE,
@@ -886,6 +892,7 @@ class TetrisScreen(Screen):
                 * self.SCALE,
             )
 
+        dialog_bg_color = darken(Color.PRIMARY, 0.8)
         if self.game_over:
             w = 200
             h = 100
@@ -896,7 +903,7 @@ class TetrisScreen(Screen):
 
             pygame.draw.rect(
                 surface,
-                darken(Color.PRIMARY, 0.8),
+                dialog_bg_color,
                 (x, y, w, h),
                 border_radius=10,
             )
@@ -921,7 +928,7 @@ class TetrisScreen(Screen):
 
             pygame.draw.rect(
                 surface,
-                darken(Color.PRIMARY, 0.8),
+                dialog_bg_color,
                 (x, y, w, h),
                 border_radius=10,
             )
@@ -953,9 +960,17 @@ class TetrisScreen(Screen):
 
             pygame.draw.rect(
                 surface,
-                darken(Color.PRIMARY, 0.8),
+                dialog_bg_color,
                 (x, y, w, h),
                 border_radius=10,
+            )
+
+            pygame.draw.rect(
+                surface,
+                Color.PRIMARY.value,
+                (x, y, w, h),
+                border_radius=10,
+                width=3,
             )
 
             font = pygame.font.Font(config.Font.MONOSPACE.value, 16)
@@ -965,16 +980,19 @@ class TetrisScreen(Screen):
                     name = name[:13] + "…"
                 received_points = f"+{pixels}"
                 if self.current_player.account_id == account_id:
-                    color = self.current_player.color
-                else:
-                    color = Color.PRIMARY.value
-                text_surface_line1 = font.render(
+                    pygame.draw.rect(
+                        surface,
+                        darken(self.current_player.color, 0.6),
+                        (x + 3, y + i * 30 + 3, w - 6, 34),
+                        border_radius=10,
+                    )
+                text_surface = font.render(
                     f"{name :14} {received_points:>3}",
                     1,
-                    color,
+                    Color.PRIMARY.value,
                 )
                 surface.blit(
-                    text_surface_line1,
+                    text_surface,
                     (
                         x + 10,
                         y + i * 30 + 10,
@@ -984,27 +1002,26 @@ class TetrisScreen(Screen):
                     factor = self.cleared_lines
                     badge_x = x + w + 5
                     badge_y = y + i * 30 + 5
-                    text_surface_line1 = font.render(
+                    text_surface = font.render(
                         f"×{factor}",
                         1,
-                        self.current_player.color,
+                        Color.PRIMARY.value,
                     )
-                    badge_w = text_surface_line1.get_height() + 10
-                    badge_h = text_surface_line1.get_width() + 10
+                    badge_w = text_surface.get_height() + 10
+                    badge_h = text_surface.get_width() + 10
                     pygame.draw.rect(
                         surface,
-                        darken(Color.PRIMARY, 0.8),
+                        darken(self.current_player.color, 0.6),
                         (badge_x, badge_y, badge_w, badge_h),
-                        border_radius=5,
                     )
                     pygame.draw.rect(
                         surface,
-                        self.current_player.color,
-                        (badge_x, badge_y, badge_w, badge_h),
+                        Color.PRIMARY.value,
+                        (badge_x - 3, badge_y - 3, badge_w + 6, badge_h + 6),
                         border_radius=5,
-                        width=2,
+                        width=3,
                     )
-                    surface.blit(text_surface_line1, (badge_x + 5, badge_y + 5))
+                    surface.blit(text_surface, (badge_x + 5, badge_y + 5))
 
         scoreboard = self.render_gameinfo()
         surface.blit(scoreboard, (config.SCREEN_WIDTH - scoreboard.get_width(), 0))
