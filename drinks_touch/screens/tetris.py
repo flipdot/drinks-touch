@@ -27,7 +27,7 @@ def darken(color: Color | tuple[int, int, int], factor: float) -> Vector3:
     if isinstance(color, Color):
         v = color.value[:3]
     else:
-        v = color
+        v = color[:3]
     return Vector3(*v) * (1 - factor)
 
 
@@ -35,7 +35,7 @@ def lighten(color: Color | tuple[int, int, int], factor: float) -> Vector3:
     if isinstance(color, Color):
         v = color.value[:3]
     else:
-        v = color
+        v = color[:3]
     return Vector3(*v) * (1 - factor) + Vector3(255, 255, 255) * factor
 
 
@@ -468,6 +468,17 @@ class TetrisScreen(Screen):
             )
         ]
 
+    def load_game_over_buttons(self):
+        self.objects = [
+            Button(
+                text="Tschüss",
+                on_click=self.home,
+                size=30,
+                pos=(config.SCREEN_WIDTH // 2 - 70, config.SCREEN_HEIGHT - 20),
+                align_bottom=True,
+            ),
+        ]
+
     def on_color_selected(self, color: Color):
         p = TetrisPlayer(
             account_id=self.account.id,
@@ -672,7 +683,7 @@ class TetrisScreen(Screen):
         self.objects = [
             HBox(
                 [
-                    Progress(on_elapsed=self.home, size=70, speed=1 / 15.0),
+                    Progress(on_elapsed=self.home, size=70, speed=1 / 7.5),
                 ],
                 pos=(200, config.SCREEN_HEIGHT),
                 align_bottom=True,
@@ -686,6 +697,7 @@ class TetrisScreen(Screen):
         self.current_block = None
         self.game_over = True
         self.reset_game_in_db()
+        self.load_game_over_buttons()
         # self.board = self.load_board()
 
     def count_full_rows(self) -> int:

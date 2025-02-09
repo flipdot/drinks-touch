@@ -22,7 +22,7 @@ DEBUG_UI_ELEMENTS = os.environ.get("DEBUG_UI_ELEMENTS", "False") in [
     "yes",
 ]
 
-_INFRAGELB = (246, 198, 0)
+_INFRAGELB = (246, 198, 0, 255)
 
 
 class Color(enum.Enum):
