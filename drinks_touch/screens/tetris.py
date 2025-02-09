@@ -16,6 +16,7 @@ from database.models import Account, TetrisPlayer, TetrisGame
 from database.storage import Session
 from elements import Button, SvgIcon, Progress
 from elements.hbox import HBox
+from elements.spacer import Spacer
 from screens.screen import Screen
 
 
@@ -218,31 +219,14 @@ class Direction(enum.Enum):
 
 class Player:
 
-    def __init__(self, account: Account):
-        player = TetrisPlayer.query.filter_by(account_id=account.id).first()
-        if player is None:
-            # TODO: color choose dialog
-            player = TetrisPlayer(
-                account_id=account.id,
-                score=0,
-                blocks=0,
-                lines=0,
-                pixels=0,
-                alltime_score=0,
-                alltime_blocks=0,
-                alltime_lines=0,
-                alltime_pixels=0,
-                color="#ff0000",
-            )
-            Session.add(player)
-            Session.commit()
+    def __init__(self, player: TetrisPlayer):
         self.score = player.score
         self.blocks = player.blocks
         self.lines = player.lines
         self.alltime_score = player.alltime_score
         self.alltime_blocks = player.alltime_blocks
         self.alltime_lines = player.alltime_lines
-        self.account_id = account.id
+        self.account_id = player.account_id
         self.color = hex_to_rgb(player.color)
 
 
@@ -348,9 +332,6 @@ class TetrisScreen(Screen):
     background_color = darken(Color.PRIMARY, 0.8)
 
     def __init__(self, account: Account):
-        def icon(filename: str):
-            return SvgIcon(f"drinks_touch/resources/images/{filename}.svg", height=50)
-
         super().__init__()
 
         # if not TetrisPlayer.query.filter_by(account_id=account.id).first():
@@ -395,10 +376,12 @@ class TetrisScreen(Screen):
         self.board = self.load_board()
         self.level = self.load_level()
         self.next_blocks: list[BlockType] = self.load_next_blocks()
-        self.current_player = Player(account)
-        self.current_block: Block | None = self.spawn_block()
+        self.current_player: Player | None = None
+        # self.current_block: Block | None = self.spawn_block()
+        self.current_block: Block | None = None
         self.game_over = False
         self.move_ended = False
+        self.game_started = False
         self.sounds = {
             name: Sound(f"drinks_touch/resources/sounds/tetris/{name}.wav")
             for name in [
@@ -413,6 +396,14 @@ class TetrisScreen(Screen):
                 "game-over",
             ]
         }
+
+        self.objects = []
+        self.load_scores()
+        self.load_color_selection_buttons()
+
+    def load_control_buttons(self):
+        def icon(filename: str):
+            return SvgIcon(f"drinks_touch/resources/images/{filename}.svg", height=50)
 
         self.objects = [
             HBox(
@@ -444,7 +435,51 @@ class TetrisScreen(Screen):
                 gap=20,
             )
         ]
-        self.load_scores()
+
+    def load_color_selection_buttons(self):
+        def color_button(color: Color):
+            return Button(
+                text="",
+                on_click=functools.partial(self.on_color_selected, color),
+                color=Color.BLACK,
+                bg_color=color,
+                inner=Spacer(width=28, height=40),
+            )
+
+        self.objects = [
+            HBox(
+                [
+                    color_button(Color.ORANGE),
+                    color_button(Color.RED),
+                    color_button(Color.MAGENTA),
+                    color_button(Color.PURPLE),
+                    color_button(Color.BLUE),
+                    color_button(Color.CYAN),
+                    color_button(Color.GREEN),
+                ],
+                pos=(5, config.SCREEN_HEIGHT),
+                align_bottom=True,
+                padding=(20, 10),
+                gap=20,
+            )
+        ]
+
+    def on_color_selected(self, color: Color):
+        p = TetrisPlayer(
+            account_id=self.account.id,
+            score=0,
+            blocks=0,
+            lines=0,
+            points=0,
+            alltime_score=0,
+            alltime_blocks=0,
+            alltime_lines=0,
+            alltime_points=0,
+            color=rgb_to_hex(color.value),
+        )
+        Session.add(p)
+        Session.commit()
+        self.current_player = Player(p)
 
     def spawn_block(self, block_type: None | BlockType = None) -> Block:
         if not block_type:
@@ -502,28 +537,28 @@ class TetrisScreen(Screen):
 
     def load_scores(self):
         query = Session().query(TetrisPlayer, Account).join(Account)
+
+        scores_query = query.filter(TetrisPlayer.blocks > 0).order_by(
+            TetrisPlayer.points.desc(), TetrisPlayer.blocks.desc()
+        )
         self.scores = [
-            (account, score.blocks, score.pixels)
-            for score, account in query.order_by(
-                TetrisPlayer.pixels.desc(), TetrisPlayer.blocks.desc()
-            )
-            # .limit(10)
-            .all()
-            if score.blocks > 0
+            (account, score.blocks, score.points) for score, account in scores_query
         ]
+
+        all_time_scores_query = query.filter(TetrisPlayer.alltime_blocks > 0).order_by(
+            TetrisPlayer.alltime_points.desc(), TetrisPlayer.alltime_blocks.desc()
+        )
         self.all_time_scores = [
-            (account, score.alltime_blocks, score.alltime_pixels)
-            for score, account in query.order_by(
-                TetrisPlayer.alltime_pixels.desc(), TetrisPlayer.alltime_blocks.desc()
-            )
-            # .limit(10)
-            .all()
+            (account, score.alltime_blocks, score.alltime_points)
+            for score, account in all_time_scores_query
         ]
         game = TetrisGame.query.first()
         self.score = game.score
         self.highscore = game.highscore
         self.level = game.level
         self.lines = game.lines
+        if p := TetrisPlayer.query.filter_by(account_id=self.account.id).first():
+            self.current_player = Player(p)
         # self.next_blocks = game.next_blocks
         # self.board = game.board
 
@@ -566,8 +601,17 @@ class TetrisScreen(Screen):
             if i < 0:
                 i = len(self.scores) - 1
             self.account = self.scores[i][0]
-            self.current_player = Player(self.scores[i][0])
+            self.current_player = Player(
+                TetrisPlayer.query.filter_by(account_id=self.account.id).first()
+            )
 
+            return
+
+        if not self.game_started:
+            if self.current_player:
+                self.game_started = True
+                self.current_block = self.spawn_block()
+                self.load_control_buttons()
             return
 
         if self.move_ended:
@@ -712,25 +756,34 @@ class TetrisScreen(Screen):
             game.next_blocks = [b.value for b in self.next_blocks]
             game.reserve_block = self.reserve_block_type
 
-            player = TetrisPlayer.query.filter_by(account_id=self.account.id).first()
-            player.score = self.current_player.score
-            player.blocks = self.current_player.blocks
-            player.lines = self.current_player.lines
-            player.alltime_lines = self.current_player.alltime_lines
-            player.alltime_blocks = self.current_player.alltime_blocks
-            player.alltime_score = self.current_player.alltime_score
-
             scored_points = []
 
             for account_id, pixels in self.removed_pixels.items():
-                player = TetrisPlayer.query.filter_by(account_id=account_id).first()
+                # player = TetrisPlayer.query.filter_by(account_id=account_id).first()
                 if account_id == self.current_player.account_id:
                     factor = self.cleared_lines
                 else:
                     factor = 1
-                player.pixels += pixels * factor
-                player.alltime_pixels += pixels * factor
+                TetrisPlayer.query.filter_by(account_id=account_id).update(
+                    {
+                        TetrisPlayer.points: TetrisPlayer.points + pixels * factor,
+                        TetrisPlayer.alltime_points: TetrisPlayer.alltime_points
+                        + pixels * factor,
+                    }
+                )
                 scored_points.append((account_id, pixels, pixels * factor))
+
+            TetrisPlayer.query.filter_by(
+                account_id=self.current_player.account_id
+            ).update(
+                {
+                    TetrisPlayer.score: self.current_player.score,
+                    TetrisPlayer.lines: self.current_player.lines,
+                    TetrisPlayer.alltime_lines: self.current_player.alltime_lines,
+                    TetrisPlayer.blocks: self.current_player.blocks,
+                    TetrisPlayer.alltime_blocks: self.current_player.alltime_blocks,
+                }
+            )
 
             Session.commit()
             self.scored_points = sorted(scored_points, key=lambda x: x[2], reverse=True)
@@ -755,7 +808,7 @@ class TetrisScreen(Screen):
                     TetrisPlayer.score: 0,
                     TetrisPlayer.blocks: 0,
                     TetrisPlayer.lines: 0,
-                    TetrisPlayer.pixels: 0,
+                    TetrisPlayer.points: 0,
                 }
             )
             Session.commit()
@@ -767,14 +820,18 @@ class TetrisScreen(Screen):
 
         def blit(x: int, y: int, sprite_name: str, account_id: int):
             v = Vector2(x, y)
+            if not self.current_player:
+                color = (100, 100, 100)
+                if sprite_name not in ["bg-empty", "bg-bricks"]:
+                    sprite_name = "block-x"
+            elif self.current_player and self.current_player.account_id == account_id:
+                color = self.current_player.color
+            else:
+                color = Color.PRIMARY.value
             surface.blit(
                 self.sprites[sprite_name],
                 v.elementwise() * self.SPRITE_RESOLUTION * self.SCALE,
             )
-            if self.current_player.account_id == account_id:
-                color = self.current_player.color
-            else:
-                color = Color.PRIMARY.value
             color_square = pygame.Surface(
                 self.SPRITE_RESOLUTION.elementwise() * self.SCALE,
             )
@@ -845,12 +902,44 @@ class TetrisScreen(Screen):
             )
 
             font = pygame.font.Font(config.Font.MONOSPACE.value, 20)
-            text_surface = font.render("GAME OVER", 1, Color.PRIMARY.value)
+            text_surface_line1 = font.render("GAME OVER", 1, Color.PRIMARY.value)
             surface.blit(
-                text_surface,
+                text_surface_line1,
                 (
-                    x + (w - text_surface.get_width()) // 2,
-                    y + (h - text_surface.get_height()) // 2,
+                    x + (w - text_surface_line1.get_width()) // 2,
+                    y + (h - text_surface_line1.get_height()) // 2,
+                ),
+            )
+
+        if not self.game_started and not self.current_player:
+            w = 200
+            h = 100
+            x = (self.BOARD_WIDTH * self.SPRITE_RESOLUTION.x * self.SCALE) // 2 - w // 2
+            y = (
+                self.BOARD_HEIGHT * self.SPRITE_RESOLUTION.y * self.SCALE
+            ) // 2 - h // 2
+
+            pygame.draw.rect(
+                surface,
+                darken(Color.PRIMARY, 0.8),
+                (x, y, w, h),
+                border_radius=10,
+            )
+            font = pygame.font.Font(config.Font.MONOSPACE.value, 20)
+            text_surface_line1 = font.render("Wähle deine", 1, Color.PRIMARY.value)
+            text_surface_line2 = font.render("Farbe", 1, Color.PRIMARY.value)
+            surface.blit(
+                text_surface_line1,
+                (
+                    x + (w - text_surface_line1.get_width()) // 2,
+                    y + 20,
+                ),
+            )
+            surface.blit(
+                text_surface_line2,
+                (
+                    x + (w - text_surface_line2.get_width()) // 2,
+                    y + 50,
                 ),
             )
 
@@ -879,13 +968,13 @@ class TetrisScreen(Screen):
                     color = self.current_player.color
                 else:
                     color = Color.PRIMARY.value
-                text_surface = font.render(
+                text_surface_line1 = font.render(
                     f"{name :14} {received_points:>3}",
                     1,
                     color,
                 )
                 surface.blit(
-                    text_surface,
+                    text_surface_line1,
                     (
                         x + 10,
                         y + i * 30 + 10,
@@ -895,13 +984,13 @@ class TetrisScreen(Screen):
                     factor = self.cleared_lines
                     badge_x = x + w + 5
                     badge_y = y + i * 30 + 5
-                    text_surface = font.render(
+                    text_surface_line1 = font.render(
                         f"×{factor}",
                         1,
                         self.current_player.color,
                     )
-                    badge_w = text_surface.get_height() + 10
-                    badge_h = text_surface.get_width() + 10
+                    badge_w = text_surface_line1.get_height() + 10
+                    badge_h = text_surface_line1.get_width() + 10
                     pygame.draw.rect(
                         surface,
                         darken(Color.PRIMARY, 0.8),
@@ -915,7 +1004,7 @@ class TetrisScreen(Screen):
                         border_radius=5,
                         width=2,
                     )
-                    surface.blit(text_surface, (badge_x + 5, badge_y + 5))
+                    surface.blit(text_surface_line1, (badge_x + 5, badge_y + 5))
 
         scoreboard = self.render_gameinfo()
         surface.blit(scoreboard, (config.SCREEN_WIDTH - scoreboard.get_width(), 0))
@@ -1062,16 +1151,17 @@ class TetrisScreen(Screen):
 
         # only render the scores around the current player, so that they are always visible
         current_player_index = 0
-        for i, row in enumerate(scores):
-            account, *_ = row
-            if account.id == self.current_player.account_id:
-                current_player_index = i
-                break
+        if self.current_player:
+            for i, row in enumerate(scores):
+                account, *_ = row
+                if account.id == self.current_player.account_id:
+                    current_player_index = i
+                    break
         scores = scores[max(0, current_player_index - 4) : current_player_index + 10]
 
         for i, row in enumerate(scores):
             account, blocks, pixels = row
-            if account.id == self.current_player.account_id:
+            if self.current_player and account.id == self.current_player.account_id:
                 text_color = Color.PRIMARY.value
                 pygame.draw.rect(
                     surface,
@@ -1172,6 +1262,7 @@ class TetrisScreen(Screen):
             "block-s",
             "block-t",
             "block-z",
+            "block-x",
         ]
 
         return {

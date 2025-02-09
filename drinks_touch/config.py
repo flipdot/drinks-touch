@@ -35,6 +35,13 @@ class Color(enum.Enum):
     BACKGROUND = (60, 60, 60, 255)
     NAVBAR_BACKGROUND = (5, 5, 5, 255)
     BUTTON_BACKGROUND = (0, 0, 0, 255)
+    ORANGE = (255, 128, 0, 255)
+    RED = (255, 0, 0, 255)
+    GREEN = (0, 255, 0, 255)
+    BLUE = (0, 0, 255, 255)
+    MAGENTA = (255, 0, 255, 255)
+    PURPLE = (128, 0, 255, 255)
+    CYAN = (0, 255, 255, 255)
 
 
 if bn := os.environ.get("BUILD_NUMBER"):

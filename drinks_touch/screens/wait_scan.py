@@ -165,6 +165,6 @@ class WaitScanScreen(Screen):
     def on_barcode(self, barcode):
         if not barcode:
             # self.goto(SearchAccountScreen())
-            self.goto(TetrisScreen(Account.query.all()[random.randint(0, 2)]))
+            self.goto(TetrisScreen(Account.query.all()[random.randint(0, 20)]))
             return
         self.goto(DrinkScannedScreen(barcode))
