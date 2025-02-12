@@ -39,6 +39,10 @@ def lighten(color: Color | tuple[int, int, int], factor: float) -> Vector3:
     return Vector3(*v) * (1 - factor) + Vector3(255, 255, 255) * factor
 
 
+def clamp(value: float, min_value: float, max_value: float) -> float:
+    return max(min(value, max_value), min_value)
+
+
 @functools.cache
 def get_name_for_account_id(account_id: int) -> str:
     account = Account.query.get(account_id)
@@ -333,6 +337,7 @@ class TetrisScreen(Screen):
     BOARD_WIDTH = 12
     BOARD_HEIGHT = 32
     SPRITE_RESOLUTION = Vector2(16, 16)
+    GAME_START_COUNTDOWN = 2
     background_color = darken(Color.PRIMARY, 0.8)
 
     def __init__(self, account: Account):
@@ -386,6 +391,7 @@ class TetrisScreen(Screen):
         self.game_over = False
         self.move_ended = False
         self.game_started = False
+        self.game_starts_at = None
         self.sounds = {
             name: Sound(f"drinks_touch/resources/sounds/tetris/{name}.wav")
             for name in [
@@ -623,10 +629,12 @@ class TetrisScreen(Screen):
             return
 
         if not self.game_started:
-            if self.current_player:
-                self.game_started = True
+            if self.game_starts_at is None and self.current_player:
+                self.game_starts_at = self.t + self.GAME_START_COUNTDOWN
                 self.current_block = self.spawn_block()
                 self.load_control_buttons()
+            if self.game_starts_at and self.t >= self.game_starts_at:
+                self.game_started = True
             return
 
         if self.move_ended:
@@ -836,7 +844,7 @@ class TetrisScreen(Screen):
 
         def blit(x: int, y: int, sprite_name: str, account_id: int):
             v = Vector2(x, y)
-            if not self.current_player:
+            if not self.game_started:
                 color = (100, 100, 100)
                 if sprite_name not in ["bg-empty", "bg-bricks"]:
                     sprite_name = "block-x"
@@ -921,12 +929,12 @@ class TetrisScreen(Screen):
             )
 
             font = pygame.font.Font(config.Font.MONOSPACE.value, 20)
-            text_surface_line1 = font.render("GAME OVER", 1, Color.PRIMARY.value)
+            text_surface_title = font.render("GAME OVER", 1, Color.PRIMARY.value)
             surface.blit(
-                text_surface_line1,
+                text_surface_title,
                 (
-                    x + (w - text_surface_line1.get_width()) // 2,
-                    y + (h - text_surface_line1.get_height()) // 2,
+                    x + (w - text_surface_title.get_width()) // 2,
+                    y + (h - text_surface_title.get_height()) // 2,
                 ),
             )
 
@@ -945,12 +953,12 @@ class TetrisScreen(Screen):
                 border_radius=10,
             )
             font = pygame.font.Font(config.Font.MONOSPACE.value, 20)
-            text_surface_line1 = font.render("Wähle deine", 1, Color.PRIMARY.value)
+            text_surface_title = font.render("Wähle deine", 1, Color.PRIMARY.value)
             text_surface_line2 = font.render("Farbe", 1, Color.PRIMARY.value)
             surface.blit(
-                text_surface_line1,
+                text_surface_title,
                 (
-                    x + (w - text_surface_line1.get_width()) // 2,
+                    x + (w - text_surface_title.get_width()) // 2,
                     y + 20,
                 ),
             )
@@ -960,6 +968,67 @@ class TetrisScreen(Screen):
                     x + (w - text_surface_line2.get_width()) // 2,
                     y + 50,
                 ),
+            )
+
+        if not self.game_started and self.game_starts_at:
+            w = 200
+            h = 200
+            x = (self.BOARD_WIDTH * self.SPRITE_RESOLUTION.x * self.SCALE) // 2 - w // 2
+            y = (
+                self.BOARD_HEIGHT * self.SPRITE_RESOLUTION.y * self.SCALE
+            ) // 2 - h // 2
+
+            pygame.draw.rect(
+                surface,
+                dialog_bg_color,
+                (x, y, w, h),
+                border_radius=10,
+            )
+            small_font = pygame.font.Font(config.Font.MONOSPACE.value, 20)
+            big_font = pygame.font.Font(config.Font.MONOSPACE.value, 90)
+
+            text_surface_title = small_font.render("LEVEL", 1, Color.PRIMARY.value)
+            text_surface_line2 = big_font.render(
+                str(self.level), 1, Color.PRIMARY.value
+            )
+            surface.blit(
+                text_surface_line2,
+                (
+                    x + (w - text_surface_line2.get_width()) // 2,
+                    y + (h - text_surface_line2.get_height()) // 2,
+                ),
+            )
+            surface.blit(
+                text_surface_title,
+                (
+                    x + (w - text_surface_title.get_width()) // 2,
+                    y + 10,
+                ),
+            )
+
+            progress_bar_from = Vector2(x, y + h - 20)
+            progress_bar_to = Vector2(x + w, y + h - 20)
+            # need to clamp because of floating point errors, self.game_starts_at can be slightly above self.t
+            starts_in = clamp(
+                self.game_starts_at - self.t, 0, self.GAME_START_COUNTDOWN
+            )
+            rect_w = (
+                progress_bar_to.lerp(
+                    progress_bar_from, 1 - starts_in / self.GAME_START_COUNTDOWN
+                ).x
+                - progress_bar_from.x
+            )
+            rect = (
+                progress_bar_from.x,
+                progress_bar_from.y,
+                rect_w,
+                20,
+            )
+            pygame.draw.rect(
+                surface,
+                Color.PRIMARY.value,
+                rect,
+                border_radius=10,
             )
 
         if self.move_ended and self.scored_points:
