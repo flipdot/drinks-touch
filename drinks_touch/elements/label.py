@@ -59,13 +59,13 @@ class Label(BaseElm):
                 return
 
         text, pos, area = self._build_text()
-        self.width = area.width
-        self.height = area.height
+        self.width = area.width + self.padding_left + self.padding_right
+        self.height = area.height + self.padding_top + self.padding_bottom
         bg = self._render_background(area)
-        surface = pygame.Surface((area.width, area.height), pygame.SRCALPHA)
+        surface = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
         if bg:
             surface.blit(bg, (0, 0), area)
-        surface.blit(text, (0, 0), area)
+        surface.blit(text, (self.padding_left, self.padding_top), area)
         return surface
 
     def _render_background(self, area: pygame.Rect) -> pygame.Surface | None:

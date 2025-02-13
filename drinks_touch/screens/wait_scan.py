@@ -1,9 +1,7 @@
 import functools
 import logging
-import random
 
 import config
-from database.models import Account
 from database.storage import get_session
 from drinks.drinks_manager import DrinksManager
 from elements import RefreshIcon, SvgIcon, Label, Button
@@ -19,7 +17,6 @@ from sqlalchemy.sql import text
 
 from .search_account import SearchAccountScreen
 from .tasks_screen import TasksScreen
-from .tetris import TetrisScreen
 
 logger = logging.getLogger(__name__)
 
@@ -100,17 +97,6 @@ class WaitScanScreen(Screen):
                 padding=(5, 5),
                 align_bottom=True,
             ),
-            VBox(
-                [
-                    Button(
-                        text="T",
-                        on_click=lambda: self.goto(
-                            TetrisScreen(Account.query.all()[random.randint(0, 2)])
-                        ),
-                    ),
-                ],
-                pos=(50, 350),
-            ),
             HBox(
                 [
                     Button(
@@ -164,7 +150,6 @@ class WaitScanScreen(Screen):
 
     def on_barcode(self, barcode):
         if not barcode:
-            # self.goto(SearchAccountScreen())
-            self.goto(TetrisScreen(Account.query.all()[random.randint(0, 40)]))
+            self.goto(SearchAccountScreen())
             return
         self.goto(DrinkScannedScreen(barcode))
