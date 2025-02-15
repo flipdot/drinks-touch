@@ -82,10 +82,10 @@ class SuccessScreen(Screen):
                 pos=(5, 100),
             ),
             Button(
-                text="OK",
+                text="Nein Danke",
                 on_click=self.home,
                 size=50,
-                pos=(200, config.SCREEN_HEIGHT - 100),
+                pos=(80, config.SCREEN_HEIGHT - 100),
                 align_bottom=True,
             ),
         ]
