@@ -6,7 +6,6 @@ from database.storage import get_session
 from drinks.drinks_manager import DrinksManager
 from elements import RefreshIcon, SvgIcon, Label, Button
 from elements.hbox import HBox
-from elements.spacer import Spacer
 from elements.vbox import VBox
 from tasks import CheckForUpdatesTask
 from .drink_scanned import DrinkScannedScreen
@@ -97,21 +96,6 @@ class WaitScanScreen(Screen):
                 pos=(0, config.SCREEN_HEIGHT),
                 padding=(5, 5),
                 align_bottom=True,
-            ),
-            VBox(
-                [
-                    Label(text="Benutze den Stylus", size=20),
-                    Label(text="denn er ist sehr gut", size=15),
-                    Spacer(height=20),
-                    Label(text="Der Handscanner geht jetzt auch!", size=25),
-                    Spacer(height=10),
-                    Label(
-                        text="Der TRINKEN Button geht wieder!",
-                        size=25,
-                    ),
-                    Label(text="Upsidupsi sorry fürs kaputt machen", size=15),
-                ],
-                pos=(50, 350),
             ),
             HBox(
                 [

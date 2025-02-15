@@ -1,0 +1,11 @@
+Sounds are generated from this webpage with jsfxr
+
+- line-clear.wav: https://sfxr.me/#11111FJ4L8MPQhDjrVfLpwjSjJVrsezZoVc79BK1MzdaLUgJys9aWZ9W8TQbQXTnW5sCWe7oqBTxsmKf3G54PJNt6sC573x5VVwwhdpRq8p9tTdsLmpNnybu
+- move-block.wav: https://sfxr.me/#34T6PktActidM6MZLdeG4F7ti2gmitejmnw9HaQ59bj6KHgkpJVYU6jv4Tx1hYiUEVnk3tXjjDZ5o9dy2ZUaCEzS8teMEmNPbEtaVzf7sHD7SUz5aaap9ceb1
+- lock-block.wav: https://sfxr.me/#7BMHBGDL5vfXWpNYMUi9QDQ9iNZNRjkLKn1QRGHgvc8eBhazkJ5ztbDfHPeFvD4KrTyQunwPYYYkQCkfduXNyB3ALnAmmeP8S38UzA1bKSZfiwFGHSTmCEZhy
+- rotate-block.wav: https://sfxr.me/#7BMHBG9qJUh6Jr6QM4uPjXV32MYsHU82UmAeU97WVc4QcofvzW8ZvjPnyCMeNqxgYhE2FHt9P38BVwcdbXGyP8CswNYWCTAVPVN1AoJkZYPNt4FpyQn64HJA3
+- 4-line-clear.wav: https://sfxr.me/#1111132G2qHP6ugnqzLvQ7Qbh7CKRuLp9ce8oQxveiifihZUV8GuZwiRXDk6h1MZ7f56zh451uBjTHCSiSw5truvc9MrPukuL1HTTv6yC6Xk2gRxrxvX3ppo
+- use-reserve.wav: https://sfxr.me/#34T6PknaeyJYvqqoN1yh8DsdJzNMJexngkiEDjdv5tYMBE2hr8nnr2Ped89mQYk4ohcsGhLf25XD8MgacmEra2Lnn1Eua4RQzJsSA1uhQ2f4QeWVLfEBBrgto
+- block-fall.wav: https://sfxr.me/#11111JyuwwFgCFo3muy5DLpayWskEkYNdMeQ9a1UTYnDcLWxVPd4STQJgpFYcKZmAa6Qs8ahSPqyGh5U8Z3b7KiEhwuVkeZC5NstcahoTGxYNvvHYFNsVN7H
+- block-to-bottom.wav: https://sfxr.me/#8v7GsPLfXzmx2cC4ZobzrthoQRLgpy1DxHpDWTWaNHJRSzEKS3BY7HNWHchvzCNSQ5ofGYjhzCzZvK3rtUNQA5darovMKpFL2D6jW6RRFSruvAvD14HtvHzmJ
+- game-over.wav: https://sfxr.me/#34T6PkpbNiDaK3sGPjRbU4DvTQaNdRf8N5T9F9UtNaEBjKhZBXbRtTHzVFeJPmWMVMgUqMvKh4j7i64q6K3HoyNqoRW7Fvcp45P4yhRh2JrDhJQc1FCQnUCUo

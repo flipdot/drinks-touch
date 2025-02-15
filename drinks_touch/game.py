@@ -18,7 +18,8 @@ from notifications.notification import send_low_balances, send_summaries
 from overlays import MouseOverlay, BaseOverlay
 from overlays.keyboard import KeyboardOverlay
 from screens.screen_manager import ScreenManager
-from screens.tasks_screen import TasksScreen
+
+# from screens.tasks_screen import TasksScreen
 from stats.stats import run as stats_send
 from users.sync import sync_recharges
 from webserver.webserver import run as run_webserver
@@ -84,6 +85,8 @@ def stats_loop():
 def main(argv):
     locale.setlocale(locale.LC_ALL, "de_DE.UTF-8")
 
+    init_db()
+
     if "--webserver" in argv:
         run_webserver()
         return 0
@@ -101,7 +104,7 @@ def main(argv):
     screen_manager = ScreenManager()
 
     screen_manager.set_default()
-    screen_manager.set_active(TasksScreen())
+    # screen_manager.set_active(TasksScreen())
 
     overlays.extend(
         [
@@ -109,8 +112,6 @@ def main(argv):
             MouseOverlay(screen_manager),
         ]
     )
-
-    init_db()
 
     # webserver needs to be a main thread #
     web_thread = subprocess.Popen([sys.argv[0], "--webserver"])

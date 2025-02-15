@@ -1,25 +1,57 @@
+import functools
+
 import pygame
 from pygame.mixer import Sound
 
 import config
+from config import Color
 from database.models import Account
 from elements import Button
 from elements.base_elm import BaseElm
+from elements.hbox import HBox
 from elements.label import Label
 from elements.vbox import VBox
 from notifications.notification import send_drink
 from .screen import Screen
+from .tetris import TetrisScreen, Shape, BlockType
+
+
+class TetrisIcon(BaseElm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.scale = 1.5
+
+        self.block_sprite = pygame.transform.scale(
+            pygame.image.load(
+                "drinks_touch/resources/images/tetris/block-t.png"
+            ).convert_alpha(),
+            TetrisScreen.SPRITE_RESOLUTION * self.scale,
+        )
+        self.shape = Shape(BlockType.T)
+
+    @property
+    def width(self):
+        return TetrisScreen.SPRITE_RESOLUTION.x * self.scale * 3
+
+    @property
+    def height(self):
+        return TetrisScreen.SPRITE_RESOLUTION.y * self.scale * 2
+
+    def render(self, *args, **kwargs) -> pygame.Surface:
+        return self.shape.render({"block-t": self.block_sprite}, Color.PRIMARY.value)
 
 
 class SuccessScreen(Screen):
     idle_timeout = 5
 
-    def __init__(self, account: Account, drink, text):
+    def __init__(self, account: Account, drink, text, offer_games: bool = False):
         super().__init__()
 
         self.account = account
         self.text = text
         self.drink = drink
+        self.offer_games = offer_games
 
     def on_start(self, *args, **kwargs):
 
@@ -50,13 +82,36 @@ class SuccessScreen(Screen):
                 pos=(5, 100),
             ),
             Button(
-                text="OK",
+                text="Nein Danke",
                 on_click=self.home,
                 size=50,
-                pos=(200, config.SCREEN_HEIGHT - 100),
+                pos=(80, config.SCREEN_HEIGHT - 100),
                 align_bottom=True,
             ),
         ]
+
+        if self.offer_games:
+            self.objects.extend(
+                [
+                    Button(
+                        inner=HBox(
+                            [
+                                TetrisIcon(),
+                                Label(
+                                    text="einen Stein setzen",
+                                    size=30,
+                                    padding=(5, 10, 0),
+                                ),
+                            ]
+                        ),
+                        on_click=functools.partial(
+                            self.goto, TetrisScreen(self.account)
+                        ),
+                        size=20,
+                        pos=(40, config.SCREEN_HEIGHT - 300),
+                    ),
+                ]
+            )
 
         self.play_sound()
 
@@ -65,7 +120,10 @@ class SuccessScreen(Screen):
 
     def event(self, event) -> BaseElm | None:
         if event.type == pygame.KEYUP and event.key == pygame.K_RETURN:
-            self.home()
+            if self.offer_games:
+                self.goto(TetrisScreen(self.account))
+            else:
+                self.home()
         else:
             return super().event(event)
 

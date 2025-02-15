@@ -15,6 +15,7 @@ class Button(BaseElm):
         size=30,
         text=None,
         color=Color.PRIMARY,
+        bg_color=Color.BUTTON_BACKGROUND,
         disabled_color=Color.DISABLED,
         on_click=None,
         force_width=None,
@@ -33,6 +34,7 @@ class Button(BaseElm):
         super().__init__(children, pos, size, size, *args, padding=padding, **kwargs)
 
         self.size = size
+        self.bg_color = bg_color
         self.color = color
         self._color = color
         self._disabled_color = disabled_color
@@ -93,7 +95,7 @@ class Button(BaseElm):
         if self.focus:
             surface.fill(tuple(c * 0.7 for c in self.color.value), (0, 0, *size))
         else:
-            surface.fill(Color.BUTTON_BACKGROUND.value, (0, 0, *size))
+            surface.fill(self.bg_color.value, (0, 0, *size))
 
         if inner is not None:
             surface.blit(inner, (self.padding_left, self.padding_top))
