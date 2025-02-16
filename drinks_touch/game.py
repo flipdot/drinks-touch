@@ -19,7 +19,7 @@ from overlays import MouseOverlay, BaseOverlay
 from overlays.keyboard import KeyboardOverlay
 from screens.screen_manager import ScreenManager
 
-# from screens.tasks_screen import TasksScreen
+from screens.tasks_screen import TasksScreen
 from stats.stats import run as stats_send
 from users.sync import sync_recharges
 from webserver.webserver import run as run_webserver
@@ -104,7 +104,7 @@ def main(argv):
     screen_manager = ScreenManager()
 
     screen_manager.set_default()
-    # screen_manager.set_active(TasksScreen())
+    screen_manager.set_active(TasksScreen())
 
     overlays.extend(
         [

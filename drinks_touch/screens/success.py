@@ -1,5 +1,3 @@
-import functools
-
 import pygame
 from pygame.mixer import Sound
 
@@ -104,9 +102,7 @@ class SuccessScreen(Screen):
                                 ),
                             ]
                         ),
-                        on_click=functools.partial(
-                            self.goto, TetrisScreen(self.account)
-                        ),
+                        on_click=lambda: self.goto(TetrisScreen(self.account)),
                         size=20,
                         pos=(40, config.SCREEN_HEIGHT - 300),
                     ),
