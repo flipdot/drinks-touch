@@ -225,7 +225,7 @@ class WaitScanScreen(Screen):
                     align_bottom=True,
                     color=config.Color.BLACK,
                     bg_color=(255, 255, 255),
-                    padding=5,
+                    padding=0,
                     blink_frequency=60,
                 )
             )
