@@ -53,7 +53,8 @@ class WaitScanScreen(Screen):
         self.events: list[FlipdotEvent] = []
 
     def on_start(self, *args, **kwargs):
-        if config.ICAL_FILE_PATH.exists():
+        if config.ICAL_FILE_PATH.exists() and False:
+            # Disabled because it causes a lot of lag
             try:
                 self.events = self.read_calendar()
             except Exception:

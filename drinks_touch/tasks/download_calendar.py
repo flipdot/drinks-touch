@@ -5,6 +5,7 @@ from tasks.base import BaseTask
 
 
 class DownloadCalendarTask(BaseTask):
+    LABEL = "Lade Kalender herunter"
 
     def run(self):
         self.logger.info("Downloaded fd event calendar")
