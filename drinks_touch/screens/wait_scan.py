@@ -146,7 +146,9 @@ class WaitScanScreen(Screen):
                 pos=(10, 270),
             )
         else:
-            event_labels = Label(text="Keine anstehenden Events", pos=(10, 270))
+            event_labels = Label(  # noqa: F841
+                text="Keine anstehenden Events", pos=(10, 270)
+            )
 
         self.objects = [
             SvgIcon(
@@ -159,7 +161,13 @@ class WaitScanScreen(Screen):
                 pos=(10, 230),
                 size=24,
             ),
-            event_labels,
+            # event_labels,
+            Label(text="Laggt zu sehr, deaktiviert", pos=(10, 300), size=20),
+            Label(
+                text="Hier wird der flipdot event-Kalender stehen",
+                pos=(10, 350),
+                size=20,
+            ),
             Label(
                 text="Mehr Infos auf https://flipdot.org",
                 pos=(10, config.SCREEN_HEIGHT - 220),
