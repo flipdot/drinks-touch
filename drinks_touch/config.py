@@ -54,7 +54,7 @@ else:
 GIT_REPO_AVAILABLE = (
     os.popen("git rev-parse --is-inside-work-tree").read().strip() == "true"
 )
-REPO_PATH = Path(__file__).parent
+REPO_PATH = Path(__file__).parent.parent
 
 OIDC_DISCOVERY_URL = os.environ.get(
     "OIDC_DISCOVERY_URL",
@@ -68,6 +68,12 @@ OIDC_CLIENT_SECRET = os.environ.get(
 
 # Refresh the token X seconds before it expires
 OIDC_REFRESH_BUFFER = 10
+
+ICAL_URL = os.environ.get(
+    "ICAL_URL",
+    "https://mail.flipdot.org/SOGo/dav/public/com@flipdot.org/Calendar/41-64A05800-5-1B5BE560.ics",
+)
+ICAL_FILE_PATH = REPO_PATH / "tmp/fd-calendar.ics"
 
 SENTRY_DSN = os.environ.get("SENTRY_DSN", "")
 

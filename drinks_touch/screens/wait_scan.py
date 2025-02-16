@@ -1,11 +1,17 @@
+import datetime
 import functools
 import logging
+from dataclasses import dataclass
+
+import pytz
 
 import config
+from config import Color
 from database.storage import get_session
 from drinks.drinks_manager import DrinksManager
 from elements import RefreshIcon, SvgIcon, Label, Button
 from elements.hbox import HBox
+from elements.spacer import Spacer
 from elements.vbox import VBox
 from tasks import CheckForUpdatesTask
 from .drink_scanned import DrinkScannedScreen
@@ -17,8 +23,24 @@ from sqlalchemy.sql import text
 
 from .search_account import SearchAccountScreen
 from .tasks_screen import TasksScreen
+from ics import Calendar
 
 logger = logging.getLogger(__name__)
+
+
+@dataclass
+class FlipdotEvent:
+    title: str
+    start: datetime.datetime
+    color: Color
+    # description: str
+
+
+def truncate(text: str, length: int) -> str:
+    text = text.strip()  # remove leading/trailing whitespace
+    if len(text) <= length + 1:
+        return text.rjust(length)
+    return text[: length - 10] + "…" + text[-10:]
 
 
 class WaitScanScreen(Screen):
@@ -26,9 +48,32 @@ class WaitScanScreen(Screen):
 
     def __init__(self):
         super().__init__()
-        self.scanned_info = []
+        self.events: list[FlipdotEvent] = []
 
     def on_start(self, *args, **kwargs):
+        if config.ICAL_FILE_PATH.exists():
+            try:
+                self.events = self.read_calendar()
+            except Exception:
+                logger.exception("Error while reading calendar")
+                self.events = [
+                    FlipdotEvent(
+                        title="Error reading calendar",
+                        start=datetime.datetime.now(),
+                        color=Color.RED,
+                    ),
+                    FlipdotEvent(
+                        title=config.ICAL_URL,
+                        start=datetime.datetime.now(),
+                        color=Color.RED,
+                    ),
+                    FlipdotEvent(
+                        title=str(config.ICAL_FILE_PATH),
+                        start=datetime.datetime.now(),
+                        color=Color.RED,
+                    ),
+                ]
+
         sql = text(
             """
             SELECT SUM(amount) - (
@@ -68,20 +113,37 @@ class WaitScanScreen(Screen):
             ),
         ]
 
+        event_labels = VBox(
+            [
+                HBox(
+                    [
+                        Label(
+                            text=event.start.strftime("%a, %d.%m. %H:%M"),
+                            font=config.Font.MONOSPACE,
+                            size=16,
+                            color=event.color,
+                        ),
+                        Spacer(width=8),
+                        Label(
+                            text=truncate(event.title, 28),
+                            font=config.Font.MONOSPACE,
+                            size=16,
+                            color=event.color,
+                        ),
+                    ],
+                )
+                for event in self.events
+            ],
+            pos=(10, 240),
+        )
+
         self.objects = [
             SvgIcon(
                 "drinks_touch/resources/images/flipdot.svg",
                 width=400,
                 pos=(40, 20),
             ),
-            Label(
-                text="Scanne dein Getränk",
-                pos=(60, 240),
-            ),
-            Label(
-                text="oder deine ID-Card :)",
-                pos=(70, 280),
-            ),
+            event_labels,
             VBox(
                 [
                     Label(
@@ -147,6 +209,25 @@ class WaitScanScreen(Screen):
             )
 
         DrinksManager.instance.set_selected_drink(None)
+
+    def read_calendar(self) -> list[FlipdotEvent]:
+        events = []
+        with open(config.ICAL_FILE_PATH, "r") as f:
+            cal = Calendar(f.read())
+            for event in cal.events:
+                in_past = event.begin.datetime < pytz.utc.localize(
+                    datetime.datetime.now()
+                )
+                events.append(
+                    FlipdotEvent(
+                        title=event.name,
+                        start=event.begin.datetime,
+                        color=Color.DISABLED if in_past else Color.PRIMARY,
+                        # description=event.description,
+                    )
+                )
+            events.sort(key=lambda x: x.start, reverse=True)
+            return events[:15]
 
     def on_barcode(self, barcode):
         if not barcode:
