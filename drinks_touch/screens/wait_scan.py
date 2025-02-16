@@ -113,29 +113,32 @@ class WaitScanScreen(Screen):
             ),
         ]
 
-        event_labels = VBox(
-            [
-                HBox(
-                    [
-                        Label(
-                            text=event.start.strftime("%a, %d.%m. %H:%M"),
-                            font=config.Font.MONOSPACE,
-                            size=16,
-                            color=event.color,
-                        ),
-                        Spacer(width=8),
-                        Label(
-                            text=truncate(event.title, 28),
-                            font=config.Font.MONOSPACE,
-                            size=16,
-                            color=event.color,
-                        ),
-                    ],
-                )
-                for event in self.events
-            ],
-            pos=(10, 240),
-        )
+        if self.events:
+            event_labels = VBox(
+                [
+                    HBox(
+                        [
+                            Label(
+                                text=event.start.strftime("%a, %d.%m. %H:%M"),
+                                font=config.Font.MONOSPACE,
+                                size=16,
+                                color=event.color,
+                            ),
+                            Spacer(width=8),
+                            Label(
+                                text=truncate(event.title, 28),
+                                font=config.Font.MONOSPACE,
+                                size=16,
+                                color=event.color,
+                            ),
+                        ],
+                    )
+                    for event in self.events
+                ],
+                pos=(10, 240),
+            )
+        else:
+            event_labels = Label(text="Keine anstehenden Events", pos=(10, 240))
 
         self.objects = [
             SvgIcon(
