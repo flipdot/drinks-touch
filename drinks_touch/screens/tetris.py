@@ -413,7 +413,11 @@ class TetrisScreen(Screen):
 
     def load_control_buttons(self):
         def icon(filename: str):
-            return SvgIcon(f"drinks_touch/resources/images/{filename}.svg", height=50)
+            return SvgIcon(
+                f"drinks_touch/resources/images/{filename}.svg",
+                height=50,
+                color=Color.PRIMARY,
+            )
 
         self.objects = [
             HBox(

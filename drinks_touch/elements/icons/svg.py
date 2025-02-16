@@ -21,13 +21,20 @@ def load_and_scale_svg(filename, scale):
 class SvgIcon(BaseIcon):
 
     def __init__(
-        self, path, pos=None, color: Color | None = None, width=None, height=None
+        self,
+        path,
+        pos=None,
+        color: Color | None = None,
+        width=None,
+        height=None,
+        *args,
+        **kwargs,
     ):
         """
         If one of width or height is set and the other is None, the other
         will be calculated to keep the aspect ratio.
         """
-        super().__init__(pos=pos)
+        super().__init__(pos=pos, *args, **kwargs)
         self.path = path
         image = pygame.image.load(self.path).convert_alpha()
         # image = load_and_scale_svg(self.path, 2)
