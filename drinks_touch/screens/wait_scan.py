@@ -4,6 +4,7 @@ import logging
 from dataclasses import dataclass
 
 import pytz
+from dateutil.rrule import rrulestr
 
 import config
 from config import Color
@@ -33,6 +34,7 @@ class FlipdotEvent:
     title: str
     start: datetime.datetime
     color: Color
+    recurring: bool = False
     # description: str
 
 
@@ -119,14 +121,20 @@ class WaitScanScreen(Screen):
                     HBox(
                         [
                             Label(
-                                text=event.start.strftime("%a, %d.%m. %H:%M"),
+                                text=event.start.strftime("%a, %Y-%m-%d %H:%M"),
                                 font=config.Font.MONOSPACE,
                                 size=16,
                                 color=event.color,
                             ),
-                            Spacer(width=8),
+                            SvgIcon(
+                                "drinks_touch/resources/images/rotate-clockwise.svg",
+                                height=14,
+                                visible=event.recurring,
+                                color=event.color,
+                            ),
+                            Spacer(width=14, visible=not event.recurring),
                             Label(
-                                text=truncate(event.title, 28),
+                                text=truncate(event.title, 24),
                                 font=config.Font.MONOSPACE,
                                 size=16,
                                 color=event.color,
@@ -135,10 +143,10 @@ class WaitScanScreen(Screen):
                     )
                     for event in self.events
                 ],
-                pos=(10, 240),
+                pos=(10, 270),
             )
         else:
-            event_labels = Label(text="Keine anstehenden Events", pos=(10, 240))
+            event_labels = Label(text="Keine anstehenden Events", pos=(10, 270))
 
         self.objects = [
             SvgIcon(
@@ -146,7 +154,17 @@ class WaitScanScreen(Screen):
                 width=400,
                 pos=(40, 20),
             ),
+            Label(
+                text="Komm zu unseren Veranstaltungen:",
+                pos=(10, 230),
+                size=24,
+            ),
             event_labels,
+            Label(
+                text="Mehr Infos auf https://flipdot.org",
+                pos=(10, config.SCREEN_HEIGHT - 220),
+                size=24,
+            ),
             VBox(
                 [
                     Label(
@@ -174,6 +192,7 @@ class WaitScanScreen(Screen):
                         inner=SvgIcon(
                             "drinks_touch/resources/images/magnifying-glass.svg",
                             height=53,
+                            color=config.Color.PRIMARY,
                         ),
                         on_click=functools.partial(self.goto, SearchAccountScreen()),
                     ),
@@ -215,20 +234,58 @@ class WaitScanScreen(Screen):
 
     def read_calendar(self) -> list[FlipdotEvent]:
         events = []
+        now = pytz.utc.localize(datetime.datetime.utcnow())
+
         with open(config.ICAL_FILE_PATH, "r") as f:
             cal = Calendar(f.read())
+
             for event in cal.events:
-                in_past = event.begin.datetime < pytz.utc.localize(
-                    datetime.datetime.now()
-                )
-                events.append(
-                    FlipdotEvent(
-                        title=event.name,
-                        start=event.begin.datetime,
-                        color=Color.DISABLED if in_past else Color.PRIMARY,
-                        # description=event.description,
+                first_occurrence = event.begin.datetime
+                in_past = first_occurrence < now
+
+                # Handle recurring events
+                # find rrule string
+                rule = None
+                for content_line in event.extra:
+                    if content_line.name == "RRULE":
+                        rule = rrulestr(content_line.value, dtstart=first_occurrence)
+                        break
+
+                if rule:
+                    # Recurring events
+                    # add next event
+                    if occurrence := rule.after(now, inc=True):
+                        events.append(
+                            FlipdotEvent(
+                                title=event.name,
+                                start=occurrence,
+                                color=Color.PRIMARY,
+                                recurring=True,
+                            )
+                        )
+                    # add past event
+                    if occurrence := rule.before(now, inc=True):
+                        events.append(
+                            FlipdotEvent(
+                                title=event.name,
+                                start=occurrence,
+                                color=Color.DISABLED,
+                                recurring=True,
+                            )
+                        )
+                else:
+                    # Non-recurring events
+                    events.append(
+                        FlipdotEvent(
+                            title=event.name,
+                            start=first_occurrence,
+                            color=Color.DISABLED if in_past else Color.PRIMARY,
+                            recurring=bool(rule),
+                        )
                     )
-                )
+
+            # Sort and limit to the latest 15 events
+            # Make sure at least two events are in the past
             events.sort(key=lambda x: x.start, reverse=True)
             return events[:15]
 

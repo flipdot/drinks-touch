@@ -71,6 +71,7 @@ class DrinkScannedScreen(Screen):
                         inner=SvgIcon(
                             "drinks_touch/resources/images/magnifying-glass.svg",
                             height=53,
+                            color=config.Color.PRIMARY,
                         ),
                         on_click=functools.partial(
                             self.goto, SearchAccountScreen(), replace=True
