@@ -30,6 +30,11 @@ class BaseElm:
         if children is None:
             children = []
         self.children = children
+        self.clickable = hasattr(self, "on_click")
+        for child in children:
+            if child.clickable:
+                self.clickable = True
+                break
         if not isinstance(padding, tuple):
             self.padding_top = padding
             self.padding_right = padding
@@ -86,14 +91,16 @@ class BaseElm:
     def box(self):
         return self.screen_pos + (self.width, self.height)
 
-    def event(self, event: pygame.event.Event, pos=None) -> "BaseElm" | None:
+    def event(self, event: pygame.event.Event, pos=None) -> bool:
         """
         Returns the element that consumed the event
         """
+        if not self.clickable:
+            return False
         if pos is None and hasattr(event, "pos"):
             pos = event.pos
         if pos is None:
-            return
+            return False
         collides = self.collides_with(pos)
         transformed_pos = (
             pos[0] - self.screen_pos[0],
@@ -101,13 +108,13 @@ class BaseElm:
         )
 
         for child in self.children:
-            if consumed_by := child.event(event, transformed_pos):
-                return consumed_by
+            if child.event(event, transformed_pos):
+                return True
 
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             if collides:
                 self.focus = True
-                return self
+                return True
             else:
                 self.focus = False
 
@@ -118,7 +125,9 @@ class BaseElm:
             if had_focus and collides:
                 if hasattr(self, "on_click"):
                     self.on_click(*transformed_pos)
-                return self
+                return True
+
+        return False
 
     def key_event(self, event: pygame.event.Event):
         """

@@ -216,11 +216,7 @@ class ScreenManager:
                 continue
 
             # Handle clicks on screen objects
-            if (
-                active_object := screen.event(event)
-            ) and not ScreenManager.instance.active_object:
-                active_object.ts_active = 0
-                ScreenManager.instance.active_object = active_object
+            screen.event(event)
 
             if event.type == pygame.KEYDOWN and (
                 active_object := ScreenManager.instance.active_object

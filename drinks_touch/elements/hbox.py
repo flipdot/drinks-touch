@@ -46,14 +46,17 @@ class HBox(BaseElm):
         return surface
 
     def render_overlay(self, *args, **kwargs) -> Surface | None:
-        surface = pygame.Surface(
-            (config.SCREEN_WIDTH, config.SCREEN_HEIGHT), pygame.SRCALPHA
-        )
+        surface = None
         x = self.padding_left
         for element in self.children:
             element.pos = (x, self.padding_top)
             element_surface = element.render_overlay(*args, **kwargs)
             if element_surface:
+                if surface is None:
+                    # only create a surface if needed. Boosts performance.
+                    surface = pygame.Surface(
+                        (config.SCREEN_WIDTH, config.SCREEN_HEIGHT), pygame.SRCALPHA
+                    )
                 surface.blit(element_surface, element.pos)
             x += element.width + self.gap
         return surface

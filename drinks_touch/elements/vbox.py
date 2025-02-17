@@ -46,14 +46,16 @@ class VBox(BaseElm):
         return surface
 
     def render_overlay(self, *args, **kwargs) -> Surface | None:
-        surface = pygame.Surface(
-            (config.SCREEN_WIDTH, config.SCREEN_HEIGHT), pygame.SRCALPHA
-        )
+        surface = None
         y = self.padding_top
         for element in self.children:
             element.pos = (self.padding_left, y)
             element_surface = element.render_overlay(*args, **kwargs)
             if element_surface:
+                if surface is None:
+                    surface = pygame.Surface(
+                        (config.SCREEN_WIDTH, config.SCREEN_HEIGHT), pygame.SRCALPHA
+                    )
                 surface.blit(element_surface, element.pos)
             y += element.height + self.gap
         return surface

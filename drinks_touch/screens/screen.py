@@ -84,14 +84,14 @@ class Screen:
         )
         return alert
 
-    def event(self, event) -> BaseElm | None:
+    def event(self, event) -> bool:
         if self._alert:
             if event.type == pygame.MOUSEBUTTONUP:
                 self._alert = None
-            return
+            return False
         for obj in self.objects[::-1]:
-            if consumed_by := obj.event(event):
-                return consumed_by
+            if obj.event(event):
+                return True
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_RETURN:
                 self.on_barcode(self._keyboard_input)
@@ -100,6 +100,7 @@ class Screen:
                 self._keyboard_input = self._keyboard_input[:-1]
             else:
                 self._keyboard_input += event.unicode
+        return False
 
     def on_barcode(self, barcode: str):
         pass

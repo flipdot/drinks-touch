@@ -172,3 +172,7 @@ class InputField(BaseElm):
                 self.on_submit(self.text)
                 return
         self.text += char
+
+    def on_click(self, x, y):
+        self.ts_active = 0
+        ScreenManager.instance.active_object = self

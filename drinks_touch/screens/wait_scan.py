@@ -53,8 +53,7 @@ class WaitScanScreen(Screen):
         self.events: list[FlipdotEvent] = []
 
     def on_start(self, *args, **kwargs):
-        if config.ICAL_FILE_PATH.exists() and False:
-            # Disabled because it causes a lot of lag
+        if config.ICAL_FILE_PATH.exists():
             try:
                 self.events = self.read_calendar()
             except Exception:
@@ -162,13 +161,7 @@ class WaitScanScreen(Screen):
                 pos=(10, 230),
                 size=24,
             ),
-            # event_labels,
-            Label(text="Laggt zu sehr, deaktiviert", pos=(10, 300), size=20),
-            Label(
-                text="Hier wird der flipdot event-Kalender stehen",
-                pos=(10, 350),
-                size=20,
-            ),
+            event_labels,
             Label(
                 text="Mehr Infos auf https://flipdot.org",
                 pos=(10, config.SCREEN_HEIGHT - 220),
