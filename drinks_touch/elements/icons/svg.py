@@ -1,3 +1,4 @@
+import functools
 import io
 
 import pygame
@@ -36,16 +37,15 @@ class SvgIcon(BaseIcon):
         """
         super().__init__(pos=pos, *args, **kwargs)
         self.path = path
-        image = pygame.image.load(self.path).convert_alpha()
-        # image = load_and_scale_svg(self.path, 2)
-        if color:
-            image.fill(color.value, special_flags=pygame.BLEND_RGBA_MIN)
+        image = SvgIcon.load_image(path, color)
 
+        img_width = image.get_width()
+        img_height = image.get_height()
         if width and height is None:
-            aspect_ratio = image.get_width() / image.get_height()
+            aspect_ratio = img_width / img_height
             height = int(width / aspect_ratio)
         elif height and width is None:
-            aspect_ratio = image.get_height() / image.get_width()
+            aspect_ratio = img_height / img_width
             width = int(height / aspect_ratio)
 
         if width and height:
@@ -54,8 +54,16 @@ class SvgIcon(BaseIcon):
             self.height = height
         else:
             self.image = image
-            self.width = image.get_width()
-            self.height = image.get_height()
+            self.width = img_width
+            self.height = img_height
+
+    @classmethod
+    @functools.cache
+    def load_image(cls, path, color: Color | None = None):
+        image = pygame.image.load(path).convert_alpha()
+        if color:
+            image.fill(color.value, special_flags=pygame.BLEND_RGBA_MIN)
+        return image
 
     def draw(self, surface):
         surface.blit(self.image, (0, 0))

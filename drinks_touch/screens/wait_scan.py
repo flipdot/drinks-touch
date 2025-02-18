@@ -54,8 +54,10 @@ class WaitScanScreen(Screen):
 
     def on_start(self, *args, **kwargs):
         if config.ICAL_FILE_PATH.exists():
+            with open(config.ICAL_FILE_PATH, "r") as f:
+                raw_ical = f.read()
             try:
-                self.events = self.read_calendar()
+                self.events = self.read_calendar(raw_ical)
             except Exception:
                 logger.exception("Error while reading calendar")
                 self.events = [
@@ -110,7 +112,7 @@ class WaitScanScreen(Screen):
                 ),
             ),
             Button(
-                on_click=functools.partial(self.goto, TasksScreen()),
+                on_click=lambda: self.goto(TasksScreen()),
                 inner=RefreshIcon(),
             ),
         ]
@@ -187,7 +189,7 @@ class WaitScanScreen(Screen):
                     Button(
                         size=45,
                         text="Benutzer",
-                        on_click=functools.partial(self.goto, MainScreen()),
+                        on_click=lambda: self.goto(MainScreen()),
                     ),
                     Button(
                         text=None,
@@ -196,7 +198,7 @@ class WaitScanScreen(Screen):
                             height=53,
                             color=config.Color.PRIMARY,
                         ),
-                        on_click=functools.partial(self.goto, SearchAccountScreen()),
+                        on_click=lambda: self.goto(SearchAccountScreen()),
                     ),
                 ],
                 pos=(config.SCREEN_WIDTH - 80, config.SCREEN_HEIGHT - 100),
@@ -234,62 +236,67 @@ class WaitScanScreen(Screen):
 
         DrinksManager.instance.set_selected_drink(None)
 
-    def read_calendar(self) -> list[FlipdotEvent]:
+    @staticmethod
+    @functools.lru_cache(maxsize=1)
+    def load_calendar(raw_ical: str) -> Calendar:
+        return Calendar(raw_ical)
+
+    @staticmethod
+    def read_calendar(raw_ical: str) -> list[FlipdotEvent]:
         events = []
         now = pytz.utc.localize(datetime.datetime.utcnow())
 
-        with open(config.ICAL_FILE_PATH, "r") as f:
-            cal = Calendar(f.read())
+        cal = WaitScanScreen.load_calendar(raw_ical)
 
-            for event in cal.events:
-                first_occurrence = event.begin.datetime
-                in_past = first_occurrence < now
+        for event in cal.events:
+            first_occurrence = event.begin.datetime
+            in_past = first_occurrence < now
 
-                # Handle recurring events
-                # find rrule string
-                rule = None
-                for content_line in event.extra:
-                    if content_line.name == "RRULE":
-                        rule = rrulestr(content_line.value, dtstart=first_occurrence)
-                        break
+            # Handle recurring events
+            # find rrule string
+            rule = None
+            for content_line in event.extra:
+                if content_line.name == "RRULE":
+                    rule = rrulestr(content_line.value, dtstart=first_occurrence)
+                    break
 
-                if rule:
-                    # Recurring events
-                    # add next event
-                    if occurrence := rule.after(now, inc=True):
-                        events.append(
-                            FlipdotEvent(
-                                title=event.name,
-                                start=occurrence,
-                                color=Color.PRIMARY,
-                                recurring=True,
-                            )
-                        )
-                    # add past event
-                    if occurrence := rule.before(now, inc=True):
-                        events.append(
-                            FlipdotEvent(
-                                title=event.name,
-                                start=occurrence,
-                                color=Color.DISABLED,
-                                recurring=True,
-                            )
-                        )
-                else:
-                    # Non-recurring events
+            if rule:
+                # Recurring events
+                # add next event
+                if occurrence := rule.after(now, inc=True):
                     events.append(
                         FlipdotEvent(
                             title=event.name,
-                            start=first_occurrence,
-                            color=Color.DISABLED if in_past else Color.PRIMARY,
-                            recurring=bool(rule),
+                            start=occurrence,
+                            color=Color.PRIMARY,
+                            recurring=True,
                         )
                     )
+                # add past event
+                if occurrence := rule.before(now, inc=True):
+                    events.append(
+                        FlipdotEvent(
+                            title=event.name,
+                            start=occurrence,
+                            color=Color.DISABLED,
+                            recurring=True,
+                        )
+                    )
+            else:
+                # Non-recurring events
+                events.append(
+                    FlipdotEvent(
+                        title=event.name,
+                        start=first_occurrence,
+                        color=Color.DISABLED if in_past else Color.PRIMARY,
+                        recurring=bool(rule),
+                    )
+                )
 
-            # Sort and limit to the latest 15 events
-            # Make sure at least two events are in the past
-            events.sort(key=lambda x: x.start, reverse=True)
-            return events[:15]
+        # Sort and limit to the latest 15 events
+        # Make sure at least two events are in the past
+        events.sort(key=lambda x: x.start, reverse=True)
+        return events[:15]
 
     def on_barcode(self, barcode):
         if not barcode:
