@@ -13,6 +13,7 @@ class HBox(BaseElm):
         children: list["BaseElm"] | None = None,
         gap=5,
         pos=(0, 0),
+        bg_color: Color | None = None,
         *args,
         **kwargs,
     ):
@@ -27,9 +28,12 @@ class HBox(BaseElm):
                 ), "Not implemented: align_bottom does not have an effect on an element in a HBox"
         self.pos = pos
         self.gap = gap
+        self.bg_color = bg_color
 
     def render(self, *args, **kwargs) -> pygame.Surface:
         surface = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
+        if self.bg_color:
+            surface.fill(self.bg_color.value)
         x = self.padding_left
         for element in self.children:
             element.pos = (x, self.padding_top)

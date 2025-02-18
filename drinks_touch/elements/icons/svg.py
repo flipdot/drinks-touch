@@ -50,12 +50,12 @@ class SvgIcon(BaseIcon):
 
         if width and height:
             self.image = pygame.transform.smoothscale(image, (width, height))
-            self.width = width
-            self.height = height
+            self.width = width + self.padding_left + self.padding_right
+            self.height = height + self.padding_top + self.padding_bottom
         else:
             self.image = image
-            self.width = img_width
-            self.height = img_height
+            self.width = img_width + self.padding_left + self.padding_right
+            self.height = img_height + self.padding_top + self.padding_bottom
 
     @classmethod
     @functools.cache
@@ -66,4 +66,4 @@ class SvgIcon(BaseIcon):
         return image
 
     def draw(self, surface):
-        surface.blit(self.image, (0, 0))
+        surface.blit(self.image, (self.padding_left, self.padding_top))

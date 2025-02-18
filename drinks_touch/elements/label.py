@@ -21,7 +21,7 @@ class Label(BaseElm):
         font: config.Font = config.Font.SANS_SERIF,
         size=35,
         color: config.Color = config.Color.PRIMARY,
-        bg_color=None,
+        bg_color: config.Color | None = None,
         border_color=None,
         border_width=0,
         blink_frequency=0,
@@ -76,7 +76,7 @@ class Label(BaseElm):
             area.height + self.padding_top + self.padding_bottom,
         )
         surface = pygame.Surface(size, pygame.SRCALPHA)
-        surface.fill(self.bg_color)
+        surface.fill(self.bg_color.value)
         return surface
 
     def _build_text(self):

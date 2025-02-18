@@ -37,6 +37,18 @@ class FlipdotEvent:
     recurring: bool = False
     # description: str
 
+    @property
+    def today(self) -> bool:
+        return self.start.date() == datetime.datetime.now().date()
+
+    @property
+    def fg_color(self) -> Color:
+        return Color.BLACK if self.today else self.color
+
+    @property
+    def bg_color(self) -> Color | None:
+        return Color.PRIMARY if self.today else None
+
 
 def truncate(text: str, length: int) -> str:
     text = text.strip()  # remove leading/trailing whitespace
@@ -126,22 +138,25 @@ class WaitScanScreen(Screen):
                                 text=event.start.strftime("%a, %Y-%m-%d %H:%M"),
                                 font=config.Font.MONOSPACE,
                                 size=16,
-                                color=event.color,
+                                color=event.fg_color,
                             ),
                             SvgIcon(
                                 "drinks_touch/resources/images/rotate-clockwise.svg",
-                                height=14,
+                                width=14,
+                                padding=(2, 0),
                                 visible=event.recurring,
-                                color=event.color,
+                                color=event.fg_color,
                             ),
                             Spacer(width=14, visible=not event.recurring),
                             Label(
                                 text=truncate(event.title, 24),
                                 font=config.Font.MONOSPACE,
                                 size=16,
-                                color=event.color,
+                                color=event.fg_color,
                             ),
                         ],
+                        gap=5,
+                        bg_color=event.bg_color,
                     )
                     for event in self.events
                 ],
