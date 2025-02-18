@@ -33,12 +33,12 @@ class VBox(BaseElm):
         y = self.padding_top
         for element in self.children:
             element.pos = (self.padding_left, y)
+            y += element.height + self.gap
             if not element.visible:
                 continue
             element_surface = element.render(*args, **kwargs)
             if element_surface:
                 surface.blit(element_surface, element.pos)
-            y += element.height + self.gap
         if self.focus:
             pygame.draw.rect(
                 surface, Color.PRIMARY.value, (0, 0, self.width, self.height), 1

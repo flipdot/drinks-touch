@@ -12,7 +12,6 @@ from database.storage import get_session
 from drinks.drinks_manager import DrinksManager
 from elements import RefreshIcon, SvgIcon, Label, Button
 from elements.hbox import HBox
-from elements.spacer import Spacer
 from elements.vbox import VBox
 from tasks import CheckForUpdatesTask
 from .drink_scanned import DrinkScannedScreen
@@ -147,7 +146,6 @@ class WaitScanScreen(Screen):
                                 visible=event.recurring,
                                 color=event.fg_color,
                             ),
-                            Spacer(width=14, visible=not event.recurring),
                             Label(
                                 text=truncate(event.title, 24),
                                 font=config.Font.MONOSPACE,
@@ -157,10 +155,11 @@ class WaitScanScreen(Screen):
                         ],
                         gap=5,
                         bg_color=event.bg_color,
+                        padding=(0, 11),
                     )
                     for event in self.events[::-1]
                 ],
-                pos=(10, 270),
+                pos=(0, 270),
             )
         else:
             event_labels = Label(  # noqa: F841
