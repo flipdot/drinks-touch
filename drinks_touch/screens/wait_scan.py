@@ -173,9 +173,9 @@ class WaitScanScreen(Screen):
                 pos=(40, 20),
             ),
             Label(
-                text="Komm zu unseren Veranstaltungen:",
-                pos=(10, 230),
-                size=24,
+                text="Veranstaltungen",
+                pos=(110, 220),
+                size=34,
             ),
             event_labels,
             Label(
