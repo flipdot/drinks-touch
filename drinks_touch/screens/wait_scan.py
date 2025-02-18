@@ -158,7 +158,7 @@ class WaitScanScreen(Screen):
                         gap=5,
                         bg_color=event.bg_color,
                     )
-                    for event in self.events
+                    for event in self.events[::-1]
                 ],
                 pos=(10, 270),
             )
@@ -243,7 +243,7 @@ class WaitScanScreen(Screen):
                     align_right=True,
                     align_bottom=True,
                     color=config.Color.BLACK,
-                    bg_color=(255, 255, 255),
+                    bg_color=Color.WHITE,
                     padding=0,
                     blink_frequency=60,
                 )

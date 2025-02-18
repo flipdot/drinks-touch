@@ -32,6 +32,7 @@ class Color(enum.Enum):
     ERROR = (255, 0, 0, 255)
     SUCCESS = (0, 255, 0, 255)
     BLACK = (0, 0, 0, 255)
+    WHITE = (255, 255, 255, 255)
     BACKGROUND = (60, 60, 60, 255)
     NAVBAR_BACKGROUND = (5, 5, 5, 255)
     BUTTON_BACKGROUND = (0, 0, 0, 255)
