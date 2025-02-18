@@ -165,7 +165,7 @@ class WaitScanScreen(Screen):
             ),
             event_labels,
             Label(
-                text="Mehr Infos auf https://flipdot.org",
+                text="Mehr Infos unter https://flipdot.org",
                 pos=(10, config.SCREEN_HEIGHT - 220),
                 size=24,
             ),
