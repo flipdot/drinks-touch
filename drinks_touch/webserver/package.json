@@ -30,7 +30,7 @@
     "imports-loader": "5.0.0",
     "jquery": "3.7.1",
     "mini-css-extract-plugin": "2.9.2",
-    "postcss": "8.5.2",
+    "postcss": "8.5.3",
     "postcss-loader": "8.1.1",
     "resolve-url-loader": "5.0.0",
     "sass": "1.85.0",
