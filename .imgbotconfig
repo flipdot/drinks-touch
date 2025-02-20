@@ -1,0 +1,5 @@
+{
+    "ignoredFiles": [
+        "drinks_touch/resources/images/*.svg"
+    ]
+}
