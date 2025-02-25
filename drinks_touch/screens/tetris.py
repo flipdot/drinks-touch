@@ -490,6 +490,13 @@ class TetrisScreen(Screen):
         ]
 
     def on_color_selected(self, color: Color):
+        if self.current_player:
+            # Due to the pi lagging, it can happen that the on_click handler is
+            # triggered multiple times. To avoid inserting a player multiple
+            # times and therefore getting a unique constraint violation, we
+            # check if self.current_player has already been set
+            logger.warning("Player already set. Skipping creation.")
+            return
         p = TetrisPlayer(
             account_id=self.account.id,
             score=0,
