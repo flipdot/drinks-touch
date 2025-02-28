@@ -1,4 +1,6 @@
 import functools
+import random
+from datetime import datetime
 
 from sqlalchemy import func
 
@@ -40,6 +42,12 @@ class MainScreen(Screen):
             .order_by("first_char")
             .all()
         )
+
+        today = datetime.now().date()
+        april_fools = today.month == 4 and today.day == 1
+
+        if april_fools:
+            random.shuffle(query)
 
         for first_char, count in query:
             text = first_char

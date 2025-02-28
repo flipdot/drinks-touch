@@ -96,7 +96,7 @@ class ConfirmPaymentScreen(Screen):
         # Users.delete_if_nomoney(
         #     {
         #         "path": self.account.ldap_path,
-        #         "id": self.account.ldap_id,
+        #         "id": self.account.ldap_entry_dn,
         #     }
         # )
 

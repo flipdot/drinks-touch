@@ -5,6 +5,7 @@ import logging
 import math
 import random
 from collections import Counter
+from datetime import datetime
 
 import pygame
 from pygame import Vector2, Vector3
@@ -342,6 +343,8 @@ class TetrisScreen(Screen):
 
     def __init__(self, account: Account):
         super().__init__()
+        today = datetime.now().date()
+        self.april_fools = today.month == 4 and today.day == 1
 
         # if not TetrisPlayer.query.filter_by(account_id=account.id).first():
         #     Session.add(TetrisPlayer(
@@ -853,6 +856,12 @@ class TetrisScreen(Screen):
         self.tick()
         surface, debug_surface = super().render(dt)
 
+        board_surface = pygame.Surface(
+            self.SPRITE_RESOLUTION.elementwise()
+            * Vector2(self.BOARD_WIDTH, self.BOARD_HEIGHT)
+            * self.SCALE,
+        )
+
         def blit(x: int, y: int, sprite_name: str, account_id: int):
             v = Vector2(x, y)
             if not self.game_started:
@@ -865,7 +874,7 @@ class TetrisScreen(Screen):
                 color = Color.PRIMARY.value
             if self.move_ended:
                 color = darken(color, 0.3)
-            surface.blit(
+            board_surface.blit(
                 self.sprites[sprite_name],
                 v.elementwise() * self.SPRITE_RESOLUTION * self.SCALE,
             )
@@ -873,7 +882,7 @@ class TetrisScreen(Screen):
                 self.SPRITE_RESOLUTION.elementwise() * self.SCALE,
             )
             color_square.fill(color)
-            surface.blit(
+            board_surface.blit(
                 color_square,
                 v.elementwise() * self.SPRITE_RESOLUTION * self.SCALE,
                 special_flags=pygame.BLEND_MULT,
@@ -894,7 +903,7 @@ class TetrisScreen(Screen):
             if row_is_full:
                 if math.sin(self.t * 15) < 0:
                     pygame.draw.rect(
-                        surface,
+                        board_surface,
                         Color.PRIMARY.value,
                         (
                             self.SPRITE_RESOLUTION.x * self.SCALE,
@@ -911,17 +920,22 @@ class TetrisScreen(Screen):
             shadow_surface = current_block_surface.copy()
             shadow_surface.fill((0, 0, 0, 100), special_flags=pygame.BLEND_RGBA_MULT)
             shadow_pos = self.current_block.shadow_pos
-            surface.blit(
+            board_surface.blit(
                 shadow_surface,
                 shadow_pos.elementwise() * self.SPRITE_RESOLUTION * self.SCALE,
             )
 
-            surface.blit(
+            board_surface.blit(
                 current_block_surface,
                 self.current_block.pos.elementwise()
                 * self.SPRITE_RESOLUTION
                 * self.SCALE,
             )
+
+        if self.april_fools:
+            board_surface = pygame.transform.flip(board_surface, True, True)
+
+        surface.blit(board_surface, (0, 0))
 
         dialog_bg_color = darken(Color.PRIMARY, 0.8)
         if self.game_over:
@@ -1352,6 +1366,9 @@ class TetrisScreen(Screen):
             self.on_rotate(clockwise=False)
         elif event.key == pygame.K_r:
             self.use_reserve_block()
+        elif event.key == pygame.K_x:
+            # for debugging purposes
+            self.game_over = True
         else:
             return super().event(event)
 

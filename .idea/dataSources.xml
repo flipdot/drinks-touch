@@ -7,11 +7,12 @@
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
       <jdbc-url>jdbc:postgresql://localhost:5432/drinks</jdbc-url>
     </data-source>
-    <data-source source="LOCAL" name="drinks@drinks.fd" read-only="true" uuid="dcdad638-4632-4b99-a2b0-f15e958c83f5">
+    <data-source source="LOCAL" name="drinks@drinks.fd" read-only="true" uuid="9e96a3ba-0785-42ac-a293-465009a83af3">
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
       <jdbc-url>jdbc:postgresql://localhost:5432/drinks</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
   </component>
 </project>

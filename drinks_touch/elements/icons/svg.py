@@ -1,5 +1,7 @@
 import functools
 import io
+from datetime import datetime
+from random import random
 
 import pygame
 
@@ -56,6 +58,13 @@ class SvgIcon(BaseIcon):
             self.image = image
             self.width = img_width + self.padding_left + self.padding_right
             self.height = img_height + self.padding_top + self.padding_bottom
+
+        today = datetime.now().date()
+        april_fools = today.month == 4 and today.day == 1
+        if april_fools:
+            self.image = pygame.transform.flip(
+                self.image, random() > 0.5, random() > 0.5
+            )
 
     @classmethod
     @functools.cache
