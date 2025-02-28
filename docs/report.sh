@@ -21,9 +21,4 @@ function send_cleanup() {
 }
 trap send_cleanup EXIT TERM INT
 
-if ! python pullLdapUsersToDatabase.py > "$tmp.ldap" 2>&1; then
-    cat "$tmp.ldap" >> "$tmp"
-    exit
-fi
-
 sudo -u postgres psql drinks < docs/auflandungs_stats.sql |head -n10 >> "$tmp"

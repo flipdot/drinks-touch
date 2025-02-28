@@ -319,9 +319,7 @@ def format_recharges(recharges: list[RechargeEvent]):
         four_eyes_id = event.helper_user_id
 
         try:
-            four_eyes_account = Account.query.filter(
-                Account.ldap_id == four_eyes_id
-            ).one()
+            four_eyes_account = Account.query.filter(Account.name == four_eyes_id).one()
         except NoResultFound:
             four_eyes = four_eyes_id
         else:

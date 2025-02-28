@@ -48,10 +48,10 @@ class KeycloakAdmin:
             - timedelta(seconds=config.OIDC_REFRESH_BUFFER)
         )
 
-    def get_user_list(self):
-        return self._admin_request("/users")
+    def get_user_list(self, **kwargs):
+        return self._admin_request("/users", **kwargs)
 
-    def _admin_request(self, path: str):
+    def _admin_request(self, path: str, stream: bool = False):
         assert path.startswith("/"), "Path must start with /"
         if self.access_token is None or self.access_token_expires_at < datetime.now():
             self.login()
@@ -59,10 +59,13 @@ class KeycloakAdmin:
         res = requests.get(
             self.admin_base_url + path,
             headers={"Authorization": f"Bearer {self.access_token}"},
+            stream=stream,
         )
         res.raise_for_status()
-
-        return res.json()
+        if stream:
+            return res
+        else:
+            return res.json()
 
 
 # Example usage:
