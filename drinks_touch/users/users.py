@@ -1,10 +1,8 @@
 import sys
 
 
-import ldap3
 from ldap3 import Server, Connection, SAFE_SYNC, SUBTREE
 import logging
-import random
 import traceback
 
 import config
@@ -181,38 +179,3 @@ class Users(object):
         if user_id in by_id:
             return by_id[user_id]
         return None
-
-    @staticmethod
-    def id_to_ean(ean_id):
-        return "FDT" + str(ean_id)
-
-    @staticmethod
-    def create_temp_user():
-        random_id = 30000 + random.randint(1, 2000)
-        while Users.get_by_id_card(Users.id_to_ean(random_id)):
-            random_id += 1
-
-        barcode = Users.id_to_ean(random_id)
-        dn = "cn=" + str(random_id) + ",ou=temp_members,dc=flipdot,dc=org"
-        mods = {
-            "drinksBarcode": barcode,
-            "cn": str(random_id),
-            "uid": "geld-" + str(random_id),
-            "sn": str(random_id),
-        }
-        object_class = ["inetOrgPerson", "organizationalPerson", "person", "flipdotter"]
-        con = Users.get_ldap_instance()
-        con.add(dn, object_class, mods)
-        con.unbind()
-        return Users.get_by_id_card(barcode)
-
-    @staticmethod
-    def set_value(user, drinks_filed, new):
-        con = Users.get_ldap_instance()
-        if "save" in Users.fields[drinks_filed]:
-            new = Users.fields[drinks_filed]["save"](new)
-        con.modify(
-            user["path"],
-            {Users.fields[drinks_filed]["ldap_field"]: [(ldap3.MODIFY_REPLACE, new)]},
-        )
-        con.unbind()
