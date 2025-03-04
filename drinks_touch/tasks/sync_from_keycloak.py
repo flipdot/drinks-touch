@@ -38,9 +38,15 @@ class SyncFromKeycloakTask(BaseTask):
                 if self.sig_killed:
                     raise Exception("Task was killed")
                 raw_response += chunk
-                self.logger.info(f"Downloaded {len(raw_response)} bytes")
+                self.logger.info(f"Downloaded {len(raw_response):6} bytes")
                 if total_size:
-                    self.progress = len(raw_response) / total_size
+                    if total_size < len(raw_response):
+                        # Last time, we downloaded less than this time.
+                        # We don't know how much more we need to download.
+                        # Show an indeterminate progress bar.
+                        self.progress = None
+                    else:
+                        self.progress = len(raw_response) / total_size
 
             # insert or update the last content length
             last_total_size = Metadata.query.filter(
