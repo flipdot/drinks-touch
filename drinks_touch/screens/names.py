@@ -27,6 +27,7 @@ class NamesScreen(Screen):
         # users = list(Users.get_all(filters=["uid=" + self.char + "*"]))
         accounts = (
             Account.query.filter(Account.name.ilike(self.char + "%"))
+            .filter(Account.enabled)
             .order_by(Account.name)
             .all()
         )

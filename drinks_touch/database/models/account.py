@@ -1,7 +1,7 @@
 import math
 from datetime import datetime
 
-from sqlalchemy import Column, Integer, String, UUID, DateTime
+from sqlalchemy import Column, Integer, String, UUID, DateTime, Boolean
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.sql import text
 
@@ -15,8 +15,9 @@ class Account(Base):
     ldap_id = Column(String(20), unique=True)
     ldap_path = Column(String(50), unique=True)
     keycloak_sub = Column(UUID, unique=True)
+    enabled = Column(Boolean, default=True)
 
-    name = Column(String(50), unique=False)
+    name = Column(String(50), unique=True)
     id_card = Column(String(50), unique=True)
     # > In addition to restrictions on syntax, there is a length limit on
     # > email addresses.  That limit is a maximum of 64 characters (octets)

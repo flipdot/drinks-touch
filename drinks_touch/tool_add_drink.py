@@ -4,9 +4,6 @@ import argparse
 
 from database.models.drink import Drink
 from database.storage import get_session
-from database.storage import init_db
-
-init_db()
 
 parser = argparse.ArgumentParser(description="Adds new drinks to the drink database.")
 parser.add_argument(
