@@ -9,14 +9,19 @@ import subprocess
 import sys
 import threading
 import time
+from pathlib import Path
+
+from alembic.runtime.migration import MigrationContext
+from alembic.script import ScriptDirectory
 
 import config
 import env
-from database.storage import init_db, Session
+from database.storage import Session, engine
 from drinks.drinks_manager import DrinksManager
 from notifications.notification import send_low_balances, send_summaries
 from overlays import MouseOverlay, BaseOverlay
 from overlays.keyboard import KeyboardOverlay
+from screens.message_screen import MessageScreen
 from screens.screen_manager import ScreenManager
 
 from screens.tasks_screen import TasksScreen
@@ -85,8 +90,6 @@ def stats_loop():
 def main(argv):
     locale.setlocale(locale.LC_ALL, "de_DE.UTF-8")
 
-    init_db()
-
     if "--webserver" in argv:
         run_webserver()
         return 0
@@ -104,7 +107,30 @@ def main(argv):
     screen_manager = ScreenManager()
 
     screen_manager.set_default()
-    screen_manager.set_active(TasksScreen())
+
+    alembic_script = ScriptDirectory(Path(__file__).parent / "alembic")
+    with engine.begin() as conn:
+        context = MigrationContext.configure(conn)
+        if context.get_current_revision() != alembic_script.get_current_head():
+            screen_manager.set_active(
+                MessageScreen(
+                    title="Database error",
+                    message=[
+                        "The database isn't up to date. Please run:",
+                        "",
+                        "$ alembic upgrade head",
+                        "",
+                        f"Current revision: {context.get_current_revision()}",
+                        f"Head revision:    {alembic_script.get_current_head()}",
+                        "",
+                        "If you continue, the application might not work",
+                        "as expected.",
+                    ],
+                ),
+                replace=True,
+            )
+        else:
+            screen_manager.set_active(TasksScreen())
 
     overlays.extend(
         [

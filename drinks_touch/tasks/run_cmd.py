@@ -73,6 +73,12 @@ class UpdateAndRestartTask(RunCmdTask):
     )
 
 
+class RestartTask(RunCmdTask):
+    ON_STARTUP = False
+    PWD = config.REPO_PATH
+    CMDS = (["sudo", "systemctl", "restart", "drinks-touch"],)
+
+
 class CheckoutAndRestartTask(RunCmdTask):
     ON_STARTUP = False
     PWD = config.REPO_PATH

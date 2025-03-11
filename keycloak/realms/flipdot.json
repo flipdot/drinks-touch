@@ -435,7 +435,7 @@
     "groups" : [ ]
   }, {
     "id" : "896185c0-2029-4dfb-8c2e-d24a17ea6b22",
-    "username" : "malled",
+    "username" : "test_malled",
     "emailVerified" : false,
     "attributes" : {
       "drinks_notification" : [ "instant and daily" ],
@@ -470,7 +470,7 @@
     "groups" : [ ]
   }, {
     "id" : "61b2d856-f83e-4b8b-a02d-97b320584b12",
-    "username" : "soerface",
+    "username" : "test_soerface",
     "email" : "soerface@flipdot.org",
     "emailVerified" : false,
     "attributes" : {
@@ -488,7 +488,7 @@
     "groups" : [ ]
   }, {
     "id" : "76f53cdc-e72d-4d5e-ab8e-04335e1bc3d9",
-    "username" : "typ_o",
+    "username" : "test_typ_o",
     "emailVerified" : false,
     "attributes" : {
       "drinks_notification" : [ "weekly" ],

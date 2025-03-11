@@ -1,4 +1,6 @@
 import functools
+import random
+from datetime import datetime
 
 import config
 from .base_elm import BaseElm
@@ -38,6 +40,14 @@ class Label(BaseElm):
         self.border_color = border_color
         self.border_width = border_width
         self.blink_frequency = blink_frequency
+        today = datetime.now().date()
+        april_fools = today.month == 4 and today.day == 1
+        if april_fools:
+            self.flip_x = random.random() > 0.8
+            self.flip_y = random.random() > 0.8
+        else:
+            self.flip_x = False
+            self.flip_y = False
 
         self.frame_counter = 0
         super().__init__(children, height=self.size, width=self.size, *args, **kwargs)
@@ -66,6 +76,8 @@ class Label(BaseElm):
         if bg:
             surface.blit(bg, (0, 0), area)
         surface.blit(text, (self.padding_left, self.padding_top), area)
+        if self.flip_x or self.flip_y:
+            surface = pygame.transform.flip(surface, self.flip_x, self.flip_y)
         return surface
 
     def _render_background(self, area: pygame.Rect) -> pygame.Surface | None:

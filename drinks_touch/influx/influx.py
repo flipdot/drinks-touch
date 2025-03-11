@@ -1,6 +1,6 @@
 from influxdb import InfluxDBClient
 
-from database.storage import get_session, init_db
+from database.storage import get_session
 
 influx_client = InfluxDBClient("172.18.0.2", 8086, "admin", "admin", "drinks")
 influx_client.create_database("drinks")
@@ -57,6 +57,5 @@ def upload_scanevents():
 
 
 if __name__ == "__main__":
-    init_db()
     upload_scanevents()
     # clear_scanevents()

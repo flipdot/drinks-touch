@@ -26,6 +26,7 @@ logger = logging.getLogger(__name__)
 def auto_complete_account_name(text, except_account: str | None = None, limit=10):
     accounts = (
         Account.query.filter(Account.name.ilike(f"{text}%"))
+        .filter(Account.enabled)
         .filter(Account.name != except_account)
         .order_by(Account.name)
         .limit(limit + 1)

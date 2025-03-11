@@ -30,6 +30,12 @@ The project is using poetry. Install the dependencies with:
 poetry install
 ```
 
+Initialize the database. Needs to be run again after the data model has changed:
+
+```sh
+alembic upgrade head
+```
+
 To start the application, run:
 
 ```sh
@@ -59,8 +65,16 @@ docker build -t flipdot/drinks-touch .
 
 The following information is therefore only useful if you decide to deploy this project containerless.
 
-### Build
-This project does not require any build procedure.
+### Changing the database model
+
+If you do changes to the database, you need to create a migration:
+
+```sh
+alembic revision --autogenerate
+```
+
+Check the migration file. It is located in `alembic/versions/`.
+If everything is fine, apply the migration like described above.
 
 ### Configuration
 The following configuration files are evaluated at execution time and must be derived from their respective examples, which can be found in the same directories.
