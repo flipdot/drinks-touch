@@ -55,7 +55,7 @@ pre-commit install
 It is also being run in the CI pipeline. If you see any rules that don't make sense for us, feel free
 to adjust the `.pre-commit-config.yaml` file or comment out invocation in the `ci.yml` file.
 
-This project is deployed within the [drinks-touch_stack](https://github.com/flipdot/drinks-touch_stack/) in accordance to the [DargStack template](https://github.com/dargstack/dargstack_template/) to make deployment a breeze.
+This project is deployed within the [drinks-touch_stack](https://github.com/flipdot/drinks-touch_stack/) in accordance to the [dargstack template](https://github.com/dargstack/dargstack_template/) to make deployment a breeze.
 
 The provided `Dockerfile` lets you build a localized Python image. Build it with the following command:
 
