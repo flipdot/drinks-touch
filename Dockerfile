@@ -4,9 +4,7 @@ ENV CI=true
 
 WORKDIR /srv/app/
 
-RUN npm install -g corepack@latest \
-    # TODO: remove (https://github.com/nodejs/corepack/issues/612)
-    && corepack enable
+RUN corepack enable
 
 
 FROM base-image AS prepare
