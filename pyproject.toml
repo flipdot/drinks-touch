@@ -6,7 +6,7 @@ authors = ["malled"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.13"
+python = "^3.11"
 flask = "^3.0.1"
 flask-compress = "^1.14"
 sudo = "^1.0.0"
