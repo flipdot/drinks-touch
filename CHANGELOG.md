@@ -1,3 +1,10 @@
+# [0.5.0](https://github.com/flipdot/drinks-touch/compare/0.4.63...0.5.0) (2025-03-25)
+
+
+### Features
+
+* **deps:** downgrade python to 3.11 ([#285](https://github.com/flipdot/drinks-touch/issues/285)) ([4c534df](https://github.com/flipdot/drinks-touch/commit/4c534df29a44cee646c56bb7c7fe71d78fc8775f))
+
 ## [0.4.63](https://github.com/flipdot/drinks-touch/compare/0.4.62...0.4.63) (2025-03-20)
 
 
