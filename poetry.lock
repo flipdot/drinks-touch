@@ -5096,14 +5096,14 @@ files = [
 
 [[package]]
 name = "qrcode"
-version = "8.0"
+version = "8.1"
 description = "QR Code image generator"
 optional = false
 python-versions = "<4.0,>=3.9"
 groups = ["main"]
 files = [
-    {file = "qrcode-8.0-py3-none-any.whl", hash = "sha256:9fc05f03305ad27a709eb742cf3097fa19e6f6f93bb9e2f039c0979190f6f1b1"},
-    {file = "qrcode-8.0.tar.gz", hash = "sha256:025ce2b150f7fe4296d116ee9bad455a6643ab4f6e7dce541613a4758cbce347"},
+    {file = "qrcode-8.1-py3-none-any.whl", hash = "sha256:9beba317d793ab8b3838c52af72e603b8ad2599c4e9bbd5c3da37c7dcc13c5cf"},
+    {file = "qrcode-8.1.tar.gz", hash = "sha256:e8df73caf72c3bace3e93d9fa0af5aa78267d4f3f5bc7ab1b208f271605a5e48"},
 ]
 
 [package.dependencies]
@@ -5138,14 +5138,14 @@ use-chardet-on-py3 = ["chardet (>=3.0.2,<6)"]
 
 [[package]]
 name = "sentry-sdk"
-version = "2.25.0"
+version = "2.25.1"
 description = "Python client for Sentry (https://sentry.io)"
 optional = false
 python-versions = ">=3.6"
 groups = ["main"]
 files = [
-    {file = "sentry_sdk-2.25.0-py2.py3-none-any.whl", hash = "sha256:aa0f558209c1819391421d65e25b1c4000f49580e6ecf5c05ff0c6e74f74470b"},
-    {file = "sentry_sdk-2.25.0.tar.gz", hash = "sha256:a6e623691ff03d1758f940fe421e5b65f313f4ac37638079ab94d1b6f052eb15"},
+    {file = "sentry_sdk-2.25.1-py2.py3-none-any.whl", hash = "sha256:60b016d0772789454dc55a284a6a44212044d4a16d9f8448725effee97aaf7f6"},
+    {file = "sentry_sdk-2.25.1.tar.gz", hash = "sha256:f9041b7054a7cf12d41eadabe6458ce7c6d6eea7a97cfe1b760b6692e9562cf0"},
 ]
 
 [package.dependencies]
@@ -5525,4 +5525,4 @@ cffi = ["cffi (>=1.11)"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.11"
-content-hash = "62bd805ba1d25b7187acfb17acaf5754357d1a0382a74146e0777ba0a27113c1"
+content-hash = "1067307b317f78ea143c11051dfc03f086fa842dbb651b0a07e92398e9a67896"
