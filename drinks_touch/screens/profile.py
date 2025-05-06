@@ -8,7 +8,6 @@ from database.models import Account
 from database.storage import get_session
 from drinks.drinks import get_by_ean
 from drinks.drinks_manager import DrinksManager
-from elements import Image
 from elements.button import Button
 from elements.label import Label
 from elements.vbox import VBox
@@ -106,10 +105,10 @@ class ProfileScreen(Screen):
                 pos=(5, 300),
                 gap=15,
             ),
-            Image(
-                src="drinks_touch/resources/images/new-text.png",
-                pos=(330, 370),
-            ),
+            # Image(
+            #     src="drinks_touch/resources/images/new-text.png",
+            #     pos=(330, 370),
+            # ),
         ]
 
         self.processing = Label(
