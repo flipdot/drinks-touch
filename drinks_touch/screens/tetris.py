@@ -186,9 +186,7 @@ class Shape:
         else:
             self.matrix = list(zip(*self.matrix))[::-1]
 
-    def render(
-        self, sprites: dict[str, pygame.Surface], color: tuple[int, int, int]
-    ) -> pygame.Surface:
+    def render(self, color: tuple[int, int, int]) -> pygame.Surface:
         matrix_size = Vector2(len(self.matrix[0]), len(self.matrix))
         size = Vector2(
             matrix_size.elementwise()
@@ -202,7 +200,7 @@ class Shape:
                     continue
                 pos = Vector2(x, y)
                 surface.blit(
-                    sprites[cell.sprite],
+                    TetrisScreen.get_sprite(cell.sprite),
                     pos.elementwise()
                     * TetrisScreen.SPRITE_RESOLUTION
                     * TetrisScreen.SCALE,
@@ -251,9 +249,9 @@ class Block:
         self.overlapping = False
         self.player = player
 
-    def render(self, sprites: dict[str, pygame.Surface]) -> pygame.Surface:
+    def render(self) -> pygame.Surface:
         color = self.player.color
-        return self.shape.render(sprites, color)
+        return self.shape.render(color)
 
     def move(self, direction: Direction, *, factor=1):
         if self.locked:
@@ -341,6 +339,16 @@ class TetrisScreen(Screen):
     GAME_START_COUNTDOWN = 2
     background_color = darken(Color.PRIMARY, 0.8)
 
+    @classmethod
+    @functools.lru_cache(maxsize=16)
+    def get_sprite(cls, sprite_name: str) -> pygame.Surface:
+        return pygame.transform.scale(
+            pygame.image.load(
+                f"drinks_touch/resources/images/tetris/{sprite_name}.png"
+            ).convert_alpha(),
+            TetrisScreen.SPRITE_RESOLUTION * TetrisScreen.SCALE,
+        )
+
     def __init__(self, account: Account):
         super().__init__()
         today = datetime.now().date()
@@ -374,7 +382,6 @@ class TetrisScreen(Screen):
         self.t = 0
         self.last_tick = 0
         self.account = account
-        self.sprites = self.load_sprites()
         self.scores: list[tuple[Account, int, int]] = []
         self.all_time_scores: list[tuple[Account, int, int]] = []
         self.score = 0
@@ -875,7 +882,7 @@ class TetrisScreen(Screen):
             if self.move_ended:
                 color = darken(color, 0.3)
             board_surface.blit(
-                self.sprites[sprite_name],
+                TetrisScreen.get_sprite(sprite_name),
                 v.elementwise() * self.SPRITE_RESOLUTION * self.SCALE,
             )
             color_square = pygame.Surface(
@@ -916,7 +923,7 @@ class TetrisScreen(Screen):
                     )
 
         if self.current_block:
-            current_block_surface = self.current_block.render(self.sprites)
+            current_block_surface = self.current_block.render()
             shadow_surface = current_block_surface.copy()
             shadow_surface.fill((0, 0, 0, 100), special_flags=pygame.BLEND_RGBA_MULT)
             shadow_pos = self.current_block.shadow_pos
@@ -1187,7 +1194,7 @@ class TetrisScreen(Screen):
         )
 
         reserve_shape = Shape(self.reserve_block_type)
-        reserve_surface = reserve_shape.render(self.sprites, Color.PRIMARY.value)
+        reserve_surface = reserve_shape.render(Color.PRIMARY.value)
         if self.reserve_block_used:
             alpha = 20 + abs(math.sin(self.t * 2)) * 150
         else:
@@ -1371,32 +1378,3 @@ class TetrisScreen(Screen):
             self.game_over = True
         else:
             return super().event(event)
-
-    def load_sprites(self):
-        sprite_names = [
-            "bg-empty",
-            "bg-bricks",
-            "block-o",
-            "block-i_h1",
-            "block-i_h2",
-            "block-i_h3",
-            "block-i_v1",
-            "block-i_v2",
-            "block-i_v3",
-            "block-j",
-            "block-l",
-            "block-s",
-            "block-t",
-            "block-z",
-            "block-x",
-        ]
-
-        return {
-            x: pygame.transform.scale(
-                pygame.image.load(
-                    f"drinks_touch/resources/images/tetris/{x}.png"
-                ).convert_alpha(),
-                self.SPRITE_RESOLUTION * self.SCALE,
-            )
-            for x in sprite_names
-        }
