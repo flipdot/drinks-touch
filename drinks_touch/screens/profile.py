@@ -1,5 +1,3 @@
-import functools
-
 from sqlalchemy.sql import text
 
 import config
@@ -15,6 +13,7 @@ from screens.recharge_screen import RechargeScreen
 from users.users import Users
 from .confirm_payment_screen import ConfirmPaymentScreen
 from .id_card_screen import IDCardScreen
+from .purchase_history_screen import PurchaseHistoryScreen
 from .screen import Screen
 from .screen_manager import ScreenManager
 from .transfer_balance_screen import TransferBalanceScreen
@@ -72,33 +71,23 @@ class ProfileScreen(Screen):
                 [
                     Button(
                         text="Buchungshistorie",
-                        on_click=functools.partial(
-                            self.alert,
-                            "Nicht implementiert",
-                        ),
+                        on_click=lambda: self.goto(PurchaseHistoryScreen()),
                         padding=20,
                     ),
                     Button(
                         text="Aufladen",
-                        on_click=functools.partial(
-                            self.goto, RechargeScreen(self.account)
-                        ),
+                        on_click=lambda: self.goto(RechargeScreen(self.account)),
                         padding=20,
                     ),
                     Button(
                         text="Guthaben übertragen",
-                        on_click=functools.partial(
-                            self.goto,
-                            TransferBalanceScreen(self.account),
-                        ),
+                        on_click=lambda: self.goto(TransferBalanceScreen(self.account)),
                         padding=20,
                     ),
                     Button(
                         text="ID card",
                         font=Font.MONOSPACE,
-                        on_click=functools.partial(
-                            self.goto, IDCardScreen(self.account)
-                        ),
+                        on_click=lambda: self.goto(IDCardScreen(self.account)),
                         padding=20,
                     ),
                 ],
