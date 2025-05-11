@@ -161,6 +161,10 @@ class Shape:
                 [CellType.O, CellType.O],
                 [CellType.O, CellType.O],
             ]
+        else:
+            self.matrix = [
+                [CellType.EMPTY],
+            ]
 
     def rotate(self, clockwise: bool):
         if self.block_type == BlockType.O:
@@ -359,17 +363,33 @@ class TetrisScreen(Screen):
         today = datetime.now().date()
         self.april_fools = today.month == 4 and today.day == 1
 
-        # if not TetrisPlayer.query.filter_by(account_id=account.id).first():
-        #     Session.add(TetrisPlayer(
-        #         account_id=account.id,
-        #         score=0,
-        #         blocks=0,
-        #         lines=0,
-        #         alltime_score=0,
-        #         alltime_blocks=0,
-        #         alltime_lines=0,
-        #     ))
-        #     Session.commit()
+        self.t = 0
+        self.last_tick = 0
+        self.loading = True
+        self.account = account
+        self.scores: list[tuple[Account, int, int]] = []
+        self.all_time_scores: list[tuple[Account, int, int]] = []
+        self.score = 0
+        self.highscore = 0
+        self.lines = 0
+        self.removed_pixels = Counter()
+        self.scored_points = []
+        self.cleared_lines = 0
+        self.reserve_block_type = None
+        self.reserve_block_used = False
+        self.board: list[list[Cell]] = TetrisScreen.generate_empty_board()
+        self.level = 0
+        self.next_blocks: list[BlockType] = []
+        self.current_player: Player | None = None
+        self.current_block: Block | None = None
+        self.game_over = False
+        self.move_ended = False
+        self.game_started = False
+        self.game_starts_at = None
+
+        self.objects = []
+
+    def on_start(self, *args, **kwargs):
         if not TetrisGame.query.first():
             Session.add(
                 TetrisGame(
@@ -384,32 +404,16 @@ class TetrisScreen(Screen):
             )
             Session.commit()
 
-        self.t = 0
-        self.last_tick = 0
-        self.account = account
-        self.scores: list[tuple[Account, int, int]] = []
-        self.all_time_scores: list[tuple[Account, int, int]] = []
-        self.score = 0
-        self.highscore = 0
-        self.lines = 0
-        self.removed_pixels = Counter()
-        self.scored_points = []
-        self.cleared_lines = 0
         self.reserve_block_type = self.load_reserve_block()
-        self.reserve_block_used = False
         self.board = self.load_board()
         self.level = self.load_level()
         self.next_blocks: list[BlockType] = self.load_next_blocks()
-        self.current_player: Player | None = None
-        self.current_block: Block | None = None
-        self.game_over = False
-        self.move_ended = False
-        self.game_started = False
-        self.game_starts_at = None
-
-        self.objects = []
         self.load_scores()
-        self.load_color_selection_buttons()
+
+        if not self.current_player:
+            self.load_color_selection_buttons()
+
+        self.loading = False
 
     def load_control_buttons(self):
         def icon(filename: str):
@@ -545,17 +549,18 @@ class TetrisScreen(Screen):
         if game.board:
             # convert json to Cell with CellType enum
             return [[Cell(CellType(c), p) for c, p in row] for row in game.board]
-        return self.generate_empty_board()
+        return TetrisScreen.generate_empty_board()
 
-    def generate_empty_board(self) -> list[list[Cell]]:
+    @classmethod
+    def generate_empty_board(cls) -> list[list[Cell]]:
         empty = [
-            [Cell() for _ in range(self.BOARD_WIDTH)] for _ in range(self.BOARD_HEIGHT)
+            [Cell() for _ in range(cls.BOARD_WIDTH)] for _ in range(cls.BOARD_HEIGHT)
         ]
         with_walls = [
             [
                 (
                     Cell(CellType.WALL)
-                    if x in (0, self.BOARD_WIDTH - 1) or y == self.BOARD_HEIGHT - 1
+                    if x in (0, cls.BOARD_WIDTH - 1) or y == cls.BOARD_HEIGHT - 1
                     else c
                 )
                 for x, c in enumerate(r)
@@ -563,6 +568,57 @@ class TetrisScreen(Screen):
             for y, r in enumerate(empty)
         ]
         return with_walls
+
+    @staticmethod
+    def draw_message_box(surface: pygame.Surface, message: str):
+        w = 200
+        h = 100
+
+        x = (
+            TetrisScreen.BOARD_WIDTH
+            * TetrisScreen.SPRITE_RESOLUTION.x
+            * TetrisScreen.SCALE
+        ) // 2 - w // 2
+        y = (
+            TetrisScreen.BOARD_HEIGHT
+            * TetrisScreen.SPRITE_RESOLUTION.y
+            * TetrisScreen.SCALE
+        ) // 2 - h // 2
+
+        pygame.draw.rect(
+            surface,
+            TetrisScreen.background_color,
+            (x, y, w, h),
+            border_radius=10,
+        )
+
+        font = pygame.font.Font(config.Font.MONOSPACE.value, 20)
+
+        line_surfaces = [
+            font.render(line, 1, Color.PRIMARY.value) for line in message.splitlines()
+        ]
+
+        if len(line_surfaces) == 1:
+            text_surface = line_surfaces[0]
+        else:
+            total_height = sum(line.get_height() for line in line_surfaces)
+            largest_width = max(line.get_width() for line in line_surfaces)
+            text_surface = pygame.Surface(
+                (largest_width, total_height), pygame.SRCALPHA
+            )
+            y_offset = 0
+            for line in line_surfaces:
+                x_offset = (largest_width - line.get_width()) // 2
+                text_surface.blit(line, (x_offset, y_offset))
+                y_offset += line.get_height()
+
+        surface.blit(
+            text_surface,
+            (
+                x + (w - text_surface.get_width()) // 2,
+                y + (h - text_surface.get_height()) // 2,
+            ),
+        )
 
     def load_reserve_block(self) -> BlockType:
         return TetrisGame.query.first().reserve_block
@@ -640,6 +696,8 @@ class TetrisScreen(Screen):
             return
 
         if not self.game_started:
+            if self.loading:
+                return
             if self.game_starts_at is None and self.current_player:
                 self.game_starts_at = self.t + self.GAME_START_COUNTDOWN
                 self.current_block = self.spawn_block()
@@ -934,63 +992,22 @@ class TetrisScreen(Screen):
 
         surface.blit(board_surface, (0, 0))
 
-        dialog_bg_color = darken(Color.PRIMARY, 0.8)
+        if self.loading:
+            TetrisScreen.draw_message_box(surface, "Lade…")
+            pygame.draw.arc(
+                surface,
+                Color.PRIMARY.value,
+                ((self.width - 70) / 2, self.height - 85, 70, 70),
+                math.pi - self.t * 5,
+                math.pi * 1.4 - self.t * 5,
+                width=int(70 / 5),
+            )
+
         if self.game_over:
-            w = 200
-            h = 100
-            x = (self.BOARD_WIDTH * self.SPRITE_RESOLUTION.x * self.SCALE) // 2 - w // 2
-            y = (
-                self.BOARD_HEIGHT * self.SPRITE_RESOLUTION.y * self.SCALE
-            ) // 2 - h // 2
+            TetrisScreen.draw_message_box(surface, "GAME OVER")
 
-            pygame.draw.rect(
-                surface,
-                dialog_bg_color,
-                (x, y, w, h),
-                border_radius=10,
-            )
-
-            font = pygame.font.Font(config.Font.MONOSPACE.value, 20)
-            text_surface_title = font.render("GAME OVER", 1, Color.PRIMARY.value)
-            surface.blit(
-                text_surface_title,
-                (
-                    x + (w - text_surface_title.get_width()) // 2,
-                    y + (h - text_surface_title.get_height()) // 2,
-                ),
-            )
-
-        if not self.game_started and not self.current_player:
-            w = 200
-            h = 100
-            x = (self.BOARD_WIDTH * self.SPRITE_RESOLUTION.x * self.SCALE) // 2 - w // 2
-            y = (
-                self.BOARD_HEIGHT * self.SPRITE_RESOLUTION.y * self.SCALE
-            ) // 2 - h // 2
-
-            pygame.draw.rect(
-                surface,
-                dialog_bg_color,
-                (x, y, w, h),
-                border_radius=10,
-            )
-            font = pygame.font.Font(config.Font.MONOSPACE.value, 20)
-            text_surface_title = font.render("Wähle deine", 1, Color.PRIMARY.value)
-            text_surface_line2 = font.render("Farbe", 1, Color.PRIMARY.value)
-            surface.blit(
-                text_surface_title,
-                (
-                    x + (w - text_surface_title.get_width()) // 2,
-                    y + 20,
-                ),
-            )
-            surface.blit(
-                text_surface_line2,
-                (
-                    x + (w - text_surface_line2.get_width()) // 2,
-                    y + 50,
-                ),
-            )
+        if not self.loading and not self.game_started and not self.current_player:
+            TetrisScreen.draw_message_box(surface, "Wähle deine\nFarbe")
 
         if not self.game_started and self.game_starts_at:
             w = 200
@@ -1002,7 +1019,7 @@ class TetrisScreen(Screen):
 
             pygame.draw.rect(
                 surface,
-                dialog_bg_color,
+                TetrisScreen.background_color,
                 (x, y, w, h),
                 border_radius=10,
             )
@@ -1063,7 +1080,7 @@ class TetrisScreen(Screen):
 
             pygame.draw.rect(
                 surface,
-                dialog_bg_color,
+                TetrisScreen.background_color,
                 (x, y, w, h),
                 border_radius=10,
             )
@@ -1308,13 +1325,13 @@ class TetrisScreen(Screen):
         return surface
 
     def on_left(self):
-        if self.game_over or self.move_ended or not self.current_block:
+        if self.loading or self.game_over or self.move_ended or not self.current_block:
             return
         self.current_block.move(Direction.LEFT)
         self.get_sound("move-block").play()
 
     def on_down(self):
-        if self.game_over or self.move_ended or not self.current_block:
+        if self.loading or self.game_over or self.move_ended or not self.current_block:
             return
         play_sound = False
         while self.current_block.fall():
@@ -1324,13 +1341,13 @@ class TetrisScreen(Screen):
             self.get_sound("block-to-bottom").play()
 
     def on_rotate(self, clockwise: bool):
-        if self.game_over or self.move_ended or not self.current_block:
+        if self.loading or self.game_over or self.move_ended or not self.current_block:
             return
         if self.current_block.rotate(clockwise=clockwise):
             self.get_sound("rotate-block").play()
 
     def on_right(self):
-        if self.game_over or self.move_ended or not self.current_block:
+        if self.loading or self.game_over or self.move_ended or not self.current_block:
             return
         self.current_block.move(Direction.RIGHT)
         self.get_sound("move-block").play()
