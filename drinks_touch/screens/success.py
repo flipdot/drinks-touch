@@ -19,13 +19,6 @@ class TetrisIcon(BaseElm):
         super().__init__(*args, **kwargs)
 
         self.scale = 1.5
-
-        self.block_sprite = pygame.transform.scale(
-            pygame.image.load(
-                "drinks_touch/resources/images/tetris/block-t.png"
-            ).convert_alpha(),
-            TetrisScreen.SPRITE_RESOLUTION * self.scale,
-        )
         self.shape = Shape(BlockType.T)
 
     @property
@@ -37,7 +30,7 @@ class TetrisIcon(BaseElm):
         return TetrisScreen.SPRITE_RESOLUTION.y * self.scale * 2
 
     def render(self, *args, **kwargs) -> pygame.Surface:
-        return self.shape.render({"block-t": self.block_sprite}, Color.PRIMARY.value)
+        return self.shape.render(Color.PRIMARY.value)
 
 
 class SuccessScreen(Screen):
