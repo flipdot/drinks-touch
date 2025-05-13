@@ -377,7 +377,8 @@ class TetrisScreen(Screen):
         self.cleared_lines = 0
         self.reserve_block_type = None
         self.reserve_block_used = False
-        self.board: list[list[Cell]] = TetrisScreen.generate_empty_board()
+        # self.board: list[list[Cell]] = TetrisScreen.generate_empty_board()
+        self.board: list[list[Cell]] = [[]]
         self.level = 0
         self.next_blocks: list[BlockType] = []
         self.current_player: Player | None = None
@@ -834,7 +835,7 @@ class TetrisScreen(Screen):
 
     @staticmethod
     def row_is_full(row: list[Cell]) -> bool:
-        return all(cell.type != CellType.EMPTY for cell in row) and not all(
+        return all(cell and cell.type != CellType.EMPTY for cell in row) and not all(
             cell.type == CellType.WALL for cell in row
         )
 
@@ -952,9 +953,14 @@ class TetrisScreen(Screen):
             # )
 
         for y in range(self.BOARD_HEIGHT):
-            row_is_full = self.row_is_full(self.board[y])
             for x in range(self.BOARD_WIDTH):
-                blit(x, y, self.board[y][x].type.sprite, self.board[y][x].account_id)
+                if self.loading:
+                    blit(x, y, "bg-bricks", -1)
+                else:
+                    blit(
+                        x, y, self.board[y][x].type.sprite, self.board[y][x].account_id
+                    )
+            row_is_full = not self.loading and self.row_is_full(self.board[y])
             if row_is_full:
                 if math.sin(self.t * 15) < 0:
                     pygame.draw.rect(
