@@ -46,8 +46,8 @@ class DrinkScannedScreen(Screen):
                     ),
                     Spacer(height=20),
                     Label(
-                        text="Preis: 1 €",
-                        size=50,
+                        text="1,00 €",
+                        size=80,
                     ),
                     Spacer(height=10),
                     Label(
