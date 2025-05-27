@@ -4,19 +4,18 @@ from datetime import datetime
 from decimal import Decimal
 import config
 
-from markupsafe import escape
 from flask import Flask, make_response
 from flask import render_template
 from flask import request
 from flask import send_file
 from flask_compress import Compress
 
+from database.models import Tx, Account
 from database.models.recharge_event import RechargeEvent
 from database.storage import get_session
 from env import is_pi
 from stats.stats import scans
 from users.qr import make_sepa_qr
-from users.users import Users
 
 
 app = Flask(__name__)
@@ -41,10 +40,8 @@ def favicon():
 @app.route("/")
 @app.route("/recharge")
 def index():
-    users = sorted(Users.get_all(), key=lambda u: u["name"].lower())
-    users.insert(0, {})
-    print(users)
-    return render_template("index.html", users=users)
+    accounts = Account.query.filter(Account.enabled).order_by(Account.name).all()
+    return render_template("index.html", accounts=accounts)
 
 
 @app.route("/stats")
@@ -54,37 +51,32 @@ def stats():
 
 @app.route("/recharge/doit", methods=["POST"])
 def recharge_doit():
-    user_id = request.form["user_user"]
-    helper_id = request.form["helper_user"]
-    amount = request.form["amount"]
-    if not user_id or not helper_id or not amount:
-        return "Please enter valid data!"
+    user_id = request.form.get("user_user")
+    if not user_id:
+        return "Bitte einen Nutzer auswählen!"
+    amount = request.form.get("amount")
+    if not amount:
+        return "Bitte einen Betrag angeben!"
 
     if amount == "0":
-        return "Invalid amount"
+        return "Ungültiger Betrag!"
 
-    if not uid_pattern.match(user_id):
-        return "Invalid user id"
-    if not uid_pattern.match(helper_id):
-        return "Invalid helper id"
-
-    users = Users.get_all(filters=["uidNumber=" + user_id])
-    helpers = Users.get_all(filters=["uidNumber=" + helper_id])
-
-    if not users:
-        return "user %s not found" % escape(user_id)
-    if not helpers:
-        return "user %s not found" % escape(helper_id)
-    user = users[0]
-    helper = helpers[0]
+    account = Account.query.filter(Account.id == user_id).one()
 
     session = get_session()
-    ev = RechargeEvent(user["id"], helper["id"], amount)
+    transaktion = Tx(
+        payment_reference="Aufladung via Web",
+        account_id=account.id,
+        amount=Decimal(amount),
+    )
+    session.add(transaktion)
+    session.commit()
+    ev = RechargeEvent(account.ldap_id, "Web UI", amount, tx_id=transaktion.id)
 
     session.add(ev)
     session.commit()
 
-    return render_template("recharge_success.html", amount=amount, user=user)
+    return render_template("recharge_success.html", amount=amount, account=account)
 
 
 @app.route("/scans.json")

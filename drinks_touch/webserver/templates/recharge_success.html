@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block title %}Start{% endblock %}
 {% block body %}
-    <h2>Aufladung in Höhe von {{ amount }}€ für {{ user.name }} erfolgreich</h2>
+    <h2>Aufladung in Höhe von {{ amount }}€ für {{ account.name }} erfolgreich</h2>
     <p>Du wirst in 5 Sekunden <a href="/">zur Hauptseite</a> geleitet.</p>
 <script>
 setTimeout(function(){window.location.pathname="/"}, 5*1000);
