@@ -38,7 +38,7 @@ services:
       - ./docker/flipdot.ldif:/assets/openldap/custom/ldif/flipdot.ldif
 
   keycloak:
-    image: "quay.io/keycloak/keycloak:25.0.6"
+    image: "quay.io/keycloak/keycloak:26.2.5"
     environment:
         KEYCLOAK_ADMIN: admin
         KEYCLOAK_ADMIN_PASSWORD: admin
