@@ -30,6 +30,12 @@ class HBox(BaseElm):
         self.gap = gap
         self.bg_color = bg_color
 
+    def __getitem__(self, item):
+        return self.children[item]
+
+    def __setitem__(self, key, value):
+        self.children[key] = value
+
     def render(self, *args, **kwargs) -> pygame.Surface:
         surface = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
         if self.bg_color:

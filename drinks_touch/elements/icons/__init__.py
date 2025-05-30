@@ -1,1 +1,0 @@
-from .refresh import RefreshIcon

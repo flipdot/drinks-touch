@@ -10,19 +10,18 @@ import config
 from config import Color
 from database.storage import get_session
 from drinks.drinks_manager import DrinksManager
-from elements import RefreshIcon, SvgIcon, Label, Button
+from elements import SvgIcon, Label, Button
 from elements.hbox import HBox
 from elements.vbox import VBox
 from tasks import CheckForUpdatesTask
 from .drink_scanned import DrinkScannedScreen
-from .git.main_screen import GitMainScreen
+from .settings.main_screen import SettingsMainScreen
 from .main import MainScreen
 from .screen import Screen
 from .screen_manager import ScreenManager
 from sqlalchemy.sql import text
 
 from .search_account import SearchAccountScreen
-from .tasks_screen import TasksScreen
 from ics import Calendar
 
 logger = logging.getLogger(__name__)
@@ -104,27 +103,18 @@ class WaitScanScreen(Screen):
             logger.exception("sql error while getting total money amount")
             total_balance_fmt = "(SQL Error)"
 
-        color = (
-            config.Color.PRIMARY if config.GIT_REPO_AVAILABLE else config.Color.DISABLED
-        )
         bottom_right_buttons = [
             Button(
                 text=None,
                 inner=SvgIcon(
-                    "drinks_touch/resources/images/git.svg",
-                    color=color,
+                    "drinks_touch/resources/images/settings.svg",
+                    color=config.Color.PRIMARY,
                     height=36,
                 ),
-                color=color,
-                on_click=(
-                    (lambda: ScreenManager.instance.set_active(GitMainScreen()))
-                    if config.GIT_REPO_AVAILABLE
-                    else None
+                color=config.Color.PRIMARY,
+                on_click=lambda: ScreenManager.instance.set_active(
+                    SettingsMainScreen()
                 ),
-            ),
-            Button(
-                on_click=lambda: self.goto(TasksScreen()),
-                inner=RefreshIcon(),
             ),
         ]
 

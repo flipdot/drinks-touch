@@ -6,7 +6,7 @@ from pygit2.enums import BranchType
 import config
 from elements import Label, Button
 from elements.vbox import VBox
-from screens.git.log_screen import GitLogScreen
+from .git_log_screen import GitLogScreen
 from screens.screen import Screen
 
 

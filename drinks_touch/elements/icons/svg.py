@@ -1,6 +1,7 @@
 import functools
 import io
 from datetime import datetime
+from pathlib import Path
 from random import random
 
 import pygame
@@ -38,7 +39,8 @@ class SvgIcon(BaseIcon):
         will be calculated to keep the aspect ratio.
         """
         super().__init__(pos=pos, *args, **kwargs)
-        self.path = path
+        self.path = Path(path)
+        self.color = color
         image = SvgIcon.load_image(path, color)
 
         img_width = image.get_width()

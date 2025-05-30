@@ -1,20 +1,19 @@
-import functools
 import subprocess
 
 from pygame.mixer import Sound
 
 import config
-from elements import Button, SvgIcon
+from elements import Button, SvgIcon, Label
 from elements.hbox import HBox
 from elements.vbox import VBox
-from screens.git.branch_screen import GitBranchScreen
-from screens.git.log_screen import GitLogScreen
+from screens.settings.git_branch_screen import GitBranchScreen
+from screens.settings.git_log_screen import GitLogScreen
 from screens.screen import Screen
 from screens.tasks_screen import TasksScreen
 from tasks import GitFetchTask, UpdateAndRestartTask
 
 
-class GitMainScreen(Screen):
+class SettingsMainScreen(Screen):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.soundcheck = False
@@ -22,24 +21,29 @@ class GitMainScreen(Screen):
         self.sound = Sound("drinks_touch/resources/sounds/smb_pipe.wav")
 
         self.soundcheck_button = Button(
-            text="Soundcheck",
             on_click=self.toggle_soundcheck,
-            size=25,
+            inner=HBox(
+                [
+                    SvgIcon(
+                        "drinks_touch/resources/images/volume-2.svg",
+                        height=30,
+                        color=config.Color.PRIMARY,
+                    ),
+                    Label(text="Soundcheck", size=25),
+                ]
+            ),
         )
 
         self.objects = [
-            SvgIcon(
-                "drinks_touch/resources/images/git-full.svg",
-                pos=(10, 20),
-                color=config.Color.PRIMARY,
-                height=36,
+            Label(
+                text="Einstellungen",
+                pos=(5, 5),
             ),
             VBox(
                 [
                     Button(
                         text="Update & Restart",
-                        on_click=functools.partial(
-                            self.goto,
+                        on_click=lambda: self.go_if_git(
                             TasksScreen(
                                 tasks=[UpdateAndRestartTask()],
                             ),
@@ -50,23 +54,19 @@ class GitMainScreen(Screen):
                         [
                             Button(
                                 text="Downgrade",
-                                on_click=functools.partial(
-                                    self.goto,
-                                    GitLogScreen(branch="master"),
+                                on_click=lambda: self.go_if_git(
+                                    GitLogScreen(branch="master")
                                 ),
                                 size=25,
                             ),
                             Button(
                                 text="Branches",
-                                on_click=functools.partial(
-                                    self.goto, GitBranchScreen()
-                                ),
+                                on_click=lambda: self.go_if_git(GitBranchScreen()),
                                 size=25,
                             ),
                             Button(
                                 text="Fetch",
-                                on_click=functools.partial(
-                                    self.goto,
+                                on_click=lambda: self.go_if_git(
                                     TasksScreen(
                                         tasks=[GitFetchTask()],
                                         box_height=600,
@@ -78,18 +78,46 @@ class GitMainScreen(Screen):
                         gap=15,
                     ),
                     self.soundcheck_button,
+                    Button(
+                        on_click=lambda: self.goto(TasksScreen()),
+                        inner=HBox(
+                            [
+                                SvgIcon(
+                                    "drinks_touch/resources/images/refresh-cw.svg",
+                                    height=30,
+                                    color=config.Color.PRIMARY,
+                                ),
+                                Label(text="Neu initialisieren", size=25),
+                            ]
+                        ),
+                    ),
                 ],
                 pos=(5, 300),
                 gap=15,
             ),
         ]
 
+    def go_if_git(self, screen: Screen):
+        if config.GIT_REPO_AVAILABLE:
+            self.goto(screen)
+        else:
+            self.alert("Nur verfügbar, wenn git Repo vorhanden")
+
     def toggle_soundcheck(self):
         self.soundcheck = not self.soundcheck
+        img_dir_path = self.soundcheck_button.inner[0].path.parent
+        height = self.soundcheck_button.inner[0].height
+        color = self.soundcheck_button.inner[0].color
         if self.soundcheck:
-            self.soundcheck_button.text = "Soundcheck aus"
+            self.soundcheck_button.inner[0] = SvgIcon(
+                img_dir_path / "volume-x.svg", height=height, color=color
+            )
+            self.soundcheck_button.inner[1].text = "Soundcheck aus"
         else:
-            self.soundcheck_button.text = "Soundcheck"
+            self.soundcheck_button.inner[0] = SvgIcon(
+                img_dir_path / "volume-2.svg", height=height, color=color
+            )
+            self.soundcheck_button.inner[1].text = "Soundcheck"
 
     def render(self, dt):
         self.clock += dt
