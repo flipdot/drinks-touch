@@ -94,7 +94,7 @@ def handle_transferred(charge, charge_amount, charge_date, got, session, uid):
         amount=charge_amount,
     )
     session.add(transaktion)
-    session.commit()
+    session.flush()
     ev = RechargeEvent(
         uid, helper_user, charge_amount, charge_date, tx_id=transaktion.id
     )

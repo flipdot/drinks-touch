@@ -132,7 +132,7 @@ class MakeTransferScreen(Screen):
         )
         session.add(positive_charge)
         session.add(negative_charge)
-        session.commit()
+        session.flush()
         positive_charge_event = RechargeEvent(
             self.to_account.ldap_id,
             self.account.name,

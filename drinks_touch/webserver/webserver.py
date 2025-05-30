@@ -70,7 +70,7 @@ def recharge_doit():
         amount=Decimal(amount),
     )
     session.add(transaktion)
-    session.commit()
+    session.flush()
     ev = RechargeEvent(account.ldap_id, "Web UI", amount, tx_id=transaktion.id)
 
     session.add(ev)

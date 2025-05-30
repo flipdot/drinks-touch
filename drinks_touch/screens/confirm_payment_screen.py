@@ -94,7 +94,7 @@ class ConfirmPaymentScreen(Screen):
             amount=-1,  # "Alles 1 Euro" policy
         )
         session.add(transaction)
-        session.commit()
+        session.flush()
         ev = ScanEvent(
             self.drink["ean"],
             self.account.ldap_id,
