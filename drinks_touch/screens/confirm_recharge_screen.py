@@ -1,5 +1,5 @@
 import config
-from database.models import RechargeEvent
+from database.models import RechargeEvent, Tx
 from database.storage import get_session
 from elements import Label, Button
 from elements.hbox import HBox
@@ -67,7 +67,16 @@ class ConfirmRechargeScreen(Screen):
 
     def save_payment(self):
         session = get_session()
-        ev = RechargeEvent(self.account.ldap_id, "DISPLAY", self.amount)
+        transaktion = Tx(
+            payment_reference="Aufladung via Display",
+            account_id=self.account.id,
+            amount=self.amount,
+        )
+        session.add(transaktion)
+        session.commit()
+        ev = RechargeEvent(
+            self.account.ldap_id, "DISPLAY", self.amount, tx_id=transaktion.id
+        )
         session.add(ev)
         session.commit()
 

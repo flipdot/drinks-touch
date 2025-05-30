@@ -31,7 +31,7 @@ def get_by_ean(ean):
         _drink_cache[ean] = drink
     else:
         drink = {
-            "name": "Unbekannt (" + ean + ")",
+            "name": "Unbekannt",
             "size": 0,
             "tags": ["unknown"],
             "ean": ean,

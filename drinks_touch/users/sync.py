@@ -8,6 +8,7 @@ from decimal import Decimal
 from requests.auth import HTTPBasicAuth
 
 import config
+from database.models import Tx
 from database.models.account import Account
 from database.models.recharge_event import RechargeEvent
 from database.storage import get_session, Session
@@ -85,7 +86,18 @@ def handle_transferred(charge, charge_amount, charge_date, got, session, uid):
     logger.info(
         "User %s transferred %s on %s: %s", uid, charge_amount, charge_date, charge
     )
-    ev = RechargeEvent(uid, helper_user, charge_amount, charge_date)
+    account = Account.query.filter(Account.ldap_id == uid).one()
+    transaktion = Tx(
+        created_at=charge_date,
+        payment_reference="Aufladung via SEPA",
+        account_id=account.id,
+        amount=charge_amount,
+    )
+    session.add(transaktion)
+    session.commit()
+    ev = RechargeEvent(
+        uid, helper_user, charge_amount, charge_date, tx_id=transaktion.id
+    )
     got.append(ev)
     session.add(ev)
     session.commit()
