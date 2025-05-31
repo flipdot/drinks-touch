@@ -16,6 +16,8 @@ class MigrateTxTask(BaseTask):
         self.logger.info("Selecting non-migrated scanevents")
         scanevents = ScanEvent.query.filter(
             ScanEvent.tx_id.is_(None),
+            ScanEvent.user_id != "0",
+            ~ScanEvent.user_id.startswith("geld-"),
         ).all()
 
         self.logger.info("Found {} scanevents".format(len(scanevents)))
@@ -57,6 +59,7 @@ class MigrateTxTask(BaseTask):
         self.logger.info("Selecting non-migrated rechargeevents")
         rechargeevents = RechargeEvent.query.filter(
             RechargeEvent.tx_id.is_(None),
+            ~RechargeEvent.user_id.startswith("geld-"),
         ).all()
         self.logger.info("Found {} rechargeevents".format(len(rechargeevents)))
         for i, rechargeevent in enumerate(rechargeevents):
