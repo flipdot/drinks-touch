@@ -9,6 +9,7 @@ from screens.settings.git_log_screen import GitLogScreen
 from screens.screen import Screen
 from screens.tasks_screen import TasksScreen
 from tasks import GitFetchTask, UpdateAndRestartTask
+from tasks.migrate_tx import MigrateTxTask
 
 
 class SettingsMainScreen(Screen):
@@ -24,10 +25,10 @@ class SettingsMainScreen(Screen):
                 [
                     SvgIcon(
                         "drinks_touch/resources/images/volume-x.svg",
-                        height=30,
+                        height=40,
                         color=config.Color.PRIMARY,
                     ),
-                    Label(text="Soundcheck", size=25),
+                    Label(text="Soundcheck"),
                 ]
             ),
         )
@@ -82,12 +83,18 @@ class SettingsMainScreen(Screen):
                             [
                                 SvgIcon(
                                     "drinks_touch/resources/images/refresh-cw.svg",
-                                    height=30,
+                                    height=40,
                                     color=config.Color.PRIMARY,
                                 ),
-                                Label(text="Neu initialisieren", size=25),
+                                Label(text="Neu initialisieren"),
                             ]
                         ),
+                    ),
+                    Button(
+                        on_click=lambda: self.goto(
+                            TasksScreen(tasks=[MigrateTxTask()])
+                        ),
+                        text="Migriere Transaktionen",
                     ),
                 ],
                 pos=(5, 300),

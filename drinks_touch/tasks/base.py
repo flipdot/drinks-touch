@@ -21,7 +21,7 @@ class LogHandler(logging.Handler):
 
 
 class BaseTask:
-    ON_STARTUP = True
+    ON_STARTUP = False
 
     def __init__(self):
         self.progress_bar: ProgressBar | None = None

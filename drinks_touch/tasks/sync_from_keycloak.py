@@ -9,6 +9,7 @@ from tasks.base import BaseTask
 
 class SyncFromKeycloakTask(BaseTask):
     LABEL = "Kopiere Nutzer von Keycloak zur Datenbank"
+    ON_STARTUP = True
 
     def run(self):
         self.progress = 0

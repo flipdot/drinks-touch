@@ -6,9 +6,10 @@ from tasks.base import BaseTask
 
 class DownloadCalendarTask(BaseTask):
     LABEL = "Lade Kalender herunter"
+    ON_STARTUP = True
 
     def run(self):
-        self.logger.info("Downloaded fd event calendar")
+        self.logger.info("Downloading fd event calendar")
 
         response = requests.get(config.ICAL_URL)
         response.raise_for_status()
