@@ -56,10 +56,10 @@ class MigrateTxTask(BaseTask):
             session.flush()
             self.logger.info("Transaction created")
             self.logger.info("Linking scanevent to transaction")
-            scanevent.tx_id = tx.id
-            session.commit()
-            self.logger.info(f"Scanevent #{scanevent.id} linked to transaction")
             self.logger.info("-------------------------------------")
+            scanevent.tx_id = tx.id
+        self.logger.info("Committing changes to the database")
+        session.commit()
 
     def _migrate_rechargeevents(self):
         session = get_session()
@@ -123,7 +123,7 @@ class MigrateTxTask(BaseTask):
             session.add(tx)
             session.flush()
             rechargeevent.tx_id = tx.id
-            session.commit()
+        session.commit()
 
     def _check_dangling_txs(self):
         """
