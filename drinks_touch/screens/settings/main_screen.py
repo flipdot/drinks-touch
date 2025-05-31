@@ -25,7 +25,7 @@ class SettingsMainScreen(Screen):
             inner=HBox(
                 [
                     SvgIcon(
-                        "drinks_touch/resources/images/volume-2.svg",
+                        "drinks_touch/resources/images/volume-x.svg",
                         height=30,
                         color=config.Color.PRIMARY,
                     ),
@@ -110,12 +110,12 @@ class SettingsMainScreen(Screen):
         color = self.soundcheck_button.inner[0].color
         if self.soundcheck:
             self.soundcheck_button.inner[0] = SvgIcon(
-                img_dir_path / "volume-x.svg", height=height, color=color
+                img_dir_path / "volume-2.svg", height=height, color=color
             )
             self.soundcheck_button.inner[1].text = "Soundcheck aus"
         else:
             self.soundcheck_button.inner[0] = SvgIcon(
-                img_dir_path / "volume-2.svg", height=height, color=color
+                img_dir_path / "volume-x.svg", height=height, color=color
             )
             self.soundcheck_button.inner[1].text = "Soundcheck"
 
