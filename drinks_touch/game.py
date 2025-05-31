@@ -156,6 +156,7 @@ def main(argv):
         os.system("rsync -a sounds/ pi@pixelfun:sounds/ &")
 
     pygame.key.set_repeat(500, 50)
+    pygame.mixer.pre_init(48000, buffer=2048)
     pygame.mixer.init()
 
     t = 0
