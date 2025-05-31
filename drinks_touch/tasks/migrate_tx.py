@@ -14,27 +14,24 @@ class MigrateTxTask(BaseTask):
     def _migrate_scanevents(self):
         session = get_session()
         self.logger.info("Selecting non-migrated scanevents")
-        scanevents = ScanEvent.query.filter(
-            ScanEvent.tx_id.is_(None),
-            ScanEvent.user_id != "0",
-            ~ScanEvent.user_id.startswith("geld-"),
-        ).all()
 
-        self.logger.info("Found {} scanevents".format(len(scanevents)))
-        for i, scanevent in enumerate(scanevents):
+        scanevents_with_accounts = (
+            session.query(ScanEvent, Account)
+            .join(Account, ScanEvent.user_id == Account.ldap_id)
+            .filter(
+                ScanEvent.tx_id.is_(None),
+                ScanEvent.user_id != "0",
+                ~ScanEvent.user_id.startswith("geld-"),
+            )
+            .all()
+        )
+
+        total_events = len(scanevents_with_accounts)
+        self.logger.info("Found {} scanevents".format(total_events))
+        for i, (scanevent, account) in enumerate(scanevents_with_accounts):
             if self.sig_killed:
                 break
-            self.progress = (i + 1) / len(scanevents)
-
-            account = Account.query.filter(
-                Account.ldap_id == scanevent.user_id,
-            ).one_or_none()
-
-            if not account:
-                self.logger.warning(
-                    f"Account {scanevent.user_id} not found, skip scanevent #{scanevent.id}"
-                )
-                continue
+            self.progress = (i + 1) / total_events
 
             drink = Drink.query.filter(
                 Drink.ean == scanevent.barcode,
@@ -57,29 +54,25 @@ class MigrateTxTask(BaseTask):
     def _migrate_rechargeevents(self):
         session = get_session()
         self.logger.info("Selecting non-migrated rechargeevents")
-        rechargeevents = RechargeEvent.query.filter(
-            RechargeEvent.tx_id.is_(None),
-            ~RechargeEvent.user_id.startswith("geld-"),
-        ).all()
-        self.logger.info("Found {} rechargeevents".format(len(rechargeevents)))
-        for i, rechargeevent in enumerate(rechargeevents):
+        rechargevents_with_accounts = (
+            session.query(RechargeEvent, Account)
+            .join(Account, RechargeEvent.user_id == Account.ldap_id)
+            .filter(
+                RechargeEvent.tx_id.is_(None),
+                ~RechargeEvent.user_id.startswith("geld-"),
+            )
+            .all()
+        )
+        total_events = len(rechargevents_with_accounts)
+        self.logger.info("Found {} rechargeevents".format(total_events))
+        for i, (rechargeevent, account) in enumerate(rechargevents_with_accounts):
             if self.sig_killed:
                 break
-            self.progress = (i + 1) / len(rechargeevents)
+            self.progress = (i + 1) / total_events
 
             if not rechargeevent.user_id:
                 self.logger.warning(
                     f"RechargeEvent #{rechargeevent.id} has no user_id, skipping"
-                )
-                continue
-
-            account = Account.query.filter(
-                Account.ldap_id == rechargeevent.user_id,
-            ).one_or_none()
-
-            if not account:
-                self.logger.warning(
-                    f"Account {rechargeevent.user_id} not found, skip rechargeevent #{rechargeevent.id}"
                 )
                 continue
 
