@@ -32,13 +32,19 @@ class MigrateTxTask(BaseTask):
             if self.sig_killed:
                 break
             self.progress = (i + 1) / total_events
+            self.logger.info(
+                f"Processing scanevent #{scanevent.id} for user {account.name}"
+            )
 
+            self.logger.info("Selecting drink")
             drink = Drink.query.filter(
                 Drink.ean == scanevent.barcode,
             ).one_or_none()
 
             name = drink.name if drink else "Unbekannt"
+            self.logger.info(f"Found drink: {name} ({scanevent.barcode})")
 
+            self.logger.info("Writing transaction")
             tx = Tx(
                 created_at=scanevent.timestamp,
                 payment_reference=f'Kauf "{name}"',
@@ -48,8 +54,12 @@ class MigrateTxTask(BaseTask):
             )
             session.add(tx)
             session.flush()
+            self.logger.info("Transaction created")
+            self.logger.info("Linking scanevent to transaction")
             scanevent.tx_id = tx.id
             session.commit()
+            self.logger.info(f"Scanevent #{scanevent.id} linked to transaction")
+            self.logger.info("-------------------------------------")
 
     def _migrate_rechargeevents(self):
         session = get_session()
