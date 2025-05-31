@@ -34,7 +34,7 @@ class DateTimeEncoder(json.JSONEncoder):
 
 @app.route("/favicon.png")
 def favicon():
-    return send_file("../img/favicon.png", mimetype="image/png")
+    return send_file("../resources/images/favicon.png", mimetype="image/png")
 
 
 @app.route("/")
