@@ -2,11 +2,12 @@ import logging
 import math
 from datetime import datetime
 
-from sqlalchemy import Column, Integer, String, UUID, DateTime, Boolean
+from sqlalchemy import Column, Integer, String, UUID, DateTime, Boolean, func
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.sql import text
 
-from database.storage import Base, Session
+
+from database.storage import Base, Session, get_session
 from users.users import Users
 
 
@@ -122,8 +123,15 @@ class Account(Base):
     def _get_tx_balance(self):
         from database.models import Tx
 
-        txs = Tx.query.filter(Tx.account_id == self.id).with_entities(Tx.amount).all()
-        return sum(tx.amount for tx in txs)
+        return (
+            get_session()
+            .query(func.sum(Tx.amount))
+            .filter(
+                Tx.account_id == self.id,
+            )
+            .scalar()
+            or 0
+        )
 
     @property
     def balance(self):
