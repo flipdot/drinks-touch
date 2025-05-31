@@ -45,6 +45,8 @@ logging.basicConfig(
     format="[%(asctime)s][%(levelname)s][%(filename)s:%(lineno)d] %(name)s: %(message)s",
 )
 logging.Formatter.converter = time.gmtime
+# Uncomment to see which SQL queries are executed
+# logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
 
 # ldap log level
 set_library_log_activation_level(logging.CRITICAL)
