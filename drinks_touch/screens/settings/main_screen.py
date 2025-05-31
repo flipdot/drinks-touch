@@ -1,5 +1,3 @@
-import subprocess
-
 from pygame.mixer import Sound
 
 import config
@@ -125,11 +123,3 @@ class SettingsMainScreen(Screen):
             self.sound.play()
             self.clock = 0
         return super().render(dt)
-
-    def update_and_restart(self):
-        # git checkout master
-        # git merge --ff-only origin/master
-        subprocess.run(["git", "checkout", "master"], cwd=config.REPO_PATH)
-        subprocess.run(
-            ["git", "merge", "--ff-only", "origin/master"], cwd=config.REPO_PATH
-        )

@@ -1,3 +1,4 @@
+import logging
 import math
 from datetime import datetime
 
@@ -7,6 +8,9 @@ from sqlalchemy.sql import text
 
 from database.storage import Base, Session
 from users.users import Users
+
+
+logger = logging.getLogger(__name__)
 
 
 class Account(Base):
@@ -84,14 +88,13 @@ class Account(Base):
 
             Session().add(account)
 
-    @property
-    def balance(self):
+    def _get_legacy_balance(self):
         sql = text(
             """
-                SELECT user_id, count(*) AS amount
-                FROM scanevent
-                WHERE user_id = :user_id
-                GROUP BY user_id
+            SELECT user_id, count(*) AS amount
+            FROM scanevent
+            WHERE user_id = :user_id
+            GROUP BY user_id
             """
         )
         row = Session().connection().execute(sql, {"user_id": self.ldap_id}).fetchone()
@@ -102,10 +105,10 @@ class Account(Base):
 
         sql = text(
             """
-                SELECT user_id, sum(amount) AS amount
-                FROM rechargeevent
-                WHERE user_id = :user_id
-                GROUP BY user_id
+            SELECT user_id, sum(amount) AS amount
+            FROM rechargeevent
+            WHERE user_id = :user_id
+            GROUP BY user_id
             """
         )
         row = Session().connection().execute(sql, {"user_id": self.ldap_id}).fetchone()
@@ -115,6 +118,23 @@ class Account(Base):
             credit = row.amount
 
         return credit - cost
+
+    def _get_tx_balance(self):
+        from database.models import Tx
+
+        txs = Tx.query.filter(Tx.account_id == self.id).with_entities(Tx.amount).all()
+        return sum(tx.amount for tx in txs)
+
+    @property
+    def balance(self):
+        legacy_balance = self._get_legacy_balance()
+        tx_balance = self._get_tx_balance()
+        if legacy_balance != tx_balance:
+            logger.error(
+                f"Balance mismatch for account {self.id}: "
+                f"Legacy balance: {legacy_balance}, Tx balance: {tx_balance}"
+            )
+        return legacy_balance
 
     def get_recharges(self):
         from database.models import RechargeEvent

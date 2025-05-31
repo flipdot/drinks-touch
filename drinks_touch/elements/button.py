@@ -20,7 +20,7 @@ class Button(BaseElm):
         on_click=None,
         force_width=None,
         force_height=None,
-        inner: BaseElm = None,
+        inner: BaseElm | None = None,
         pos=(0, 0),
         padding: (
             int | tuple[int, int] | tuple[int, int, int] | tuple[int, int, int, int]
