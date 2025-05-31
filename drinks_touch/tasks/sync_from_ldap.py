@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 
 class SyncFromLDAPTask(BaseTask):
     LABEL = "Kopiere Nutzer von LDAP zur Datenbank"
+    ON_STARTUP = True
 
     def run(self):
         def set_progress(progress):

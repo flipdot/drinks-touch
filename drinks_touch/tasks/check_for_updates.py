@@ -5,6 +5,7 @@ import requests
 
 class CheckForUpdatesTask(BaseTask):
     LABEL = "Suche nach drinks-touch updates"
+    ON_STARTUP = True
     newest_version_sha_short = ""
     newest_version_lock = threading.Lock()
 

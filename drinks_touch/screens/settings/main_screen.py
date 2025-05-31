@@ -1,5 +1,3 @@
-import subprocess
-
 from pygame.mixer import Sound
 
 import config
@@ -11,6 +9,7 @@ from screens.settings.git_log_screen import GitLogScreen
 from screens.screen import Screen
 from screens.tasks_screen import TasksScreen
 from tasks import GitFetchTask, UpdateAndRestartTask
+from tasks.migrate_tx import MigrateTxTask
 
 
 class SettingsMainScreen(Screen):
@@ -25,11 +24,11 @@ class SettingsMainScreen(Screen):
             inner=HBox(
                 [
                     SvgIcon(
-                        "drinks_touch/resources/images/volume-2.svg",
-                        height=30,
+                        "drinks_touch/resources/images/volume-x.svg",
+                        height=40,
                         color=config.Color.PRIMARY,
                     ),
-                    Label(text="Soundcheck", size=25),
+                    Label(text="Soundcheck"),
                 ]
             ),
         )
@@ -84,12 +83,18 @@ class SettingsMainScreen(Screen):
                             [
                                 SvgIcon(
                                     "drinks_touch/resources/images/refresh-cw.svg",
-                                    height=30,
+                                    height=40,
                                     color=config.Color.PRIMARY,
                                 ),
-                                Label(text="Neu initialisieren", size=25),
+                                Label(text="Neu initialisieren"),
                             ]
                         ),
+                    ),
+                    Button(
+                        on_click=lambda: self.goto(
+                            TasksScreen(tasks=[MigrateTxTask()])
+                        ),
+                        text="Migriere Transaktionen",
                     ),
                 ],
                 pos=(5, 300),
@@ -110,12 +115,12 @@ class SettingsMainScreen(Screen):
         color = self.soundcheck_button.inner[0].color
         if self.soundcheck:
             self.soundcheck_button.inner[0] = SvgIcon(
-                img_dir_path / "volume-x.svg", height=height, color=color
+                img_dir_path / "volume-2.svg", height=height, color=color
             )
             self.soundcheck_button.inner[1].text = "Soundcheck aus"
         else:
             self.soundcheck_button.inner[0] = SvgIcon(
-                img_dir_path / "volume-2.svg", height=height, color=color
+                img_dir_path / "volume-x.svg", height=height, color=color
             )
             self.soundcheck_button.inner[1].text = "Soundcheck"
 
@@ -125,11 +130,3 @@ class SettingsMainScreen(Screen):
             self.sound.play()
             self.clock = 0
         return super().render(dt)
-
-    def update_and_restart(self):
-        # git checkout master
-        # git merge --ff-only origin/master
-        subprocess.run(["git", "checkout", "master"], cwd=config.REPO_PATH)
-        subprocess.run(
-            ["git", "merge", "--ff-only", "origin/master"], cwd=config.REPO_PATH
-        )

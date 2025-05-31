@@ -15,6 +15,7 @@ logger = logging.getLogger(__name__)
 
 class InitializeBarcodeScannerTask(BaseTask):
     LABEL = "Initialisiere Barcode-Scanner"
+    ON_STARTUP = True
     thread = None
 
     def run(self):
