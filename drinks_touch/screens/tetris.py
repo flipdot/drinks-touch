@@ -538,16 +538,14 @@ class TetrisScreen(Screen):
 
     def load_level(self) -> int:
         with Session() as session:
-            game = session.scalars(select(TetrisGame)).one()
-        if game.level:
-            return game.level
-        return 0
+            level = session.scalars(select(TetrisGame.level)).one()
+        return level or 0
 
     def load_next_blocks(self) -> list[BlockType]:
         with Session() as session:
-            game = session.scalars(select(TetrisGame)).one()
-        if game.next_blocks:
-            return [BlockType(b) for b in game.next_blocks]
+            next_blocks = session.scalars(select(TetrisGame.next_blocks)).one()
+        if next_blocks:
+            return [BlockType(b) for b in next_blocks]
         return self.generate_block_bag()
 
     def generate_block_bag(self) -> list[BlockType]:
@@ -557,10 +555,10 @@ class TetrisScreen(Screen):
 
     def load_board(self) -> list[list[Cell]]:
         with Session() as session:
-            game = session.scalars(select(TetrisGame)).one()
-        if game.board:
+            board = session.scalars(select(TetrisGame.board)).one()
+        if board:
             # convert json to Cell with CellType enum
-            return [[Cell(CellType(c), p) for c, p in row] for row in game.board]
+            return [[Cell(CellType(c), p) for c, p in row] for row in board]
         return TetrisScreen.generate_empty_board()
 
     @classmethod
@@ -637,23 +635,23 @@ class TetrisScreen(Screen):
             return session.scalars(select(TetrisGame.reserve_block)).one()
 
     def load_scores(self):
-        query = select(TetrisPlayer, Account).join(Account)
-
-        scores_query = query.where(TetrisPlayer.blocks > 0).order_by(
-            TetrisPlayer.points.desc(), TetrisPlayer.blocks.desc()
+        scores_query = (
+            select(Account, TetrisPlayer.blocks, TetrisPlayer.points)
+            .join(Account)
+            .where(TetrisPlayer.blocks > 0)
+            .order_by(TetrisPlayer.points.desc(), TetrisPlayer.blocks.desc())
         )
-        all_time_scores_query = query.where(TetrisPlayer.alltime_blocks > 0).order_by(
-            TetrisPlayer.alltime_points.desc(), TetrisPlayer.alltime_blocks.desc()
+        all_time_scores_query = (
+            select(Account, TetrisPlayer.alltime_blocks, TetrisPlayer.alltime_points)
+            .join(Account)
+            .where(TetrisPlayer.alltime_blocks > 0)
+            .order_by(
+                TetrisPlayer.alltime_points.desc(), TetrisPlayer.alltime_blocks.desc()
+            )
         )
         with Session() as session:
-            self.scores = [
-                (account, score.blocks, score.points)
-                for score, account in session.execute(scores_query).all()
-            ]
-            self.all_time_scores = [
-                (account, score.alltime_blocks, score.alltime_points)
-                for score, account in session.execute(all_time_scores_query)
-            ]
+            self.scores = session.execute(scores_query).all()
+            self.all_time_scores = session.execute(all_time_scores_query).all()
             game = session.scalar(select(TetrisGame))
             self.score = game.score
             self.highscore = game.highscore
