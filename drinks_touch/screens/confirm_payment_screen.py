@@ -4,7 +4,7 @@ import pygame
 
 import config
 from database.models import ScanEvent, Tx
-from database.storage import get_session
+from database.storage import Session
 from drinks.drinks_manager import DrinksManager
 from elements import Label, Button
 from elements.base_elm import BaseElm
@@ -86,23 +86,24 @@ class ConfirmPaymentScreen(Screen):
         DrinksManager.instance.set_selected_drink(None)
 
     def save_drink(self):
-        session = get_session()
-        transaction = Tx(
-            payment_reference=f'Kauf "{self.drink["name"]}"',
-            ean=self.drink["ean"],
-            account_id=self.account.id,
-            amount=-1,  # "Alles 1 Euro" policy
-        )
-        session.add(transaction)
-        session.flush()
-        ev = ScanEvent(
-            self.drink["ean"],
-            self.account.ldap_id,
-            datetime.datetime.now(),
-            tx_id=transaction.id,
-        )
-        session.add(ev)
-        session.commit()
+        with Session() as session:
+            with session.begin():
+                transaction = Tx(
+                    payment_reference=f'Kauf "{self.drink["name"]}"',
+                    ean=self.drink["ean"],
+                    account_id=self.account.id,
+                    amount=-1,  # "Alles 1 Euro" policy
+                )
+                session.add(transaction)
+                session.flush()
+                ev = ScanEvent(
+                    self.drink["ean"],
+                    self.account.ldap_id,
+                    datetime.datetime.now(),
+                    tx_id=transaction.id,
+                )
+                session.add(ev)
+                session.commit()
         DrinksManager.instance.set_selected_drink(None)
         # Legacy: Delete a temp ldap user. They were only used for
         # Gutscheincodes

@@ -119,35 +119,36 @@ class MakeTransferScreen(Screen):
         self.sound_coin = Sound("drinks_touch/resources/sounds/smb_coin.wav")
 
     def _transfer_balance(self):
-        session = Session()
-        positive_charge = Tx(
-            payment_reference=f"Übertrag von {self.account.name}",
-            account_id=self.to_account.id,
-            amount=self.amount,
-        )
-        negative_charge = Tx(
-            payment_reference=f"Übertrag an {self.to_account.name}",
-            account_id=self.account.id,
-            amount=-self.amount,
-        )
-        session.add(positive_charge)
-        session.add(negative_charge)
-        session.flush()
-        positive_charge_event = RechargeEvent(
-            self.to_account.ldap_id,
-            self.account.name,
-            self.amount,
-            tx_id=positive_charge.id,
-        )
-        negative_charge_event = RechargeEvent(
-            self.account.ldap_id,
-            self.to_account.name,
-            -self.amount,
-            tx_id=negative_charge.id,
-        )
-        session.add(negative_charge_event)
-        session.add(positive_charge_event)
-        session.commit()
+        with Session() as session:
+            with session.begin():
+                positive_charge = Tx(
+                    payment_reference=f"Übertrag von {self.account.name}",
+                    account_id=self.to_account.id,
+                    amount=self.amount,
+                )
+                negative_charge = Tx(
+                    payment_reference=f"Übertrag an {self.to_account.name}",
+                    account_id=self.account.id,
+                    amount=-self.amount,
+                )
+                session.add(positive_charge)
+                session.add(negative_charge)
+                session.flush()
+                positive_charge_event = RechargeEvent(
+                    self.to_account.ldap_id,
+                    self.account.name,
+                    self.amount,
+                    tx_id=positive_charge.id,
+                )
+                negative_charge_event = RechargeEvent(
+                    self.account.ldap_id,
+                    self.to_account.name,
+                    -self.amount,
+                    tx_id=negative_charge.id,
+                )
+                session.add(negative_charge_event)
+                session.add(positive_charge_event)
+                session.commit()
 
     def on_start(self, *args, **kwargs):
         self.objects = [

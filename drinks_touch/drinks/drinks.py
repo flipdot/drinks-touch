@@ -1,6 +1,7 @@
-from sqlalchemy.sql import text
+from sqlalchemy import select
 
-from database.storage import get_session
+from database.models import Drink
+from database.storage import Session
 
 _drink_cache = {}
 
@@ -9,32 +10,25 @@ def get_by_ean(ean):
     if ean in _drink_cache:
         return _drink_cache[ean]
 
-    session = get_session()
-    sql = text(
-        """
-        SELECT *
-        FROM drink
-        WHERE ean = :ean
-    """
-    )
-    # stmt = select(Drink).where(Drink.ean == ean)
+    query = select(Drink).where(Drink.ean == ean)
 
-    row = session.connection().execute(sql, {"ean": ean}).fetchone()
+    with Session() as session:
+        drink = session.scalars(query).one_or_none()
 
-    if row:
-        drink = {
-            "name": row.name,
-            "size": row.size,
+    if drink:
+        legacy_drink = {
+            "name": drink.name,
+            "size": drink.size,
             "tags": ["unknown"],
-            "ean": row.ean,
+            "ean": drink.ean,
         }
-        _drink_cache[ean] = drink
+        _drink_cache[ean] = legacy_drink
     else:
-        drink = {
+        legacy_drink = {
             "name": "Unbekannt",
             "size": 0,
             "tags": ["unknown"],
             "ean": ean,
         }
 
-    return drink
+    return legacy_drink

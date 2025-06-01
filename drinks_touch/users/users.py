@@ -6,7 +6,7 @@ import logging
 import traceback
 
 import config
-from database.storage import get_session, Session
+from database.storage import Session
 
 logger = logging.getLogger(__name__)
 
@@ -136,17 +136,6 @@ class Users(object):
         if ean in by_card:
             return by_card[ean]
         return None
-
-    @staticmethod
-    def delete_if_nomoney(user, session=None):
-        if session is None:
-            session = get_session()
-        if not user["path"].endswith(",ou=temp_members,dc=flipdot,dc=org"):
-            return
-        balance = Users.get_balance(user["id"], session=session)
-        if balance <= 0:
-            print("deleting user " + str(user["id"]) + " because they are broke")
-            Users.delete(user)
 
     @staticmethod
     def delete(user):

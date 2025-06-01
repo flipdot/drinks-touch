@@ -6,6 +6,7 @@ import config
 from env import is_pi
 
 engine = create_engine(config.POSTGRES_CONNECTION_STRING)
+# Session management: https://chatgpt.com/share/683bb663-8f28-800e-b668-a3c6b9b75e8b
 Session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
 Base = declarative_base(
     metadata=MetaData(
@@ -18,15 +19,9 @@ Base = declarative_base(
         }
     )
 )
-Base.query = Session.query_property()
 
 if not is_pi():
     import logging
 
     logger = logging.getLogger("sqlalchemy.engine")
     logger.setLevel(getattr(logging, config.LOGLEVEL))
-
-
-def get_session():
-    # Session.remove()
-    return Session

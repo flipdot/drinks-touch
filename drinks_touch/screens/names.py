@@ -1,7 +1,10 @@
 import functools
 import math
 
+from sqlalchemy import select
+
 from database.models import Account
+from database.storage import Session
 from elements.button import Button
 from elements.label import Label
 from screens.profile import ProfileScreen
@@ -25,12 +28,16 @@ class NamesScreen(Screen):
         )
 
         # users = list(Users.get_all(filters=["uid=" + self.char + "*"]))
-        accounts = (
-            Account.query.filter(Account.name.ilike(self.char + "%"))
-            .filter(Account.enabled)
+        query = (
+            select(Account)
+            .where(
+                Account.name.ilike(self.char + "%"),
+                Account.enabled.is_(True),
+            )
             .order_by(Account.name)
-            .all()
         )
+        with Session() as session:
+            accounts = session.scalars(query).all()
 
         btns_y = 7
         num_cols = int(math.ceil(len(accounts) / float(btns_y)))
@@ -54,6 +61,9 @@ class NamesScreen(Screen):
     def on_barcode(self, barcode):
         if not barcode:
             return
-        account = Account.query.filter(Account.id_card == barcode).first()
+        with Session() as session:
+            account = session.scalars(
+                select(Account).where(Account.id_card == barcode)
+            ).one_or_none()
         if account:
             self.goto(ProfileScreen(account))

@@ -1,11 +1,12 @@
 import functools
 
+from sqlalchemy import select
 from sqlalchemy.sql import text
 
 import config
 from config import Font
 from database.models import Account
-from database.storage import get_session
+from database.storage import Session
 from drinks.drinks import get_by_ean
 from drinks.drinks_manager import DrinksManager
 from elements.button import Button
@@ -226,11 +227,13 @@ class ProfileScreen(Screen):
             return
         self.processing.text = f"Gescannt: {barcode}"
         self.processing.visible = True
-        account = Account.query.filter(Account.id_card == barcode).first()
-        if account:
-            ScreenManager.instance.set_active(ProfileScreen(account))
-            self.processing.visible = False
-            return
+        query = select(Account).where(Account.id_card == barcode)
+        with Session() as session:
+            account = session.scalars(query).one_or_none()
+            if account:
+                ScreenManager.instance.set_active(ProfileScreen(account))
+                self.processing.visible = False
+                return
         drink = get_by_ean(barcode)
         DrinksManager.instance.set_selected_drink(drink)
         if drink:
@@ -249,7 +252,6 @@ class ProfileScreen(Screen):
         self.objects.extend(self.elements_drinks)
 
     def get_stats(self, limit=None):
-        session = get_session()
         sql = text(
             """
             SELECT COUNT(*) as count, barcode as name
@@ -260,10 +262,9 @@ class ProfileScreen(Screen):
             LIMIT :limit
         """
         )
-        result = (
-            session.connection()
-            .execute(sql, {"userid": self.account.ldap_id, "limit": limit})
-            .fetchall()
-        )
+        with Session() as session:
+            result = session.execute(
+                sql, {"userid": self.account.ldap_id, "limit": limit}
+            ).fetchall()
 
         return [{"count": x[0], "name": x[1]} for x in result]

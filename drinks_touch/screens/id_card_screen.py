@@ -2,9 +2,12 @@ import time
 
 import subprocess
 from pystrich.code128 import Code128Encoder
+from sqlalchemy import update
+from sqlalchemy.exc import IntegrityError
 
 from config import Font
 from database.models import Account
+from database.storage import Session
 from drinks.drinks import get_by_ean
 from drinks.drinks_manager import DrinksManager
 from elements.button import Button
@@ -39,14 +42,14 @@ class IDCardScreen(Screen):
 
         self.id_label = Label(
             text=self.account.id_card,
-            pos=(50, 400),
-            size=70,
+            pos=(30, 400),
+            size=30,
             font=Font.SANS_SERIF,
         )
         self.objects.append(self.id_label)
 
-        self.objects.append(Label(text="Scanne deine ID,", pos=(30, 550), size=60))
-        self.objects.append(Label(text="um sie zuzuweisen.", pos=(30, 600), size=60))
+        self.objects.append(Label(text="Scanne deine ID,", pos=(30, 550), size=30))
+        self.objects.append(Label(text="um sie zuzuweisen.", pos=(30, 600), size=30))
 
         self.objects.append(
             Button(
@@ -78,7 +81,27 @@ class IDCardScreen(Screen):
 
     def set_id(self, ean):
         ean = ean.upper() if ean else ean
-        self.id_label.text = self.account.id_card = ean
+        with Session() as session:
+            with session.begin():
+                # I guess I should stop passing around database objects
+                # between screens. We need to update the object so it
+                # updates in the parent screens, but we can't just add the
+                # object to the session and flush it because then it would
+                # be detached for the parent screen.
+                query = (
+                    update(Account)
+                    .where(Account.id == self.account.id)
+                    .values(id_card=ean)
+                )
+                try:
+                    session.execute(query)
+                except IntegrityError:
+                    # If the ID is already taken, we just ignore it.
+                    # The user can try again with a different ID.
+                    self.alert("Bereits vergeben!")
+                    return
+                self.id_label.text = self.account.id_card = ean
+                session.commit()
 
     def reset_id(self):
         self.set_id(None)

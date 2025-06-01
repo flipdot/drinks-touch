@@ -2,7 +2,7 @@ import functools
 import logging
 from decimal import Decimal
 
-from sqlalchemy import func
+from sqlalchemy import func, select
 
 import config
 from database.models import Account
@@ -24,35 +24,36 @@ logger = logging.getLogger(__name__)
 # Still, we want to get fresh results every time the user changes the input.
 @functools.lru_cache(maxsize=1)
 def auto_complete_account_name(text, except_account: str | None = None, limit=10):
-    accounts = (
-        Account.query.filter(Account.name.ilike(f"{text}%"))
-        .filter(Account.enabled)
-        .filter(Account.name != except_account)
+    query = (
+        select(Account.name)
+        .where(Account.name.ilike(f"{text}%"))
+        .where(Account.enabled)
+        .where(Account.name != except_account)
         .order_by(Account.name)
         .limit(limit + 1)
     )
-    res = [account.name for account in accounts]
-    if len(res) == limit + 1:
-        res[-1] = "..."
+    with Session() as session:
+        res = session.execute(query).scalars().all()
+        if len(res) == limit + 1:
+            res[-1] = "..."
 
-    if len(res) >= 1:
-        n_char = len(text) + 1
-        query = (
-            Session()
-            .query(
-                func.upper(func.substr(Account.name, n_char, 1)).label("n_char"),
-                func.count(Account.id),
+        if len(res) >= 1:
+            n_char = len(text) + 1
+            query = (
+                session.query(
+                    func.upper(func.substr(Account.name, n_char, 1)).label("n_char"),
+                    func.count(Account.id),
+                )
+                .filter(Account.name != except_account)
+                .filter(Account.name.ilike(f"{text}%"))
+                .group_by("n_char")
+                .order_by("n_char")
+                .all()
             )
-            .filter(Account.name != except_account)
-            .filter(Account.name.ilike(f"{text}%"))
-            .group_by("n_char")
-            .order_by("n_char")
-            .all()
-        )
-        disabled_characters = "1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-        for char, _ in query:
-            disabled_characters = disabled_characters.replace(char, "")
-        KeyboardOverlay.instance.set_keys_disabled(disabled_characters)
+            disabled_characters = "1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+            for char, _ in query:
+                disabled_characters = disabled_characters.replace(char, "")
+            KeyboardOverlay.instance.set_keys_disabled(disabled_characters)
     return res
 
 
@@ -149,7 +150,9 @@ class TransferBalanceScreen(Screen):
             self.label_error_message.text = "Bitte gib einen Betrag ein."
             return
 
-        account = Account.query.filter(Account.name == account_name).first()
+        query = select(Account).where(Account.name == account_name)
+        with Session() as session:
+            account = session.scalars(query).one()
         if not account:
             self.label_error_message.text = "Account nicht gefunden."
             return

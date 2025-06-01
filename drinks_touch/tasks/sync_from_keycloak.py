@@ -1,5 +1,7 @@
 import json
 
+from sqlalchemy import select
+
 from database.models import AppSettings
 from database.models.account import Account
 from database.storage import Session
@@ -14,20 +16,21 @@ class SyncFromKeycloakTask(BaseTask):
     def run(self):
         self.progress = 0
 
-        with Session.begin():
+        with Session() as session:
             admin = KeycloakAdmin()
             self.logger.info("Starting download…")
             res = admin.get_user_list(stream=True)
 
             total_size = res.headers.get("content-length")
             if total_size is None:
-                last_total_size = AppSettings.query.filter(
-                    AppSettings.key == "last_keycloak_content_length"
-                ).one_or_none()
-                if last_total_size is not None:
-                    total_size = last_total_size.value
-                else:
-                    total_size = 0
+                total_size = (
+                    session.execute(
+                        select(AppSettings.value).filter(
+                            AppSettings.key == "last_keycloak_content_length"
+                        )
+                    ).scalar_one_or_none()
+                    or 0
+                )
 
             total_size = int(total_size)
             if total_size == 0:
@@ -50,13 +53,15 @@ class SyncFromKeycloakTask(BaseTask):
                         self.progress = len(raw_response) / total_size
 
             # insert or update the last content length
-            last_total_size = AppSettings.query.filter(
-                AppSettings.key == "last_keycloak_content_length"
-            ).one_or_none()
+            last_total_size = session.execute(
+                select(AppSettings).filter(
+                    AppSettings.key == "last_keycloak_content_length"
+                )
+            ).scalar_one_or_none()
             if last_total_size is None:
                 last_total_size = AppSettings(key="last_keycloak_content_length")
             last_total_size.value = str(len(raw_response))
-            Session().add(last_total_size)
+            session.add(last_total_size)
 
             users = json.loads(raw_response)
             total_users = len(users)
@@ -103,16 +108,22 @@ class SyncFromKeycloakTask(BaseTask):
         if keycloak_id is None:
             return None
         self.logger.info(f"Looking for keycloak user {keycloak_id}")
-        return Account.query.filter(Account.keycloak_sub == keycloak_id).one_or_none()
+        query = select(Account).where(Account.keycloak_sub == keycloak_id)
+        with Session() as session:
+            return session.scalars(query).one_or_none()
 
     def find_account_by_ldap_entry_dn(self, ldap_entry_dn) -> Account | None:
         if ldap_entry_dn is None:
             return None
         self.logger.info(f"Looking for ldap user {ldap_entry_dn}")
-        return Account.query.filter(Account.ldap_path == ldap_entry_dn).one_or_none()
+        query = select(Account).where(Account.ldap_path == ldap_entry_dn)
+        with Session() as session:
+            return session.scalars(query).one_or_none()
 
     def find_account_by_name(self, name) -> Account | None:
         if name is None:
             return None
         self.logger.info(f"Looking for username {name}")
-        return Account.query.filter(Account.name == name).one_or_none()
+        query = select(Account).where(Account.name == name)
+        with Session() as session:
+            return session.scalars(query).one_or_none()

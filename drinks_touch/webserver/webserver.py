@@ -2,6 +2,9 @@ import json
 import re
 from datetime import datetime
 from decimal import Decimal
+
+from sqlalchemy import select
+
 import config
 
 from flask import Flask, make_response
@@ -12,9 +15,8 @@ from flask_compress import Compress
 
 from database.models import Tx, Account
 from database.models.recharge_event import RechargeEvent
-from database.storage import get_session
+from database.storage import Session
 from env import is_pi
-from stats.stats import scans
 from users.qr import make_sepa_qr
 
 
@@ -40,8 +42,18 @@ def favicon():
 @app.route("/")
 @app.route("/recharge")
 def index():
-    accounts = Account.query.filter(Account.enabled).order_by(Account.name).all()
-    return render_template("index.html", accounts=accounts)
+    with Session() as session:
+        accounts = session.scalars(
+            select(Account).where(Account.enabled).order_by(Account.name)
+        ).all()
+        account_data = [
+            {
+                "id": account.id,
+                "name": account.name,
+            }
+            for account in accounts
+        ]
+    return render_template("index.html", accounts=account_data)
 
 
 @app.route("/stats")
@@ -61,28 +73,25 @@ def recharge_doit():
     if amount == "0":
         return "Ungültiger Betrag!"
 
-    account = Account.query.filter(Account.id == user_id).one()
+    with Session() as session:
+        query = select(Account).where(Account.id == user_id)
+        account = session.scalars(query).one()
+        account_data = {
+            "name": account.name,
+        }
+        transaktion = Tx(
+            payment_reference="Aufladung via Web",
+            account_id=account.id,
+            amount=Decimal(amount),
+        )
+        session.add(transaktion)
+        session.flush()
+        ev = RechargeEvent(account.ldap_id, "Web UI", amount, tx_id=transaktion.id)
 
-    session = get_session()
-    transaktion = Tx(
-        payment_reference="Aufladung via Web",
-        account_id=account.id,
-        amount=Decimal(amount),
-    )
-    session.add(transaktion)
-    session.flush()
-    ev = RechargeEvent(account.ldap_id, "Web UI", amount, tx_id=transaktion.id)
+        session.add(ev)
+        session.commit()
 
-    session.add(ev)
-    session.commit()
-
-    return render_template("recharge_success.html", amount=amount, account=account)
-
-
-@app.route("/scans.json")
-def scans_json():
-    limit = int(request.args.get("limit", 1000))
-    return to_json(scans(limit))
+    return render_template("recharge_success.html", amount=amount, account=account_data)
 
 
 @app.route("/tx.png")

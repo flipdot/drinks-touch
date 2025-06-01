@@ -3,7 +3,7 @@
 import argparse
 
 from database.models.drink import Drink
-from database.storage import get_session
+from database.storage import Session
 
 parser = argparse.ArgumentParser(description="Adds new drinks to the drink database.")
 parser.add_argument(
@@ -21,10 +21,10 @@ parser.add_argument(
 
 args = parser.parse_args()
 
-session = get_session()
-ev = Drink(args.ean, args.name, args.size)
-
-session.add(ev)
-session.commit()
+with Session() as session:
+    with session.begin():
+        ev = Drink(args.ean, args.name, args.size)
+        session.add(ev)
+        session.commit()
 
 print("OK, done!")

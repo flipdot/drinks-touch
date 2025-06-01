@@ -11,8 +11,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.utils import formatdate, make_msgid
 from premailer import transform
-from sqlalchemy import text
-from sqlalchemy.exc import NoResultFound
+from sqlalchemy import text, select
 
 import config
 from database.models.account import Account
@@ -99,27 +98,29 @@ def send_drink(account: Account, drink, with_summary=False):
 
 
 def send_low_balances(with_summary=True):
-    if config.FORCE_MAIL_TO_UID:
-        account = (
-            Session()
-            .query(Account)
-            .filter(Account.ldap_id == config.FORCE_MAIL_TO_UID)
-            .first()
-        )
-        send_low_balance(
-            account,
-            with_summary,
-            force=True,
-        )
-        return
+    with Session() as session:
+        if config.FORCE_MAIL_TO_UID:
+            account = (
+                Session()
+                .query(Account)
+                .filter(Account.ldap_id == config.FORCE_MAIL_TO_UID)
+                .first()
+            )
+            send_low_balance(
+                account,
+                with_summary,
+                force=True,
+            )
+            return
 
-    accounts = Session().query(Account).filter(Account.email.isnot(None)).all()
-    for account in accounts:
-        try:
-            send_low_balance(account, with_summary)
-        except Exception:
-            logger.exception("while sending lowbalances:")
-            continue
+        query = select(Account).where(Account.email.isnot(None))
+        accounts = session.scalars(query).all()
+        for account in accounts:
+            try:
+                send_low_balance(account, with_summary)
+            except Exception:
+                logger.exception("while sending lowbalances:")
+                continue
 
 
 def send_low_balance(account: Account, with_summary=False, force=False):
@@ -195,12 +196,9 @@ def send_low_balance(account: Account, with_summary=False, force=False):
 
 def send_summaries():
     if config.FORCE_MAIL_TO_UID:
-        account = (
-            Session()
-            .query(Account)
-            .filter(Account.ldap_id == config.FORCE_MAIL_TO_UID)
-            .one()
-        )
+        query = select(Account).filter(Account.ldap_id == config.FORCE_MAIL_TO_UID)
+        with Session() as session:
+            account = session.scalars(query).one()
         send_summary(
             account,
             "Getränkeübersicht",
@@ -208,7 +206,11 @@ def send_summaries():
         )
         return
 
-    for account in Session().query(Account).filter(Account.email.isnot(None)).all():
+    query = select(Account).filter(Account.email.isnot(None))
+    with Session() as session:
+        accounts = session.scalars(query).all()
+
+    for account in accounts:
         try:
             send_summary(account, "Getränkeübersicht")
         except Exception:
@@ -310,23 +312,12 @@ def format_drinks(drinks_consumed):
 
 
 def format_recharges(recharges: list[RechargeEvent]):
-    recharges_fmt = (
-        "\nAufladungen:\n" "    #                 datum     mit aufgeladen\n"
-    )
+    recharges_fmt = "\nAufladungen:\n" "    #                 datum     aufgeladen\n"
 
     for i, event in enumerate(recharges):
         date = event.timestamp.strftime("%F %T Z")
-        four_eyes_id = event.helper_user_id
-
-        try:
-            four_eyes_account = Account.query.filter(Account.name == four_eyes_id).one()
-        except NoResultFound:
-            four_eyes = four_eyes_id
-        else:
-            four_eyes = four_eyes_account.name
-
         amount = event.amount
-        recharges_fmt += "  % 3d % 15s %7s %10s\n" % (i, date, four_eyes, amount)
+        recharges_fmt += "  % 3d % 15s %10s\n" % (i, date, amount)
 
     return recharges_fmt
 

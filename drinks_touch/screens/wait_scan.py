@@ -8,7 +8,7 @@ from dateutil.rrule import rrulestr
 
 import config
 from config import Color
-from database.storage import get_session
+from database.storage import Session
 from drinks.drinks_manager import DrinksManager
 from elements import SvgIcon, Label, Button
 from elements.hbox import HBox
@@ -96,12 +96,13 @@ class WaitScanScreen(Screen):
                 ) AS Gesamtguthaben
             FROM "rechargeevent" WHERE "user_id" NOT LIKE 'geld%';"""
         )
-        try:
-            total_balance = get_session().execute(sql).scalar() or 0
-            total_balance_fmt = "{:.02f}€".format(total_balance)
-        except Exception:
-            logger.exception("sql error while getting total money amount")
-            total_balance_fmt = "(SQL Error)"
+        with Session() as session:
+            try:
+                total_balance = session.execute(sql).scalar() or 0
+                total_balance_fmt = "{:.02f}€".format(total_balance)
+            except Exception:
+                logger.exception("sql error while getting total money amount")
+                total_balance_fmt = "(SQL Error)"
 
         bottom_right_buttons = [
             Button(

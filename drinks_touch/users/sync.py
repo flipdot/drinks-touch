@@ -5,13 +5,15 @@ from json import JSONDecodeError
 
 import requests
 from decimal import Decimal
+
 from requests.auth import HTTPBasicAuth
+from sqlalchemy import select
 
 import config
 from database.models import Tx
 from database.models.account import Account
 from database.models.recharge_event import RechargeEvent
-from database.storage import get_session, Session
+from database.storage import Session
 from notifications.notification import send_summary
 
 logger = logging.getLogger(__name__)
@@ -19,12 +21,13 @@ logger = logging.getLogger(__name__)
 helper_user = "SEPA"
 
 
-def get_existing(session):
-    rechargeevents = (
-        session.query(RechargeEvent)
-        .filter(RechargeEvent.helper_user_id == str(helper_user))
-        .all()
-    )
+def get_existing():
+    with Session() as session:
+        rechargeevents = (
+            session.query(RechargeEvent)
+            .filter(RechargeEvent.helper_user_id == str(helper_user))
+            .all()
+        )
     got_by_user = {}
     for ev in rechargeevents:
         if ev.user_id not in got_by_user:
@@ -54,8 +57,7 @@ def sync_recharges_real():
         logger.exception("Cannot decode sync recharge json:")
         return
 
-    session = get_session()
-    got_by_user = get_existing(session)
+    got_by_user = get_existing()
 
     for uid, charges in recharges.items():
         logger.info("Syncing recharges for user %s", uid)
@@ -79,42 +81,45 @@ def sync_recharges_real():
             if found:
                 continue
 
-            handle_transferred(charge, charge_amount, charge_date, got, session, uid)
+            handle_transferred(charge, charge_amount, charge_date, got, uid)
 
 
-def handle_transferred(charge, charge_amount, charge_date, got, session, uid):
+def handle_transferred(charge, charge_amount, charge_date, got, uid):
     logger.info(
         "User %s transferred %s on %s: %s", uid, charge_amount, charge_date, charge
     )
-    account = Account.query.filter(Account.ldap_id == uid).one()
-    transaktion = Tx(
-        created_at=charge_date,
-        payment_reference="Aufladung via SEPA",
-        account_id=account.id,
-        amount=charge_amount,
-    )
-    session.add(transaktion)
-    session.flush()
-    ev = RechargeEvent(
-        uid, helper_user, charge_amount, charge_date, tx_id=transaktion.id
-    )
-    got.append(ev)
-    session.add(ev)
-    session.commit()
-    try:
-        account = Session().query(Account).filter(Account.ldap_id == uid).one()
-        if not account:
-            logger.error("could not find user %s to send email", uid)
-        else:
-            subject = "Aufladung EUR %s für %s" % (charge_amount, account.name)
-            text = "Deine Aufladung über %s € am %s mit Text '%s' war erfolgreich." % (
-                charge_amount,
-                charge_date,
-                charge["info"],
+    with Session() as session:
+        with session.begin():
+            account = session.scalars(
+                select(Account).where(Account.ldap_id == uid)
+            ).one()
+            tx = Tx(
+                created_at=charge_date,
+                payment_reference="Aufladung via SEPA",
+                account_id=account.id,
+                amount=charge_amount,
             )
-            send_summary(account, subject=subject, force=True, prepend_text=text)
-    except Exception:
-        logger.exception("sending notification mail:")
+            session.add(tx)
+            session.flush()
+            ev = RechargeEvent(
+                uid, helper_user, charge_amount, charge_date, tx_id=tx.id
+            )
+            got.append(ev)
+            session.add(ev)
+            try:
+                subject = "Aufladung EUR %s für %s" % (charge_amount, account.name)
+                text = (
+                    "Deine Aufladung über %s € am %s mit Text '%s' war erfolgreich."
+                    % (
+                        charge_amount,
+                        charge_date,
+                        charge["info"],
+                    )
+                )
+                send_summary(account, subject=subject, force=True, prepend_text=text)
+            except Exception:
+                logger.exception("sending notification mail:")
+            session.commit()
 
 
 if __name__ == "__main__":
