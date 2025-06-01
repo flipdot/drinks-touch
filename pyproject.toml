@@ -31,11 +31,11 @@ python-dotenv = "^1.0.1"
 pygit2 = "^1.16.0"
 ics = "^0.7.2"
 alembic = "^1.15.1"
-black = "^25.1.0"
 
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "4.2.0"
+black = "^25.1.0"
 
 [build-system]
 requires = ["poetry-core"]
