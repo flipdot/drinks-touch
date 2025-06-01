@@ -5,6 +5,7 @@ from pathlib import Path
 from random import random
 
 import pygame
+import cairosvg
 
 from config import Color
 from .base import BaseIcon
@@ -41,7 +42,7 @@ class SvgIcon(BaseIcon):
         super().__init__(pos=pos, *args, **kwargs)
         self.path = Path(path)
         self.color = color
-        image = SvgIcon.load_image(path, color)
+        image = SvgIcon.load_image(path, color, width, height)
 
         img_width = image.get_width()
         img_height = image.get_height()
@@ -70,8 +71,9 @@ class SvgIcon(BaseIcon):
 
     @classmethod
     @functools.cache
-    def load_image(cls, path, color: Color | None = None):
-        image = pygame.image.load(path).convert_alpha()
+    def load_image(cls, path, color: Color | None = None, width=None, height=None):
+        png_bytes = cairosvg.svg2png(url=path, output_width=width, output_height=height)
+        image = pygame.image.load(io.BytesIO(png_bytes)).convert_alpha()
         if color:
             image.fill(color.value, special_flags=pygame.BLEND_RGBA_MIN)
         return image
