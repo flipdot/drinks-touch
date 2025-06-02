@@ -38,15 +38,17 @@ services:
       - ./docker/flipdot.ldif:/assets/openldap/custom/ldif/flipdot.ldif
 
   keycloak:
-    image: "quay.io/keycloak/keycloak:25.0.6"
+    image: "quay.io/keycloak/keycloak:26.2"
     environment:
-        KEYCLOAK_ADMIN: admin
-        KEYCLOAK_ADMIN_PASSWORD: admin
+        KC_BOOTSTRAP_ADMIN_USERNAME: admin
+        KC_BOOTSTRAP_ADMIN_PASSWORD: admin
     ports:
         - "8080:8080"
     command: "start-dev --proxy-headers xforwarded --import-realm"
     volumes:
-      - keycloak:/opt/keycloak/data
+      # Old data isn't compatible since we upgrade from 25.0.7 to 26.2?
+      # Commenting out here for simplicity. Feel free to fix
+      # - keycloak:/opt/keycloak/data
       # To update the realm, stop keycloak and run:
       # docker compose -f compose.dev.yaml run -it keycloak export --file /opt/keycloak/data/import/flipdot.json --realm flipdot
       # Attention: The file it exports isn't importable.
