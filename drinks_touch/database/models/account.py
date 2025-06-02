@@ -1,6 +1,4 @@
 import logging
-import math
-from datetime import datetime
 from decimal import Decimal
 
 from sqlalchemy import Column, Integer, String, UUID, DateTime, Boolean, func, select
@@ -8,7 +6,6 @@ from sqlalchemy.sql import text
 
 
 from database.storage import Base, Session
-from users.users import Users
 
 
 logger = logging.getLogger(__name__)
@@ -36,56 +33,6 @@ class Account(Base):
     last_balance_warning_email_sent_at = Column(DateTime(), unique=False)
     last_summary_email_sent_at = Column(DateTime(), unique=False)
     summary_email_notification_setting = Column(String(50), unique=False)
-
-    @staticmethod
-    def sync_all_from_ldap(progress=None, was_killed=None):
-        if progress is None:
-            progress = lambda *args, **kwargs: None  # noqa: E731
-
-        ldap_users = Users.get_all(include_temp=True)
-
-        # sort by id, but put None last
-        # this way, our oldest flipdot members get the smallest ids.
-        # Not really necessary, but it's nice to keep history.
-        ldap_users = sorted(ldap_users, key=lambda x: x["id"] or math.inf)
-        with Session() as session:
-            for i, user in enumerate(ldap_users):
-                if was_killed is not None and was_killed():
-                    raise Exception("Task was killed")
-                progress(i / len(ldap_users))
-                if user["id"] == 10000 and user["name"] == "malled2":
-                    # malled how did you manage to get two accounts with the same id?
-                    continue
-
-                    # find existing account based on ldap_path (the anonymous accounts don't have an ldap_id)
-                    account = session.scalars(
-                        select(Account).where(Account.ldap_id == user["id"])
-                    ).one_or_none()
-                    if not account:
-                        account = Account(
-                            ldap_id=user["id"],
-                            ldap_path=user["path"],
-                        )
-                        session.add(account)
-
-                account.name = user["name"]
-                account.id_card = user["id_card"]
-                account.email = user["email"]
-                account.summary_email_notification_setting = user["drinksNotification"]
-
-                # Only update the last email sent at if it is not set yet
-                # This way we can start writing the new value to the DB without needing
-                # to worry about it getting overridden on sync.
-                if not account.last_balance_warning_email_sent_at and (
-                    ts := user["lastEmailed"]
-                ):
-                    account.last_balance_warning_email_sent_at = datetime.fromtimestamp(
-                        ts
-                    )
-                if not account.last_summary_email_sent_at and (
-                    ts := user["lastDrinkNotification"]
-                ):
-                    account.last_summary_email_sent_at = datetime.fromtimestamp(ts)
 
     def _get_legacy_balance(self, session):
         sql = text(

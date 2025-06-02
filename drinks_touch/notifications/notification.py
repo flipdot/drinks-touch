@@ -25,7 +25,6 @@ SUBJECT_PREFIX = "[fd-noti]"
 FOOTER = """
 Besuchen Sie uns bald wieder!
 
-Einstellungen: https://ldap.flipdot.space/
 Aufladen: https://drinks.flipdot.space
 Oder per SEPA:
   Kontoinhaber: flipdot e.V.
@@ -351,14 +350,15 @@ ORDER BY se.timestamp"""
 
 
 def get_recharges(account: Account) -> list[RechargeEvent]:
-    query = (
-        Session().query(RechargeEvent).filter(RechargeEvent.user_id == account.ldap_id)
-    )
-    if account.last_summary_email_sent_at:
-        query = query.filter(
-            RechargeEvent.timestamp >= account.last_summary_email_sent_at
+    with Session() as session:
+        query = session.query(RechargeEvent).filter(
+            RechargeEvent.user_id == account.ldap_id
         )
-    return query.order_by(RechargeEvent.timestamp).all()
+        if account.last_summary_email_sent_at:
+            query = query.filter(
+                RechargeEvent.timestamp >= account.last_summary_email_sent_at
+            )
+        return query.order_by(RechargeEvent.timestamp).all()
 
 
 def render_jinja_html(

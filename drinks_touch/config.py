@@ -11,10 +11,6 @@ MONEY_URL = os.environ.get("MONEY_URL", "https://somewhere/x.json")
 MONEY_USER = os.environ.get("MONEY_USER", "my_user")
 MONEY_PASSWORD = os.environ.get("MONEY_PASSWORD", "my_basicauth_passwd")
 
-LDAP_HOST = os.environ.get("LDAP_HOST", "ldap://127.0.0.1")
-LDAP_USER = os.environ.get("LDAP_USER", "cn=admin,dc=flipdot,dc=org")
-LDAP_PW = os.environ.get("LDAP_PW", "admin")
-
 DEBUG_UI_ELEMENTS = os.environ.get("DEBUG_UI_ELEMENTS", "False") in [
     "True",
     "true",

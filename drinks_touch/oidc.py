@@ -75,11 +75,3 @@ if __name__ == "__main__":
     admin = KeycloakAdmin()
     users = admin.get_user_list()
     pprint(users)
-
-    # This is supposed to replace the LDAP API. But first, we want to refactor the game code
-    # to read the users from the local database instead of directly from LDAP.
-    # Reason:
-    # In LDAP, we currently store the attributes `lastDrinkNotification` and `lastEmailed`.
-    # We don't want to pollute our keycloak with it, so first step is to move those attributes to the local
-    # SQL database, and after we successfully did this, we can work on replacing the usersync
-    # from LDAP to local DB by keycloak to local DB

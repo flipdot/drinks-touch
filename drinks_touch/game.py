@@ -29,11 +29,6 @@ from stats.stats import run as stats_send
 from users.sync import sync_recharges
 from webserver.webserver import run as run_webserver
 import sentry_sdk
-from ldap3.utils.log import (
-    set_library_log_detail_level,
-    set_library_log_activation_level,
-    EXTENDED,
-)
 
 with contextlib.redirect_stdout(None):
     import pygame
@@ -47,11 +42,6 @@ logging.basicConfig(
 logging.Formatter.converter = time.gmtime
 # Uncomment to see which SQL queries are executed
 # logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
-
-# ldap log level
-set_library_log_activation_level(logging.CRITICAL)
-if config.LOGLEVEL == logging.DEBUG:
-    set_library_log_detail_level(EXTENDED)
 
 event_queue = queue.Queue()
 overlays: list[BaseOverlay] = []
