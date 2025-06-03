@@ -121,6 +121,7 @@ def send_low_balances(with_summary=True):
             except Exception:
                 logger.exception("while sending lowbalances:")
                 continue
+        session.commit()
 
 
 def send_low_balance(account: Account, with_summary=False, force=False):
