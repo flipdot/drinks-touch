@@ -196,27 +196,27 @@ def send_low_balance(account: Account, with_summary=False, force=False):
 
 
 def send_summaries():
-    if config.FORCE_MAIL_TO_UID:
-        query = select(Account).filter(Account.ldap_id == config.FORCE_MAIL_TO_UID)
-        with Session() as session:
-            account = session.scalars(query).one()
-        send_summary(
-            account,
-            "Getränkeübersicht",
-            force=True,
-        )
-        return
-
-    query = select(Account).filter(Account.email.isnot(None))
     with Session() as session:
+        if config.FORCE_MAIL_TO_UID:
+            query = select(Account).filter(Account.ldap_id == config.FORCE_MAIL_TO_UID)
+            account = session.scalars(query).one()
+            send_summary(
+                account,
+                "Getränkeübersicht",
+                force=True,
+            )
+            return
+
+        query = select(Account).filter(Account.email.isnot(None))
         accounts = session.scalars(query).all()
 
-    for account in accounts:
-        try:
-            send_summary(account, "Getränkeübersicht")
-        except Exception:
-            logger.exception("Error while sending summary for %s", account.name)
-            continue
+        for account in accounts:
+            try:
+                send_summary(account, "Getränkeübersicht")
+            except Exception:
+                logger.exception("Error while sending summary for %s", account.name)
+                continue
+        session.commit()
 
 
 def send_summary(
