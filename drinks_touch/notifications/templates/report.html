@@ -70,6 +70,9 @@ Keine neuen Aufladungen.
                 Datum
             </th>
             <th>
+                4-Augen-Person
+            </th>
+            <th>
                 Wert
             </th>
         </tr>
@@ -82,6 +85,9 @@ Keine neuen Aufladungen.
             </td>
             <td>
                 {{ recharge.timestamp.strftime("%F %T Z") }}
+            </td>
+            <td>
+                {{ recharge.helper_user_id }}
             </td>
             <td>
                 {{ recharge.amount }}&thinsp;€

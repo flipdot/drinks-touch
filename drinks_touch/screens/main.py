@@ -1,7 +1,8 @@
 import functools
+import random
 from datetime import datetime
 
-from sqlalchemy import func, select
+from sqlalchemy import func
 
 from database.models import Account
 from database.storage import Session
@@ -29,23 +30,27 @@ class MainScreen(Screen):
 
         self.objects.append(Label(text="member auswählen", pos=(65, 250), size=40))
 
-        query = select(
-            func.upper(func.substr(Account.name, 1, 1)).label("first_char")
-        ).group_by("first_char")
+        i = 0
+
+        query = (
+            Session()
+            .query(
+                func.upper(func.substr(Account.name, 1, 1)).label("first_char"),
+                func.count(Account.id),
+            )
+            .group_by("first_char")
+            .order_by("first_char")
+            .all()
+        )
 
         today = datetime.now().date()
         april_fools = today.month == 4 and today.day == 1
 
         if april_fools:
-            query = query.order_by(func.random())
-        else:
-            query = query.order_by("first_char")
+            random.shuffle(query)
 
-        with Session() as session:
-            rows = session.execute(query)
-
-        for i, row in enumerate(rows):
-            text = row.first_char
+        for first_char, count in query:
+            text = first_char
             self.objects.append(
                 Button(
                     text=text,
@@ -56,6 +61,7 @@ class MainScreen(Screen):
                     padding=(15, 25),
                 )
             )
+            i += 1
 
     def switch_to_screen(self, param):
         from .screen_manager import ScreenManager
@@ -69,9 +75,7 @@ class MainScreen(Screen):
 
         if not barcode:
             return
-        query = select(Account).filter(Account.id_card == barcode).limit(1)
-        with Session() as session:
-            account = session.execute(query).scalar_one_or_none()
+        account = Account.query.filter(Account.id_card == barcode).first()
         if account:
             ScreenManager.instance.set_active(ProfileScreen(account))
 

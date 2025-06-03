@@ -1,8 +1,5 @@
-from sqlalchemy import select
-
 import config
 from database.models import Account
-from database.storage import Session
 from elements import Label
 from elements.input_field import InputField
 from screens.profile import ProfileScreen
@@ -41,9 +38,7 @@ class SearchAccountScreen(Screen):
         return super().render(dt)
 
     def select_account(self, text: str):
-        query = select(Account).where(Account.name == text)
-        with Session() as session:
-            account = session.scalars(query).one_or_none()
+        account = Account.query.filter(Account.name == text).first()
         if account:
             self.goto(ProfileScreen(account))
         else:

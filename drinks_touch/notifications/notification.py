@@ -11,7 +11,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.utils import formatdate, make_msgid
 from premailer import transform
-from sqlalchemy import text, select
+from sqlalchemy import text
 
 import config
 from database.models.account import Account
@@ -98,29 +98,27 @@ def send_drink(account: Account, drink, with_summary=False):
 
 
 def send_low_balances(with_summary=True):
-    with Session() as session:
-        if config.FORCE_MAIL_TO_UID:
-            account = (
-                session.query(Account)
-                .filter(Account.ldap_id == config.FORCE_MAIL_TO_UID)
-                .first()
-            )
-            send_low_balance(
-                account,
-                with_summary,
-                force=True,
-            )
-            return
+    if config.FORCE_MAIL_TO_UID:
+        account = (
+            Session()
+            .query(Account)
+            .filter(Account.ldap_id == config.FORCE_MAIL_TO_UID)
+            .first()
+        )
+        send_low_balance(
+            account,
+            with_summary,
+            force=True,
+        )
+        return
 
-        query = select(Account).where(Account.email.isnot(None))
-        accounts = session.scalars(query).all()
-        for account in accounts:
-            try:
-                send_low_balance(account, with_summary)
-            except Exception:
-                logger.exception("while sending lowbalances:")
-                continue
-        session.commit()
+    accounts = Session().query(Account).filter(Account.email.isnot(None)).all()
+    for account in accounts:
+        try:
+            send_low_balance(account, with_summary)
+        except Exception:
+            logger.exception("while sending lowbalances:")
+            continue
 
 
 def send_low_balance(account: Account, with_summary=False, force=False):
@@ -195,27 +193,26 @@ def send_low_balance(account: Account, with_summary=False, force=False):
 
 
 def send_summaries():
-    with Session() as session:
-        if config.FORCE_MAIL_TO_UID:
-            query = select(Account).filter(Account.ldap_id == config.FORCE_MAIL_TO_UID)
-            account = session.scalars(query).one()
-            send_summary(
-                account,
-                "Getränkeübersicht",
-                force=True,
-            )
-            return
+    if config.FORCE_MAIL_TO_UID:
+        account = (
+            Session()
+            .query(Account)
+            .filter(Account.ldap_id == config.FORCE_MAIL_TO_UID)
+            .one()
+        )
+        send_summary(
+            account,
+            "Getränkeübersicht",
+            force=True,
+        )
+        return
 
-        query = select(Account).filter(Account.email.isnot(None))
-        accounts = session.scalars(query).all()
-
-        for account in accounts:
-            try:
-                send_summary(account, "Getränkeübersicht")
-            except Exception:
-                logger.exception("Error while sending summary for %s", account.name)
-                continue
-        session.commit()
+    for account in Session().query(Account).filter(Account.email.isnot(None)).all():
+        try:
+            send_summary(account, "Getränkeübersicht")
+        except Exception:
+            logger.exception("Error while sending summary for %s", account.name)
+            continue
 
 
 def send_summary(

@@ -16,7 +16,7 @@ from alembic.script import ScriptDirectory
 
 import config
 import env
-from database.storage import engine
+from database.storage import Session, engine
 from drinks.drinks_manager import DrinksManager
 from notifications.notification import send_low_balances, send_summaries
 from overlays import MouseOverlay, BaseOverlay
@@ -77,11 +77,12 @@ def stats_loop():
     i = 0
     while True:
         # stats_send()
-        send_low_balances()
-        if env.is_pi():
-            sync_recharges()
-        if i % 60 * 12 == 0:
-            send_summaries()
+        with Session.begin():
+            send_low_balances()
+            if env.is_pi():
+                sync_recharges()
+            if i % 60 * 12 == 0:
+                send_summaries()
         time.sleep(60)
         i += 1
         i %= 60 * 12
