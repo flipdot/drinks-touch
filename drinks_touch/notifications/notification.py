@@ -101,8 +101,7 @@ def send_low_balances(with_summary=True):
     with Session() as session:
         if config.FORCE_MAIL_TO_UID:
             account = (
-                Session()
-                .query(Account)
+                session.query(Account)
                 .filter(Account.ldap_id == config.FORCE_MAIL_TO_UID)
                 .first()
             )
