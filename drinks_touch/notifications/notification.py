@@ -351,15 +351,14 @@ ORDER BY se.timestamp"""
 
 
 def get_recharges(account: Account) -> list[RechargeEvent]:
-    with Session() as session:
-        query = session.query(RechargeEvent).filter(
-            RechargeEvent.user_id == account.ldap_id
+    query = (
+        Session().query(RechargeEvent).filter(RechargeEvent.user_id == account.ldap_id)
+    )
+    if account.last_summary_email_sent_at:
+        query = query.filter(
+            RechargeEvent.timestamp >= account.last_summary_email_sent_at
         )
-        if account.last_summary_email_sent_at:
-            query = query.filter(
-                RechargeEvent.timestamp >= account.last_summary_email_sent_at
-            )
-        return query.order_by(RechargeEvent.timestamp).all()
+    return query.order_by(RechargeEvent.timestamp).all()
 
 
 def render_jinja_html(
