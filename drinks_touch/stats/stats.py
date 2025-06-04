@@ -4,9 +4,9 @@ import sys
 
 import re
 from PIL import Image, ImageDraw, ImageFont, ImageMath
-from sqlalchemy import text
 
-from database.storage import Session
+from database.storage import get_session
+from sqlalchemy import text
 from env import is_pi
 from stats.flipdot import create_socket, send_frame, w, h
 import os
@@ -19,25 +19,25 @@ max_drinks = 6
 
 
 def scans(limit=1000, hours=None):
-    with Session() as session:
-        where = ""
-        params = {}
-        if hours:
-            where = "WHERE se.timestamp > NOW() - INTERVAL ':hours HOUR'"
-            params["hours"] = hours
-        sql = text(
-            """
-        SELECT se.id, barcode, se.timestamp, name
-        FROM scanevent se
-        LEFT OUTER JOIN drink d on se.barcode = d.ean
-        %s
-        ORDER BY timestamp DESC
-        LIMIT %d
+    session = get_session()
+    where = ""
+    params = {}
+    if hours:
+        where = "WHERE se.timestamp > NOW() - INTERVAL ':hours HOUR'"
+        params["hours"] = hours
+    sql = text(
         """
-            % (where, int(limit))
-        )
-        sql_scans = session.execute(sql, params).fetchall()
-        return [dict(zip(row.keys(), row)) for row in sql_scans]
+    SELECT se.id, barcode, se.timestamp, name
+    FROM scanevent se
+    LEFT OUTER JOIN drink d on se.barcode = d.ean
+    %s
+    ORDER BY timestamp DESC
+    LIMIT %d
+    """
+        % (where, int(limit))
+    )
+    sql_scans = session.execute(sql, params).fetchall()
+    return [dict(zip(row.keys(), row)) for row in sql_scans]
 
 
 def create_image(scan_list):

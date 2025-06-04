@@ -1,5 +1,5 @@
 from database.models import ScanEvent, Tx, Drink, Account, RechargeEvent
-from database.storage import Session
+from database.storage import get_session
 from tasks.base import BaseTask
 
 
@@ -7,14 +7,12 @@ class MigrateTxTask(BaseTask):
     LABEL = "Migriere Scan- und Rechargeevents zu Transaktionen"
 
     def run(self):
-        with Session() as session:
-            with session.begin():
-                self._migrate_scanevents(session)
-                self._migrate_rechargeevents(session)
-                self._check_dangling_txs(session)
-                session.commit()
+        self._migrate_scanevents()
+        self._migrate_rechargeevents()
+        self._check_dangling_txs()
 
-    def _migrate_scanevents(self, session):
+    def _migrate_scanevents(self):
+        session = get_session()
         self.logger.info("Selecting non-migrated scanevents")
 
         scanevents_with_accounts = (
@@ -53,8 +51,10 @@ class MigrateTxTask(BaseTask):
             session.flush()
             scanevent.tx_id = tx.id
         self.logger.info("Committing changes to the database")
+        session.commit()
 
-    def _migrate_rechargeevents(self, session):
+    def _migrate_rechargeevents(self):
+        session = get_session()
         self.logger.info("Selecting non-migrated rechargeevents")
         rechargevents_with_accounts = (
             session.query(RechargeEvent, Account)
@@ -115,11 +115,13 @@ class MigrateTxTask(BaseTask):
             session.add(tx)
             session.flush()
             rechargeevent.tx_id = tx.id
+        session.commit()
 
-    def _check_dangling_txs(self, session):
+    def _check_dangling_txs(self):
         """
         Find transactions that are not linked to any scan or recharge event.
         """
+        session = get_session()
         self.logger.info("Checking for dangling transactions")
         txs = (
             session.query(Tx)
@@ -132,4 +134,5 @@ class MigrateTxTask(BaseTask):
         for tx in txs:
             self.logger.warning(f'Deleting "{tx.payment_reference}" ({tx.id})')
             session.delete(tx)
+        session.commit()
         self.logger.info("Deleted dangling transactions")

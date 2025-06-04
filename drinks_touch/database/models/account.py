@@ -1,7 +1,7 @@
 import logging
 from decimal import Decimal
 
-from sqlalchemy import Column, Integer, String, UUID, DateTime, Boolean, func, select
+from sqlalchemy import Column, Integer, String, UUID, DateTime, Boolean, func
 from sqlalchemy.sql import text
 
 
@@ -34,7 +34,7 @@ class Account(Base):
     last_summary_email_sent_at = Column(DateTime(), unique=False)
     summary_email_notification_setting = Column(String(50), unique=False)
 
-    def _get_legacy_balance(self, session):
+    def _get_legacy_balance(self):
         sql = text(
             """
             SELECT user_id, count(*) AS amount
@@ -43,7 +43,7 @@ class Account(Base):
             GROUP BY user_id
             """
         )
-        row = session.execute(sql, {"user_id": self.ldap_id}).fetchone()
+        row = Session().connection().execute(sql, {"user_id": self.ldap_id}).fetchone()
         if not row:
             cost = 0
         else:
@@ -57,8 +57,7 @@ class Account(Base):
             GROUP BY user_id
             """
         )
-        # row = Session().connection().execute(sql, {"user_id": self.ldap_id}).fetchone()
-        row = session.execute(sql, {"user_id": self.ldap_id}).fetchone()
+        row = Session().connection().execute(sql, {"user_id": self.ldap_id}).fetchone()
         if not row:
             credit = 0
         else:
@@ -66,20 +65,17 @@ class Account(Base):
 
         return credit - cost
 
-    def _get_tx_balance(self, session) -> Decimal:
+    def _get_tx_balance(self):
         from database.models import Tx
 
-        query = select(func.sum(Tx.amount)).where(
+        return Session().query(func.sum(Tx.amount)).filter(
             Tx.account_id == self.id,
-        )
-
-        return session.scalars(query).one() or Decimal(0)
+        ).scalar() or Decimal(0)
 
     @property
     def balance(self):
-        with Session() as session:
-            legacy_balance = self._get_legacy_balance(session)
-            tx_balance = self._get_tx_balance(session)
+        legacy_balance = self._get_legacy_balance()
+        tx_balance = self._get_tx_balance()
         if legacy_balance != tx_balance:
             logger.error(
                 f"Balance mismatch for account {self.id}: "

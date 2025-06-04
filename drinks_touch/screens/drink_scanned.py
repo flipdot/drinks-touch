@@ -3,7 +3,6 @@ import functools
 
 import config
 from database.models import Account
-from database.storage import Session
 from drinks.drinks import get_by_ean
 from drinks.drinks_manager import DrinksManager
 from elements import Label, Button, SvgIcon
@@ -20,10 +19,7 @@ class DrinkScannedScreen(Screen):
 
     def __init__(self, barcode: str):
         super().__init__()
-        with Session() as session:
-            account = (
-                session.query(Account).where(Account.id_card == barcode).one_or_none()
-            )
+        account = Account.query.filter(Account.id_card == barcode).first()
         if account:
             self.account = account
             return

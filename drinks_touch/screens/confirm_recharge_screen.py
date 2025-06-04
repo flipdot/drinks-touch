@@ -1,6 +1,6 @@
 import config
 from database.models import RechargeEvent, Tx
-from database.storage import Session
+from database.storage import get_session
 from elements import Label, Button
 from elements.hbox import HBox
 from elements.vbox import VBox
@@ -66,20 +66,17 @@ class ConfirmRechargeScreen(Screen):
         ]
 
     def save_payment(self):
-        with Session() as session:
-            with session.begin():
-                tx = Tx(
-                    payment_reference="Aufladung via Display",
-                    account_id=self.account.id,
-                    amount=self.amount,
-                )
-                session.add(tx)
-                session.flush()
-                ev = RechargeEvent(
-                    self.account.ldap_id, "DISPLAY", self.amount, tx_id=tx.id
-                )
-                session.add(ev)
-                session.commit()
+        session = get_session()
+        tx = Tx(
+            payment_reference="Aufladung via Display",
+            account_id=self.account.id,
+            amount=self.amount,
+        )
+        session.add(tx)
+        session.flush()
+        ev = RechargeEvent(self.account.ldap_id, "DISPLAY", self.amount, tx_id=tx.id)
+        session.add(ev)
+        session.commit()
 
         self.goto(
             SuccessScreen(
