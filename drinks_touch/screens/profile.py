@@ -12,7 +12,6 @@ from elements.button import Button
 from elements.label import Label
 from elements.vbox import VBox
 from screens.recharge_screen import RechargeScreen
-from users.users import Users
 from .confirm_payment_screen import ConfirmPaymentScreen
 from .id_card_screen import IDCardScreen
 from .screen import Screen
@@ -189,8 +188,11 @@ class ProfileScreen(Screen):
                 elif helper == "DISPLAY":
                     time_text += " mit DISPLAY"
                 else:
-                    # TODO: this is the slow part because it queries LDAP
-                    user = Users.get_by_id(aufladung.helper_user_id)
+                    # TODO: this was the slow part because it queried LDAP
+                    #             Currently the code is unreachable anyway,
+                    #             so commented out to get rid of ldap code
+                    # user = Users.get_by_id(aufladung.helper_user_id)
+                    user = None
                     if user:
                         helper = user["name"]
                         time_text += " mit " + helper

@@ -84,18 +84,18 @@ The following configuration files are evaluated at execution time and must be de
 ### Deployment
 
 #### Dependencies
-- LDAP server, reachable via `ldap://rail/` (see [users.py](drinks_touch/users/users.py))
+- Keycloak server, (see [oidc.py](drinks_touch/oidc.py))
 - PostgreSQL @localhost (see [storage.py](drinks_touch/database/storage.py))
 - touch display with a minimum of 480x800 px.
 
 Install dependencies like this:
 
 ```bash
-sudo apt-get install libsasl2-dev python-dev libldap2-dev libssl-dev
+sudo apt-get install python-dev libssl-dev
 pip2 install -r requirements.txt
 ```
 
-Then, start PostgreSQL and OpenLDAP with `systemctl start`. And finally, run the entrypoint script `drinks_touch/game.py`.
+Then, start PostgreSQL with `systemctl start`. And finally, run the entrypoint script `drinks_touch/game.py`.
 
 For embedded systems it is recommended to use `@reboot runGame.sh` inside a cron tab.
 This starts an X server, sets various display properties and puts the application itself in a loop.

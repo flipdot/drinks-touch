@@ -25,7 +25,7 @@ SUBJECT_PREFIX = "[fd-noti]"
 FOOTER = """
 Besuchen Sie uns bald wieder!
 
-Einstellungen: https://ldap.flipdot.space/
+Konto: https://login.flipdot.org/
 Aufladen: https://drinks.flipdot.space
 Oder per SEPA:
   Kontoinhaber: flipdot e.V.

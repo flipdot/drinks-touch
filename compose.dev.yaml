@@ -8,34 +8,6 @@ services:
     ports:
       - 5432:5432
 
-  # user: cn=admin,dc=example,dc=org
-  # password: admin
-  openldap:
-    image: osixia/openldap:1.5.0
-    environment:
-        LDAP_LOG_LEVEL: "256"
-        LDAP_ORGANISATION: "Example Inc."
-        LDAP_DOMAIN: "flipdot.org"
-        LDAP_BASE_DN: "dc=flipdot,dc=org"
-        LDAP_ADMIN_PASSWORD: "admin"
-        LDAP_CONFIG_PASSWORD: "config"
-        LDAP_READONLY_USER: "false"
-        #LDAP_READONLY_USER_USERNAME: "readonly"
-        #LDAP_READONLY_USER_PASSWORD: "readonly"
-        LDAP_RFC2307BIS_SCHEMA: "false"
-        LDAP_BACKEND: "mdb"
-        LDAP_TLS: "false"
-        LDAP_REPLICATION: "false"
-        KEEP_EXISTING_CONFIG: "false"
-        LDAP_REMOVE_CONFIG_AFTER_SETUP: "false"
-        LDAP_SEED_INTERNAL_SCHEMA_PATH: "/assets/openldap/custom/schema/"
-        LDAP_SEED_INTERNAL_LDIF_PATH: "/assets/openldap/custom/ldif/"
-    ports:
-        - "389:389"
-        - "636:636"
-    volumes:
-      - ./docker/flipdot.schema:/assets/openldap/custom/schema/flipdot.schema
-      - ./docker/flipdot.ldif:/assets/openldap/custom/ldif/flipdot.ldif
 
   keycloak:
     image: "quay.io/keycloak/keycloak:26.2"
@@ -55,16 +27,6 @@ services:
       # Explanation at https://github.com/flipdot/drinks-touch/pull/213#discussion_r1769129578
       - ./keycloak/realms/:/opt/keycloak/data/import
 
-
-  hackertool:
-    image: osixia/phpldapadmin:latest
-    environment:
-      PHPLDAPADMIN_LDAP_HOSTS: "openldap"
-      PHPLDAPADMIN_HTTPS: "false"
-    ports:
-      - "9090:80"
-    depends_on:
-      - openldap
 
   mailpit:
     image: axllent/mailpit

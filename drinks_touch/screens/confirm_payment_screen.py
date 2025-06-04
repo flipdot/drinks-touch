@@ -104,14 +104,6 @@ class ConfirmPaymentScreen(Screen):
         session.add(ev)
         session.commit()
         DrinksManager.instance.set_selected_drink(None)
-        # Legacy: Delete a temp ldap user. They were only used for
-        # Gutscheincodes
-        # Users.delete_if_nomoney(
-        #     {
-        #         "path": self.account.ldap_path,
-        #         "id": self.account.ldap_entry_dn,
-        #     }
-        # )
 
         self.goto(
             SuccessScreen(
