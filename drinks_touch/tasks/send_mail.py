@@ -1,6 +1,8 @@
 from datetime import datetime, timedelta
 
 from babel import dates
+from sqlalchemy import select
+
 import config
 from database.models import Account
 from database.storage import Session
@@ -55,7 +57,7 @@ class SendMailTask(BaseTask):
             return
 
         delta = datetime.now() - account.last_balance_warning_email_sent_at
-        account_info = f"Account {account.id:3} {account.balance:7}€"
+        account_info = f"Account {account.id:3} {account.balance:7.2f}€"
         if delta < config.REMIND_MAIL_DELTA_FOR_MINIMUM_BALANCE:
             self.logger.info(
                 f"{account_info} | Skip, mailed {dates.format_timedelta(delta, locale='en_US')} ago"
@@ -88,7 +90,8 @@ class SendMailTask(BaseTask):
         Session().flush()
 
     def send_summaries(self):
-        accounts = Session().query(Account).filter(Account.email.isnot(None)).all()
+        query = select(Account).where(Account.email.isnot(None) & Account.enabled)
+        accounts = Session().scalars(query).all()
         for i, account in enumerate(accounts):
             self.progress = 0.5 + (i + 1) / len(accounts) / 2
             if self.sig_killed:
@@ -106,6 +109,9 @@ class SendMailTask(BaseTask):
             delta = timedelta.max
 
         if delta < config.MAIL_SUMMARY_DELTA.get(frequency_str, timedelta.max):
+            self.logger.info(
+                f"Account {account.id:3} | Skip, mailed {dates.format_timedelta(delta, locale='en_US')} ago"
+            )
             return
 
         content_text = ""
@@ -117,6 +123,7 @@ class SendMailTask(BaseTask):
             )
         )
 
+        self.logger.info(f"Account {account.id:3} | Checking history...")
         drinks_consumed = get_drinks_consumed(account)
         recharges = get_recharges(account)
 
