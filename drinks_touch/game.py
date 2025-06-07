@@ -18,7 +18,7 @@ import config
 import env
 from database.storage import Session, engine
 from drinks.drinks_manager import DrinksManager
-from notifications.notification import send_low_balances, send_summaries
+from notifications.notification import send_summaries
 from overlays import MouseOverlay, BaseOverlay
 from overlays.keyboard import KeyboardOverlay
 from screens.message_screen import MessageScreen
@@ -68,7 +68,8 @@ def stats_loop():
     while True:
         # stats_send()
         with Session.begin():
-            send_low_balances()
+            # moved to SendMailTask
+            # send_low_balances()
             if env.is_pi():
                 sync_recharges()
             if i % 60 * 12 == 0:

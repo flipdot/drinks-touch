@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 SUBJECT_PREFIX = "[fd-noti]"
 
 FOOTER = """
-Besuchen Sie uns bald wieder!
+Besuche uns bald wieder!
 
 Konto: https://login.flipdot.org/
 Aufladen: https://drinks.flipdot.space
@@ -72,11 +72,15 @@ def send_drink(account: Account, drink, with_summary=False):
                     drink_name=drink["name"]
                 )
             )
-            content_html = render_jinja_html("instant.html", drink_name=drink["name"])
+            content_html = render_jinja_template(
+                "instant.html", drink_name=drink["name"]
+            )
 
             if not with_summary:
                 content_text += FOOTER.format(uid=account.ldap_id)
-                content_html = render_jinja_html("main.html", prepend_html=content_html)
+                content_html = render_jinja_template(
+                    "main.html", prepend_html=content_html
+                )
                 send_notification(
                     account,
                     "Getränk getrunken",
@@ -95,101 +99,6 @@ def send_drink(account: Account, drink, with_summary=False):
             )
     except Exception:
         logger.exception("while sending drink noti")
-
-
-def send_low_balances(with_summary=True):
-    if config.FORCE_MAIL_TO_UID:
-        account = (
-            Session()
-            .query(Account)
-            .filter(Account.ldap_id == config.FORCE_MAIL_TO_UID)
-            .first()
-        )
-        send_low_balance(
-            account,
-            with_summary,
-            force=True,
-        )
-        return
-
-    accounts = Session().query(Account).filter(Account.email.isnot(None)).all()
-    for account in accounts:
-        try:
-            send_low_balance(account, with_summary)
-        except Exception:
-            logger.exception("while sending lowbalances:")
-            continue
-
-
-def send_low_balance(account: Account, with_summary=False, force=False):
-    assert account.email, "Account has no email"
-
-    if not force and account.balance >= config.MINIMUM_BALANCE:
-        # reset time
-        # TODO: It's a bit misleading when looking in the DB,
-        #  because it will contain a timestamp at which the user didn't
-        #  actually got an email.
-        #  Maybe we can instead store the time at which the balance went negative
-        account.last_balance_warning_email_sent_at = datetime.now()
-        return
-
-    delta = datetime.now() - account.last_balance_warning_email_sent_at
-    if delta < config.REMIND_MAIL_DELTA_FOR_MINIMUM_BALANCE:
-        return
-
-    logger.info(
-        "%s's low balance last emailed %s ago. Mailing now.",
-        account.name,
-        babel.dates.format_timedelta(delta, locale="en_US"),
-    )
-    content_text = (
-        "Du hast seit mehr als {diff_days} "
-        "ein Guthaben von unter {minimum_balance}€!\n"
-        "Aktueller Kontostand: {balance:.2f}€.\n"
-        "Zum Aufladen im Space-Netz https://drinks.flipdot.space/ besuchen."
-    ).format(
-        diff_days=babel.dates.format_timedelta(delta, locale="de_DE"),
-        minimum_balance=config.MINIMUM_BALANCE,
-        balance=account.balance,
-    )
-    content_html = render_jinja_html(
-        "low_balance.html",
-        # TODO: the template tells the user that he "has a negative balance
-        #  since {delta}", but as a delta we pass the time since the last email
-        #  was sent. This is not the same as the time since the balance went
-        #  negative. This should be fixed.
-        delta=delta,
-        minimum_balance=config.MINIMUM_BALANCE,
-        balance=account.balance,
-        uid=account.ldap_id,
-    )
-
-    if not with_summary:
-        content_text += FOOTER.format(uid=account.ldap_id)
-        content_html = render_jinja_html(
-            "main.html",
-            prepend_html=content_html,
-            uid=account.ldap_id,
-        )
-
-        send_notification(
-            account.email,
-            "Negatives Guthaben",
-            content_text,
-            content_html,
-            account.ldap_id,
-        )
-        return
-
-    send_summary(
-        account,
-        subject="Negatives Guthaben",
-        prepend_text=content_text,
-        prepend_html=content_html,
-        force=True,
-    )
-
-    account.last_balance_warning_email_sent_at = datetime.now()
 
 
 def send_summaries():
@@ -260,7 +169,7 @@ def send_summary(
         content_text += format_recharges(recharges)
 
     content_text += FOOTER.format(uid=account.ldap_id)
-    content_html = render_jinja_html(
+    content_html = render_jinja_template(
         "main.html",
         with_report=True,
         balance=account.balance,
@@ -358,7 +267,7 @@ def get_recharges(account: Account) -> list[RechargeEvent]:
     return query.order_by(RechargeEvent.timestamp).all()
 
 
-def render_jinja_html(
+def render_jinja_template(
     file_name, template_loc="drinks_touch/notifications/templates", **context
 ):
     environment = jinja2.Environment(loader=jinja2.FileSystemLoader(template_loc))
