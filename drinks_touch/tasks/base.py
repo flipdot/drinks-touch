@@ -85,7 +85,7 @@ class BaseTask:
             self.run()
         except Exception as e:
             logger.exception(f"Error in task {self.LABEL}")
-            self.logger.error(e)
+            self.logger.error(f"{e.__class__.__name__}: {e}")
             self._fail()
         else:
             self._success()
