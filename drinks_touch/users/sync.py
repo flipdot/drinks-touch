@@ -12,7 +12,6 @@ from database.models import Tx
 from database.models.account import Account
 from database.models.recharge_event import RechargeEvent
 from database.storage import get_session, Session
-from notifications.notification import send_summary
 
 logger = logging.getLogger(__name__)
 
@@ -83,6 +82,7 @@ def sync_recharges_real():
 
 
 def handle_transferred(charge, charge_amount, charge_date, got, session, uid):
+    raise NotImplementedError
     logger.info(
         "User %s transferred %s on %s: %s", uid, charge_amount, charge_date, charge
     )
@@ -106,13 +106,15 @@ def handle_transferred(charge, charge_amount, charge_date, got, session, uid):
         if not account:
             logger.error("could not find user %s to send email", uid)
         else:
-            subject = "Aufladung EUR %s für %s" % (charge_amount, account.name)
-            text = "Deine Aufladung über %s € am %s mit Text '%s' war erfolgreich." % (
-                charge_amount,
-                charge_date,
-                charge["info"],
-            )
-            send_summary(account, subject=subject, force=True, prepend_text=text)
+            pass
+            # TODO: Commented out because of linter. Needs refactoring
+            # subject = "Aufladung EUR %s für %s" % (charge_amount, account.name)
+            # text = "Deine Aufladung über %s € am %s mit Text '%s' war erfolgreich." % (
+            #     charge_amount,
+            #     charge_date,
+            #     charge["info"],
+            # )
+            # send_summary(account, subject=subject, force=True, prepend_text=text)
     except Exception:
         logger.exception("sending notification mail:")
 

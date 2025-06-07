@@ -1,0 +1,8 @@
+{% extends "base.txt" %}
+
+{%- block body -%}
+Instant-Getränkebericht
+
+Du hast das folgende Getränk getrunken: {{ drink_name }}.
+Dein aktuelles Guthaben beträgt {{ balance }}€.
+{%- endblock -%}

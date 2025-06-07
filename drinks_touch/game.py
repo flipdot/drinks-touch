@@ -18,7 +18,6 @@ import config
 import env
 from database.storage import Session, engine
 from drinks.drinks_manager import DrinksManager
-from notifications.notification import send_summaries
 from overlays import MouseOverlay, BaseOverlay
 from overlays.keyboard import KeyboardOverlay
 from screens.message_screen import MessageScreen
@@ -72,8 +71,6 @@ def stats_loop():
             # send_low_balances()
             if env.is_pi():
                 sync_recharges()
-            if i % 60 * 12 == 0:
-                send_summaries()
         time.sleep(60)
         i += 1
         i %= 60 * 12

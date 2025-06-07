@@ -1,0 +1,8 @@
+Konto: https://login.flipdot.org/
+Bar vor Ort aufladen: https://drinks.flipdot.space
+Oder aufladen mittels Überweisung. Auf Verwendungszweck achten:
+
+Kontoinhaber: flipdot e.V.
+IBAN: DE07 5205 0353 0001 1477 13
+Bank: Kasseler Sparkasse
+Verwendungszweck: drinks {{ uid }} Freitext

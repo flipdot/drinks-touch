@@ -1,1 +1,4 @@
 {% block body %}{% endblock %}
+{% block footer %}
+{% include "footer.txt" %}
+{% endblock %}

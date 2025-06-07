@@ -105,7 +105,7 @@ class SuccessScreen(Screen):
         self.play_sound()
 
         if self.drink:
-            send_drink(self.account, self.drink, True)
+            send_drink(self.account, self.drink)
 
     def event(self, event) -> BaseElm | None:
         if event.type == pygame.KEYUP and event.key == pygame.K_RETURN:

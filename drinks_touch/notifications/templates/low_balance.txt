@@ -4,7 +4,4 @@
 Du hast seit mehr als {{delta | format_timedelta}} ein Guthaben von unter {{minimum_balance}}€!
 Dein aktuelles Guthaben beträgt {{balance}}€.
 
-Bar vor Ort aufladen: https://drinks.flipdot.space
-
-{% include "sepa.txt" %}
 {%- endblock -%}

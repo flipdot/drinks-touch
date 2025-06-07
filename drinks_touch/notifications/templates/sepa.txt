@@ -1,5 +1,0 @@
-Aufladen mittels Überweisung. Auf Verwendungszweck achten:
-
-Kontoinhaber: flipdot e.V.
-IBAN: DE07 5205 0353 0001 1477 13
-Verwendungszweck: drinks {{ uid }} Freitext

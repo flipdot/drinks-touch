@@ -1,6 +1,6 @@
 import functools
 import time
-from datetime import datetime, timedelta
+from datetime import datetime
 
 import babel.dates
 import jinja2
@@ -30,8 +30,7 @@ Aufladen: https://drinks.flipdot.space
 Oder per SEPA:
   Kontoinhaber: flipdot e.V.
   IBAN: DE07 5205 0353 0001 1477 13
-  Verwendungszweck: "drinks {uid} hinweistext"
-  Der Hinweistext ist frei wählbar.
+  Verwendungszweck: drinks {uid} Freitext
 """
 
 
@@ -64,139 +63,24 @@ def send_notification(to_address, subject, content_text, content_html, uid):
     s.quit()
 
 
-def send_drink(account: Account, drink, with_summary=False):
-    try:
-        if account.email and "instant" in account.summary_email_notification_setting:
-            content_text = (
-                "Du hast das folgende Getränk getrunken: {drink_name}.".format(
-                    drink_name=drink["name"]
-                )
-            )
-            content_html = render_jinja_template(
-                "instant.html", drink_name=drink["name"]
-            )
-
-            if not with_summary:
-                content_text += FOOTER.format(uid=account.ldap_id)
-                content_html = render_jinja_template(
-                    "main.html", prepend_html=content_html
-                )
-                send_notification(
-                    account,
-                    "Getränk getrunken",
-                    content_text,
-                    content_html,
-                    account.ldap_id,
-                )
-                return
-
-            send_summary(
-                account,
-                subject="Getränk getrunken",
-                prepend_text=content_text,
-                prepend_html=content_html,
-                force=True,
-            )
-    except Exception:
-        logger.exception("while sending drink noti")
-
-
-def send_summaries():
-    if config.FORCE_MAIL_TO_UID:
-        account = (
-            Session()
-            .query(Account)
-            .filter(Account.ldap_id == config.FORCE_MAIL_TO_UID)
-            .one()
-        )
-        send_summary(
-            account,
-            "Getränkeübersicht",
-            force=True,
-        )
+def send_drink(account: Account, drink):
+    if not account.email or "instant" not in account.summary_email_notification_setting:
         return
+    context = {
+        "drink_name": drink["name"],
+        "uid": account.ldap_id,
+        "balance": account.balance,
+    }
+    content_text = render_jinja_template("instant.txt", **context)
+    content_html = render_jinja_template("instant.html", **context)
 
-    for account in Session().query(Account).filter(Account.email.isnot(None)).all():
-        try:
-            send_summary(account, "Getränkeübersicht")
-        except Exception:
-            logger.exception("Error while sending summary for %s", account.name)
-            continue
-
-
-def send_summary(
-    account: Account, subject, prepend_text=None, prepend_html=None, force=False
-):
-    assert account.email, "Account has no email"
-
-    frequency_str = account.summary_email_notification_setting
-
-    if last_noti := account.last_summary_email_sent_at:
-        delta = datetime.now() - last_noti
-    else:
-        delta = timedelta.max
-
-    if not force and delta < config.MAIL_SUMMARY_DELTA.get(
-        frequency_str, timedelta.max
-    ):
-        return
-
-    logger.info(
-        "%s's summary last emailed %s ago. Mailing now.",
-        account.name,
-        babel.dates.format_timedelta(delta, locale="en_US"),
-    )
-
-    content_text = ""
-
-    if prepend_text:
-        content_text += prepend_text + "\n==========\n"
-
-    content_text += (
-        "Hier ist deine Getränkeübersicht seit {since}.\n"
-        "Dein aktuelles Guthaben beträgt EUR {balance:.2f}.\n".format(
-            since=account.last_summary_email_sent_at, balance=account.balance
-        )
-    )
-
-    drinks_consumed = get_drinks_consumed(account)
-    recharges = get_recharges(account)
-
-    if drinks_consumed:
-        content_text += format_drinks(drinks_consumed)
-
-    if recharges:
-        content_text += format_recharges(recharges)
-
-    content_text += FOOTER.format(uid=account.ldap_id)
-    content_html = render_jinja_template(
-        "main.html",
-        with_report=True,
-        balance=account.balance,
-        last_drink_notification_sent_at=account.last_summary_email_sent_at,
-        drinks=drinks_consumed,
-        recharges=recharges,
-        prepend_html=prepend_html,
-        minimum_balance=config.MINIMUM_BALANCE,
-        uid=account.ldap_id,
-    )
-
-    if len(drinks_consumed) == 0 and len(recharges) == 0 and not force:
-        logger.info("Nothing to mail to %s", account.email)
-        return
-
-    logger.info(
-        "Got %d drinks and %d recharges. Mailing.", len(drinks_consumed), len(recharges)
-    )
     send_notification(
         account.email,
-        subject,
+        "Getränk getrunken",
         content_text,
         content_html,
         account.ldap_id,
     )
-
-    account.last_summary_email_sent_at = datetime.now()
 
 
 def format_drinks(drinks_consumed):

@@ -10,6 +10,7 @@
 
         body {
             max-width: 800px;
+            margin: auto;
         }
 
         button, a.btn {
@@ -66,5 +67,8 @@
 <body>
     {% block body %}
         <h1>Body block did not load!</h1>
+    {% endblock %}
+    {% block footer %}
+        {% include "footer.html" %}
     {% endblock %}
 </body>
