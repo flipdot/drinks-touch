@@ -37,7 +37,9 @@ class SyncFromKeycloakTask(BaseTask):
             raw_response = b""
             for i, chunk in enumerate(res.iter_content(block_size)):
                 if self.sig_killed:
-                    raise Exception("Task was killed")
+                    self.logger.error("Task was killed while downloading users")
+                    self._fail()
+                    return
                 raw_response += chunk
                 self.logger.info(f"Downloaded {len(raw_response):6} bytes")
                 if total_size:
@@ -63,7 +65,9 @@ class SyncFromKeycloakTask(BaseTask):
             self.logger.info(f"Downloaded {total_users} user accounts")
             for i, user in enumerate(users):
                 if self.sig_killed:
-                    raise Exception("Task was killed")
+                    self.logger.error("Task was killed while saving users")
+                    self._fail()
+                    return
 
                 ldap_entry_dn = user["attributes"].get("LDAP_ENTRY_DN", [None])[0]
                 if account := self.find_account_by_keycloak_id(user["id"]):
