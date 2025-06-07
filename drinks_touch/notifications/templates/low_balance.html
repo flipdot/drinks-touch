@@ -1,17 +1,12 @@
-<h1>
-    Guthabenwarnung
-</h1>
-<p>
-    Du hast seit mehr als {{ delta | format_timedelta }} ein Guthaben unter {{ minimum_balance }}&thinsp;€!
-    <br>
-    Dein aktuelles Guthaben beträgt {{ balance }}&thinsp;€.
-</p>
-<div class="text-centered" id="buttons">
-    <form action="http://drinks-touch.fd/">
-        <button title="http://drinks-touch.fd/" type="submit">
-            <span>
-                Aufladen
-            </span>
-        </button>
-    </form>
-</div>
+{% extends "layout.html" %}
+
+{% block body %}
+    <h1>
+        Guthabenwarnung
+    </h1>
+    <p>
+        Du hast seit mehr als {{delta | format_timedelta}} ein Guthaben unter {{minimum_balance}}&thinsp;€!
+        <br>
+        Dein aktuelles Guthaben beträgt <strong>{{balance}}&thinsp;€</strong>.
+    </p>
+{% endblock %}

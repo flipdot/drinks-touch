@@ -1,6 +1,13 @@
-<h1>
-    Instant-Getränkebericht
-</h1>
-<p>
-    Du hast das folgende Getränk getrunken: {{ drink_name }}.
-</p>
+{% extends "layout.html" %}
+
+{% block body %}
+    <h1>
+        Instant-Getränkebericht
+    </h1>
+    <p>
+        Du hast das folgende Getränk getrunken: {{ drink_name }}.
+    </p>
+    <p>
+        Dein aktuelles Guthaben beträgt <strong>{{ balance }}&thinsp;€</strong>.
+    </p>
+{% endblock %}

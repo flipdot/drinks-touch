@@ -93,8 +93,10 @@ REMIND_MAIL_DELTA_FOR_MINIMUM_BALANCE = timedelta(weeks=1)
 MAIL_SUMMARY_DELTA = {
     "daily": timedelta(days=1),
     "instant and daily": timedelta(days=1),
-    "weekly": timedelta(weeks=1),
-    "instant and weekly": timedelta(weeks=1),
+    # 6 instead of 7 days, because the device might be booted only once a week,
+    # and with 7 days, the user might not be notified for a week
+    "weekly": timedelta(days=6),
+    "instant and weekly": timedelta(days=6),
 }
 
 SCANNER_DEVICE_PATH = os.environ.get("SCANNER_DEVICE_PATH", "/dev/ttyACM0")

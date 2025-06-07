@@ -8,8 +8,13 @@ from screens.settings.git_branch_screen import GitBranchScreen
 from screens.settings.git_log_screen import GitLogScreen
 from screens.screen import Screen
 from screens.tasks_screen import TasksScreen
-from tasks import GitFetchTask, UpdateAndRestartTask
-from tasks.migrate_tx import MigrateTxTask
+from tasks import (
+    GitFetchTask,
+    UpdateAndRestartTask,
+    SepaSyncTask,
+    SendMailTask,
+    SyncFromKeycloakTask,
+)
 
 
 class SettingsMainScreen(Screen):
@@ -90,14 +95,57 @@ class SettingsMainScreen(Screen):
                             ]
                         ),
                     ),
+                    # Transaction migration was done already.
+                    # Keeping it here as long as we have the old data model still in place
+                    # Button(
+                    #     on_click=lambda: self.goto(
+                    #         TasksScreen(tasks=[MigrateTxTask()])
+                    #     ),
+                    #     text="Migriere Transaktionen",
+                    # ),
+                    Button(
+                        on_click=lambda: self.goto(TasksScreen(tasks=[SepaSyncTask()])),
+                        inner=HBox(
+                            [
+                                SvgIcon(
+                                    "drinks_touch/resources/images/euro.svg",
+                                    height=40,
+                                    color=config.Color.PRIMARY,
+                                ),
+                                Label(text="SEPA Sync"),
+                            ]
+                        ),
+                    ),
+                    Button(
+                        on_click=lambda: self.goto(TasksScreen(tasks=[SendMailTask()])),
+                        inner=HBox(
+                            [
+                                SvgIcon(
+                                    "drinks_touch/resources/images/mail.svg",
+                                    height=40,
+                                    color=config.Color.PRIMARY,
+                                ),
+                                Label(text="Mails versenden"),
+                            ]
+                        ),
+                    ),
                     Button(
                         on_click=lambda: self.goto(
-                            TasksScreen(tasks=[MigrateTxTask()])
+                            TasksScreen(tasks=[SyncFromKeycloakTask()])
                         ),
-                        text="Migriere Transaktionen",
+                        inner=HBox(
+                            [
+                                SvgIcon(
+                                    "drinks_touch/resources/images/users.svg",
+                                    height=40,
+                                    color=config.Color.PRIMARY,
+                                ),
+                                Label(text="Account Sync"),
+                            ]
+                        ),
                     ),
                 ],
-                pos=(5, 300),
+                pos=(5, 100),
                 gap=15,
             ),
         ]

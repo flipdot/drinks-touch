@@ -16,9 +16,8 @@ from alembic.script import ScriptDirectory
 
 import config
 import env
-from database.storage import Session, engine
+from database.storage import engine
 from drinks.drinks_manager import DrinksManager
-from notifications.notification import send_low_balances, send_summaries
 from overlays import MouseOverlay, BaseOverlay
 from overlays.keyboard import KeyboardOverlay
 from screens.message_screen import MessageScreen
@@ -26,7 +25,6 @@ from screens.screen_manager import ScreenManager
 
 from screens.tasks_screen import TasksScreen
 from stats.stats import run as stats_send
-from users.sync import sync_recharges
 from webserver.webserver import run as run_webserver
 import sentry_sdk
 
@@ -61,21 +59,6 @@ def handle_events():
             overlay.events(events)
 
         screen_manager.events(events)
-
-
-def stats_loop():
-    i = 0
-    while True:
-        # stats_send()
-        with Session.begin():
-            send_low_balances()
-            if env.is_pi():
-                sync_recharges()
-            if i % 60 * 12 == 0:
-                send_summaries()
-        time.sleep(60)
-        i += 1
-        i %= 60 * 12
 
 
 # Rendering #
@@ -137,10 +120,6 @@ def main(argv):
     event_thread = threading.Thread(target=handle_events)
     event_thread.daemon = True
     event_thread.start()
-
-    stats_thread = threading.Thread(target=stats_loop)
-    stats_thread.daemon = True
-    stats_thread.start()
 
     if env.is_pi():
         os.system("rsync -a sounds/ pi@pixelfun:sounds/ &")
