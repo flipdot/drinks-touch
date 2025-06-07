@@ -2,6 +2,8 @@ import threading
 import time
 from random import random
 
+from sentry_sdk.integrations.logging import ignore_logger
+
 from elements.progress_bar import ProgressBar
 import logging
 
@@ -34,6 +36,7 @@ class BaseTask:
         self.thread = None
 
         self.logger = logging.getLogger(self.__class__.__name__)
+        ignore_logger(self.logger.name)
 
         handler = LogHandler(self)
         formatter = logging.Formatter("%(message)s")
