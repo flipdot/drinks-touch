@@ -25,13 +25,11 @@ class SendMailTask(BaseTask):
             self.logger.info("Sending negative balance reminders...")
             self.send_low_balances()
             if self.sig_killed:
-                self._fail()
-                return
+                raise Exception("Task was killed while sending low balances")
             self.logger.info("Sending summaries...")
             self.send_summaries()
             if self.sig_killed:
-                self._fail()
-                return
+                raise Exception("Task was killed while sending summaries")
             self.logger.info("Mail sending completed.")
 
     def send_low_balances(self):
