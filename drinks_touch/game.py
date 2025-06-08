@@ -7,7 +7,6 @@ import os
 import queue
 import subprocess
 import sys
-import threading
 import time
 from pathlib import Path
 
@@ -46,19 +45,21 @@ overlays: list[BaseOverlay] = []
 screen_manager: ScreenManager | None = None
 
 
-def handle_events():
-    while True:
-        events = []
-        while True:
-            block = len(events) == 0
-            try:
-                events.append(event_queue.get(block))
-            except queue.Empty:
-                break
-        for overlay in overlays[::-1]:
-            overlay.events(events)
-
-        screen_manager.events(events)
+def handle_events(events, t: int, dt: float) -> bool:
+    for e in events:
+        e.t = t
+        e.dt = dt
+        if e.type == pygame.QUIT:
+            return True
+        if e.type == pygame.KEYDOWN and e.key == pygame.K_ESCAPE:
+            if screen_manager.active_object is None:
+                return True
+            else:
+                screen_manager.active_object = None
+    for overlay in overlays[::-1]:
+        overlay.events(events)
+    screen_manager.events(events)
+    return False
 
 
 # Rendering #
@@ -115,11 +116,7 @@ def main(argv):
     )
 
     # webserver needs to be a main thread #
-    web_thread = subprocess.Popen([sys.argv[0], "--webserver"])
-
-    event_thread = threading.Thread(target=handle_events)
-    event_thread.daemon = True
-    event_thread.start()
+    web_process = subprocess.Popen([sys.argv[0], "--webserver"])
 
     if env.is_pi():
         os.system("rsync -a sounds/ pi@pixelfun:sounds/ &")
@@ -135,29 +132,16 @@ def main(argv):
         dt = clock.tick(config.FPS) / 1000.0
         t += dt
 
+        done = handle_events(pygame.event.get(), t, dt)
+
         screen_manager.render(dt)
         for overlay in overlays:
             overlay.render(dt)
 
         pygame.display.flip()
 
-        events = pygame.event.get()
-        for e in events:
-            e.t = t
-            e.dt = dt
-            if e.type == pygame.QUIT:
-                done = True
-                break
-            if e.type == pygame.KEYDOWN and e.key == pygame.K_ESCAPE:
-                if screen_manager.active_object is None:
-                    done = True
-                    break
-                else:
-                    screen_manager.active_object = None
-            event_queue.put(e, True)
-
-    web_thread.terminate()
-    web_thread.wait()
+    web_process.terminate()
+    web_process.wait()
 
     return 0
 
