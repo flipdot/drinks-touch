@@ -191,9 +191,11 @@ class MakeTransferScreen(Screen):
             return None
         return super().event(event)
 
-    def render(self, dt):
+    def tick(self, dt):
+        super().tick(dt)
         self.clock += dt
 
+    def render(self):
         if self.clock > self.DURATIONS[self.animation_phase]:
             if self.animation_phase == AnimationPhase.WALK_OUT:
                 ScreenManager.instance.set_default()
@@ -252,7 +254,7 @@ class MakeTransferScreen(Screen):
         self.q_box_off.pos = self.q_box_pos
         self.animation_coin.pos = self.coin_pos
 
-        return super().render(dt)
+        return super().render()
 
     def animation_walk_in(self):
         self.mario_pos = self.mario_start_pos.lerp(

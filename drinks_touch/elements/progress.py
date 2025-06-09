@@ -16,7 +16,6 @@ class Progress(BaseElm):
         pos=None,
         size=50,
         color=config.Color.PRIMARY,
-        tick=None,
         speed=1 / 4.0,  # 4 secs
         on_elapsed=None,
         *args,
@@ -24,9 +23,6 @@ class Progress(BaseElm):
     ):
         self.size = size
         self.color = color
-        if tick is None:
-            tick = self.__default_tick
-        self.tick = tick
         self.speed = speed
         self.on_elapsed = on_elapsed
         self.value = 0
@@ -37,6 +33,18 @@ class Progress(BaseElm):
         )
         self.start()
 
+    def calculate_hash(self):
+        super_hash = super().calculate_hash()
+        return hash(
+            (
+                super_hash,
+                self.value,
+                self.is_running,
+                self.size,
+                self.color,
+            )
+        )
+
     def start(self):
         self.value = 0
         self.is_running = True
@@ -44,21 +52,17 @@ class Progress(BaseElm):
     def stop(self):
         self.is_running = False
 
-    def __default_tick(self, old_value, dt):
-        if self.is_running and old_value >= 1:
-            self.stop()
-            if self.on_elapsed:
-                self.on_elapsed()
+    def tick(self, dt: float):
+        if not self.is_running:
+            return
+        if not self.on_elapsed:
+            return
 
-        if self.is_running:
-            return old_value + self.speed * dt
-        else:
-            return old_value
+        self.value += self.speed * dt
+        if self.value >= 1:
+            self.on_elapsed()
 
-    def render(self, dt, *args, **kwargs) -> pygame.Surface:
-        if self.tick is not None:
-            self.value = self.tick(self.value, dt)
-
+    def render(self, *args, **kwargs) -> pygame.Surface:
         surface = pygame.Surface((self.size, self.size), pygame.SRCALPHA)
         if self.is_running:
             extra_rounds = 0.75

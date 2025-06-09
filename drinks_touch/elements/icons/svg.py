@@ -40,23 +40,32 @@ class SvgIcon(BaseIcon):
         will be calculated to keep the aspect ratio.
         """
         super().__init__(pos=pos, *args, **kwargs)
-        self.path = Path(path)
         self.color = color
-        image = SvgIcon.load_image(path, color, width, height)
+        self.img_width = width
+        self.img_height = height
+        self.path = Path(path)
 
-        img_width = image.get_width()
-        img_height = image.get_height()
+    def calculate_hash(self):
+        super_hash = super().calculate_hash()
+        return hash((super_hash, self.path, self.color, self.width, self.height))
 
-        self.image = image
-        self.width = img_width + self.padding_left + self.padding_right
-        self.height = img_height + self.padding_top + self.padding_bottom
+    @property
+    def path(self):
+        return self._path
 
+    @path.setter
+    def path(self, value):
+        self._path = value
+        image = SvgIcon.load_image(value, self.color, self.img_width, self.img_height)
         today = datetime.now().date()
         april_fools = today.month == 4 and today.day == 1
         if april_fools:
-            self.image = pygame.transform.flip(
-                self.image, random() > 0.5, random() > 0.5
-            )
+            flip_x = random() > 0.5
+            flip_y = random() > 0.5
+            image = pygame.transform.flip(image, flip_x, flip_y)
+        self.width = image.get_width() + self.padding_left + self.padding_right
+        self.height = image.get_height() + self.padding_top + self.padding_bottom
+        self.image = image
 
     @classmethod
     @functools.cache

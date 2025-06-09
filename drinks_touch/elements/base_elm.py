@@ -31,6 +31,10 @@ class BaseElm:
             children = []
         self.children = children
         self.clickable = hasattr(self, "on_click")
+        self.dirty = True
+        self.last_hash = 0
+        self.surface: Surface | None = None
+        self.overlay_surface: Surface | None = None
         for child in children:
             if child.clickable:
                 self.clickable = True
@@ -55,6 +59,26 @@ class BaseElm:
             self.padding_right = padding[1]
             self.padding_bottom = padding[2]
             self.padding_left = padding[3]
+
+    def calculate_hash(self):
+        """
+        Calculate a hash based on the element's properties.
+        This can be used to determine if the element has changed.
+        """
+        return hash(
+            (
+                tuple(self.pos),  # could be a vector, which is unhashable
+                self._height,
+                self._width,
+                self.visible,
+                self.screen_pos,
+                self.padding_top,
+                self.padding_right,
+                self.padding_bottom,
+                self.padding_left,
+                tuple(child.calculate_hash() for child in self.children),
+            )
+        )
 
     @property
     def keyboard_settings(self):
@@ -90,6 +114,15 @@ class BaseElm:
     @property
     def box(self):
         return self.screen_pos + (self.width, self.height)
+
+    def tick(self, dt: float):
+        """
+        Called every frame to update the element.
+        May be used to update animations or other time-based changes.
+        Keep the computation simple to avoid performance issues.
+        """
+        for child in self.children:
+            child.tick(dt)
 
     def event(self, event: pygame.event.Event, pos=None) -> bool:
         """
@@ -151,6 +184,15 @@ class BaseElm:
 
     def render_overlay(self, *args, **kwargs) -> Surface | None:
         return None
+
+    def render_cached(self, *args, **kwargs):
+        if self.last_hash != (new_hash := self.calculate_hash()):
+            self.dirty = True
+            self.last_hash = new_hash
+        if self.dirty:
+            self.surface = self.render(*args, **kwargs)
+            self.overlay_surface = self.render_overlay(*args, **kwargs)
+            self.dirty = False
 
     def render_debug(self) -> pygame.Surface:
         w = self.width

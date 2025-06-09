@@ -11,7 +11,7 @@ MONEY_URL = os.environ.get("MONEY_URL", "https://somewhere/x.json")
 MONEY_USER = os.environ.get("MONEY_USER", "my_user")
 MONEY_PASSWORD = os.environ.get("MONEY_PASSWORD", "my_basicauth_passwd")
 
-DEBUG_UI_ELEMENTS = os.environ.get("DEBUG_UI_ELEMENTS", "False") in [
+DEBUG_LEVEL = os.environ.get("DEBUG_LEVEL", "False") in [
     "True",
     "true",
     "1",

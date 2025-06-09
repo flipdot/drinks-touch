@@ -675,8 +675,9 @@ class TetrisScreen(Screen):
         self.reserve_block_used = True
         self.get_sound("use-reserve").play()
 
-    def tick(self):
-
+    def tick(self, dt):
+        self.t += dt
+        super().tick(dt)
         if self.game_over:
             if self.t - self.last_tick < 1.5:
                 return
@@ -907,10 +908,8 @@ class TetrisScreen(Screen):
             )
             Session.commit()
 
-    def render(self, dt):
-        self.t += dt
-        self.tick()
-        surface, debug_surface = super().render(dt)
+    def render(self):
+        surface, debug_surface = super().render()
 
         board_surface = pygame.Surface(
             self.SPRITE_RESOLUTION.elementwise()

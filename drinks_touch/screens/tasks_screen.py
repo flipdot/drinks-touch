@@ -57,10 +57,9 @@ class TasksScreen(Screen):
         for task in self.tasks:
             task.kill()
 
-    def render(self, *args, **kwargs):
-        res = super(TasksScreen, self).render(*args, **kwargs)
+    def tick(self, dt: float):
+        super().tick(dt)
         self.check_task_completion()
-        return res
 
     @property
     def all_tasks_finished(self):

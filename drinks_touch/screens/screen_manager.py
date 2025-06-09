@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 class ScreenManager:
     instance: "ScreenManager" = None
     MENU_BAR_HEIGHT = 65
-    DEBUG_LEVEL = int(config.DEBUG_UI_ELEMENTS)
+    DEBUG_LEVEL = int(config.DEBUG_LEVEL)
     MAX_DEBUG_LEVEL = 3
 
     def __init__(self):
@@ -128,13 +128,23 @@ class ScreenManager:
             return False
         return self.get_active().nav_bar_visible
 
-    def render(self, dt, fps):
+    def tick(self, dt: float):
         self.ts += dt
         if self.active_object:
             self.active_object.ts_active += dt
+        obj_list = (
+            self.active_keyboard_objects
+            if self.keyboard_visible
+            else self.default_objects
+        )
+        for obj in obj_list:
+            obj.tick(dt)
+        self.get_active().tick(dt)
+
+    def render(self, fps):
         self.surface.fill(Color.BACKGROUND.value)
         current_screen = self.get_active()
-        surface, debug_surface = current_screen.render(dt)
+        surface, debug_surface = current_screen.render()
         if surface is not None:
             self.surface.blit(surface, (0, 0))
         if debug_surface is not None:
@@ -153,8 +163,10 @@ class ScreenManager:
                 else self.default_objects
             )
             for obj in obj_list:
-                obj_surface = obj.render(dt)
-                menu_bar.blit(obj_surface, obj.screen_pos)
+                if not obj.visible:
+                    continue
+                obj.render_cached()
+                menu_bar.blit(obj.surface, obj.screen_pos)
             # back_surface = pygame.Surface((100, 50))
             # back_surface.fill((255, 0, 255))
             # back_surface.blit(
