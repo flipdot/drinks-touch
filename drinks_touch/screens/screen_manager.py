@@ -128,13 +128,16 @@ class ScreenManager:
             return False
         return self.get_active().nav_bar_visible
 
-    def render(self, dt, fps):
+    def tick(self, dt: float):
         self.ts += dt
         if self.active_object:
             self.active_object.ts_active += dt
+        self.get_active().tick(dt)
+
+    def render(self, fps):  # TODO: no dt for this function
         self.surface.fill(Color.BACKGROUND.value)
         current_screen = self.get_active()
-        surface, debug_surface = current_screen.render(dt)
+        surface, debug_surface = current_screen.render()
         if surface is not None:
             self.surface.blit(surface, (0, 0))
         if debug_surface is not None:
@@ -153,14 +156,13 @@ class ScreenManager:
                 else self.default_objects
             )
             for obj in obj_list:
-                obj.tick(dt)
                 if not obj.visible:
                     continue
                 if obj.last_hash != obj.calculate_hash():
                     obj.dirty = True
                     obj.last_hash = obj.calculate_hash()
                 if obj.dirty:
-                    obj.surface = obj.render(dt)
+                    obj.surface = obj.render()
                     obj.dirty = False
                 menu_bar.blit(obj.surface, obj.screen_pos)
             # back_surface = pygame.Surface((100, 50))

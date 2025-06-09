@@ -188,9 +188,9 @@ class SettingsMainScreen(Screen):
             button.inner[0].path = img_dir_path / "volume-x.svg"
             button.inner[1].text = "Soundcheck"
 
-    def render(self, dt):
+    def tick(self, dt: float):
+        super().tick(dt)
         self.clock += dt
         if self.soundcheck and self.clock > 1.5:
             self.sound.play()
             self.clock = 0
-        return super().render(dt)

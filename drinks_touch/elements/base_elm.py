@@ -34,6 +34,7 @@ class BaseElm:
         self.dirty = True
         self.last_hash = 0
         self.surface: Surface | None = None
+        self.overlay_surface: Surface | None = None
         for child in children:
             if child.clickable:
                 self.clickable = True
@@ -183,6 +184,15 @@ class BaseElm:
 
     def render_overlay(self, *args, **kwargs) -> Surface | None:
         return None
+
+    def render_cached(self, *args, **kwargs):
+        if self.last_hash != (new_hash := self.calculate_hash()):
+            self.dirty = True
+            self.last_hash = new_hash
+        if self.dirty:
+            self.surface = self.render(*args, **kwargs)
+            self.overlay_surface = self.render_overlay(*args, **kwargs)
+            self.dirty = False
 
     def render_debug(self) -> pygame.Surface:
         w = self.width

@@ -36,6 +36,18 @@ class Animation(BaseElm):
             **kwargs
         )
 
-    def render(self, dt, *args, **kwargs) -> pygame.Surface:
+    def calculate_hash(self):
+        super_hash = super().calculate_hash()
+        return hash(
+            (
+                super_hash,
+                self.ts,
+            )
+        )
+
+    def tick(self, dt: float):
+        super().tick(dt)
         self.ts += dt
+
+    def render(self, *args, **kwargs) -> pygame.Surface:
         return self.frames[int(self.ts / self.frame_duration) % len(self.frames)]

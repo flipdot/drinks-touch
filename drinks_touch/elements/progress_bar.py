@@ -106,8 +106,7 @@ class ProgressBar(BaseElm):
     def tick(self, dt: float):
         self.forever_bar_pos += dt * 300
 
-    def render(self, dt, *args, **kwargs) -> pygame.Surface:
-        # self.tick += dt
+    def render(self, *args, **kwargs) -> pygame.Surface:
         surface = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
 
         x = 0

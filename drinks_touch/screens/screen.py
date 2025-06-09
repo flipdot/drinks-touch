@@ -24,11 +24,29 @@ class Screen:
         self._alert = None
         self.on_create()
         self._keyboard_input = ""
+        self.dirty = True
+        self.last_hash = 0
+        self.surface: pygame.Surface | None = None
+        self.debug_surface: pygame.Surface | None = None
 
     def __repr__(self):
         return f"<{self.__class__.__name__}>"
 
-    def render(self, dt):
+    def calculate_hash(self):
+        return hash(
+            (
+                self.width,
+                self.height,
+                self._alert,
+                tuple(o.calculate_hash() for o in self.objects),
+            )
+        )
+
+    def tick(self, dt: float):
+        for o in self.objects:
+            o.tick(dt)
+
+    def _render(self) -> tuple[pygame.Surface, pygame.Surface | None]:
         surface = pygame.Surface((self.width, self.height))
         surface.fill(self.background_color)
         if ScreenManager.instance.DEBUG_LEVEL >= 3:
@@ -36,31 +54,36 @@ class Screen:
         else:
             debug_surface = None
         for o in self.objects:
-            o.tick(dt)
             if not o.visible:
                 continue
-            if o.last_hash != o.calculate_hash():
-                o.dirty = True
-                o.last_hash = o.calculate_hash()
-            if o.dirty:
-                o.surface = o.render(dt)
-                o.dirty = False
+            o.render_cached()
             if o.surface is not None:
                 surface.blit(o.surface, o.screen_pos)
-            if ScreenManager.instance.DEBUG_LEVEL >= 3:
-                obj_debug_surface = o.render_debug()
-                if obj_debug_surface is not None:
-                    debug_surface.blit(obj_debug_surface, o.screen_pos)
+                if ScreenManager.instance.DEBUG_LEVEL >= 3:
+                    obj_debug_surface = o.render_debug()
+                    if obj_debug_surface is not None:
+                        debug_surface.blit(obj_debug_surface, o.screen_pos)
         for o in self.objects:
-            if o.visible:
-                obj_overlay_surface = o.render_overlay()
-                if obj_overlay_surface is not None:
-                    surface.blit(obj_overlay_surface, o.screen_pos)
+            o.overlay_surface = o.render_overlay()
+            if o.visible and o.overlay_surface is not None:
+                surface.blit(o.overlay_surface, o.screen_pos)
         if self._alert:
             alert = self.render_alert()
             surface.blit(alert, (0, 0))
 
         return surface, debug_surface
+
+    def render(self) -> tuple[pygame.Surface, pygame.Surface | None]:
+        """
+        Caches the result of the internal `_render` method
+        """
+        if self.last_hash != (new_hash := self.calculate_hash()):
+            self.dirty = True
+            self.last_hash = new_hash
+        if self.dirty:
+            self.surface, self.debug_surface = self._render()
+            self.dirty = False
+        return self.surface, self.debug_surface
 
     def render_alert(self) -> pygame.Surface:
         alert_text_surface = pygame.font.Font(None, 30).render(

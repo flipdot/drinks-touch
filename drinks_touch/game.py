@@ -134,7 +134,8 @@ def main(argv):
 
         done = handle_events(pygame.event.get(), t, dt)
 
-        screen_manager.render(dt, fps)
+        screen_manager.tick(dt)
+        screen_manager.render(fps)
         for overlay in overlays:
             overlay.render(dt)
 

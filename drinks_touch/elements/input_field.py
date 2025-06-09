@@ -65,6 +65,7 @@ class InputField(BaseElm):
         self.only_auto_complete = only_auto_complete
         self.on_submit = on_submit
         self.text = ""
+        self.is_active = False
 
     def __repr__(self):
         return f"<InputField {self.text}>"
@@ -74,6 +75,7 @@ class InputField(BaseElm):
         properties = (
             self.input_type,
             self.text,
+            self.is_active,
         )
         return hash((super_hash, properties))
 
@@ -85,8 +87,10 @@ class InputField(BaseElm):
             layout = KeyboardLayout.DEFAULT
         return {"enabled": True, "layout": layout}
 
+    def tick(self, dt: float):
+        self.is_active = ScreenManager.instance.active_object is self
+
     def render(self, *args, **kwargs):
-        is_active = ScreenManager.instance.active_object is self
         surface = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
         pygame.draw.rect(
             surface, Color.NAVBAR_BACKGROUND.value, (0, 0, self.width, self.height)
@@ -101,7 +105,7 @@ class InputField(BaseElm):
         font = pygame.font.Font(Font.SANS_SERIF.value, self.height - 10)
         text_surface = font.render(self.text, 1, Color.PRIMARY.value)
         surface.blit(text_surface, (5, 0))
-        if is_active:
+        if self.is_active:
             pygame.draw.rect(
                 surface, Color.PRIMARY.value, (0, 0, self.width, self.height), 1
             )
@@ -114,12 +118,12 @@ class InputField(BaseElm):
                 )
         return surface
 
-    def render_overlay(self, *args, **kwargs):
+    def render_overlay(self, *args, **kwargs) -> pygame.Surface | None:
         if not self.auto_complete:
-            return
-        is_active = ScreenManager.instance.active_object is self
-        if not is_active:
-            return
+            return None
+
+        if not self.is_active:
+            return None
 
         suggestions = self.auto_complete(self.text)
         surface = pygame.Surface(
@@ -129,7 +133,7 @@ class InputField(BaseElm):
 
         if suggestions:
             if len(suggestions) == 1 and suggestions[0] == self.text:
-                return
+                return None
             suggestion_surface = pygame.Surface(
                 (self.width, len(suggestions) * self.height)
             )
