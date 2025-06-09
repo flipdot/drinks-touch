@@ -74,8 +74,6 @@ def main(argv):
         stats_send()
         return 0
 
-    clock = pygame.time.Clock()
-
     DrinksManager()
 
     global screen_manager
@@ -125,16 +123,18 @@ def main(argv):
     pygame.mixer.pre_init(48000, buffer=2048)
     pygame.mixer.init()
 
+    clock = pygame.time.Clock()
     t = 0
     done = False
 
     while not done:
         dt = clock.tick(config.FPS) / 1000.0
         t += dt
+        fps = clock.get_fps()
 
         done = handle_events(pygame.event.get(), t, dt)
 
-        screen_manager.render(dt)
+        screen_manager.render(dt, fps)
         for overlay in overlays:
             overlay.render(dt)
 

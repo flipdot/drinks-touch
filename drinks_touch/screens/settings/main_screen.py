@@ -4,6 +4,7 @@ import config
 from elements import Button, SvgIcon, Label
 from elements.hbox import HBox
 from elements.vbox import VBox
+from screens.screen_manager import ScreenManager
 from screens.settings.git_branch_screen import GitBranchScreen
 from screens.settings.git_log_screen import GitLogScreen
 from screens.screen import Screen
@@ -144,11 +145,29 @@ class SettingsMainScreen(Screen):
                             ]
                         ),
                     ),
+                    Button(
+                        on_click=self.toggle_debug,
+                        inner=HBox(
+                            [
+                                SvgIcon(
+                                    "drinks_touch/resources/images/bug.svg",
+                                    height=40,
+                                    color=config.Color.PRIMARY,
+                                ),
+                                Label(text="Debug"),
+                            ]
+                        ),
+                    ),
                 ],
                 pos=(5, 100),
                 gap=15,
             ),
         ]
+
+    def toggle_debug(self):
+        ScreenManager.instance.DEBUG_UI_ELEMENTS = (
+            not ScreenManager.instance.DEBUG_UI_ELEMENTS
+        )
 
     def go_if_git(self, screen: Screen):
         if config.GIT_REPO_AVAILABLE:

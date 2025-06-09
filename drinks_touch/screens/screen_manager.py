@@ -17,6 +17,7 @@ if TYPE_CHECKING:
 class ScreenManager:
     instance: "ScreenManager" = None
     MENU_BAR_HEIGHT = 65
+    DEBUG_UI_ELEMENTS = config.DEBUG_UI_ELEMENTS
 
     def __init__(self):
         assert ScreenManager.instance is None, "ScreenManager is a singleton"
@@ -126,7 +127,7 @@ class ScreenManager:
             return False
         return self.get_active().nav_bar_visible
 
-    def render(self, dt):
+    def render(self, dt, fps):
         self.ts += dt
         if self.active_object:
             self.active_object.ts_active += dt
@@ -162,17 +163,17 @@ class ScreenManager:
                 menu_bar, (0, self.surface.get_height() - menu_bar.get_height())
             )
 
-        if config.DEBUG_UI_ELEMENTS:
+        if self.DEBUG_UI_ELEMENTS:
             info = pygame.display.Info()
             font = pygame.font.Font(None, 30)
-            for i, text in enumerate(
-                [
-                    f"{info.current_w}x{info.current_h}",
-                    f"active_object: {self.active_object}",
-                ]
-            ):
-                text_surface = font.render(text, True, (255, 0, 255))
-                self.surface.blit(text_surface, (0, i * 30))
+            resolution_text = font.render(
+                f"{info.current_w}x{info.current_h}", True, (255, 255, 255)
+            )
+            fps_text = font.render(f"FPS: {fps:.2f}", True, (255, 255, 255))
+            self.surface.blit(resolution_text, (10, 10))
+            self.surface.blit(
+                fps_text, (self.surface.get_width() - fps_text.get_width() - 10, 10)
+            )
 
     def events(self, events: list[EventType]):
         screen = self.get_active()
@@ -222,10 +223,6 @@ class ScreenManager:
                 active_object := ScreenManager.instance.active_object
             ):
                 active_object.key_event(event)
-
-    @staticmethod
-    def get_instance() -> "ScreenManager":
-        return ScreenManager.instance
 
     @property
     def keyboard_visible(self):

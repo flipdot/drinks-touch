@@ -48,7 +48,7 @@ class MouseOverlay(BaseOverlay):
                 end_pos,
                 width=3,
             )
-            if config.DEBUG_UI_ELEMENTS:
+            if ScreenManager.instance.DEBUG_UI_ELEMENTS:
                 pygame.draw.circle(self.screen, (255, 0, 255), start_pos, 3)
                 pygame.draw.circle(self.screen, (0, 255, 255), end_pos, 3)
 
