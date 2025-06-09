@@ -25,20 +25,6 @@ class SettingsMainScreen(Screen):
         self.clock = 0
         self.sound = Sound("drinks_touch/resources/sounds/smb_pipe.wav")
 
-        self.soundcheck_button = Button(
-            on_click=self.toggle_soundcheck,
-            inner=HBox(
-                [
-                    SvgIcon(
-                        "drinks_touch/resources/images/volume-x.svg",
-                        height=40,
-                        color=config.Color.PRIMARY,
-                    ),
-                    Label(text="Soundcheck"),
-                ]
-            ),
-        )
-
         self.objects = [
             Label(
                 text="Einstellungen",
@@ -82,7 +68,20 @@ class SettingsMainScreen(Screen):
                         ],
                         gap=15,
                     ),
-                    self.soundcheck_button,
+                    Button(
+                        on_click=self.toggle_soundcheck,
+                        pass_on_click_kwargs=True,
+                        inner=HBox(
+                            [
+                                SvgIcon(
+                                    "drinks_touch/resources/images/volume-x.svg",
+                                    height=40,
+                                    color=config.Color.PRIMARY,
+                                ),
+                                Label(text="Soundcheck"),
+                            ]
+                        ),
+                    ),
                     Button(
                         on_click=lambda: self.goto(TasksScreen()),
                         inner=HBox(
@@ -147,6 +146,7 @@ class SettingsMainScreen(Screen):
                     ),
                     Button(
                         on_click=self.toggle_debug,
+                        pass_on_click_kwargs=True,
                         inner=HBox(
                             [
                                 SvgIcon(
@@ -154,7 +154,9 @@ class SettingsMainScreen(Screen):
                                     height=40,
                                     color=config.Color.PRIMARY,
                                 ),
-                                Label(text="Debug"),
+                                Label(
+                                    text=f"Debug {ScreenManager.instance.DEBUG_LEVEL}"
+                                ),
                             ]
                         ),
                     ),
@@ -164,10 +166,11 @@ class SettingsMainScreen(Screen):
             ),
         ]
 
-    def toggle_debug(self):
-        ScreenManager.instance.DEBUG_UI_ELEMENTS = (
-            not ScreenManager.instance.DEBUG_UI_ELEMENTS
-        )
+    def toggle_debug(self, button: Button):
+        ScreenManager.instance.DEBUG_LEVEL += 1
+        if ScreenManager.instance.DEBUG_LEVEL > ScreenManager.instance.MAX_DEBUG_LEVEL:
+            ScreenManager.instance.DEBUG_LEVEL = 0
+        button.inner[1].text = f"Debug {ScreenManager.instance.DEBUG_LEVEL}"
 
     def go_if_git(self, screen: Screen):
         if config.GIT_REPO_AVAILABLE:
@@ -175,21 +178,21 @@ class SettingsMainScreen(Screen):
         else:
             self.alert("Nur verfügbar, wenn git Repo vorhanden")
 
-    def toggle_soundcheck(self):
+    def toggle_soundcheck(self, button: Button):
         self.soundcheck = not self.soundcheck
-        img_dir_path = self.soundcheck_button.inner[0].path.parent
-        height = self.soundcheck_button.inner[0].height
-        color = self.soundcheck_button.inner[0].color
+        img_dir_path = button.inner[0].path.parent
+        height = button.inner[0].height
+        color = button.inner[0].color
         if self.soundcheck:
-            self.soundcheck_button.inner[0] = SvgIcon(
+            button.inner[0] = SvgIcon(
                 img_dir_path / "volume-2.svg", height=height, color=color
             )
-            self.soundcheck_button.inner[1].text = "Soundcheck aus"
+            button.inner[1].text = "Soundcheck aus"
         else:
-            self.soundcheck_button.inner[0] = SvgIcon(
+            button.inner[0] = SvgIcon(
                 img_dir_path / "volume-x.svg", height=height, color=color
             )
-            self.soundcheck_button.inner[1].text = "Soundcheck"
+            button.inner[1].text = "Soundcheck"
 
     def render(self, dt):
         self.clock += dt

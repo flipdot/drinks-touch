@@ -17,7 +17,8 @@ if TYPE_CHECKING:
 class ScreenManager:
     instance: "ScreenManager" = None
     MENU_BAR_HEIGHT = 65
-    DEBUG_UI_ELEMENTS = config.DEBUG_UI_ELEMENTS
+    DEBUG_LEVEL = int(config.DEBUG_UI_ELEMENTS)
+    MAX_DEBUG_LEVEL = 3
 
     def __init__(self):
         assert ScreenManager.instance is None, "ScreenManager is a singleton"
@@ -163,7 +164,7 @@ class ScreenManager:
                 menu_bar, (0, self.surface.get_height() - menu_bar.get_height())
             )
 
-        if self.DEBUG_UI_ELEMENTS:
+        if self.DEBUG_LEVEL >= 1:
             info = pygame.display.Info()
             font = pygame.font.Font(None, 30)
             resolution_text = font.render(

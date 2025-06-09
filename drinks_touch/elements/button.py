@@ -26,6 +26,7 @@ class Button(BaseElm):
             int | tuple[int, int] | tuple[int, int, int] | tuple[int, int, int, int]
         ) = 10,
         disabled=False,
+        pass_on_click_kwargs=False,
         *args,
         **kwargs,
     ):
@@ -51,6 +52,7 @@ class Button(BaseElm):
             )
         self.inner = inner
         self.disabled = disabled
+        self.pass_on_click_kwargs = pass_on_click_kwargs
 
     @property
     def text(self):
@@ -107,4 +109,7 @@ class Button(BaseElm):
             return
         if self.on_click_handler is None:
             raise NotImplementedError("No on_click handler defined")
-        self.on_click_handler()
+        if self.pass_on_click_kwargs:
+            self.on_click_handler(button=self)
+        else:
+            self.on_click_handler()

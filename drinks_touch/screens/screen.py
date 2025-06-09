@@ -31,7 +31,7 @@ class Screen:
     def render(self, dt):
         surface = pygame.Surface((self.width, self.height))
         surface.fill(self.background_color)
-        if ScreenManager.instance.DEBUG_UI_ELEMENTS:
+        if ScreenManager.instance.DEBUG_LEVEL >= 3:
             debug_surface = pygame.Surface((self.width, self.height))
         else:
             debug_surface = None
@@ -41,7 +41,7 @@ class Screen:
             obj_surface = o.render(dt)
             if obj_surface is not None:
                 surface.blit(obj_surface, o.screen_pos)
-            if ScreenManager.instance.DEBUG_UI_ELEMENTS:
+            if ScreenManager.instance.DEBUG_LEVEL >= 3:
                 obj_debug_surface = o.render_debug()
                 if obj_debug_surface is not None:
                     debug_surface.blit(obj_debug_surface, o.screen_pos)
