@@ -132,6 +132,13 @@ class ScreenManager:
         self.ts += dt
         if self.active_object:
             self.active_object.ts_active += dt
+        obj_list = (
+            self.active_keyboard_objects
+            if self.keyboard_visible
+            else self.default_objects
+        )
+        for obj in obj_list:
+            obj.tick(dt)
         self.get_active().tick(dt)
 
     def render(self, fps):  # TODO: no dt for this function
