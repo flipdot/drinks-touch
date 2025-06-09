@@ -60,9 +60,9 @@ class SvgIcon(BaseIcon):
         today = datetime.now().date()
         april_fools = today.month == 4 and today.day == 1
         if april_fools:
-            self.flip_x = random() > 0.5
-            self.flip_y = random() > 0.5
-            image = pygame.transform.flip(image, random() > 0.5, random() > 0.5)
+            flip_x = random() > 0.5
+            flip_y = random() > 0.5
+            image = pygame.transform.flip(image, flip_x, flip_y)
         self.width = image.get_width() + self.padding_left + self.padding_right
         self.height = image.get_height() + self.padding_top + self.padding_bottom
         self.image = image
