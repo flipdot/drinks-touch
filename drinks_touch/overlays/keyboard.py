@@ -337,12 +337,7 @@ class KeyboardOverlay(BaseOverlay):
             obj.tick(dt)
             if not obj.visible:
                 continue
-            if obj.last_hash != obj.calculate_hash():
-                obj.dirty = True
-                obj.last_hash = obj.calculate_hash()
-            if obj.dirty:
-                obj.surface = obj.render(dt)
-                obj.dirty = False
+            obj.render_cached()
             if obj.surface is not None:
                 surface.blit(obj.surface, obj.screen_pos)
 
