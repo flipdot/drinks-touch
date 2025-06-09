@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 class ScreenManager:
     instance: "ScreenManager" = None
     MENU_BAR_HEIGHT = 65
-    DEBUG_LEVEL = int(config.DEBUG_UI_ELEMENTS)
+    DEBUG_LEVEL = int(config.DEBUG_LEVEL)
     MAX_DEBUG_LEVEL = 3
 
     def __init__(self):

@@ -38,9 +38,11 @@ class Screen:
         for o in self.objects:
             if not o.visible:
                 continue
-            obj_surface = o.render(dt)
-            if obj_surface is not None:
-                surface.blit(obj_surface, o.screen_pos)
+            if o.dirty:
+                o.surface = o.render(dt)
+                o.dirty = False
+            if o.surface is not None:
+                surface.blit(o.surface, o.screen_pos)
             if ScreenManager.instance.DEBUG_LEVEL >= 3:
                 obj_debug_surface = o.render_debug()
                 if obj_debug_surface is not None:

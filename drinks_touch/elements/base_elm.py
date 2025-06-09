@@ -31,6 +31,8 @@ class BaseElm:
             children = []
         self.children = children
         self.clickable = hasattr(self, "on_click")
+        self.dirty = True
+        self.surface: Surface | None = None
         for child in children:
             if child.clickable:
                 self.clickable = True
