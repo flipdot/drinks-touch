@@ -39,13 +39,12 @@ def upgrade() -> None:
         ),
         sa.PrimaryKeyConstraint("id", name=op.f("pk_tx")),
     )
-    op.drop_constraint("account_email_key", "account", type_="unique")
-    op.drop_constraint("account_id_card_key", "account", type_="unique")
-    op.drop_constraint("account_keycloak_sub_key", "account", type_="unique")
-    op.drop_constraint("account_ldap_id_key", "account", type_="unique")
-    op.drop_constraint("account_ldap_path_key", "account", type_="unique")
-    op.drop_constraint("account_name_key", "account", type_="unique")
-    op.drop_constraint("account_name_key1", "account", type_="unique")
+    op.drop_constraint("uq_account_name", "account", type_="unique")
+    op.drop_constraint("uq_account_email", "account", type_="unique")
+    op.drop_constraint("uq_account_id_card", "account", type_="unique")
+    op.drop_constraint("uq_account_keycloak_sub", "account", type_="unique")
+    op.drop_constraint("uq_account_ldap_id", "account", type_="unique")
+    op.drop_constraint("uq_account_ldap_path", "account", type_="unique")
     op.create_unique_constraint(op.f("uq_account_email"), "account", ["email"])
     op.create_unique_constraint(op.f("uq_account_id_card"), "account", ["id_card"])
     op.create_unique_constraint(
