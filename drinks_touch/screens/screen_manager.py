@@ -141,7 +141,7 @@ class ScreenManager:
             obj.tick(dt)
         self.get_active().tick(dt)
 
-    def render(self, fps):  # TODO: no dt for this function
+    def render(self, fps):
         self.surface.fill(Color.BACKGROUND.value)
         current_screen = self.get_active()
         surface, debug_surface = current_screen.render()
