@@ -165,12 +165,7 @@ class ScreenManager:
             for obj in obj_list:
                 if not obj.visible:
                     continue
-                if obj.last_hash != obj.calculate_hash():
-                    obj.dirty = True
-                    obj.last_hash = obj.calculate_hash()
-                if obj.dirty:
-                    obj.surface = obj.render()
-                    obj.dirty = False
+                obj.render_cached()
                 menu_bar.blit(obj.surface, obj.screen_pos)
             # back_surface = pygame.Surface((100, 50))
             # back_surface.fill((255, 0, 255))
