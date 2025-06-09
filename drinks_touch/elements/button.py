@@ -54,6 +54,17 @@ class Button(BaseElm):
         self.disabled = disabled
         self.pass_on_click_kwargs = pass_on_click_kwargs
 
+    def calculate_hash(self):
+        super_hash = super().calculate_hash()
+        properties = (
+            self.disabled,
+            self.bg_color,
+            self.focus,
+        )
+        if self.inner:
+            return hash((super_hash, properties, self.inner.calculate_hash()))
+        return hash((super_hash, properties))
+
     @property
     def text(self):
         return self.inner.text

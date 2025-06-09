@@ -181,17 +181,11 @@ class SettingsMainScreen(Screen):
     def toggle_soundcheck(self, button: Button):
         self.soundcheck = not self.soundcheck
         img_dir_path = button.inner[0].path.parent
-        height = button.inner[0].height
-        color = button.inner[0].color
         if self.soundcheck:
-            button.inner[0] = SvgIcon(
-                img_dir_path / "volume-2.svg", height=height, color=color
-            )
+            button.inner[0].path = img_dir_path / "volume-2.svg"
             button.inner[1].text = "Soundcheck aus"
         else:
-            button.inner[0] = SvgIcon(
-                img_dir_path / "volume-x.svg", height=height, color=color
-            )
+            button.inner[0].path = img_dir_path / "volume-x.svg"
             button.inner[1].text = "Soundcheck"
 
     def render(self, dt):

@@ -69,6 +69,14 @@ class InputField(BaseElm):
     def __repr__(self):
         return f"<InputField {self.text}>"
 
+    def calculate_hash(self):
+        super_hash = super().calculate_hash()
+        properties = (
+            self.input_type,
+            self.text,
+        )
+        return hash((super_hash, properties))
+
     @property
     def keyboard_settings(self):
         if self.input_type in (InputType.NUMBER, InputType.POSITIVE_NUMBER):

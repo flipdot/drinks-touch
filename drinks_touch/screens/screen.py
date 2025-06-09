@@ -36,8 +36,12 @@ class Screen:
         else:
             debug_surface = None
         for o in self.objects:
+            o.tick(dt)
             if not o.visible:
                 continue
+            if o.last_hash != o.calculate_hash():
+                o.dirty = True
+                o.last_hash = o.calculate_hash()
             if o.dirty:
                 o.surface = o.render(dt)
                 o.dirty = False

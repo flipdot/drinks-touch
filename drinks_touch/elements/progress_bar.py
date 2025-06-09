@@ -42,9 +42,25 @@ class ProgressBar(BaseElm):
 
         self.color = Color.PRIMARY
         self.percent = None
-        self.tick = 0
+        self.forever_bar_pos = 0
         self.font = pygame.font.SysFont("sans serif", 25)
         self.font_mono = pygame.font.Font(config.Font.MONOSPACE.value, 15)
+
+    def calculate_hash(self):
+        super_hash = super().calculate_hash()
+        return hash(
+            (
+                super_hash,
+                self.bar_height,
+                self.text_height,
+                self.label,
+                self.text,
+                self.label_height,
+                self.color,
+                self.percent,
+                self.forever_bar_pos,
+            )
+        )
 
     @property
     def pos_label(self):
@@ -87,8 +103,11 @@ class ProgressBar(BaseElm):
         self.color = Color.PRIMARY
         self.percent = None
 
+    def tick(self, dt: float):
+        self.forever_bar_pos += dt * 300
+
     def render(self, dt, *args, **kwargs) -> pygame.Surface:
-        self.tick += dt
+        # self.tick += dt
         surface = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
 
         x = 0
@@ -173,7 +192,8 @@ class ProgressBar(BaseElm):
             cx, y = 0, 0
             cx -= inner_width / 2
 
-            cx += self.tick * 300 % (self.width + inner_width)
+            # cx += self.tick * 300 % (self.width + inner_width)
+            cx += self.forever_bar_pos % (self.width + inner_width)
 
             x = cx - inner_width / 2
             width = inner_width

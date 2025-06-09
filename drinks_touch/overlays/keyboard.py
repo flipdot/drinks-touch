@@ -323,7 +323,7 @@ class KeyboardOverlay(BaseOverlay):
         event = pygame.event.Event(pygame.KEYDOWN, key=key, unicode=char)
         self.screen_manager.events([event])
 
-    def render(self, dt):
+    def render(self, dt: float):
         if not self.visible:
             self.clock = 0
             return
@@ -334,9 +334,17 @@ class KeyboardOverlay(BaseOverlay):
         surface.fill((0, 0, 0, 255))
 
         for obj in self.layout:
-            obj_surface = obj.render(dt)
-            if obj_surface is not None:
-                surface.blit(obj_surface, obj.screen_pos)
+            obj.tick(dt)
+            if not obj.visible:
+                continue
+            if obj.last_hash != obj.calculate_hash():
+                obj.dirty = True
+                obj.last_hash = obj.calculate_hash()
+            if obj.dirty:
+                obj.surface = obj.render(dt)
+                obj.dirty = False
+            if obj.surface is not None:
+                surface.blit(obj.surface, obj.screen_pos)
 
         if self.clock < self.ANIMATION_DURATION:
             alpha = int((self.clock / self.ANIMATION_DURATION) * 255)
