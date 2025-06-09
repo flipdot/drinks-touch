@@ -1,5 +1,3 @@
-import time
-
 import subprocess
 from pystrich.code128 import Code128Encoder
 
@@ -85,13 +83,12 @@ class IDCardScreen(Screen):
 
     def print_id(self):
         if not self.account.id_card:
-            self.set_id("fd_" + bytes.decode(self.account.name))
+            self.set_id(f"fd_{self.account.name}")
         enc = Code128Encoder(str(self.account.id_card))
         enc.height = 300
         png = enc.get_imagedata()
         p = subprocess.Popen(["lp", "-d", "labeldrucker", "-"], stdin=subprocess.PIPE)
         p.communicate(input=png)
-        time.sleep(10)
 
     def on_barcode(self, barcode):
         if not barcode:
