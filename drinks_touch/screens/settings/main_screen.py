@@ -15,6 +15,7 @@ from tasks import (
     SepaSyncTask,
     SendMailTask,
     SyncFromKeycloakTask,
+    InitializeBarcodeScannerTask,
 )
 
 
@@ -92,6 +93,21 @@ class SettingsMainScreen(Screen):
                                     color=config.Color.PRIMARY,
                                 ),
                                 Label(text="Neu initialisieren"),
+                            ]
+                        ),
+                    ),
+                    Button(
+                        on_click=lambda: self.goto(
+                            TasksScreen(tasks=[InitializeBarcodeScannerTask()])
+                        ),
+                        inner=HBox(
+                            [
+                                SvgIcon(
+                                    "drinks_touch/resources/images/barcode.svg",
+                                    height=40,
+                                    color=config.Color.PRIMARY,
+                                ),
+                                Label(text="Barcode-Scanner Init"),
                             ]
                         ),
                     ),
