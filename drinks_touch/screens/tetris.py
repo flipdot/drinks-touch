@@ -260,6 +260,9 @@ class Block:
         self.locked = False
         self.overlapping = False
         self.player = player
+        self.dirty = True
+        self.last_hash = 0
+        self.surface: pygame.Surface | None = None
 
     def calculate_hash(self) -> int:
         return hash(
@@ -273,9 +276,18 @@ class Block:
             )
         )
 
-    def render(self) -> pygame.Surface:
+    def _render(self) -> pygame.Surface:
         color = self.player.color
         return self.shape.render(color)
+
+    def render(self) -> pygame.Surface:
+        if self.surface is None or self.last_hash != self.calculate_hash():
+            self.last_hash = self.calculate_hash()
+            self.dirty = True
+        if self.dirty:
+            self.surface = self._render()
+            self.dirty = False
+        return self.surface
 
     def move(self, direction: Direction, *, factor=1):
         if self.locked:
