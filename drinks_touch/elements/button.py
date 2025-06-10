@@ -93,8 +93,8 @@ class Button(BaseElm):
             text = str(self.inner)
         return f"<Button {text}>"
 
-    def render(self, *args, **kwargs) -> pygame.Surface:
-        inner = self.inner.render(*args, **kwargs)
+    def _render(self, *args, **kwargs) -> pygame.Surface:
+        inner = self.inner._render(*args, **kwargs)
 
         size = (
             self.inner.width + self.padding_left + self.padding_right,

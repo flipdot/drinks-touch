@@ -10,5 +10,5 @@ class Spacer(BaseElm):
     def __init__(self, *args, width=0, height=0, **kwargs):
         super().__init__(*args, **kwargs, width=width, height=height)
 
-    def render(self, *args, **kwargs):
+    def _render(self, *args, **kwargs):
         return None

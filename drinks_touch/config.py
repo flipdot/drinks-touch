@@ -103,7 +103,7 @@ SCANNER_DEVICE_PATH = os.environ.get("SCANNER_DEVICE_PATH", "/dev/ttyACM0")
 
 WEBSERVER_PORT = os.environ.get("WEBSERVER_PORT", 5002)
 
-FPS = 30
+FPS = 60
 
 
 class Font(enum.Enum):

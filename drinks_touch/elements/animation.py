@@ -49,5 +49,5 @@ class Animation(BaseElm):
         super().tick(dt)
         self.ts += dt
 
-    def render(self, *args, **kwargs) -> pygame.Surface:
+    def _render(self, *args, **kwargs) -> pygame.Surface:
         return self.frames[int(self.ts / self.frame_duration) % len(self.frames)]

@@ -337,9 +337,8 @@ class KeyboardOverlay(BaseOverlay):
             obj.tick(dt)
             if not obj.visible:
                 continue
-            obj.render_cached()
-            if obj.surface is not None:
-                surface.blit(obj.surface, obj.screen_pos)
+            if obj_surface := obj.render():
+                surface.blit(obj_surface, obj.screen_pos)
 
         if self.clock < self.ANIMATION_DURATION:
             alpha = int((self.clock / self.ANIMATION_DURATION) * 255)

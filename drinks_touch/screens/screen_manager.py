@@ -137,8 +137,9 @@ class ScreenManager:
             if self.keyboard_visible
             else self.default_objects
         )
-        for obj in obj_list:
-            obj.tick(dt)
+        if self.nav_bar_visible:
+            for obj in obj_list:
+                obj.tick(dt)
         self.get_active().tick(dt)
 
     def render(self, fps):
@@ -165,8 +166,7 @@ class ScreenManager:
             for obj in obj_list:
                 if not obj.visible:
                     continue
-                obj.render_cached()
-                menu_bar.blit(obj.surface, obj.screen_pos)
+                menu_bar.blit(obj.render(), obj.screen_pos)
             # back_surface = pygame.Surface((100, 50))
             # back_surface.fill((255, 0, 255))
             # back_surface.blit(

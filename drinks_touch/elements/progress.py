@@ -25,7 +25,7 @@ class Progress(BaseElm):
         self.color = color
         self.speed = speed
         self.on_elapsed = on_elapsed
-        self.value = 0
+        self.value = self.display_value = 0
         self.is_running = False
 
         super(Progress, self).__init__(
@@ -38,7 +38,7 @@ class Progress(BaseElm):
         return hash(
             (
                 super_hash,
-                self.value,
+                self.display_value,
                 self.is_running,
                 self.size,
                 self.color,
@@ -46,7 +46,7 @@ class Progress(BaseElm):
         )
 
     def start(self):
-        self.value = 0
+        self.value = self.display_value = 0
         self.is_running = True
 
     def stop(self):
@@ -59,15 +59,16 @@ class Progress(BaseElm):
             return
 
         self.value += self.speed * dt
+        self.display_value = round(self.value, 2)
         if self.value >= 1:
             self.on_elapsed()
 
-    def render(self, *args, **kwargs) -> pygame.Surface:
+    def _render(self, *args, **kwargs) -> pygame.Surface:
         surface = pygame.Surface((self.size, self.size), pygame.SRCALPHA)
         if self.is_running:
             extra_rounds = 0.75
-            start = 0.5 * math.pi + self.value * math.pi * extra_rounds * 2
-            end = start + self.value * 2 * math.pi
+            start = 0.5 * math.pi + self.display_value * math.pi * extra_rounds * 2
+            end = start + self.display_value * 2 * math.pi
             pygame.draw.arc(
                 surface,
                 self.color.value,

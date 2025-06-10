@@ -36,7 +36,7 @@ class HBox(BaseElm):
     def __setitem__(self, key, value):
         self.children[key] = value
 
-    def render(self, *args, **kwargs) -> pygame.Surface:
+    def _render(self, *args, **kwargs) -> pygame.Surface:
         surface = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
         if self.bg_color:
             surface.fill(self.bg_color.value)
@@ -46,7 +46,7 @@ class HBox(BaseElm):
             x += element.width + self.gap
             if not element.visible:
                 continue
-            element_surface = element.render(*args, **kwargs)
+            element_surface = element._render(*args, **kwargs)
             if element_surface:
                 surface.blit(element_surface, element.pos)
         if self.focus:
@@ -55,12 +55,12 @@ class HBox(BaseElm):
             )
         return surface
 
-    def render_overlay(self, *args, **kwargs) -> Surface | None:
+    def _render_overlay(self, *args, **kwargs) -> Surface | None:
         surface = None
         x = self.padding_left
         for element in self.children:
             element.pos = (x, self.padding_top)
-            element_surface = element.render_overlay(*args, **kwargs)
+            element_surface = element._render_overlay(*args, **kwargs)
             if element_surface:
                 if surface is None:
                     # only create a surface if needed. Boosts performance.

@@ -90,7 +90,7 @@ class InputField(BaseElm):
     def tick(self, dt: float):
         self.is_active = ScreenManager.instance.active_object is self
 
-    def render(self, *args, **kwargs):
+    def _render(self, *args, **kwargs):
         surface = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
         pygame.draw.rect(
             surface, Color.NAVBAR_BACKGROUND.value, (0, 0, self.width, self.height)
@@ -118,7 +118,7 @@ class InputField(BaseElm):
                 )
         return surface
 
-    def render_overlay(self, *args, **kwargs) -> pygame.Surface | None:
+    def _render_overlay(self, *args, **kwargs) -> pygame.Surface | None:
         if not self.auto_complete:
             return None
 
