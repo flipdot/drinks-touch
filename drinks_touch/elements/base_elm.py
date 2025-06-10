@@ -33,8 +33,8 @@ class BaseElm:
         self.clickable = hasattr(self, "on_click")
         self.dirty = True
         self.last_hash = 0
-        self.surface: Surface | None = None
-        self.overlay_surface: Surface | None = None
+        self._surface: Surface | None = None
+        self._overlay_surface: Surface | None = None
         for child in children:
             if child.clickable:
                 self.clickable = True
@@ -176,23 +176,27 @@ class BaseElm:
             and pygame.Rect(self.box).collidepoint(pos[0], pos[1])
         )
 
-    def render(self, *args, **kwargs) -> Surface | None:
+    def _render(self, *args, **kwargs) -> Surface | None:
         surface = pygame.font.SysFont("monospace", 25).render(
             "Return surface or None in render()", 1, (255, 0, 255)
         )
         return surface
 
-    def render_overlay(self, *args, **kwargs) -> Surface | None:
+    def _render_overlay(self, *args, **kwargs) -> Surface | None:
         return None
 
-    def render_cached(self, *args, **kwargs):
+    def render(self, *args, **kwargs) -> Surface | None:
         if self.last_hash != (new_hash := self.calculate_hash()):
             self.dirty = True
             self.last_hash = new_hash
         if self.dirty:
-            self.surface = self.render(*args, **kwargs)
-            self.overlay_surface = self.render_overlay(*args, **kwargs)
+            self._surface = self._render(*args, **kwargs)
+            self._overlay_surface = self._render_overlay(*args, **kwargs)
             self.dirty = False
+        return self._surface
+
+    def render_overlay(self, *args, **kwargs) -> Surface | None:
+        return self._overlay_surface
 
     def render_debug(self) -> pygame.Surface:
         w = self.width

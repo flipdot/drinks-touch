@@ -56,17 +56,14 @@ class Screen:
         for o in self.objects:
             if not o.visible:
                 continue
-            o.render_cached()
-            if o.surface is not None:
-                surface.blit(o.surface, o.screen_pos)
+            if obj_surface := o.render():
+                surface.blit(obj_surface, o.screen_pos)
                 if ScreenManager.instance.DEBUG_LEVEL >= 3:
-                    obj_debug_surface = o.render_debug()
-                    if obj_debug_surface is not None:
+                    if obj_debug_surface := o.render_debug():
                         debug_surface.blit(obj_debug_surface, o.screen_pos)
         for o in self.objects:
-            o.overlay_surface = o.render_overlay()
-            if o.visible and o.overlay_surface is not None:
-                surface.blit(o.overlay_surface, o.screen_pos)
+            if o.visible and (overlay_surface := o.render_overlay()):
+                surface.blit(overlay_surface, o.screen_pos)
         if self._alert:
             alert = self.render_alert()
             surface.blit(alert, (0, 0))

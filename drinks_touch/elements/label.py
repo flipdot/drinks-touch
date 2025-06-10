@@ -83,7 +83,7 @@ class Label(BaseElm):
         self.frame_counter += 1
         self.visible = (self.frame_counter // self.blink_frequency) % 2 == 0
 
-    def render(self, *args, **kwargs) -> pygame.Surface | None:
+    def _render(self, *args, **kwargs) -> pygame.Surface | None:
         text, pos, area = self._build_text()
         self.width = area.width + self.padding_left + self.padding_right
         self.height = area.height + self.padding_top + self.padding_bottom

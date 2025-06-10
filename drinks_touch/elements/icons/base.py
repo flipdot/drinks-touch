@@ -49,7 +49,7 @@ class BaseIcon(BaseElm):
         self.width = (width or self.SIZE) + self.padding_left + self.padding_right
         self.height = (height or self.SIZE) + self.padding_top + self.padding_bottom
 
-    def render(self, *args, **kwargs) -> pygame.Surface | None:
+    def _render(self, *args, **kwargs) -> pygame.Surface | None:
         if not self.visible:
             return None
         assert self.pos is not None

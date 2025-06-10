@@ -62,7 +62,7 @@ class Progress(BaseElm):
         if self.value >= 1:
             self.on_elapsed()
 
-    def render(self, *args, **kwargs) -> pygame.Surface:
+    def _render(self, *args, **kwargs) -> pygame.Surface:
         surface = pygame.Surface((self.size, self.size), pygame.SRCALPHA)
         if self.is_running:
             extra_rounds = 0.75

@@ -29,7 +29,7 @@ class TetrisIcon(BaseElm):
     def height(self):
         return TetrisScreen.SPRITE_RESOLUTION.y * self.scale * 2
 
-    def render(self, *args, **kwargs) -> pygame.Surface:
+    def _render(self, *args, **kwargs) -> pygame.Surface:
         return self.shape.render(Color.PRIMARY.value)
 
 

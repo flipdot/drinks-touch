@@ -28,7 +28,7 @@ class VBox(BaseElm):
         self.pos = pos
         self.gap = gap
 
-    def render(self, *args, **kwargs) -> pygame.Surface:
+    def _render(self, *args, **kwargs) -> pygame.Surface:
         surface = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
         y = self.padding_top
         for element in self.children:
@@ -36,7 +36,7 @@ class VBox(BaseElm):
             y += element.height + self.gap
             if not element.visible:
                 continue
-            element_surface = element.render(*args, **kwargs)
+            element_surface = element._render(*args, **kwargs)
             if element_surface:
                 surface.blit(element_surface, element.pos)
         if self.focus:
@@ -45,12 +45,12 @@ class VBox(BaseElm):
             )
         return surface
 
-    def render_overlay(self, *args, **kwargs) -> Surface | None:
+    def _render_overlay(self, *args, **kwargs) -> Surface | None:
         surface = None
         y = self.padding_top
         for element in self.children:
             element.pos = (self.padding_left, y)
-            element_surface = element.render_overlay(*args, **kwargs)
+            element_surface = element._render_overlay(*args, **kwargs)
             if element_surface:
                 if surface is None:
                     surface = pygame.Surface(

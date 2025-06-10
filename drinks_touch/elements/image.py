@@ -22,5 +22,5 @@ class Image(BaseElm):
             *args, height=self.img.get_height(), width=self.img.get_width(), **kwargs
         )
 
-    def render(self, *args, **kwargs) -> pygame.Surface:
+    def _render(self, *args, **kwargs) -> pygame.Surface:
         return self.img
