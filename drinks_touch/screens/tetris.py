@@ -386,6 +386,7 @@ class TetrisScreen(Screen):
         self.t = 0
         self.last_tick = 0
         self.name_scroll_offset = 0
+        self.reserve_block_alpha = 255
         self.loading = True
         self.account = account
         self.scores: list[tuple[Account, int, int]] = []
@@ -702,6 +703,10 @@ class TetrisScreen(Screen):
         self.t += dt
         super().tick(dt)
         self.name_scroll_offset = int(self.t * 3)
+        if self.reserve_block_used:
+            self.reserve_block_alpha = int(20 + abs(math.sin(self.t * 2)) * 150)
+        else:
+            self.reserve_block_alpha = 255
         if self.game_over:
             if self.t - self.last_tick < 1.5:
                 return
@@ -974,6 +979,7 @@ class TetrisScreen(Screen):
                 self.hide_full_row,
                 self.current_player.account_id if self.current_player else None,
                 self.name_scroll_offset,
+                self.reserve_block_alpha,
             )
         )
 
@@ -1271,11 +1277,7 @@ class TetrisScreen(Screen):
 
         reserve_shape = Shape(self.reserve_block_type)
         reserve_surface = reserve_shape.render(Color.PRIMARY.value)
-        if self.reserve_block_used:
-            alpha = 20 + abs(math.sin(self.t * 2)) * 150
-        else:
-            alpha = 255
-        reserve_surface.set_alpha(alpha)
+        reserve_surface.set_alpha(self.reserve_block_alpha)
         surface.blit(
             reserve_surface,
             reserve_bg_pos
