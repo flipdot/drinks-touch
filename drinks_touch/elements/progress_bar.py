@@ -104,7 +104,8 @@ class ProgressBar(BaseElm):
         self.percent = None
 
     def tick(self, dt: float):
-        self.forever_bar_pos += dt * 300
+        if not self.percent:
+            self.forever_bar_pos += dt * 300
 
     def _render(self, *args, **kwargs) -> pygame.Surface:
         surface = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
