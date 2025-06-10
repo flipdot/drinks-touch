@@ -1029,20 +1029,17 @@ class TetrisScreen(Screen):
                         x, y, self.board[y][x].type.sprite, self.board[y][x].account_id
                     )
             row_is_full = not self.loading and self.row_is_full(self.board[y])
-            if row_is_full:
-                if math.sin(self.t * 15) < 0:
-                    pygame.draw.rect(
-                        board_surface,
-                        Color.PRIMARY.value,
-                        (
-                            self.SPRITE_RESOLUTION.x * self.SCALE,
-                            y * self.SPRITE_RESOLUTION.y * self.SCALE,
-                            (self.BOARD_WIDTH - 2)
-                            * self.SPRITE_RESOLUTION.x
-                            * self.SCALE,
-                            self.SPRITE_RESOLUTION.y * self.SCALE,
-                        ),
-                    )
+            if row_is_full and not self.hide_full_row:
+                pygame.draw.rect(
+                    board_surface,
+                    Color.PRIMARY.value,
+                    (
+                        self.SPRITE_RESOLUTION.x * self.SCALE,
+                        y * self.SPRITE_RESOLUTION.y * self.SCALE,
+                        (self.BOARD_WIDTH - 2) * self.SPRITE_RESOLUTION.x * self.SCALE,
+                        self.SPRITE_RESOLUTION.y * self.SCALE,
+                    ),
+                )
 
         if self.current_block:
             current_block_surface = self.current_block.render()
