@@ -137,8 +137,9 @@ class ScreenManager:
             if self.keyboard_visible
             else self.default_objects
         )
-        for obj in obj_list:
-            obj.tick(dt)
+        if self.nav_bar_visible:
+            for obj in obj_list:
+                obj.tick(dt)
         self.get_active().tick(dt)
 
     def render(self, fps):

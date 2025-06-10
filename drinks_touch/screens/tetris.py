@@ -166,6 +166,14 @@ class Shape:
                 [CellType.EMPTY],
             ]
 
+    def calculate_hash(self) -> int:
+        return hash(
+            (
+                self.block_type,
+                tuple(tuple(row) for row in self.matrix),
+            )
+        )
+
     def rotate(self, clockwise: bool):
         if self.block_type == BlockType.O:
             return
@@ -252,6 +260,18 @@ class Block:
         self.locked = False
         self.overlapping = False
         self.player = player
+
+    def calculate_hash(self) -> int:
+        return hash(
+            (
+                self.shape.calculate_hash(),
+                self.pos.x,
+                self.pos.y,
+                self.locked,
+                self.overlapping,
+                self.player.account_id,
+            )
+        )
 
     def render(self) -> pygame.Surface:
         color = self.player.color
@@ -365,6 +385,7 @@ class TetrisScreen(Screen):
 
         self.t = 0
         self.last_tick = 0
+        self.name_scroll_offset = 0
         self.loading = True
         self.account = account
         self.scores: list[tuple[Account, int, int]] = []
@@ -387,6 +408,8 @@ class TetrisScreen(Screen):
         self.move_ended = False
         self.game_started = False
         self.game_starts_at = None
+        self.game_starts_in = 0
+        self.hide_full_row = False
 
         self.objects = []
 
@@ -678,6 +701,7 @@ class TetrisScreen(Screen):
     def tick(self, dt):
         self.t += dt
         super().tick(dt)
+        self.name_scroll_offset = int(self.t * 3)
         if self.game_over:
             if self.t - self.last_tick < 1.5:
                 return
@@ -704,14 +728,24 @@ class TetrisScreen(Screen):
                 self.game_starts_at = self.t + self.GAME_START_COUNTDOWN
                 self.current_block = self.spawn_block()
                 self.load_control_buttons()
-            if self.game_starts_at and self.t >= self.game_starts_at:
-                self.game_started = True
+            if self.game_starts_at:
+                if self.t >= self.game_starts_at:
+                    self.game_started = True
+                else:
+                    # need to clamp because of floating point errors, self.game_starts_at can be slightly above self.t
+                    self.game_starts_in = round(
+                        clamp(
+                            self.game_starts_at - self.t, 0, self.GAME_START_COUNTDOWN
+                        ),
+                        2,
+                    )
             return
 
         if self.move_ended:
             return
 
         if not self.current_block:
+            self.hide_full_row = math.sin(self.t * 15) < 0
             if self.t - self.last_tick < 1.5:
                 return
             self.last_tick = self.t
@@ -908,8 +942,43 @@ class TetrisScreen(Screen):
             )
             Session.commit()
 
-    def render(self):
-        surface, debug_surface = super().render()
+    def calculate_hash(self):
+        super_hash = super().calculate_hash()
+        board_tuple = tuple(
+            tuple(cell.type.value for cell in row) for row in self.board
+        )
+        current_block_hash = (
+            self.current_block.calculate_hash() if self.current_block else None
+        )
+        return hash(
+            (
+                super_hash,
+                self.loading,
+                tuple(self.scores),
+                tuple(self.all_time_scores),
+                self.score,
+                self.highscore,
+                self.lines,
+                tuple(self.scored_points),
+                self.reserve_block_type,
+                self.reserve_block_used,
+                board_tuple,
+                self.level,
+                tuple(self.next_blocks),
+                current_block_hash,
+                self.game_over,
+                self.move_ended,
+                self.game_started,
+                self.game_starts_at,
+                self.game_starts_in,
+                self.hide_full_row,
+                self.current_player.account_id if self.current_player else None,
+                self.name_scroll_offset,
+            )
+        )
+
+    def _render(self):
+        surface, debug_surface = super()._render()
 
         board_surface = pygame.Surface(
             self.SPRITE_RESOLUTION.elementwise()
@@ -1052,13 +1121,11 @@ class TetrisScreen(Screen):
 
             progress_bar_from = Vector2(x, y + h - 20)
             progress_bar_to = Vector2(x + w, y + h - 20)
-            # need to clamp because of floating point errors, self.game_starts_at can be slightly above self.t
-            starts_in = clamp(
-                self.game_starts_at - self.t, 0, self.GAME_START_COUNTDOWN
-            )
+
             rect_w = (
                 progress_bar_to.lerp(
-                    progress_bar_from, 1 - starts_in / self.GAME_START_COUNTDOWN
+                    progress_bar_from,
+                    1 - self.game_starts_in / self.GAME_START_COUNTDOWN,
                 ).x
                 - progress_bar_from.x
             )
@@ -1318,7 +1385,7 @@ class TetrisScreen(Screen):
             if len(name) > 6:
                 name = " " * 6 + name
                 end_offset = len(name)
-                start = int(self.t * 5) % end_offset
+                start = self.name_scroll_offset % end_offset
                 end = start + 6
                 name = name[start:end]
 
