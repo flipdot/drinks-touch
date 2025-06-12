@@ -221,9 +221,7 @@ class WaitScanScreen(Screen):
 
         if (
             CheckForUpdatesTask.newest_version_sha_short
-            and not config.BUILD_NUMBER.startswith(
-                CheckForUpdatesTask.newest_version_sha_short
-            )
+            and not config.BUILD_NUMBER == CheckForUpdatesTask.newest_version_sha_short
         ):
             # make build number flash, show "Update available" when flashing
             self.objects.append(

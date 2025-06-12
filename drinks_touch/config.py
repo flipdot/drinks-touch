@@ -45,7 +45,7 @@ if bn := os.environ.get("BUILD_NUMBER"):
     BUILD_NUMBER = bn
 else:
     BUILD_NUMBER = (
-        os.popen("git rev-parse HEAD").read().strip() or "git is not available"
+        os.popen("git rev-parse --short HEAD").read().strip() or "git is not available"
     )
 
 GIT_REPO_AVAILABLE = (
@@ -103,7 +103,7 @@ SCANNER_DEVICE_PATH = os.environ.get("SCANNER_DEVICE_PATH", "/dev/ttyACM0")
 
 WEBSERVER_PORT = os.environ.get("WEBSERVER_PORT", 5002)
 
-FPS = 60000000
+FPS = 60
 
 
 class Font(enum.Enum):
