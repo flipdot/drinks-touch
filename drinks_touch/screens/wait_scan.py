@@ -168,11 +168,6 @@ class WaitScanScreen(Screen):
                 size=34,
             ),
             event_labels,
-            Label(
-                text="Mehr Infos unter https://flipdot.org",
-                pos=(10, config.SCREEN_HEIGHT - 220),
-                size=24,
-            ),
             VBox(
                 [
                     Label(
