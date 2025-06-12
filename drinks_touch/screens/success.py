@@ -35,7 +35,7 @@ class TetrisIcon(BaseElm):
 
 
 class SuccessScreen(Screen):
-    idle_timeout = 5
+    idle_timeout = 10
 
     def __init__(self, account: Account, drink, text, offer_games: bool = False):
         super().__init__()
