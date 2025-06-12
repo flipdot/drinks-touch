@@ -1,0 +1,7 @@
+from pygame import Vector2
+
+SCALE = 1.5
+BOARD_WIDTH = 12
+BOARD_HEIGHT = 32
+SPRITE_RESOLUTION = Vector2(16, 16)
+GAME_START_COUNTDOWN = 2

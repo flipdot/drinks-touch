@@ -11,7 +11,8 @@ from elements.label import Label
 from elements.vbox import VBox
 from notifications.notification import send_drink
 from .screen import Screen
-from .tetris import TetrisScreen, Shape, BlockType
+from .tetris.constants import SPRITE_RESOLUTION
+from .tetris.screen import TetrisScreen, Shape, BlockType
 
 
 class TetrisIcon(BaseElm):
@@ -23,11 +24,11 @@ class TetrisIcon(BaseElm):
 
     @property
     def width(self):
-        return TetrisScreen.SPRITE_RESOLUTION.x * self.scale * 3
+        return SPRITE_RESOLUTION.x * self.scale * 3
 
     @property
     def height(self):
-        return TetrisScreen.SPRITE_RESOLUTION.y * self.scale * 2
+        return SPRITE_RESOLUTION.y * self.scale * 2
 
     def _render(self, *args, **kwargs) -> pygame.Surface:
         return self.shape.render(Color.PRIMARY.value)
