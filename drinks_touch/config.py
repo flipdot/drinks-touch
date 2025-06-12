@@ -45,7 +45,7 @@ if bn := os.environ.get("BUILD_NUMBER"):
     BUILD_NUMBER = bn
 else:
     BUILD_NUMBER = (
-        os.popen("git describe --tags --dirty").read().strip() or "git is not available"
+        os.popen("git rev-parse HEAD").read().strip() or "git is not available"
     )
 
 GIT_REPO_AVAILABLE = (
