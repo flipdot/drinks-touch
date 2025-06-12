@@ -78,6 +78,7 @@ class Label(BaseElm):
         return pygame.font.Font(font.value, size)
 
     def tick(self, dt: float):
+        # TODO: Should be independent from frame rate
         if not self.blink_frequency:
             return
         self.frame_counter += 1

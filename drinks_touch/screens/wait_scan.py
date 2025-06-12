@@ -180,6 +180,7 @@ class WaitScanScreen(Screen):
                         size=25,
                     ),
                     Label(
+                        font=config.Font.MONOSPACE,
                         text=f"Build: {config.BUILD_NUMBER}",
                         size=20,
                     ),
@@ -226,13 +227,13 @@ class WaitScanScreen(Screen):
             # make build number flash, show "Update available" when flashing
             self.objects.append(
                 Label(
-                    text=f"Update available: {CheckForUpdatesTask.newest_version_sha_short}",
-                    size=15,
-                    pos=(config.SCREEN_WIDTH, config.SCREEN_HEIGHT),
-                    align_right=True,
+                    font=config.Font.MONOSPACE,
+                    text=f"Build: {CheckForUpdatesTask.newest_version_sha_short} <- Update available",
+                    size=20,
+                    pos=(5, config.SCREEN_HEIGHT - 5),
                     align_bottom=True,
-                    color=config.Color.BLACK,
-                    bg_color=Color.WHITE,
+                    color=config.Color.BACKGROUND,
+                    bg_color=Color.PRIMARY,
                     padding=0,
                     blink_frequency=60,
                 )
