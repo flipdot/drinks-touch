@@ -70,7 +70,6 @@ class TetrisScreen(Screen):
 
         self.t = 0
         self.last_tick = 0
-        self.reserve_block_alpha = 255
         self.loading = True
         self.account = account
         self.scores: list[tuple[Account, int, int]] = []
@@ -379,10 +378,6 @@ class TetrisScreen(Screen):
         self.t += dt
         super().tick(dt)
         self.gameinfo.tick(dt)
-        if self.reserve_block_used:
-            self.reserve_block_alpha = int(20 + abs(math.sin(self.t * 2)) * 150)
-        else:
-            self.reserve_block_alpha = 255
         if self.game_over:
             if self.t - self.last_tick < 1.5:
                 return
@@ -654,7 +649,6 @@ class TetrisScreen(Screen):
                 self.current_player.account_id if self.current_player else None,
                 self.gameinfo.calculate_hash(),
                 self.board_obj.calculate_hash(),
-                self.reserve_block_alpha,
             )
         )
 

@@ -1,3 +1,4 @@
+import math
 from typing import TYPE_CHECKING
 import pygame
 from pygame import Vector2
@@ -15,19 +16,39 @@ if TYPE_CHECKING:
 class GameInfo:
 
     def __init__(self, screen: "TetrisScreen"):
+        self.last_hash = 0
+        self.dirty = True
+        self.surface: pygame.Surface | None = None
         self.t = 0
         self.name_scroll_offset = 0
+        self.reserve_block_alpha = 255
         # TODO: don't like dependency to parent. Using it for now while refactoring
         self.screen = screen
 
     def calculate_hash(self):
-        return hash((self.name_scroll_offset,))
+        return hash((self.name_scroll_offset, self.reserve_block_alpha))
+
+    def render(self) -> pygame.Surface:
+        """
+        Caches the result of the internal `_render` method
+        """
+        if self.last_hash != (new_hash := self.calculate_hash()):
+            self.dirty = True
+            self.last_hash = new_hash
+        if self.dirty:
+            self.surface = self._render()
+            self.dirty = False
+        return self.surface
 
     def tick(self, dt: float):
         self.t += dt
         self.name_scroll_offset = int(self.t * 3)
+        if self.screen.reserve_block_used:
+            self.reserve_block_alpha = int(20 + abs(math.sin(self.t * 2)) * 150)
+        else:
+            self.reserve_block_alpha = 255
 
-    def render(self) -> pygame.Surface:
+    def _render(self) -> pygame.Surface:
         w = SCREEN_WIDTH - BOARD_WIDTH * SPRITE_RESOLUTION.x * SCALE
         h = BOARD_HEIGHT * SPRITE_RESOLUTION.y * SCALE
         size = Vector2(w, h)
@@ -80,7 +101,7 @@ class GameInfo:
 
         reserve_shape = Shape(self.screen.reserve_block_type)
         reserve_surface = reserve_shape.render(Color.PRIMARY.value)
-        reserve_surface.set_alpha(self.screen.reserve_block_alpha)
+        reserve_surface.set_alpha(self.reserve_block_alpha)
         surface.blit(
             reserve_surface,
             reserve_bg_pos
