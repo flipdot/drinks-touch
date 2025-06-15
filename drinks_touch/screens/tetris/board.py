@@ -21,6 +21,7 @@ class Board:
         self.screen = screen
 
     def calculate_hash(self):
+        # TODO: profiler shows that <genexpr> in this function is a bottleneck
         board_tuple = tuple(
             tuple(cell.type.value for cell in row) for row in self.screen.board
         )

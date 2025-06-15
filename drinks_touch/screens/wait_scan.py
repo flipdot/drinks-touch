@@ -2,6 +2,7 @@ import datetime
 import functools
 import logging
 from dataclasses import dataclass
+from pathlib import Path
 
 import pytz
 from dateutil.rrule import rrulestr
@@ -64,10 +65,10 @@ class WaitScanScreen(Screen):
 
     def on_start(self, *args, **kwargs):
         if config.ICAL_FILE_PATH.exists():
-            with open(config.ICAL_FILE_PATH, "r") as f:
-                raw_ical = f.read()
             try:
-                self.events = self.read_calendar(raw_ical)
+                self.events = WaitScanScreen.load_events_from_ical(
+                    config.ICAL_FILE_PATH
+                )
             except Exception:
                 logger.exception("Error while reading calendar")
                 self.events = [
@@ -87,7 +88,6 @@ class WaitScanScreen(Screen):
                         color=Color.RED,
                     ),
                 ]
-
         sql = text(
             """
             SELECT SUM(amount) - (
@@ -235,6 +235,13 @@ class WaitScanScreen(Screen):
             )
 
         DrinksManager.instance.set_selected_drink(None)
+
+    @staticmethod
+    @functools.cache
+    def load_events_from_ical(file_path: Path) -> list[FlipdotEvent]:
+        with open(file_path, "r") as f:
+            raw_ical = f.read()
+        return WaitScanScreen.read_calendar(raw_ical)
 
     @staticmethod
     @functools.lru_cache(maxsize=1)
