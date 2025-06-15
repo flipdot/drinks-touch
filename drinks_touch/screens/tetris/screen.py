@@ -19,6 +19,7 @@ from elements.hbox import HBox
 from elements.spacer import Spacer
 from screens.screen import Screen
 from screens.tetris.block import Block, BlockType, Direction
+from screens.tetris.board import Board
 from screens.tetris.cell import Cell, CellType
 from screens.tetris.constants import (
     BOARD_WIDTH,
@@ -30,7 +31,7 @@ from screens.tetris.constants import (
 from screens.tetris.gameinfo import GameInfo
 from screens.tetris.player import Player
 from screens.tetris.shape import Shape
-from screens.tetris.utils import get_sprite, clamp, darken
+from screens.tetris.utils import clamp, darken
 
 logger = logging.getLogger(__name__)
 
@@ -95,6 +96,7 @@ class TetrisScreen(Screen):
         self.game_starts_in = 0
         self.hide_full_row = False
         self.gameinfo = GameInfo(self)
+        self.board_obj = Board(self)
 
         self.objects = []
 
@@ -651,6 +653,7 @@ class TetrisScreen(Screen):
                 self.hide_full_row,
                 self.current_player.account_id if self.current_player else None,
                 self.gameinfo.calculate_hash(),
+                self.board_obj.calculate_hash(),
                 self.reserve_block_alpha,
             )
         )
@@ -658,81 +661,7 @@ class TetrisScreen(Screen):
     def _render(self):
         surface, debug_surface = super()._render()
 
-        board_surface = pygame.Surface(
-            SPRITE_RESOLUTION.elementwise()
-            * Vector2(BOARD_WIDTH, BOARD_HEIGHT)
-            * SCALE,
-        )
-
-        def blit(x: int, y: int, sprite_name: str, account_id: int):
-            v = Vector2(x, y)
-            if not self.game_started:
-                color = (100, 100, 100)
-                if sprite_name not in ["bg-empty", "bg-bricks"]:
-                    sprite_name = "block-x"
-            elif self.current_player and self.current_player.account_id == account_id:
-                color = self.current_player.color
-            else:
-                color = Color.PRIMARY.value
-            if self.move_ended:
-                color = darken(color, 0.3)
-            board_surface.blit(
-                get_sprite(sprite_name),
-                v.elementwise() * SPRITE_RESOLUTION * SCALE,
-            )
-            color_square = pygame.Surface(
-                SPRITE_RESOLUTION.elementwise() * SCALE,
-            )
-            color_square.fill(color)
-            board_surface.blit(
-                color_square,
-                v.elementwise() * SPRITE_RESOLUTION * SCALE,
-                special_flags=pygame.BLEND_MULT,
-            )
-            # pygame.draw.rect(
-            #     surface,
-            #     (255, 255, 255, 50),
-            #     (
-            #         v.elementwise() * SPRITE_RESOLUTION * SCALE,
-            #         SPRITE_RESOLUTION * SCALE,
-            #     ),
-            # )
-
-        for y in range(BOARD_HEIGHT):
-            for x in range(BOARD_WIDTH):
-                if self.loading:
-                    blit(x, y, "bg-bricks", -1)
-                else:
-                    blit(
-                        x, y, self.board[y][x].type.sprite, self.board[y][x].account_id
-                    )
-            row_is_full = not self.loading and self.row_is_full(self.board[y])
-            if row_is_full and not self.hide_full_row:
-                pygame.draw.rect(
-                    board_surface,
-                    Color.PRIMARY.value,
-                    (
-                        SPRITE_RESOLUTION.x * SCALE,
-                        y * SPRITE_RESOLUTION.y * SCALE,
-                        (BOARD_WIDTH - 2) * SPRITE_RESOLUTION.x * SCALE,
-                        SPRITE_RESOLUTION.y * SCALE,
-                    ),
-                )
-
-        if self.current_block:
-            current_block_surface = self.current_block.render()
-            shadow_surface = current_block_surface.copy()
-            shadow_surface.fill((0, 0, 0, 100), special_flags=pygame.BLEND_RGBA_MULT)
-            shadow_pos = self.current_block.shadow_pos
-            board_surface.blit(
-                shadow_surface,
-                shadow_pos.elementwise() * SPRITE_RESOLUTION * SCALE,
-            )
-
-            board_surface.blit(
-                current_block_surface,
-                self.current_block.pos.elementwise() * SPRITE_RESOLUTION * SCALE,
-            )
+        board_surface = self.board_obj.render()
 
         if self.april_fools:
             board_surface = pygame.transform.flip(board_surface, True, True)
