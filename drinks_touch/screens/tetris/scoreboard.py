@@ -31,7 +31,14 @@ class Scoreboard:
         self.scores = scores
 
     def calculate_hash(self):
-        return hash((self.name_scroll_offset, self.width, self.title))
+        return hash(
+            (
+                self.name_scroll_offset,
+                self.width,
+                self.title,
+                self.screen.current_player,
+            )
+        )
 
     def tick(self, dt: float):
         self.t += dt
