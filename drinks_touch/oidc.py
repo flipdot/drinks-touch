@@ -6,7 +6,9 @@ import requests
 
 
 class KeycloakAdmin:
-    def __init__(self, client_id=None, client_secret=None, oidc_discovery_url=None):
+    def __init__(
+        self, client_id=None, client_secret=None, oidc_discovery_url=None, timeout=10
+    ):
         self.client_id = client_id or config.OIDC_CLIENT_ID
         self.client_secret = client_secret or config.OIDC_CLIENT_SECRET
         self.oidc_discovery_url = oidc_discovery_url or config.OIDC_DISCOVERY_URL
@@ -14,9 +16,10 @@ class KeycloakAdmin:
         self.access_token_expires_at = datetime.now()
         self.token_endpoint = None
         self.admin_base_url = None
+        self.timeout = timeout
 
     def _reload_oidc_discovery(self):
-        discovery_response = requests.get(self.oidc_discovery_url)
+        discovery_response = requests.get(self.oidc_discovery_url, timeout=self.timeout)
         discovery_response.raise_for_status()
         discovery = discovery_response.json()
         self.token_endpoint = discovery["token_endpoint"]
@@ -38,6 +41,7 @@ class KeycloakAdmin:
                 "client_id": config.OIDC_CLIENT_ID,
                 "client_secret": config.OIDC_CLIENT_SECRET,
             },
+            timeout=self.timeout,
         )
         token_response.raise_for_status()
         token = token_response.json()
@@ -60,6 +64,7 @@ class KeycloakAdmin:
             self.admin_base_url + path,
             headers={"Authorization": f"Bearer {self.access_token}"},
             stream=stream,
+            timeout=self.timeout,
         )
         res.raise_for_status()
         if stream:
