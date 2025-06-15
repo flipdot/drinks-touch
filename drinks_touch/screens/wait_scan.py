@@ -96,8 +96,11 @@ class WaitScanScreen(Screen):
         tx_total_balance = Session().query(func.sum(Tx.amount)).scalar() or Decimal(0)
         if legacy_total_balance != tx_total_balance:
             logger.error(
-                f"Total system balance: Legacy balance ({legacy_total_balance}) does "
-                f"not match Tx balance ({tx_total_balance})"
+                "Total system balance: Legacy balance does not match Tx balance",
+                extra={
+                    "legacy_total_balance": legacy_total_balance,
+                    "tx_total_balance": tx_total_balance,
+                },
             )
         total_balance_fmt = "{:.02f}€".format(legacy_total_balance)
 
