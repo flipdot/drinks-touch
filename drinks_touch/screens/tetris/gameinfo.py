@@ -6,6 +6,7 @@ from pygame import Vector2
 from config import Color, Font, SCREEN_WIDTH
 from database.models import Account
 from screens.tetris.constants import BOARD_WIDTH, SPRITE_RESOLUTION, SCALE, BOARD_HEIGHT
+from screens.tetris.scoreboard import Scoreboard
 from screens.tetris.shape import Shape
 from screens.tetris.utils import darken
 
@@ -15,18 +16,38 @@ if TYPE_CHECKING:
 
 class GameInfo:
 
-    def __init__(self, screen: "TetrisScreen"):
+    def __init__(
+        self,
+        screen: "TetrisScreen",
+        scores: list[tuple[Account, int, int]],
+        all_time_scores: list[tuple[Account, int, int]],
+    ):
         self.last_hash = 0
         self.dirty = True
         self.surface: pygame.Surface | None = None
         self.t = 0
-        self.name_scroll_offset = 0
         self.reserve_block_alpha = 255
+        self.width = SCREEN_WIDTH - BOARD_WIDTH * SPRITE_RESOLUTION.x * SCALE
+        self.height = BOARD_HEIGHT * SPRITE_RESOLUTION.y * SCALE
+        self.scoreboard = Scoreboard(
+            screen, width=self.width * 0.9, title="GAME", scores=scores
+        )
+        self.all_time_scoreboard = Scoreboard(
+            screen, width=self.width * 0.9, title="ALLTIME", scores=all_time_scores
+        )
         # TODO: don't like dependency to parent. Using it for now while refactoring
         self.screen = screen
 
     def calculate_hash(self):
-        return hash((self.name_scroll_offset, self.reserve_block_alpha))
+        return hash(
+            (
+                self.reserve_block_alpha,
+                self.width,
+                self.height,
+                self.scoreboard.calculate_hash(),
+                self.all_time_scoreboard.calculate_hash(),
+            )
+        )
 
     def render(self) -> pygame.Surface:
         """
@@ -42,16 +63,15 @@ class GameInfo:
 
     def tick(self, dt: float):
         self.t += dt
-        self.name_scroll_offset = int(self.t * 3)
+        self.scoreboard.tick(dt)
+        self.all_time_scoreboard.tick(dt)
         if self.screen.reserve_block_used:
             self.reserve_block_alpha = int(20 + abs(math.sin(self.t * 2)) * 150)
         else:
             self.reserve_block_alpha = 255
 
     def _render(self) -> pygame.Surface:
-        w = SCREEN_WIDTH - BOARD_WIDTH * SPRITE_RESOLUTION.x * SCALE
-        h = BOARD_HEIGHT * SPRITE_RESOLUTION.y * SCALE
-        size = Vector2(w, h)
+        size = Vector2(self.width, self.height)
         surface = pygame.Surface(size)
         surface.fill(darken(Color.PRIMARY, 0.8))
 
@@ -63,16 +83,20 @@ class GameInfo:
             self.render_score(size.x * 0.9),
             size.elementwise() * Vector2(0.05, 0.25),
         )
+        surface.blit(self.scoreboard.render(), size.elementwise() * Vector2(0.05, 0.42))
         surface.blit(
-            self.render_scoreboard(size.x * 0.9, "GAME", self.screen.scores),
-            size.elementwise() * Vector2(0.05, 0.42),
+            self.all_time_scoreboard.render(), size.elementwise() * Vector2(0.05, 0.71)
         )
-        surface.blit(
-            self.render_scoreboard(
-                size.x * 0.9, "ALLTIME", self.screen.all_time_scores
-            ),
-            size.elementwise() * Vector2(0.05, 0.71),
-        )
+        # surface.blit(
+        #     self.render_scoreboard(size.x * 0.9, "GAME", self.screen.scores),
+        #     size.elementwise() * Vector2(0.05, 0.42),
+        # )
+        # surface.blit(
+        #     self.render_scoreboard(
+        #         size.x * 0.9, "ALLTIME", self.screen.all_time_scores
+        #     ),
+        #     size.elementwise() * Vector2(0.05, 0.71),
+        # )
 
         return surface
 
@@ -115,75 +139,6 @@ class GameInfo:
         if not self.screen.reserve_block_used:
             text_surface = text_font.render("Tauschen", 1, Color.BLACK.value)
             surface.blit(text_surface, (45, 125))
-        return surface
-
-    def render_scoreboard(
-        self, width: float, title: str, scores: list[tuple[Account, int, int]]
-    ) -> pygame.Surface:
-        size = Vector2(width, 210)
-        surface = pygame.Surface(size, pygame.SRCALPHA)
-
-        pygame.draw.rect(
-            surface,
-            darken(Color.PRIMARY, 0.3),
-            (0, 0, size.x, size.y),
-            border_radius=10,
-        )
-
-        title_font = pygame.font.Font(Font.MONOSPACE.value, 20)
-        text_surface = title_font.render(title, 1, Color.BLACK.value)
-
-        label_font = pygame.font.Font(Font.MONOSPACE.value, 11)
-        points_label = label_font.render("points", 1, Color.BLACK.value)
-        blocks_label = label_font.render("blocks", 1, Color.BLACK.value)
-
-        points_label = pygame.transform.rotate(points_label, -45)
-        blocks_label = pygame.transform.rotate(blocks_label, -45)
-        surface.blit(points_label, (size.x - 40, 3))
-        surface.blit(blocks_label, (size.x - 80, 3))
-
-        surface.blit(text_surface, (5, 10))
-        row_font = pygame.font.Font(Font.MONOSPACE.value, 13)
-
-        # only render the scores around the current player, so that they are always visible
-        current_player_index = 0
-        if self.screen.current_player:
-            for i, row in enumerate(scores):
-                account, *_ = row
-                if account.id == self.screen.current_player.account_id:
-                    current_player_index = i
-                    break
-        scores = scores[max(0, current_player_index - 4) : current_player_index + 10]
-
-        for i, row in enumerate(scores):
-            account, blocks, pixels = row
-            if (
-                self.screen.current_player
-                and account.id == self.screen.current_player.account_id
-            ):
-                text_color = Color.PRIMARY.value
-                pygame.draw.rect(
-                    surface,
-                    darken(self.screen.current_player.color, 0.6),
-                    (0, 40 + i * 20, size.x, 20),
-                )
-            else:
-                text_color = Color.BLACK.value
-
-            # scrolling names
-            name = account.name
-            if len(name) > 6:
-                name = " " * 6 + name
-                end_offset = len(name)
-                start = self.name_scroll_offset % end_offset
-                end = start + 6
-                name = name[start:end]
-
-            pos = i + 1 + max(0, current_player_index - 4)
-            text_surface = row_font.render(
-                f"{pos:2}. {name:6} {blocks:4} {pixels:4}", 1, text_color
-            )
-            surface.blit(text_surface, (5, 40 + i * 20))
         return surface
 
     def render_score(self, width: float) -> pygame.Surface:

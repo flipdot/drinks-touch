@@ -31,7 +31,6 @@ class RunCmdTask(BaseTask):
                 if self.sig_killed:
                     self.logger.info(f"Killing PID {process.pid}")
                     process.kill()
-                    raise Exception("Process killed")
             for line in process.stdout.readlines():
                 self.logger.info(line.decode().strip())
             if process.returncode != 0:

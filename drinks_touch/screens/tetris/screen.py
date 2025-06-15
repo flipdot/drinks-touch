@@ -94,7 +94,7 @@ class TetrisScreen(Screen):
         self.game_starts_at = None
         self.game_starts_in = 0
         self.hide_full_row = False
-        self.gameinfo = GameInfo(self)
+        self.gameinfo = GameInfo(self, self.scores, self.all_time_scores)
         self.board_obj = Board(self)
 
         self.objects = []
@@ -340,6 +340,7 @@ class TetrisScreen(Screen):
             (account, score.alltime_blocks, score.alltime_points)
             for score, account in all_time_scores_query
         ]
+        self.gameinfo = GameInfo(self, self.scores, self.all_time_scores)
         game = TetrisGame.query.first()
         self.score = game.score
         self.highscore = game.highscore
