@@ -14,14 +14,49 @@ if TYPE_CHECKING:
 class Board:
 
     def __init__(self, screen: "TetrisScreen"):
+        self.last_hash = 0
+        self.dirty = True
+        self.surface: pygame.Surface | None = None
         # TODO: don't like dependency to parent. Using it for now while refactoring
         self.screen = screen
 
     def calculate_hash(self):
-        # TODO
-        return None
+        board_tuple = tuple(
+            tuple(cell.type.value for cell in row) for row in self.screen.board
+        )
+        current_block_hash = (
+            self.screen.current_block.calculate_hash()
+            if self.screen.current_block
+            else None
+        )
+        return hash(
+            (
+                self.screen.game_started,
+                self.screen.current_player,
+                (
+                    self.screen.current_player.account_id
+                    if self.screen.current_player
+                    else None
+                ),
+                board_tuple,
+                self.screen.hide_full_row,
+                current_block_hash,
+            )
+        )
 
     def render(self) -> pygame.Surface:
+        """
+        Caches the result of the internal `_render` method
+        """
+        if self.last_hash != (new_hash := self.calculate_hash()):
+            self.dirty = True
+            self.last_hash = new_hash
+        if self.dirty:
+            self.surface = self._render()
+            self.dirty = False
+        return self.surface
+
+    def _render(self) -> pygame.Surface:
         surface = pygame.Surface(
             SPRITE_RESOLUTION.elementwise()
             * Vector2(BOARD_WIDTH, BOARD_HEIGHT)

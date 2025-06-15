@@ -618,12 +618,6 @@ class TetrisScreen(Screen):
 
     def calculate_hash(self):
         super_hash = super().calculate_hash()
-        board_tuple = tuple(
-            tuple(cell.type.value for cell in row) for row in self.board
-        )
-        current_block_hash = (
-            self.current_block.calculate_hash() if self.current_block else None
-        )
         return hash(
             (
                 super_hash,
@@ -636,17 +630,13 @@ class TetrisScreen(Screen):
                 tuple(self.scored_points),
                 self.reserve_block_type,
                 self.reserve_block_used,
-                board_tuple,
                 self.level,
                 tuple(self.next_blocks),
-                current_block_hash,
                 self.game_over,
                 self.move_ended,
                 self.game_started,
                 self.game_starts_at,
                 self.game_starts_in,
-                self.hide_full_row,
-                self.current_player.account_id if self.current_player else None,
                 self.gameinfo.calculate_hash(),
                 self.board_obj.calculate_hash(),
             )
