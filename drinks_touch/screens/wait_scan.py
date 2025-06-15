@@ -95,7 +95,7 @@ class WaitScanScreen(Screen):
         legacy_total_balance = WaitScanScreen.get_legacy_total_balance()
         tx_total_balance = Session().query(func.sum(Tx.amount)).scalar() or Decimal(0)
         if legacy_total_balance != tx_total_balance:
-            logger.exception(
+            logger.error(
                 "Total system balance: Legacy balance does not match Tx balance",
                 extra={
                     "legacy_total_balance": legacy_total_balance,
