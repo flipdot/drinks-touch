@@ -2,14 +2,17 @@ import datetime
 import functools
 import logging
 from dataclasses import dataclass
+from decimal import Decimal
 from pathlib import Path
 
 import pytz
 from dateutil.rrule import rrulestr
+from sqlalchemy import func
 
 import config
 from config import Color
-from database.storage import get_session
+from database.models import Tx
+from database.storage import get_session, Session
 from drinks.drinks_manager import DrinksManager
 from elements import SvgIcon, Label, Button
 from elements.hbox import HBox
@@ -88,20 +91,15 @@ class WaitScanScreen(Screen):
                         color=Color.RED,
                     ),
                 ]
-        sql = text(
-            """
-            SELECT SUM(amount) - (
-                SELECT COUNT(*) FROM "scanevent"
-                 WHERE "user_id" NOT LIKE 'geld%' AND "user_id" != '0'
-                ) AS Gesamtguthaben
-            FROM "rechargeevent" WHERE "user_id" NOT LIKE 'geld%';"""
-        )
-        try:
-            total_balance = get_session().execute(sql).scalar() or 0
-            total_balance_fmt = "{:.02f}€".format(total_balance)
-        except Exception:
-            logger.exception("sql error while getting total money amount")
-            total_balance_fmt = "(SQL Error)"
+
+        legacy_total_balance = WaitScanScreen.get_legacy_total_balance()
+        tx_total_balance = Session().query(func.sum(Tx.amount)).scalar() or Decimal(0)
+        if legacy_total_balance != tx_total_balance:
+            logger.error(
+                f"Total system balance: Legacy balance ({legacy_total_balance}) does "
+                f"not match Tx balance ({tx_total_balance})"
+            )
+        total_balance_fmt = "{:.02f}€".format(legacy_total_balance)
 
         bottom_right_buttons = [
             Button(
@@ -304,6 +302,20 @@ class WaitScanScreen(Screen):
         # Make sure at least two events are in the past
         events.sort(key=lambda x: x.start, reverse=True)
         return events[:15]
+
+    @staticmethod
+    def get_legacy_total_balance():
+        sql = text(
+            """
+            SELECT SUM(amount) - (SELECT COUNT(*)
+                                  FROM "scanevent"
+                                  WHERE "user_id" NOT LIKE 'geld%'
+                                    AND "user_id" != '0'
+                ) AS Gesamtguthaben
+            FROM "rechargeevent"
+            WHERE "user_id" NOT LIKE 'geld%';"""
+        )
+        return get_session().execute(sql).scalar() or 0
 
     def on_barcode(self, barcode):
         if not barcode:
