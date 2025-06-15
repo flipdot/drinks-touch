@@ -21,6 +21,9 @@ class Scoreboard:
         scores: list[tuple[Account, int, int]],
     ):
         self.t = 0
+        self.last_hash = 0
+        self.dirty = True
+        self.surface: pygame.Surface | None = None
         self.name_scroll_offset = 0
         self.screen = screen
         self.width = width
@@ -35,6 +38,18 @@ class Scoreboard:
         self.name_scroll_offset = int(self.t * 3)
 
     def render(self) -> pygame.Surface:
+        """
+        Caches the result of the internal `_render` method
+        """
+        if self.last_hash != (new_hash := self.calculate_hash()):
+            self.dirty = True
+            self.last_hash = new_hash
+        if self.dirty:
+            self.surface = self._render()
+            self.dirty = False
+        return self.surface
+
+    def _render(self) -> pygame.Surface:
         # self, width: float, title: str, scores: list[tuple[Account, int, int]]
         size = Vector2(self.width, 210)
         surface = pygame.Surface(size, pygame.SRCALPHA)
