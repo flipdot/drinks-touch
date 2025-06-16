@@ -231,7 +231,7 @@ class WaitScanScreen(Screen):
                     color=config.Color.BACKGROUND,
                     bg_color=Color.PRIMARY,
                     padding=0,
-                    blink_frequency=60,
+                    blink_frequency=0.5,
                 )
             )
 

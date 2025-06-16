@@ -40,6 +40,8 @@ class Label(BaseElm):
         self.border_color = border_color
         self.border_width = border_width
         self.blink_frequency = blink_frequency
+        self.t = 0.0
+        self.last_blink = 0.0
         today = datetime.now().date()
         april_fools = today.month == 4 and today.day == 1
         if april_fools:
@@ -49,7 +51,6 @@ class Label(BaseElm):
             self.flip_x = False
             self.flip_y = False
 
-        self.frame_counter = 0
         super().__init__(children, height=self.size, width=self.size, *args, **kwargs)
 
         self.font = Label.get_font(font, self.size)
@@ -69,6 +70,7 @@ class Label(BaseElm):
                 self.bg_color,
                 self.border_color,
                 self.border_width,
+                self.visible,
             )
         )
 
@@ -81,8 +83,10 @@ class Label(BaseElm):
         # TODO: Should be independent from frame rate
         if not self.blink_frequency:
             return
-        self.frame_counter += 1
-        self.visible = (self.frame_counter // self.blink_frequency) % 2 == 0
+        self.t += dt
+        if self.t > self.last_blink + (1 / self.blink_frequency):
+            self.last_blink = self.t
+            self.visible = not self.visible
 
     def _render(self, *args, **kwargs) -> pygame.Surface | None:
         text, pos, area = self._build_text()
