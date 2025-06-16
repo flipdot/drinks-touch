@@ -15,20 +15,18 @@ class MouseOverlay(BaseOverlay):
         self.click_pos = (0, 0)
         self.mouse_path = []
         self.color = config.Color.PRIMARY
-        self.tick = 0
         self.mouse_pressed = False
 
-    def render(self, dt):
-        self.tick += dt
+    def render(self):
         self._render_click_animation()
         self._render_mouse_path()
         self._render_mouse_pos()
 
     def _render_click_animation(self):
-        radius_inner = 50 * math.sin(self.tick * 1.3)
-        radius_outer = 50 * math.sin(self.tick * 2)
+        radius_inner = 50 * math.sin(self.t * 1.3)
+        radius_outer = 50 * math.sin(self.t * 2)
         # Avoid infinite loop
-        if self.tick > 2:
+        if self.t > 2:
             return
         if radius_inner >= radius_outer:
             return
@@ -85,4 +83,4 @@ class MouseOverlay(BaseOverlay):
                 self.reset()
 
     def reset(self):
-        self.tick = 0
+        self.t = 0

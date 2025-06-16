@@ -311,7 +311,6 @@ class KeyboardOverlay(BaseOverlay):
             ],
         }
         self.layout = self.layouts[KeyboardLayout.DEFAULT]
-        self.clock = 0
         self._settings_for_object = None
 
     def set_keys_disabled(self, disabled_characters: str):
@@ -323,30 +322,33 @@ class KeyboardOverlay(BaseOverlay):
         event = pygame.event.Event(pygame.KEYDOWN, key=key, unicode=char)
         self.screen_manager.events([event])
 
-    def render(self, dt: float):
+    def tick(self, dt: float):
+        super().tick(dt)
         if not self.visible:
-            self.clock = 0
+            self.t = 0
             return
-        self.clock += dt
+        for obj in self.layout:
+            obj.tick(dt)
+
+    def render(self):
+        if not self.visible:
+            return
         surface = pygame.Surface(
             (self.screen.get_width(), self.height), pygame.SRCALPHA
         )
         surface.fill((0, 0, 0, 255))
 
         for obj in self.layout:
-            obj.tick(dt)
             if not obj.visible:
                 continue
             if obj_surface := obj.render():
                 surface.blit(obj_surface, obj.screen_pos)
 
-        if self.clock < self.ANIMATION_DURATION:
-            alpha = int((self.clock / self.ANIMATION_DURATION) * 255)
+        if self.t < self.ANIMATION_DURATION:
+            alpha = int((self.t / self.ANIMATION_DURATION) * 255)
             surface.set_alpha(alpha)
 
-            pos = self._anim_start_pos.lerp(
-                self.pos, self.clock / self.ANIMATION_DURATION
-            )
+            pos = self._anim_start_pos.lerp(self.pos, self.t / self.ANIMATION_DURATION)
         else:
             pos = self.pos
 
