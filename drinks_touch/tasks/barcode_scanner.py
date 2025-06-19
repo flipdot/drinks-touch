@@ -56,7 +56,7 @@ class BarcodeWorker:
         if barcode == "RESTART":
             from screens.tasks_screen import TasksScreen
 
-            screen.goto(TasksScreen(screen.screen, [CheckoutAndRestartTask("master")]))
+            screen.goto(TasksScreen([CheckoutAndRestartTask("master")]))
             return
 
         screen.on_barcode(barcode)
