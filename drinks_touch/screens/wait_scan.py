@@ -8,11 +8,12 @@ from pathlib import Path
 import pytz
 from dateutil.rrule import rrulestr
 from sqlalchemy import func
+from sqlalchemy.orm import Session
 
 import config
 from config import Color
 from database.models import Tx
-from database.storage import get_session, Session
+from database.storage import with_db_session
 from drinks.drinks_manager import DrinksManager
 from elements import SvgIcon, Label, Button
 from elements.hbox import HBox
@@ -92,17 +93,8 @@ class WaitScanScreen(Screen):
                     ),
                 ]
 
-        legacy_total_balance = WaitScanScreen.get_legacy_total_balance()
-        tx_total_balance = Session().query(func.sum(Tx.amount)).scalar() or Decimal(0)
-        if legacy_total_balance != tx_total_balance:
-            logger.error(
-                "Total system balance: Legacy balance does not match Tx balance",
-                extra={
-                    "legacy_total_balance": legacy_total_balance,
-                    "tx_total_balance": tx_total_balance,
-                },
-            )
-        total_balance_fmt = "{:.02f}€".format(legacy_total_balance)
+        total_balance = WaitScanScreen.get_total_balance()
+        total_balance_fmt = "{:.02f}€".format(total_balance)
 
         bottom_right_buttons = [
             Button(
@@ -238,6 +230,21 @@ class WaitScanScreen(Screen):
         DrinksManager.instance.set_selected_drink(None)
 
     @staticmethod
+    @with_db_session
+    def get_total_balance(session: Session) -> Decimal:
+        legacy_total_balance = WaitScanScreen.get_legacy_total_balance(session)
+        tx_total_balance = session.query(func.sum(Tx.amount)).scalar() or Decimal(0)
+        if legacy_total_balance != tx_total_balance:
+            logger.error(
+                "Total system balance: Legacy balance does not match Tx balance",
+                extra={
+                    "legacy_total_balance": legacy_total_balance,
+                    "tx_total_balance": tx_total_balance,
+                },
+            )
+        return legacy_total_balance
+
+    @staticmethod
     @functools.cache
     def load_events_from_ical(file_path: Path) -> list[FlipdotEvent]:
         with open(file_path, "r") as f:
@@ -307,7 +314,7 @@ class WaitScanScreen(Screen):
         return events[:15]
 
     @staticmethod
-    def get_legacy_total_balance():
+    def get_legacy_total_balance(session: Session):
         sql = text(
             """
             SELECT SUM(amount) - (SELECT COUNT(*)
@@ -318,7 +325,7 @@ class WaitScanScreen(Screen):
             FROM "rechargeevent"
             WHERE "user_id" NOT LIKE 'geld%';"""
         )
-        return get_session().execute(sql).scalar() or 0
+        return session.execute(sql).scalar() or 0
 
     def on_barcode(self, barcode):
         if not barcode:
