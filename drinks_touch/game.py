@@ -41,11 +41,10 @@ logging.Formatter.converter = time.gmtime
 # logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
 
 event_queue = queue.Queue()
-overlays: list[BaseOverlay] = []
-screen_manager: ScreenManager | None = None
 
 
-def handle_events(events, t: int, dt: float) -> bool:
+def handle_events(events, t: int, dt: float, overlays: list[BaseOverlay]) -> bool:
+    screen_manager = ScreenManager.instance
     for e in events:
         e.t = t
         e.dt = dt
@@ -76,8 +75,6 @@ def main(argv):
 
     DrinksManager()
 
-    global screen_manager
-    global overlays
     screen_manager = ScreenManager()
 
     screen_manager.set_default()
@@ -106,12 +103,10 @@ def main(argv):
         else:
             screen_manager.set_active(TasksScreen())
 
-    overlays.extend(
-        [
-            KeyboardOverlay(screen_manager),
-            MouseOverlay(screen_manager),
-        ]
-    )
+    overlays = [
+        KeyboardOverlay(screen_manager),
+        MouseOverlay(screen_manager),
+    ]
 
     # webserver needs to be a main thread #
     web_process = subprocess.Popen([sys.argv[0], "--webserver"])
@@ -132,7 +127,7 @@ def main(argv):
         t += dt
         fps = clock.get_fps()
 
-        done = handle_events(pygame.event.get(), t, dt)
+        done = handle_events(pygame.event.get(), t, dt, overlays)
 
         screen_manager.tick(dt)
         for overlay in overlays:
