@@ -21,7 +21,12 @@ from stats.stats import scans
 from users.qr import make_sepa_qr
 
 
-db = SQLAlchemy(model_class=Base)
+db = SQLAlchemy(
+    model_class=Base,
+    engine_options={
+        "connect_args": {"application_name": "drinks_web"},
+    },
+)
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = config.POSTGRES_CONNECTION_STRING
 db.init_app(app)
