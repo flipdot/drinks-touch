@@ -4,8 +4,9 @@ import sys
 
 import re
 from PIL import Image, ImageDraw, ImageFont, ImageMath
+from sqlalchemy.orm import Session
 
-from database.storage import get_session
+from database.storage import with_db_session
 from sqlalchemy import text
 from env import is_pi
 from stats.flipdot import create_socket, send_frame, w, h
@@ -18,8 +19,8 @@ font = ImageFont.truetype(
 max_drinks = 6
 
 
-def scans(limit=1000, hours=None):
-    session = get_session()
+@with_db_session
+def scans(session: Session, limit=1000, hours=None):
     where = ""
     params = {}
     if hours:

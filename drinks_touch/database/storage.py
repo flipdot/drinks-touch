@@ -34,11 +34,6 @@ if not is_pi():
     logger.setLevel(getattr(logging, config.LOGLEVEL))
 
 
-def get_session():
-    # Session.remove()
-    return Session
-
-
 def with_db_session(func):
     """
     A decorator that injects an SQLAlchemy session into the decorated method.

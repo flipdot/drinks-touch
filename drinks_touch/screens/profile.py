@@ -1,11 +1,12 @@
 import functools
 
+from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
 
 import config
 from config import Font
 from database.models import Account
-from database.storage import get_session
+from database.storage import with_db_session
 from drinks.drinks import get_by_ean
 from drinks.drinks_manager import DrinksManager
 from elements.button import Button
@@ -250,8 +251,8 @@ class ProfileScreen(Screen):
             self.objects.remove(d)
         self.objects.extend(self.elements_drinks)
 
-    def get_stats(self, limit=None):
-        session = get_session()
+    @with_db_session
+    def get_stats(self, session: Session, limit=None):
         sql = text(
             """
             SELECT COUNT(*) as count, barcode as name
@@ -262,10 +263,8 @@ class ProfileScreen(Screen):
             LIMIT :limit
         """
         )
-        result = (
-            session.connection()
-            .execute(sql, {"userid": self.account.ldap_id, "limit": limit})
-            .fetchall()
-        )
+        result = session.execute(
+            sql, {"userid": self.account.ldap_id, "limit": limit}
+        ).fetchall()
 
         return [{"count": x[0], "name": x[1]} for x in result]

@@ -1,5 +1,7 @@
+from sqlalchemy.orm import Session
+
 from database.models import ScanEvent, Tx, Drink, Account, RechargeEvent
-from database.storage import get_session
+from database.storage import with_db_session
 from tasks.base import BaseTask
 
 
@@ -11,8 +13,8 @@ class MigrateTxTask(BaseTask):
         self._migrate_rechargeevents()
         self._check_dangling_txs()
 
-    def _migrate_scanevents(self):
-        session = get_session()
+    @with_db_session
+    def _migrate_scanevents(self, session: Session):
         self.logger.info("Selecting non-migrated scanevents")
 
         scanevents_with_accounts = (
@@ -53,8 +55,8 @@ class MigrateTxTask(BaseTask):
         self.logger.info("Committing changes to the database")
         session.commit()
 
-    def _migrate_rechargeevents(self):
-        session = get_session()
+    @with_db_session
+    def _migrate_rechargeevents(self, session: Session):
         self.logger.info("Selecting non-migrated rechargeevents")
         rechargevents_with_accounts = (
             session.query(RechargeEvent, Account)
@@ -117,11 +119,11 @@ class MigrateTxTask(BaseTask):
             rechargeevent.tx_id = tx.id
         session.commit()
 
-    def _check_dangling_txs(self):
+    @with_db_session
+    def _check_dangling_txs(self, session: Session):
         """
         Find transactions that are not linked to any scan or recharge event.
         """
-        session = get_session()
         self.logger.info("Checking for dangling transactions")
         txs = (
             session.query(Tx)

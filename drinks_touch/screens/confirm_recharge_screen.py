@@ -1,6 +1,8 @@
+from sqlalchemy.orm import Session
+
 import config
 from database.models import RechargeEvent, Tx
-from database.storage import get_session
+from database.storage import with_db_session
 from elements import Label, Button
 from elements.hbox import HBox
 from elements.vbox import VBox
@@ -65,8 +67,8 @@ class ConfirmRechargeScreen(Screen):
             ),
         ]
 
-    def save_payment(self):
-        session = get_session()
+    @with_db_session
+    def save_payment(self, session: Session):
         tx = Tx(
             payment_reference="Aufladung via Display",
             account_id=self.account.id,
