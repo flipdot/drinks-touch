@@ -61,8 +61,6 @@ def with_db_session(func):
         with Session() as session:
             # Inject the session into the function's keyword arguments
             kwargs["session"] = session
-            res = func(*args, **kwargs)
-            session.commit()
-            return res
+            return func(*args, **kwargs)
 
     return wrapper
