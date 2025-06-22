@@ -3,7 +3,6 @@
 import contextlib
 import locale
 import logging
-import os
 import queue
 import subprocess
 import sys
@@ -14,7 +13,6 @@ from alembic.runtime.migration import MigrationContext
 from alembic.script import ScriptDirectory
 
 import config
-import env
 from database.storage import engine
 from drinks.drinks_manager import DrinksManager
 from overlays import MouseOverlay, BaseOverlay
@@ -24,7 +22,6 @@ from screens.screen_manager import ScreenManager
 
 from screens.tasks_screen import TasksScreen
 from stats.stats import run as stats_send
-from webserver.webserver import run as run_webserver
 import sentry_sdk
 
 with contextlib.redirect_stdout(None):
@@ -64,10 +61,6 @@ def handle_events(events, t: int, dt: float, overlays: list[BaseOverlay]) -> boo
 # Rendering #
 def main(argv):
     locale.setlocale(locale.LC_ALL, "de_DE.UTF-8")
-
-    if "--webserver" in argv:
-        run_webserver()
-        return 0
 
     if "--stats" in argv:
         stats_send()
@@ -109,10 +102,8 @@ def main(argv):
     ]
 
     # webserver needs to be a main thread #
-    web_process = subprocess.Popen([sys.argv[0], "--webserver"])
-
-    if env.is_pi():
-        os.system("rsync -a sounds/ pi@pixelfun:sounds/ &")
+    script_dir = Path(sys.argv[0]).parent
+    web_process = subprocess.Popen([script_dir / "webapp.py"])
 
     pygame.key.set_repeat(500, 50)
     pygame.mixer.pre_init(48000, buffer=2048)

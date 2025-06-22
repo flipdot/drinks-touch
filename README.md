@@ -22,7 +22,7 @@ docker compose -f docker-compose.dev.yml up
 - Mailpit: http://localhost:8025/
 - Keycloak: http://localhost:8080/
 - Webapp: http://localhost:5002/
-  - Not part of compose; Requires game.py to be running
+  - Not part of compose; Requires either game.py or webapp.py to be running
 
 The project is using poetry. Install the dependencies with:
 
