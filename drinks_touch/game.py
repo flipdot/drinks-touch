@@ -21,7 +21,6 @@ from screens.message_screen import MessageScreen
 from screens.screen_manager import ScreenManager
 
 from screens.tasks_screen import TasksScreen
-from stats.stats import run as stats_send
 import sentry_sdk
 
 with contextlib.redirect_stdout(None):
@@ -59,12 +58,8 @@ def handle_events(events, t: int, dt: float, overlays: list[BaseOverlay]) -> boo
 
 
 # Rendering #
-def main(argv):
+def main():
     locale.setlocale(locale.LC_ALL, "de_DE.UTF-8")
-
-    if "--stats" in argv:
-        stats_send()
-        return 0
 
     DrinksManager()
 
@@ -101,10 +96,6 @@ def main(argv):
         MouseOverlay(screen_manager),
     ]
 
-    # webserver needs to be a main thread #
-    script_dir = Path(sys.argv[0]).parent
-    web_process = subprocess.Popen([script_dir / "webapp.py"])
-
     pygame.key.set_repeat(500, 50)
     pygame.mixer.pre_init(48000, buffer=2048)
     pygame.mixer.init()
@@ -130,11 +121,18 @@ def main(argv):
 
         pygame.display.flip()
 
-    web_process.terminate()
-    web_process.wait()
-
     return 0
 
 
 if __name__ == "__main__":
-    sys.exit(main(sys.argv))
+    # Run the web server in a separate process.
+    # To be discussed: Should systemd handle this instead?
+    script_dir = Path(sys.argv[0]).parent
+    web_process = subprocess.Popen([script_dir / "webapp.py"])
+
+    return_code = main()
+
+    web_process.terminate()
+    web_process.wait()
+
+    sys.exit(return_code)
