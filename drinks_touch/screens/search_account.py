@@ -1,5 +1,8 @@
+from sqlalchemy import select
+
 import config
 from database.models import Account
+from database.storage import Session, with_db
 from elements import Label
 from elements.input_field import InputField
 from screens.profile import ProfileScreen
@@ -37,8 +40,10 @@ class SearchAccountScreen(Screen):
         if not ScreenManager.instance.keyboard_visible:
             self.back()
 
+    @with_db
     def select_account(self, text: str):
-        account = Account.query.filter(Account.name == text).first()
+        query = select(Account).filter(Account.name == text)
+        account = Session().execute(query).scalar_one_or_none()
         if account:
             self.goto(ProfileScreen(account))
         else:

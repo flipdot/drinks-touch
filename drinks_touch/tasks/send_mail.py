@@ -5,12 +5,10 @@ from sqlalchemy import select
 
 import config
 from database.models import Account
-from database.storage import Session
+from database.storage import Session, with_db
 from notifications.notification import (
     render_jinja_template,
     send_notification,
-    get_drinks_consumed,
-    get_recharges,
     format_drinks,
     format_recharges,
     FOOTER,
@@ -23,21 +21,21 @@ class SendMailTask(BaseTask):
     ON_STARTUP = True
 
     def run(self):
-        with Session().begin():
-            self.logger.info("Sending negative balance reminders...")
-            self.send_low_balances()
-            if self.sig_killed:
-                self.logger.error("Task was killed while sending low balances")
-                self._fail()
-                return
-            self.logger.info("Sending summaries...")
-            self.send_summaries()
-            if self.sig_killed:
-                self.logger.error("Task was killed while sending summaries")
-                self._fail()
-                return
-            self.logger.info("Mail sending completed.")
+        self.logger.info("Sending negative balance reminders...")
+        self.send_low_balances()
+        if self.sig_killed:
+            self.logger.error("Task was killed while sending low balances")
+            self._fail()
+            return
+        self.logger.info("Sending summaries...")
+        self.send_summaries()
+        if self.sig_killed:
+            self.logger.error("Task was killed while sending summaries")
+            self._fail()
+            return
+        self.logger.info("Mail sending completed.")
 
+    @with_db
     def send_low_balances(self):
         accounts = Session().query(Account).filter(Account.email.isnot(None)).all()
         for i, account in enumerate(accounts):
@@ -45,7 +43,6 @@ class SendMailTask(BaseTask):
             if self.sig_killed:
                 return
             self.send_low_balance(account)
-            continue
 
     def send_low_balance(self, account: Account):
         assert account.email, "Account has no email"
@@ -57,7 +54,6 @@ class SendMailTask(BaseTask):
             #  actually got an email.
             #  Maybe we can instead store the time at which the balance went negative
             account.last_balance_warning_email_sent_at = datetime.now()
-            Session().flush()
             return
 
         delta = datetime.now() - account.last_balance_warning_email_sent_at
@@ -91,18 +87,30 @@ class SendMailTask(BaseTask):
         )
 
         account.last_balance_warning_email_sent_at = datetime.now()
-        Session().flush()
 
+    @with_db
     def send_summaries(self):
+        from sqlalchemy import inspect
+
         query = select(Account).where(Account.email.isnot(None) & Account.enabled)
         accounts = Session().scalars(query).all()
         for i, account in enumerate(accounts):
             self.progress = 0.5 + (i + 1) / len(accounts) / 2
             if self.sig_killed:
-                return
+                break
             self.send_summary(account, "Getränkeübersicht")
+            # After send_summary:
+            state = inspect(account)
+            if state.modified:
+                print(f"Account {account.name} | Dirty attributes:")
+                print("Dirty:", state.attrs)
+                print("Is dirty:", state.modified)
+                print(
+                    "Pending changes?",
+                    state.attrs.last_summary_email_sent_at.history.has_changes(),
+                )
 
-    def send_summary(self, account: Account, subject):
+    def send_summary(self, account: Account, subject: str):
         assert account.email, "Account has no email"
 
         frequency_str = account.summary_email_notification_setting
@@ -128,8 +136,13 @@ class SendMailTask(BaseTask):
         )
 
         self.logger.info(f"Account {account.id:3} | Checking history...")
-        drinks_consumed = get_drinks_consumed(account)
-        recharges = get_recharges(account)
+        # TODO: Call to nested database operations cause a rollback
+        # drinks_consumed = get_drinks_consumed(account)
+        drinks_consumed = [
+            {"timestamp": datetime.now(), "name": "Cola", "size": "0.5"}
+        ]  # Placeholder for testing
+        # recharges = get_recharges(account)
+        recharges = []
 
         if drinks_consumed:
             content_text += format_drinks(drinks_consumed)
@@ -164,4 +177,3 @@ class SendMailTask(BaseTask):
         )
 
         account.last_summary_email_sent_at = datetime.now()
-        Session().flush()

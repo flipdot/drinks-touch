@@ -2,7 +2,6 @@ import pygame
 from pygame import Vector2
 
 from config import Color, Font
-from database.models import Account
 from screens.tetris.utils import darken
 
 from typing import TYPE_CHECKING
@@ -18,7 +17,7 @@ class Scoreboard:
         screen: "TetrisScreen",
         width: float,
         title: str,
-        scores: list[tuple[Account, int, int]],
+        scores: list[tuple[int, str, int, int]],
     ):
         self.t = 0
         self.last_hash = 0
@@ -87,8 +86,8 @@ class Scoreboard:
         current_player_index = 0
         if self.screen.current_player:
             for i, row in enumerate(self.scores):
-                account, *_ = row
-                if account.id == self.screen.current_player.account_id:
+                account_id, *_ = row
+                if account_id == self.screen.current_player.account_id:
                     current_player_index = i
                     break
         scores = self.scores[
@@ -96,10 +95,10 @@ class Scoreboard:
         ]
 
         for i, row in enumerate(scores):
-            account, blocks, pixels = row
+            account_id, account_name, blocks, pixels = row
             if (
                 self.screen.current_player
-                and account.id == self.screen.current_player.account_id
+                and account_id == self.screen.current_player.account_id
             ):
                 text_color = Color.PRIMARY.value
                 pygame.draw.rect(
@@ -111,7 +110,7 @@ class Scoreboard:
                 text_color = Color.BLACK.value
 
             # scrolling names
-            name = account.name
+            name = account_name
             if len(name) > 6:
                 name = " " * 6 + name
                 end_offset = len(name)

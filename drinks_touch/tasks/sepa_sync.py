@@ -13,13 +13,14 @@ import config
 from database.models import Tx
 from database.models.account import Account
 from database.models.recharge_event import RechargeEvent
-from database.storage import Session
+from database.storage import Session, with_db
 
 
 class SepaSyncTask(BaseTask):
     LABEL = "SEPA Synchronisation"
     ON_STARTUP = True
 
+    @with_db
     def run(self):
         try:
             data = requests.get(
@@ -61,7 +62,6 @@ class SepaSyncTask(BaseTask):
                     continue
 
                 self.handle_transferred(charge, charge_amount, charge_date, got, uid)
-        Session().commit()
 
     def get_existing(self):
         rechargeevents = (

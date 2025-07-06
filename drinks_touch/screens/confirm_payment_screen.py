@@ -1,11 +1,10 @@
 import datetime
 
 import pygame
-from sqlalchemy.orm import Session
 
 import config
 from database.models import ScanEvent, Tx
-from database.storage import with_db_session
+from database.storage import Session, with_db
 from drinks.drinks_manager import DrinksManager
 from elements import Label, Button
 from elements.base_elm import BaseElm
@@ -86,24 +85,23 @@ class ConfirmPaymentScreen(Screen):
     def on_stop(self, *args, **kwargs):
         DrinksManager.instance.set_selected_drink(None)
 
-    @with_db_session
-    def save_drink(self, session: Session):
+    @with_db
+    def save_drink(self):
         transaction = Tx(
             payment_reference=f'Kauf "{self.drink["name"]}"',
             ean=self.drink["ean"],
             account_id=self.account.id,
             amount=-1,  # "Alles 1 Euro" policy
         )
-        session.add(transaction)
-        session.flush()
+        Session().add(transaction)
+        Session().flush()
         ev = ScanEvent(
             self.drink["ean"],
             self.account.ldap_id,
             datetime.datetime.now(),
             tx_id=transaction.id,
         )
-        session.add(ev)
-        session.commit()
+        Session().add(ev)
         DrinksManager.instance.set_selected_drink(None)
 
         self.goto(

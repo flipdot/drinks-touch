@@ -1,7 +1,6 @@
 from influxdb import InfluxDBClient
-from sqlalchemy.orm import Session
 
-from database.storage import with_db_session
+from database.storage import Session, with_db
 
 influx_client = InfluxDBClient("172.18.0.2", 8086, "admin", "admin", "drinks")
 influx_client.create_database("drinks")
@@ -15,9 +14,9 @@ def clear_scanevents():
     influx_client.query("delete from drink_scans")
 
 
-@with_db_session
-def upload_scanevents(session: Session):
-    result = session.execute(
+@with_db
+def upload_scanevents():
+    result = Session().execute(
         """
         SELECT scanevent.id, scanevent.timestamp as time, drink.name, type
         FROM scanevent
@@ -45,7 +44,7 @@ def upload_scanevents(session: Session):
         ]
         influx_client.write_points(json_body)
 
-        session.execute(
+        Session().execute(
             """
             UPDATE scanevent
             SET uploaded_to_influx = TRUE
@@ -53,7 +52,6 @@ def upload_scanevents(session: Session):
         """,
             {"id": scan_id},
         )
-        session.commit()
 
 
 if __name__ == "__main__":

@@ -9,11 +9,12 @@ from datetime import datetime
 import pygame
 from pygame import Vector2
 from pygame.mixer import Sound
+from sqlalchemy import select
 
 import config
 from config import Color
 from database.models import Account, TetrisPlayer, TetrisGame
-from database.storage import Session
+from database.storage import Session, with_db
 from elements import Button, SvgIcon, Progress
 from elements.hbox import HBox
 from elements.spacer import Spacer
@@ -37,9 +38,11 @@ logger = logging.getLogger(__name__)
 
 
 @functools.cache
+@with_db
 def get_name_for_account_id(account_id: int) -> str:
-    account = Account.query.get(account_id)
-    return account.name
+    query = select(Account.name).where(Account.id == account_id)
+    name = Session().execute(query).scalar_one()
+    return name
 
 
 class TetrisJSONEncoder(json.JSONEncoder):
@@ -72,8 +75,8 @@ class TetrisScreen(Screen):
         self.last_tick = 0
         self.loading = True
         self.account = account
-        self.scores: list[tuple[Account, int, int]] = []
-        self.all_time_scores: list[tuple[Account, int, int]] = []
+        self.scores: list[tuple[int, str, int, int]] = []
+        self.all_time_scores: list[tuple[int, str, int, int]] = []
         self.score = 0
         self.highscore = 0
         self.lines = 0
@@ -99,8 +102,11 @@ class TetrisScreen(Screen):
 
         self.objects = []
 
+    @with_db
     def on_start(self, *args, **kwargs):
-        if not TetrisGame.query.first():
+        query = select(TetrisGame)
+        tetris_game = Session().execute(query).scalar_one_or_none()
+        if not tetris_game:
             Session.add(
                 TetrisGame(
                     score=0,
@@ -112,7 +118,6 @@ class TetrisScreen(Screen):
                     reserve_block=random.choice(list(BlockType)),
                 )
             )
-            Session.commit()
 
         self.reserve_block_type = self.load_reserve_block()
         self.board = self.load_board()
@@ -203,6 +208,7 @@ class TetrisScreen(Screen):
             ),
         ]
 
+    @with_db
     def on_color_selected(self, color: Color):
         if self.current_player:
             # Due to the pi lagging, it can happen that the on_click handler is
@@ -224,7 +230,6 @@ class TetrisScreen(Screen):
             color=rgb_to_hex(color.value),
         )
         Session.add(p)
-        Session.commit()
         self.current_player = Player(p)
 
     def spawn_block(self, block_type: None | BlockType = None) -> Block:
@@ -238,10 +243,12 @@ class TetrisScreen(Screen):
         )
 
     def load_level(self) -> int:
-        game = TetrisGame.query.first()
-        if game.level:
-            return game.level
-        return 0
+        # game = TetrisGame.query.first()
+        # if game.level:
+        #     return game.level
+        # return 0
+        query = select(TetrisGame.level)
+        return Session().execute(query).scalar_one_or_none() or 0
 
     def load_next_blocks(self) -> list[BlockType]:
         game = TetrisGame.query.first()
@@ -323,6 +330,7 @@ class TetrisScreen(Screen):
     def load_reserve_block(self) -> BlockType:
         return TetrisGame.query.first().reserve_block
 
+    @with_db
     def load_scores(self):
         query = Session().query(TetrisPlayer, Account).join(Account)
 
@@ -330,15 +338,16 @@ class TetrisScreen(Screen):
             TetrisPlayer.points.desc(), TetrisPlayer.blocks.desc()
         )
         self.scores = [
-            (account, score.blocks, score.points) for score, account in scores_query
+            (account.id, account.name, score.blocks, score.points)
+            for score, account in scores_query
         ]
 
         all_time_scores_query = query.filter(TetrisPlayer.alltime_blocks > 0).order_by(
             TetrisPlayer.alltime_points.desc(), TetrisPlayer.alltime_blocks.desc()
         )
         self.all_time_scores = [
-            (account, score.alltime_blocks, score.alltime_points)
-            for score, account in all_time_scores_query
+            (account.id, account.name, player.alltime_blocks, player.alltime_points)
+            for player, account in all_time_scores_query
         ]
         self.gameinfo = GameInfo(self, self.scores, self.all_time_scores)
         game = TetrisGame.query.first()
@@ -375,6 +384,7 @@ class TetrisScreen(Screen):
         self.reserve_block_used = True
         self.get_sound("use-reserve").play()
 
+    @with_db
     def tick(self, dt):
         self.t += dt
         super().tick(dt)
@@ -385,16 +395,18 @@ class TetrisScreen(Screen):
             self.last_tick = self.t
             # cycle through the highscores by switching the current player
             i = 0
-            for i, (account, _, _) in enumerate(self.scores):
-                if account.id == self.account.id:
+            for i, (account_id, _, _, _) in enumerate(self.scores):
+                if account_id == self.account.id:
                     break
             i -= 1
             if i < 0:
                 i = len(self.scores) - 1
-            self.account = self.scores[i][0]
-            self.current_player = Player(
-                TetrisPlayer.query.filter_by(account_id=self.account.id).first()
+            query = select(Account).where(Account.id == self.scores[i][0])
+            self.account = Session().execute(query).scalar_one()
+            query = select(TetrisPlayer).where(
+                TetrisPlayer.account_id == self.account.id
             )
+            self.current_player = Player(Session().execute(query).scalar_one_or_none())
 
             return
 
@@ -453,10 +465,9 @@ class TetrisScreen(Screen):
 
     def settle_block(self):
         self.clear_lines()
-        with Session.begin_nested():
-            self.current_player.blocks += 1
-            self.current_player.alltime_blocks += 1
-            self.save_to_db()
+        self.current_player.blocks += 1
+        self.current_player.alltime_blocks += 1
+        self.save_to_db()
         self.load_scores()
         self.reserve_block_used = False
         self.move_ended = True
@@ -471,7 +482,7 @@ class TetrisScreen(Screen):
         self.objects = [
             HBox(
                 [
-                    Progress(on_elapsed=self.home, size=70, speed=1 / 7.5),
+                    Progress(on_elapsed=self.home, size=70, speed=1000 / 7.5),
                 ],
                 pos=(200, config.SCREEN_HEIGHT),
                 align_bottom=True,
@@ -549,73 +560,69 @@ class TetrisScreen(Screen):
             cell.type == CellType.WALL for cell in row
         )
 
+    @with_db
     def save_to_db(self):
-        with Session.begin_nested():
-            game = TetrisGame.query.first()
-            game.score = self.score
-            game.highscore = self.highscore
-            game.level = self.level
-            game.lines = self.lines
-            game.board = json.loads(json.dumps(self.board, cls=TetrisJSONEncoder))
-            game.next_blocks = [b.value for b in self.next_blocks]
-            game.reserve_block = self.reserve_block_type
+        game = TetrisGame.query.first()
+        game.score = self.score
+        game.highscore = self.highscore
+        game.level = self.level
+        game.lines = self.lines
+        game.board = json.loads(json.dumps(self.board, cls=TetrisJSONEncoder))
+        game.next_blocks = [b.value for b in self.next_blocks]
+        game.reserve_block = self.reserve_block_type
 
-            scored_points = []
+        scored_points = []
 
-            for account_id, pixels in self.removed_pixels.items():
-                # player = TetrisPlayer.query.filter_by(account_id=account_id).first()
-                if account_id == self.current_player.account_id:
-                    factor = self.cleared_lines
-                else:
-                    factor = 1
-                TetrisPlayer.query.filter_by(account_id=account_id).update(
-                    {
-                        TetrisPlayer.points: TetrisPlayer.points + pixels * factor,
-                        TetrisPlayer.alltime_points: TetrisPlayer.alltime_points
-                        + pixels * factor,
-                    }
-                )
-                scored_points.append((account_id, pixels, pixels * factor))
-
-            TetrisPlayer.query.filter_by(
-                account_id=self.current_player.account_id
-            ).update(
+        for account_id, pixels in self.removed_pixels.items():
+            # player = TetrisPlayer.query.filter_by(account_id=account_id).first()
+            if account_id == self.current_player.account_id:
+                factor = self.cleared_lines
+            else:
+                factor = 1
+            TetrisPlayer.query.filter_by(account_id=account_id).update(
                 {
-                    TetrisPlayer.score: self.current_player.score,
-                    TetrisPlayer.lines: self.current_player.lines,
-                    TetrisPlayer.alltime_lines: self.current_player.alltime_lines,
-                    TetrisPlayer.blocks: self.current_player.blocks,
-                    TetrisPlayer.alltime_blocks: self.current_player.alltime_blocks,
+                    TetrisPlayer.points: TetrisPlayer.points + pixels * factor,
+                    TetrisPlayer.alltime_points: TetrisPlayer.alltime_points
+                    + pixels * factor,
                 }
             )
+            scored_points.append((account_id, pixels, pixels * factor))
 
-            Session.commit()
-            self.scored_points = sorted(scored_points, key=lambda x: x[2], reverse=True)
-            self.removed_pixels.clear()
+        TetrisPlayer.query.filter_by(account_id=self.current_player.account_id).update(
+            {
+                TetrisPlayer.score: self.current_player.score,
+                TetrisPlayer.lines: self.current_player.lines,
+                TetrisPlayer.alltime_lines: self.current_player.alltime_lines,
+                TetrisPlayer.blocks: self.current_player.blocks,
+                TetrisPlayer.alltime_blocks: self.current_player.alltime_blocks,
+            }
+        )
 
+        self.scored_points = sorted(scored_points, key=lambda x: x[2], reverse=True)
+        self.removed_pixels.clear()
+
+    @with_db
     def reset_game_in_db(self):
-        with Session.begin_nested():
-            TetrisGame.query.update(
-                {
-                    TetrisGame.score: 0,
-                    TetrisGame.level: 0,
-                    TetrisGame.lines: 0,
-                    TetrisGame.next_blocks: [],
-                    TetrisGame.board: json.loads(
-                        json.dumps(self.generate_empty_board(), cls=TetrisJSONEncoder)
-                    ),
-                    TetrisGame.reserve_block: random.choice(list(BlockType)),
-                }
-            )
-            TetrisPlayer.query.update(
-                {
-                    TetrisPlayer.score: 0,
-                    TetrisPlayer.blocks: 0,
-                    TetrisPlayer.lines: 0,
-                    TetrisPlayer.points: 0,
-                }
-            )
-            Session.commit()
+        TetrisGame.query.update(
+            {
+                TetrisGame.score: 0,
+                TetrisGame.level: 0,
+                TetrisGame.lines: 0,
+                TetrisGame.next_blocks: [],
+                TetrisGame.board: json.loads(
+                    json.dumps(self.generate_empty_board(), cls=TetrisJSONEncoder)
+                ),
+                TetrisGame.reserve_block: random.choice(list(BlockType)),
+            }
+        )
+        TetrisPlayer.query.update(
+            {
+                TetrisPlayer.score: 0,
+                TetrisPlayer.blocks: 0,
+                TetrisPlayer.lines: 0,
+                TetrisPlayer.points: 0,
+            }
+        )
 
     def calculate_hash(self):
         super_hash = super().calculate_hash()

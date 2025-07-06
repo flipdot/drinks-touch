@@ -8,12 +8,11 @@ from pathlib import Path
 import pytz
 from dateutil.rrule import rrulestr
 from sqlalchemy import func
-from sqlalchemy.orm import Session
 
 import config
 from config import Color
 from database.models import Tx
-from database.storage import with_db_session
+from database.storage import Session, with_db
 from drinks.drinks_manager import DrinksManager
 from elements import SvgIcon, Label, Button
 from elements.hbox import HBox
@@ -230,10 +229,10 @@ class WaitScanScreen(Screen):
         DrinksManager.instance.set_selected_drink(None)
 
     @staticmethod
-    @with_db_session
-    def get_total_balance(session: Session) -> Decimal:
-        legacy_total_balance = WaitScanScreen.get_legacy_total_balance(session)
-        tx_total_balance = session.query(func.sum(Tx.amount)).scalar() or Decimal(0)
+    @with_db
+    def get_total_balance() -> Decimal:
+        legacy_total_balance = WaitScanScreen.get_legacy_total_balance(Session())
+        tx_total_balance = Session().query(func.sum(Tx.amount)).scalar() or Decimal(0)
         if legacy_total_balance != tx_total_balance:
             logger.error(
                 "Total system balance: Legacy balance does not match Tx balance",

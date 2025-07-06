@@ -13,7 +13,9 @@ engine = create_engine(
         "application_name": "drinks_touch",
     },
 )
-Session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
+Session = scoped_session(
+    sessionmaker(autocommit=False, autoflush=False, bind=engine, autobegin=False)
+)
 Base = declarative_base(
     metadata=MetaData(
         naming_convention={
@@ -31,31 +33,22 @@ if not is_pi():
     import logging
 
     logger = logging.getLogger("sqlalchemy.engine")
-    logger.setLevel(getattr(logging, config.LOGLEVEL))
+    logger.setLevel(logging.INFO)
 
 
-def with_db_session(func):
+def with_db(func):
     """
-    A decorator that injects an SQLAlchemy session into the decorated method.
-
-    The session is managed as a unit of work: it's acquired, passed to the method,
-    committed on success, rolled back on exception, and always closed/removed.
-
-    The decorated method must accept 'session: Session' as one of its parameters.
+    A decorator that starts a transaction in the global SQLAlchemy session
     """
 
     @wraps(func)
     def wrapper(*args, **kwargs):
-        if "session" in kwargs:
-            # If a session is explicitly passed, use it directly.
-            # This allows for nested calls
-            return func(*args, **kwargs)
+        session = Session()
+        if session.in_transaction():
+            with session.begin_nested():
+                return func(*args, **kwargs)
 
-        # Otherwise, acquire a new session using the context manager
-        # for this unit of work.
-        with Session() as session:
-            # Inject the session into the function's keyword arguments
-            kwargs["session"] = session
+        with session.begin():
             return func(*args, **kwargs)
 
     return wrapper

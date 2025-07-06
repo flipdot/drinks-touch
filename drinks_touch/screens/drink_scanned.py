@@ -1,8 +1,10 @@
 import functools
 
+from sqlalchemy import select
 
 import config
 from database.models import Account
+from database.storage import with_db, Session
 from drinks.drinks import get_by_ean
 from drinks.drinks_manager import DrinksManager
 from elements import Label, Button, SvgIcon
@@ -19,17 +21,16 @@ class DrinkScannedScreen(Screen):
 
     def __init__(self, barcode: str):
         super().__init__()
-        account = Account.query.filter(Account.id_card == barcode).first()
-        if account:
-            self.account = account
-            return
-        self.account = None
+        self.barcode = barcode
         self.drink = get_by_ean(barcode)
         self.ean = barcode
 
+    @with_db
     def on_start(self, *args, **kwargs):
-        if self.account:
-            self.goto(ProfileScreen(self.account), replace=True)
+        query = select(Account).where(Account.id_card == self.barcode)
+        account = Session().execute(query).scalar_one_or_none()
+        if account:
+            self.goto(ProfileScreen(account), replace=True)
             return
         DrinksManager.instance.set_selected_drink(self.drink)
         self.objects = [

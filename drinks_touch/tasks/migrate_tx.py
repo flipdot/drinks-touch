@@ -1,7 +1,5 @@
-from sqlalchemy.orm import Session
-
 from database.models import ScanEvent, Tx, Drink, Account, RechargeEvent
-from database.storage import with_db_session
+from database.storage import Session, with_db
 from tasks.base import BaseTask
 
 
@@ -13,12 +11,13 @@ class MigrateTxTask(BaseTask):
         self._migrate_rechargeevents()
         self._check_dangling_txs()
 
-    @with_db_session
-    def _migrate_scanevents(self, session: Session):
+    @with_db
+    def _migrate_scanevents(self):
         self.logger.info("Selecting non-migrated scanevents")
 
         scanevents_with_accounts = (
-            session.query(ScanEvent, Account)
+            Session()
+            .query(ScanEvent, Account)
             .join(Account, ScanEvent.user_id == Account.ldap_id)
             .filter(
                 ScanEvent.tx_id.is_(None),
@@ -49,17 +48,16 @@ class MigrateTxTask(BaseTask):
                 amount=-1,
                 account_id=account.id,
             )
-            session.add(tx)
-            session.flush()
+            Session().add(tx)
+            Session().flush()
             scanevent.tx_id = tx.id
-        self.logger.info("Committing changes to the database")
-        session.commit()
 
-    @with_db_session
-    def _migrate_rechargeevents(self, session: Session):
+    @with_db
+    def _migrate_rechargeevents(self):
         self.logger.info("Selecting non-migrated rechargeevents")
         rechargevents_with_accounts = (
-            session.query(RechargeEvent, Account)
+            Session()
+            .query(RechargeEvent, Account)
             .join(Account, RechargeEvent.user_id == Account.ldap_id)
             .filter(
                 RechargeEvent.tx_id.is_(None),
@@ -86,20 +84,24 @@ class MigrateTxTask(BaseTask):
                 # Try to find a recharge event on the same day for the helper user
                 # with the same amount, but negative. In this case, it's a transfer
                 # to the helper user.
-                is_transfer = session.query(
-                    RechargeEvent.query.filter(
-                        RechargeEvent.helper_user_id == account.name,
-                        RechargeEvent.amount == -rechargeevent.amount,
-                        RechargeEvent.timestamp
-                        >= rechargeevent.timestamp.replace(
-                            hour=0, minute=0, second=0, microsecond=0
-                        ),
-                        RechargeEvent.timestamp
-                        < rechargeevent.timestamp.replace(
-                            hour=23, minute=59, second=59, microsecond=999999
-                        ),
-                    ).exists()
-                ).scalar()
+                is_transfer = (
+                    Session()
+                    .query(
+                        RechargeEvent.query.filter(
+                            RechargeEvent.helper_user_id == account.name,
+                            RechargeEvent.amount == -rechargeevent.amount,
+                            RechargeEvent.timestamp
+                            >= rechargeevent.timestamp.replace(
+                                hour=0, minute=0, second=0, microsecond=0
+                            ),
+                            RechargeEvent.timestamp
+                            < rechargeevent.timestamp.replace(
+                                hour=23, minute=59, second=59, microsecond=999999
+                            ),
+                        ).exists()
+                    )
+                    .scalar()
+                )
 
                 if is_transfer and rechargeevent.amount > 0:
                     payment_reference = f"Übertrag von {rechargeevent.helper_user_id}"
@@ -114,19 +116,19 @@ class MigrateTxTask(BaseTask):
                 amount=rechargeevent.amount,
                 account_id=account.id,
             )
-            session.add(tx)
-            session.flush()
+            Session().add(tx)
+            Session().flush()
             rechargeevent.tx_id = tx.id
-        session.commit()
 
-    @with_db_session
-    def _check_dangling_txs(self, session: Session):
+    @with_db
+    def _check_dangling_txs(self):
         """
         Find transactions that are not linked to any scan or recharge event.
         """
         self.logger.info("Checking for dangling transactions")
         txs = (
-            session.query(Tx)
+            Session()
+            .query(Tx)
             .outerjoin(RechargeEvent, Tx.id == RechargeEvent.tx_id)
             .outerjoin(ScanEvent, Tx.id == ScanEvent.tx_id)
             .filter(RechargeEvent.tx_id.is_(None), ScanEvent.tx_id.is_(None))
@@ -135,6 +137,5 @@ class MigrateTxTask(BaseTask):
         self.logger.info("Found {} dangling transactions".format(len(txs)))
         for tx in txs:
             self.logger.warning(f'Deleting "{tx.payment_reference}" ({tx.id})')
-            session.delete(tx)
-        session.commit()
+            Session().delete(tx)
         self.logger.info("Deleted dangling transactions")

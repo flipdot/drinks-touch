@@ -1,12 +1,12 @@
 import functools
 
-from sqlalchemy.orm import Session
+from sqlalchemy import select
 from sqlalchemy.sql import text
 
 import config
 from config import Font
 from database.models import Account
-from database.storage import with_db_session
+from database.storage import Session, with_db
 from drinks.drinks import get_by_ean
 from drinks.drinks_manager import DrinksManager
 from elements.button import Button
@@ -34,6 +34,7 @@ class ProfileScreen(Screen):
         self.elements_aufladungen = []
         self.elements_drinks = []
 
+    @with_db
     def on_start(self, *args, **kwargs):
         self.objects = [
             Label(
@@ -224,12 +225,14 @@ class ProfileScreen(Screen):
             )
             y += 35
 
+    @with_db
     def on_barcode(self, barcode):
         if not barcode:
             return
         self.processing.text = f"Gescannt: {barcode}"
         self.processing.visible = True
-        account = Account.query.filter(Account.id_card == barcode).first()
+        query = select(Account).filter(Account.id_card == barcode)
+        account = Session().execute(query).scalars().first()
         if account:
             ScreenManager.instance.set_active(ProfileScreen(account))
             self.processing.visible = False
@@ -251,8 +254,8 @@ class ProfileScreen(Screen):
             self.objects.remove(d)
         self.objects.extend(self.elements_drinks)
 
-    @with_db_session
-    def get_stats(self, session: Session, limit=None):
+    @with_db
+    def get_stats(self, limit=None):
         sql = text(
             """
             SELECT COUNT(*) as count, barcode as name
@@ -263,8 +266,10 @@ class ProfileScreen(Screen):
             LIMIT :limit
         """
         )
-        result = session.execute(
-            sql, {"userid": self.account.ldap_id, "limit": limit}
-        ).fetchall()
+        result = (
+            Session()
+            .execute(sql, {"userid": self.account.ldap_id, "limit": limit})
+            .fetchall()
+        )
 
         return [{"count": x[0], "name": x[1]} for x in result]

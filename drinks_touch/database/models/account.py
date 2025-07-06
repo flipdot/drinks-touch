@@ -5,8 +5,7 @@ from sqlalchemy import Column, Integer, String, UUID, DateTime, Boolean, func
 from sqlalchemy.sql import text
 
 
-from database.storage import Base, Session
-
+from database.storage import Base, Session, with_db
 
 logger = logging.getLogger(__name__)
 
@@ -34,6 +33,7 @@ class Account(Base):
     last_summary_email_sent_at = Column(DateTime(), unique=False)
     summary_email_notification_setting = Column(String(50), unique=False)
 
+    @with_db
     def _get_legacy_balance(self):
         sql = text(
             """
@@ -43,7 +43,7 @@ class Account(Base):
             GROUP BY user_id
             """
         )
-        row = Session().connection().execute(sql, {"user_id": self.ldap_id}).fetchone()
+        row = Session().execute(sql, {"user_id": self.ldap_id}).fetchone()
         if not row:
             cost = 0
         else:
@@ -57,7 +57,7 @@ class Account(Base):
             GROUP BY user_id
             """
         )
-        row = Session().connection().execute(sql, {"user_id": self.ldap_id}).fetchone()
+        row = Session().execute(sql, {"user_id": self.ldap_id}).fetchone()
         if not row:
             credit = 0
         else:
@@ -65,6 +65,7 @@ class Account(Base):
 
         return credit - cost
 
+    @with_db
     def _get_tx_balance(self):
         from database.models import Tx
 

@@ -1,8 +1,6 @@
-from sqlalchemy.orm import Session
-
 import config
 from database.models import RechargeEvent, Tx
-from database.storage import with_db_session
+from database.storage import Session, with_db
 from elements import Label, Button
 from elements.hbox import HBox
 from elements.vbox import VBox
@@ -67,18 +65,17 @@ class ConfirmRechargeScreen(Screen):
             ),
         ]
 
-    @with_db_session
-    def save_payment(self, session: Session):
+    @with_db
+    def save_payment(self):
         tx = Tx(
             payment_reference="Aufladung via Display",
             account_id=self.account.id,
             amount=self.amount,
         )
-        session.add(tx)
-        session.flush()
+        Session().add(tx)
+        Session().flush()
         ev = RechargeEvent(self.account.ldap_id, "DISPLAY", self.amount, tx_id=tx.id)
-        session.add(ev)
-        session.commit()
+        Session().add(ev)
 
         self.goto(
             SuccessScreen(

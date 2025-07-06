@@ -2,11 +2,11 @@ import functools
 import logging
 from decimal import Decimal
 
-from sqlalchemy import func
+from sqlalchemy import func, select
 
 import config
 from database.models import Account
-from database.storage import Session
+from database.storage import Session, with_db
 from elements import Label, Button
 from elements.input_field import InputField, InputType
 from elements.spacer import Spacer
@@ -23,14 +23,19 @@ logger = logging.getLogger(__name__)
 # because it is called in the render() function.
 # Still, we want to get fresh results every time the user changes the input.
 @functools.lru_cache(maxsize=1)
+@with_db
 def auto_complete_account_name(text, except_account: str | None = None, limit=10):
-    accounts = (
-        Account.query.filter(Account.name.ilike(f"{text}%"))
-        .filter(Account.enabled)
-        .filter(Account.name != except_account)
+    query = (
+        select(Account)
+        .where(
+            Account.name.ilike(f"{text}%"),
+            Account.enabled,
+            Account.name != except_account,
+        )
         .order_by(Account.name)
         .limit(limit + 1)
     )
+    accounts = Session().execute(query).scalars().all()
     res = [account.name for account in accounts]
     if len(res) == limit + 1:
         res[-1] = "..."

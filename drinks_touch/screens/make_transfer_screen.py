@@ -8,7 +8,7 @@ from pygame.mixer import Sound
 
 import config
 from database.models import Account, RechargeEvent, Tx
-from database.storage import Session
+from database.storage import Session, with_db
 from elements import Label, Animation, Image
 from elements.base_elm import BaseElm
 from elements.spacer import Spacer
@@ -118,6 +118,7 @@ class MakeTransferScreen(Screen):
         self.animation_phase = AnimationPhase.WALK_IN
         self.sound_coin = Sound("drinks_touch/resources/sounds/smb_coin.wav")
 
+    @with_db
     def _transfer_balance(self):
         session = Session()
         positive_charge = Tx(
@@ -147,7 +148,6 @@ class MakeTransferScreen(Screen):
         )
         session.add(negative_charge_event)
         session.add(positive_charge_event)
-        session.commit()
 
     def on_start(self, *args, **kwargs):
         self.objects = [

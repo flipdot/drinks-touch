@@ -3,6 +3,7 @@ from pygame.event import EventType
 
 import config
 from config import Color, Font
+from database.storage import Session
 from elements import Button, Progress, Label
 from elements.base_elm import BaseElm
 from overlays.keyboard import KeyboardOverlay
@@ -187,6 +188,15 @@ class ScreenManager:
             self.surface.blit(
                 fps_text, (self.surface.get_width() - fps_text.get_width() - 10, 10)
             )
+        if Session().in_transaction():
+            font = pygame.font.Font(None, 37)
+            transaction_text = font.render(
+                "Open transaction! Data isn't saved yet!",
+                True,
+                (255, 255, 255),
+                (255, 0, 0),
+            )
+            self.surface.blit(transaction_text, (0, 0))
 
     def events(self, events: list[EventType]):
         screen = self.get_active()
