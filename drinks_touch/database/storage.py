@@ -33,7 +33,7 @@ if not is_pi():
     import logging
 
     logger = logging.getLogger("sqlalchemy.engine")
-    logger.setLevel(logging.INFO)
+    logger.setLevel(getattr(logging, config.LOGLEVEL))
 
 
 def with_db(func):
