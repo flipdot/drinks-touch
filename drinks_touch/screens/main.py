@@ -33,17 +33,6 @@ class MainScreen(Screen):
 
         i = 0
 
-        # query = (
-        #     Session()
-        #     .query(
-        #         func.upper(func.substr(Account.name, 1, 1)).label("first_char"),
-        #         func.count(Account.id),
-        #     )
-        #     .group_by("first_char")
-        #     .order_by("first_char")
-        #     .all()
-        # )
-
         query = (
             select(
                 func.upper(func.substr(Account.name, 1, 1)).label("first_char"),
