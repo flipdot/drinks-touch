@@ -478,7 +478,7 @@ class TetrisScreen(Screen):
         self.objects = [
             HBox(
                 [
-                    Progress(on_elapsed=self.home, size=70, speed=1000 / 7.5),
+                    Progress(on_elapsed=self.home, size=70, speed=1 / 7.5),
                 ],
                 pos=(200, config.SCREEN_HEIGHT),
                 align_bottom=True,
