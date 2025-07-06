@@ -243,10 +243,6 @@ class TetrisScreen(Screen):
         )
 
     def load_level(self) -> int:
-        # game = TetrisGame.query.first()
-        # if game.level:
-        #     return game.level
-        # return 0
         query = select(TetrisGame.level)
         return Session().execute(query).scalar_one_or_none() or 0
 
