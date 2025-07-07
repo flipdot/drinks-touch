@@ -5,3 +5,4 @@ from .scan_event import ScanEvent
 from .tetris import TetrisGame, TetrisPlayer
 from .tx import Tx
 from .appsettings import AppSettings
+from .sales import Sales
