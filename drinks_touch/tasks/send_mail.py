@@ -98,6 +98,7 @@ class SendMailTask(BaseTask):
             self.progress = 0.5 + (i + 1) / len(accounts) / 2
             if self.sig_killed:
                 return
+            self.send_summary(account, "Getränkeübersicht")
 
     def send_summary(self, account: Account, subject: str):
         assert account.email, "Account has no email"
