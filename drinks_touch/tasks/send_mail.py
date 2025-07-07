@@ -12,6 +12,8 @@ from notifications.notification import (
     format_drinks,
     format_recharges,
     FOOTER,
+    get_recharges,
+    get_drinks_consumed,
 )
 from tasks.base import BaseTask
 
@@ -90,25 +92,12 @@ class SendMailTask(BaseTask):
 
     @with_db
     def send_summaries(self):
-        from sqlalchemy import inspect
-
         query = select(Account).where(Account.email.isnot(None) & Account.enabled)
         accounts = Session().scalars(query).all()
         for i, account in enumerate(accounts):
             self.progress = 0.5 + (i + 1) / len(accounts) / 2
             if self.sig_killed:
-                break
-            self.send_summary(account, "Getränkeübersicht")
-            # After send_summary:
-            state = inspect(account)
-            if state.modified:
-                print(f"Account {account.name} | Dirty attributes:")
-                print("Dirty:", state.attrs)
-                print("Is dirty:", state.modified)
-                print(
-                    "Pending changes?",
-                    state.attrs.last_summary_email_sent_at.history.has_changes(),
-                )
+                return
 
     def send_summary(self, account: Account, subject: str):
         assert account.email, "Account has no email"
@@ -136,13 +125,8 @@ class SendMailTask(BaseTask):
         )
 
         self.logger.info(f"Account {account.id:3} | Checking history...")
-        # TODO: Call to nested database operations cause a rollback
-        # drinks_consumed = get_drinks_consumed(account)
-        drinks_consumed = [
-            {"timestamp": datetime.now(), "name": "Cola", "size": "0.5"}
-        ]  # Placeholder for testing
-        # recharges = get_recharges(account)
-        recharges = []
+        drinks_consumed = get_drinks_consumed(account)
+        recharges = get_recharges(account)
 
         if drinks_consumed:
             content_text += format_drinks(drinks_consumed)
