@@ -12,6 +12,8 @@ from notifications.notification import (
     format_drinks,
     format_recharges,
     FOOTER,
+    get_recharges,
+    get_drinks_consumed,
 )
 from tasks.base import BaseTask
 

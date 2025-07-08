@@ -1,7 +1,9 @@
 from functools import partial
 
 import config
+from config import Color
 from database.models import Account
+from database.storage import with_db
 from elements.button import Button
 from elements.hbox import HBox
 from elements.image import Image
@@ -17,6 +19,7 @@ class RechargeScreen(Screen):
         super().__init__()
         self.account = account
 
+    @with_db
     def on_start(self, *args, **kwargs):
 
         qr_file = make_sepa_qr(
@@ -26,7 +29,7 @@ class RechargeScreen(Screen):
             pixel_width=7,
             border=4,
             color="black",
-            bg="yellow",
+            bg=Color.PRIMARY.value,
         )
         self.objects = [
             Label(
