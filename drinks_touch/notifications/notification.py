@@ -16,7 +16,7 @@ from sqlalchemy import text
 import config
 from database.models.account import Account
 from database.models.recharge_event import RechargeEvent
-from database.storage import Session
+from database.storage import Session, with_db
 
 logger = logging.getLogger(__name__)
 
@@ -112,6 +112,7 @@ def format_recharges(recharges: list[RechargeEvent]):
     return recharges_fmt
 
 
+@with_db
 def get_drinks_consumed(account: Account):
     if account.last_summary_email_sent_at:
         since_timestamp = account.last_summary_email_sent_at.timestamp()
@@ -131,15 +132,12 @@ ORDER BY se.timestamp"""
         % since_timestamp
     )
     drinks_consumed = (
-        Session()
-        .connection()
-        .execute(sql, {"userid": account.ldap_id})
-        .mappings()
-        .all()
+        Session().execute(sql, {"userid": account.ldap_id}).mappings().all()
     )
     return drinks_consumed
 
 
+@with_db
 def get_recharges(account: Account) -> list[RechargeEvent]:
     query = (
         Session().query(RechargeEvent).filter(RechargeEvent.user_id == account.ldap_id)

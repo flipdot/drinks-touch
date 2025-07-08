@@ -2,6 +2,9 @@ import json
 import re
 from datetime import datetime
 from decimal import Decimal
+
+from flask_sqlalchemy import SQLAlchemy
+
 import config
 
 from flask import Flask, make_response
@@ -12,13 +15,21 @@ from flask_compress import Compress
 
 from database.models import Tx, Account
 from database.models.recharge_event import RechargeEvent
-from database.storage import get_session
+from database.storage import Base
 from env import is_pi
 from stats.stats import scans
 from users.qr import make_sepa_qr
 
 
+db = SQLAlchemy(
+    model_class=Base,
+    engine_options={
+        "connect_args": {"application_name": "drinks_web"},
+    },
+)
 app = Flask(__name__)
+app.config["SQLALCHEMY_DATABASE_URI"] = config.POSTGRES_CONNECTION_STRING
+db.init_app(app)
 Compress(app)
 
 uid_pattern = re.compile(r"^\d+$")
@@ -40,7 +51,9 @@ def favicon():
 @app.route("/")
 @app.route("/recharge")
 def index():
-    accounts = Account.query.filter(Account.enabled).order_by(Account.name).all()
+    accounts = (
+        db.session.query(Account).filter(Account.enabled).order_by(Account.name).all()
+    )
     return render_template("index.html", accounts=accounts)
 
 
@@ -61,20 +74,19 @@ def recharge_doit():
     if amount == "0":
         return "Ungültiger Betrag!"
 
-    account = Account.query.filter(Account.id == user_id).one()
+    account = db.session.query(Account).filter(Account.id == user_id).one()
 
-    session = get_session()
-    transaktion = Tx(
+    tx = Tx(
         payment_reference="Aufladung via Web",
         account_id=account.id,
         amount=Decimal(amount),
     )
-    session.add(transaktion)
-    session.flush()
-    ev = RechargeEvent(account.ldap_id, "Web UI", amount, tx_id=transaktion.id)
+    db.session.add(tx)
+    db.session.flush()
+    ev = RechargeEvent(account.ldap_id, "Web UI", amount, tx_id=tx.id)
 
-    session.add(ev)
-    session.commit()
+    db.session.add(ev)
+    db.session.commit()
 
     return render_template("recharge_success.html", amount=amount, account=account)
 

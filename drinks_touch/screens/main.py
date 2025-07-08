@@ -2,10 +2,10 @@ import functools
 import random
 from datetime import datetime
 
-from sqlalchemy import func
+from sqlalchemy import func, select
 
 from database.models import Account
-from database.storage import Session
+from database.storage import Session, with_db
 from elements import SvgIcon
 from elements.button import Button
 from elements.label import Label
@@ -18,6 +18,7 @@ class MainScreen(Screen):
         super().__init__()
         self.timeout = None
 
+    @with_db
     def on_start(self, *args, **kwargs):
         self.objects = []
         self.objects.append(
@@ -33,23 +34,23 @@ class MainScreen(Screen):
         i = 0
 
         query = (
-            Session()
-            .query(
+            select(
                 func.upper(func.substr(Account.name, 1, 1)).label("first_char"),
                 func.count(Account.id),
             )
             .group_by("first_char")
             .order_by("first_char")
-            .all()
         )
+
+        rows = Session().execute(query).all()
 
         today = datetime.now().date()
         april_fools = today.month == 4 and today.day == 1
 
         if april_fools:
-            random.shuffle(query)
+            random.shuffle(rows)
 
-        for first_char, count in query:
+        for first_char, count in rows:
             text = first_char
             self.objects.append(
                 Button(
@@ -69,13 +70,15 @@ class MainScreen(Screen):
         screen_manager = ScreenManager.instance
         screen_manager.set_active(NamesScreen(param))
 
+    @with_db
     def on_barcode(self, barcode):
         from .screen_manager import ScreenManager
         from .profile import ProfileScreen
 
         if not barcode:
             return
-        account = Account.query.filter(Account.id_card == barcode).first()
+        query = select(Account).where(Account.id_card == barcode)
+        account = Session().execute(query).scalar_one_or_none()
         if account:
             ScreenManager.instance.set_active(ProfileScreen(account))
 

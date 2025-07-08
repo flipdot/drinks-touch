@@ -2,11 +2,11 @@ import functools
 import logging
 from decimal import Decimal
 
-from sqlalchemy import func
+from sqlalchemy import func, select
 
 import config
 from database.models import Account
-from database.storage import Session
+from database.storage import Session, with_db
 from elements import Label, Button
 from elements.input_field import InputField, InputType
 from elements.spacer import Spacer
@@ -23,14 +23,19 @@ logger = logging.getLogger(__name__)
 # because it is called in the render() function.
 # Still, we want to get fresh results every time the user changes the input.
 @functools.lru_cache(maxsize=1)
+@with_db
 def auto_complete_account_name(text, except_account: str | None = None, limit=10):
-    accounts = (
-        Account.query.filter(Account.name.ilike(f"{text}%"))
-        .filter(Account.enabled)
-        .filter(Account.name != except_account)
+    query = (
+        select(Account)
+        .where(
+            Account.name.ilike(f"{text}%"),
+            Account.enabled,
+            Account.name != except_account,
+        )
         .order_by(Account.name)
         .limit(limit + 1)
     )
+    accounts = Session().execute(query).scalars().all()
     res = [account.name for account in accounts]
     if len(res) == limit + 1:
         res[-1] = "..."
@@ -67,10 +72,14 @@ class TransferBalanceScreen(Screen):
         self.input_field_amount = None
         self.label_error_message = None
 
+    @with_db
     def on_start(self, *args, **kwargs):
         def focus(obj):
             ScreenManager.instance.active_object = obj
 
+        # The next line is causing a database query. We use the name inside a lambda –
+        # if we don't query it now, the access below would fail.
+        account_name = self.account.name
         self.objects = [
             Label(
                 text=self.account.name,
@@ -100,7 +109,7 @@ class TransferBalanceScreen(Screen):
                         width=config.SCREEN_WIDTH - 10,
                         height=50,
                         auto_complete=lambda text: auto_complete_account_name(
-                            text, except_account=self.account.name
+                            text, except_account=account_name
                         ),
                         only_auto_complete=True,
                         on_submit=lambda _: focus(input_field_amount),
@@ -139,6 +148,7 @@ class TransferBalanceScreen(Screen):
 
         ScreenManager.instance.active_object = input_field_account_name
 
+    @with_db
     def submit(self):
         account_name = self.input_field_account_name.text
         amount = self.input_field_amount.text
@@ -149,7 +159,8 @@ class TransferBalanceScreen(Screen):
             self.label_error_message.text = "Bitte gib einen Betrag ein."
             return
 
-        account = Account.query.filter(Account.name == account_name).first()
+        query = select(Account).where(Account.name == account_name)
+        account = Session().execute(query).scalar_one_or_none()
         if not account:
             self.label_error_message.text = "Account nicht gefunden."
             return

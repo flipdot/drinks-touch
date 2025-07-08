@@ -1,3 +1,5 @@
+from functools import wraps
+
 from sqlalchemy import create_engine, MetaData
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -5,8 +7,15 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 import config
 from env import is_pi
 
-engine = create_engine(config.POSTGRES_CONNECTION_STRING)
-Session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
+engine = create_engine(
+    config.POSTGRES_CONNECTION_STRING,
+    connect_args={
+        "application_name": "drinks_touch",
+    },
+)
+Session = scoped_session(
+    sessionmaker(autocommit=False, autoflush=False, bind=engine, autobegin=False)
+)
 Base = declarative_base(
     metadata=MetaData(
         naming_convention={
@@ -27,6 +36,19 @@ if not is_pi():
     logger.setLevel(getattr(logging, config.LOGLEVEL))
 
 
-def get_session():
-    # Session.remove()
-    return Session
+def with_db(func):
+    """
+    A decorator that starts a transaction in the global SQLAlchemy session
+    """
+
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        session = Session()
+        if session.in_transaction():
+            with session.begin_nested():
+                return func(*args, **kwargs)
+
+        with session.begin():
+            return func(*args, **kwargs)
+
+    return wrapper

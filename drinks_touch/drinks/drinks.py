@@ -1,15 +1,15 @@
 from sqlalchemy.sql import text
 
-from database.storage import get_session
+from database.storage import Session, with_db
 
 _drink_cache = {}
 
 
+@with_db
 def get_by_ean(ean):
     if ean in _drink_cache:
         return _drink_cache[ean]
 
-    session = get_session()
     sql = text(
         """
         SELECT *
@@ -19,7 +19,7 @@ def get_by_ean(ean):
     )
     # stmt = select(Drink).where(Drink.ean == ean)
 
-    row = session.connection().execute(sql, {"ean": ean}).fetchone()
+    row = Session().execute(sql, {"ean": ean}).fetchone()
 
     if row:
         drink = {

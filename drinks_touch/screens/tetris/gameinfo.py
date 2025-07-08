@@ -4,7 +4,6 @@ import pygame
 from pygame import Vector2
 
 from config import Color, Font, SCREEN_WIDTH
-from database.models import Account
 from screens.tetris.constants import BOARD_WIDTH, SPRITE_RESOLUTION, SCALE, BOARD_HEIGHT
 from screens.tetris.scoreboard import Scoreboard
 from screens.tetris.shape import Shape
@@ -19,8 +18,8 @@ class GameInfo:
     def __init__(
         self,
         screen: "TetrisScreen",
-        scores: list[tuple[Account, int, int]],
-        all_time_scores: list[tuple[Account, int, int]],
+        scores: list[tuple[int, str, int, int]],
+        all_time_scores: list[tuple[int, str, int, int]],
     ):
         self.last_hash = 0
         self.dirty = True

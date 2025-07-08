@@ -4,6 +4,7 @@ from pygame.mixer import Sound
 import config
 from config import Color
 from database.models import Account
+from database.storage import with_db
 from elements import Button
 from elements.base_elm import BaseElm
 from elements.hbox import HBox
@@ -45,6 +46,7 @@ class SuccessScreen(Screen):
         self.drink = drink
         self.offer_games = offer_games
 
+    @with_db
     def on_start(self, *args, **kwargs):
 
         self.objects = [
