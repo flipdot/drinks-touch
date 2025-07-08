@@ -1,6 +1,7 @@
 from functools import partial
 
 import config
+from config import Color
 from database.models import Account
 from database.storage import with_db
 from elements.button import Button
@@ -28,7 +29,7 @@ class RechargeScreen(Screen):
             pixel_width=7,
             border=4,
             color="black",
-            bg="yellow",
+            bg=Color.PRIMARY.value,
         )
         self.objects = [
             Label(
