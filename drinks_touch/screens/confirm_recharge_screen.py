@@ -17,6 +17,7 @@ class ConfirmRechargeScreen(Screen):
         self.account = account
         self.amount = amount
 
+    @with_db
     def on_start(self):
         self.objects = [
             Label(
