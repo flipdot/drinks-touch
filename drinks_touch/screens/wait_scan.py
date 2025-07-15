@@ -258,11 +258,13 @@ class WaitScanScreen(Screen):
     @staticmethod
     def read_calendar(raw_ical: str) -> list[FlipdotEvent]:
         events = []
-        now = pytz.utc.localize(datetime.datetime.utcnow())
+        aware_now = pytz.utc.localize(datetime.datetime.utcnow())
+        naive_now = aware_now.replace(tzinfo=None)
 
         cal = WaitScanScreen.load_calendar(raw_ical)
 
         for event in cal.events:
+            now = aware_now
             first_occurrence = event.begin.datetime
             in_past = first_occurrence < now
 
@@ -271,7 +273,14 @@ class WaitScanScreen(Screen):
             rule = None
             for content_line in event.extra:
                 if content_line.name == "RRULE":
-                    rule = rrulestr(content_line.value, dtstart=first_occurrence)
+                    try:
+                        rule = rrulestr(content_line.value, dtstart=first_occurrence)
+                    except ValueError:
+                        # For some reason, events that have an end date ("UNTIL"),
+                        # that end date is not timezone-aware. Pass a timezone-naive timestamp
+                        # and then make sure that the comparisons below are also naive.
+                        rule = rrulestr(content_line.value, dtstart=event.begin.naive)
+                        now = naive_now
                     break
 
             if rule:
@@ -306,6 +315,11 @@ class WaitScanScreen(Screen):
                         recurring=bool(rule),
                     )
                 )
+
+        # Make offset-naive events timezone-aware, otherwise we can't sort them
+        for event in events:
+            if event.start.tzinfo is None:
+                event.start = pytz.utc.localize(event.start)
 
         # Sort and limit to the latest 15 events
         # Make sure at least two events are in the past
