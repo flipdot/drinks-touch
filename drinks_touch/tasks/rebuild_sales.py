@@ -10,12 +10,18 @@ class RebuildSalesTask(BaseTask):
 
     @with_db
     def run(self):
-        Session().execute(delete(Sale))
+        res = Session().execute(delete(Sale))
+
+        self.logger.info(f"Deleted {res.rowcount} sales records")
 
         query = select(Tx)
         txs = Session().execute(query).scalars().all()
 
         total_tx = len(txs)
+
+        self.logger.info(f"Found {total_tx} transactions.")
+        self.logger.info("Creating a record for each sale…")
+        sales = 0
         for i, tx in enumerate(txs):
             if self.sig_killed:
                 break
@@ -26,4 +32,7 @@ class RebuildSalesTask(BaseTask):
                     date=tx.created_at,
                 )
                 Session().add(sale)
+                sales += 1
+        self.logger.info(f"Created {sales} sales records.")
+        self.logger.info("Committing changes to the database")
         Session().commit()
