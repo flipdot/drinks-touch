@@ -21,6 +21,7 @@ class ConfirmPaymentScreen(Screen):
         self.account = account
         self.drink = drink
 
+    @with_db
     def on_start(self):
         self.objects = [
             Label(
