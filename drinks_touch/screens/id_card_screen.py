@@ -5,6 +5,7 @@ from config import Font
 from database.models import Account
 from drinks.drinks import get_by_ean
 from drinks.drinks_manager import DrinksManager
+from database.storage import with_db
 from elements.button import Button
 from elements.label import Label
 from .screen import Screen
@@ -19,6 +20,7 @@ class IDCardScreen(Screen):
         self.timeout = None
         self.id_label = None
 
+    @with_db
     def on_start(self, *args, **kwargs):
         self.objects = []
 
@@ -74,6 +76,7 @@ class IDCardScreen(Screen):
     def btn_home(self):
         self.home()
 
+    @with_db
     def set_id(self, ean):
         ean = ean.upper() if ean else ean
         self.id_label.text = self.account.id_card = ean
@@ -81,6 +84,7 @@ class IDCardScreen(Screen):
     def reset_id(self):
         self.set_id(None)
 
+    @with_db
     def print_id(self):
         if not self.account.id_card:
             self.set_id(f"fd_{self.account.name}")
