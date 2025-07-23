@@ -17,7 +17,6 @@ from tasks import (
     SyncFromKeycloakTask,
     InitializeBarcodeScannerTask,
 )
-from tasks.rebuild_sales import RebuildSalesTask
 
 
 class SettingsMainScreen(Screen):
@@ -175,15 +174,6 @@ class SettingsMainScreen(Screen):
                                 ),
                             ]
                         ),
-                    ),
-                    Button(
-                        text="Rebuild sales stats",
-                        on_click=lambda: self.go_if_git(
-                            TasksScreen(
-                                tasks=[RebuildSalesTask()],
-                            ),
-                        ),
-                        size=15,
                     ),
                 ],
                 pos=(5, 100),
