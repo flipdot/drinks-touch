@@ -29,7 +29,7 @@ class GitBranchScreen(Screen):
         self.objects = [
             Label(
                 text="git branch",
-                pos=(10, 20),
+                pos=(5, 5),
                 size=36,
             ),
             VBox(branch_buttons, gap=5, pos=(10, 80)),

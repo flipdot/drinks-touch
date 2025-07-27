@@ -65,6 +65,7 @@ class UpdateAndRestartTask(RunCmdTask):
     ON_STARTUP = False
     PWD = config.REPO_PATH
     CMDS = (
+        ["git", "fetch", "-p"],
         ["git", "checkout", "master"],
         ["git", "merge", "--ff-only", "origin/master"],
         ["sudo", "systemctl", "restart", "drinks-touch"],

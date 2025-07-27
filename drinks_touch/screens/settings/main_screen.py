@@ -6,11 +6,9 @@ from elements.hbox import HBox
 from elements.vbox import VBox
 from screens.screen_manager import ScreenManager
 from screens.settings.git_branch_screen import GitBranchScreen
-from screens.settings.git_log_screen import GitLogScreen
 from screens.screen import Screen
 from screens.tasks_screen import TasksScreen
 from tasks import (
-    GitFetchTask,
     UpdateAndRestartTask,
     SepaSyncTask,
     SendMailTask,
@@ -26,6 +24,8 @@ class SettingsMainScreen(Screen):
         self.clock = 0
         self.sound = Sound("drinks_touch/resources/sounds/smb_pipe.wav")
 
+        icon_text_gap = 15
+
         self.objects = [
             Label(
                 text="Einstellungen",
@@ -33,40 +33,56 @@ class SettingsMainScreen(Screen):
             ),
             VBox(
                 [
-                    Button(
-                        text="Update & Restart",
-                        on_click=lambda: self.go_if_git(
-                            TasksScreen(
-                                tasks=[UpdateAndRestartTask()],
-                            ),
-                        ),
-                    ),
                     HBox(
                         [
                             Button(
-                                text="Downgrade",
-                                on_click=lambda: self.go_if_git(
-                                    GitLogScreen(branch="master")
-                                ),
-                                size=25,
-                            ),
-                            Button(
-                                text="Branches",
-                                on_click=lambda: self.go_if_git(GitBranchScreen()),
-                                size=25,
-                            ),
-                            Button(
-                                text="Fetch",
                                 on_click=lambda: self.go_if_git(
                                     TasksScreen(
-                                        tasks=[GitFetchTask()],
-                                        box_height=600,
+                                        tasks=[UpdateAndRestartTask()],
                                     ),
                                 ),
-                                size=25,
+                                inner=HBox(
+                                    [
+                                        SvgIcon(
+                                            "drinks_touch/resources/images/arrow-up-circle.svg",
+                                            height=40,
+                                            color=config.Color.PRIMARY,
+                                        ),
+                                        Label(text="Update"),
+                                    ],
+                                    gap=icon_text_gap,
+                                ),
+                            ),
+                            Button(
+                                on_click=lambda: self.go_if_git(GitBranchScreen()),
+                                inner=HBox(
+                                    [
+                                        SvgIcon(
+                                            "drinks_touch/resources/images/git-branch.svg",
+                                            height=40,
+                                            color=config.Color.PRIMARY,
+                                        ),
+                                        Label(text="Branches"),
+                                    ],
+                                    gap=icon_text_gap,
+                                ),
                             ),
                         ],
                         gap=15,
+                    ),
+                    Button(
+                        on_click=lambda: self.goto(TasksScreen()),
+                        inner=HBox(
+                            [
+                                SvgIcon(
+                                    "drinks_touch/resources/images/refresh-cw.svg",
+                                    height=40,
+                                    color=config.Color.PRIMARY,
+                                ),
+                                Label(text="Neu initialisieren"),
+                            ],
+                            gap=icon_text_gap,
+                        ),
                     ),
                     Button(
                         on_click=self.toggle_soundcheck,
@@ -79,20 +95,8 @@ class SettingsMainScreen(Screen):
                                     color=config.Color.PRIMARY,
                                 ),
                                 Label(text="Soundcheck"),
-                            ]
-                        ),
-                    ),
-                    Button(
-                        on_click=lambda: self.goto(TasksScreen()),
-                        inner=HBox(
-                            [
-                                SvgIcon(
-                                    "drinks_touch/resources/images/refresh-cw.svg",
-                                    height=40,
-                                    color=config.Color.PRIMARY,
-                                ),
-                                Label(text="Neu initialisieren"),
-                            ]
+                            ],
+                            gap=icon_text_gap,
                         ),
                     ),
                     Button(
@@ -107,7 +111,8 @@ class SettingsMainScreen(Screen):
                                     color=config.Color.PRIMARY,
                                 ),
                                 Label(text="Barcode-Scanner Init"),
-                            ]
+                            ],
+                            gap=icon_text_gap,
                         ),
                     ),
                     # Transaction migration was done already.
@@ -128,7 +133,8 @@ class SettingsMainScreen(Screen):
                                     color=config.Color.PRIMARY,
                                 ),
                                 Label(text="SEPA Sync"),
-                            ]
+                            ],
+                            gap=icon_text_gap,
                         ),
                     ),
                     Button(
@@ -141,7 +147,8 @@ class SettingsMainScreen(Screen):
                                     color=config.Color.PRIMARY,
                                 ),
                                 Label(text="Mails versenden"),
-                            ]
+                            ],
+                            gap=icon_text_gap,
                         ),
                     ),
                     Button(
@@ -156,7 +163,8 @@ class SettingsMainScreen(Screen):
                                     color=config.Color.PRIMARY,
                                 ),
                                 Label(text="Account Sync"),
-                            ]
+                            ],
+                            gap=icon_text_gap,
                         ),
                     ),
                     Button(
@@ -172,11 +180,12 @@ class SettingsMainScreen(Screen):
                                 Label(
                                     text=f"Debug {ScreenManager.instance.DEBUG_LEVEL}"
                                 ),
-                            ]
+                            ],
+                            gap=icon_text_gap,
                         ),
                     ),
                 ],
-                pos=(5, 100),
+                pos=(5, 70),
                 gap=15,
             ),
         ]
