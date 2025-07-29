@@ -32,7 +32,6 @@ class Label(BaseElm):
         **kwargs,
     ):
         assert isinstance(color, config.Color)
-        self.size = size
         self.max_width = max_width
         self.text = text
         self.color = color
@@ -51,9 +50,9 @@ class Label(BaseElm):
             self.flip_x = False
             self.flip_y = False
 
-        super().__init__(children, height=self.size, width=self.size, *args, **kwargs)
+        super().__init__(children, height=size, width=size, *args, **kwargs)
 
-        self.font = Label.get_font(font, self.size)
+        self.font = Label.get_font(font, size)
 
     def __repr__(self):
         return f"<Label {self.text}>"

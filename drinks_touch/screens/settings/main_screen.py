@@ -26,6 +26,7 @@ class SettingsMainScreen(Screen):
 
         icon_text_gap = 15
 
+        button_width = config.SCREEN_WIDTH - 10
         self.objects = [
             Label(
                 text="Einstellungen",
@@ -52,6 +53,7 @@ class SettingsMainScreen(Screen):
                                     ],
                                     gap=icon_text_gap,
                                 ),
+                                width=button_width / 2 - 15,
                             ),
                             Button(
                                 on_click=lambda: self.go_if_git(GitBranchScreen()),
@@ -66,6 +68,7 @@ class SettingsMainScreen(Screen):
                                     ],
                                     gap=icon_text_gap,
                                 ),
+                                width=button_width / 2,
                             ),
                         ],
                         gap=15,
@@ -83,6 +86,7 @@ class SettingsMainScreen(Screen):
                             ],
                             gap=icon_text_gap,
                         ),
+                        width=button_width,
                     ),
                     Button(
                         on_click=self.toggle_soundcheck,
@@ -98,6 +102,7 @@ class SettingsMainScreen(Screen):
                             ],
                             gap=icon_text_gap,
                         ),
+                        width=button_width,
                     ),
                     Button(
                         on_click=lambda: self.goto(
@@ -114,6 +119,7 @@ class SettingsMainScreen(Screen):
                             ],
                             gap=icon_text_gap,
                         ),
+                        width=button_width,
                     ),
                     # Transaction migration was done already.
                     # Keeping it here as long as we have the old data model still in place
@@ -136,6 +142,7 @@ class SettingsMainScreen(Screen):
                             ],
                             gap=icon_text_gap,
                         ),
+                        width=button_width,
                     ),
                     Button(
                         on_click=lambda: self.goto(TasksScreen(tasks=[SendMailTask()])),
@@ -150,6 +157,7 @@ class SettingsMainScreen(Screen):
                             ],
                             gap=icon_text_gap,
                         ),
+                        width=button_width,
                     ),
                     Button(
                         on_click=lambda: self.goto(
@@ -166,6 +174,7 @@ class SettingsMainScreen(Screen):
                             ],
                             gap=icon_text_gap,
                         ),
+                        width=button_width,
                     ),
                     Button(
                         on_click=self.toggle_debug,
@@ -183,6 +192,7 @@ class SettingsMainScreen(Screen):
                             ],
                             gap=icon_text_gap,
                         ),
+                        width=button_width,
                     ),
                 ],
                 pos=(5, 70),

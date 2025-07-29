@@ -36,6 +36,7 @@ class ProfileScreen(Screen):
 
     @with_db
     def on_start(self, *args, **kwargs):
+        button_width = config.SCREEN_WIDTH - 10
         self.objects = [
             Label(
                 text=self.account.name,
@@ -78,6 +79,7 @@ class ProfileScreen(Screen):
                             "Nicht implementiert",
                         ),
                         padding=20,
+                        width=button_width,
                     ),
                     Button(
                         text="Aufladen",
@@ -85,6 +87,7 @@ class ProfileScreen(Screen):
                             self.goto, RechargeScreen(self.account)
                         ),
                         padding=20,
+                        width=button_width,
                     ),
                     Button(
                         text="Guthaben übertragen",
@@ -93,6 +96,7 @@ class ProfileScreen(Screen):
                             TransferBalanceScreen(self.account),
                         ),
                         padding=20,
+                        width=button_width,
                     ),
                     Button(
                         text="ID card",
@@ -101,6 +105,7 @@ class ProfileScreen(Screen):
                             self.goto, IDCardScreen(self.account)
                         ),
                         padding=20,
+                        width=button_width,
                     ),
                 ],
                 pos=(5, 300),

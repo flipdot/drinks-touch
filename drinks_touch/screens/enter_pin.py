@@ -67,8 +67,6 @@ class EnterPinScreen(Screen):
                 on_click=functools.partial(self.add_char, label),
                 font=Font.MONOSPACE,
                 size=50,
-                force_width=width,
-                force_height=width,
             )
         )
 

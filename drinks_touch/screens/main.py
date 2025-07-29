@@ -57,8 +57,6 @@ class MainScreen(Screen):
                     text=text,
                     pos=self.__get_pos(i),
                     on_click=functools.partial(self.switch_to_screen, text),
-                    force_width=440 / 6,
-                    force_height=440 / 6,
                     padding=(15, 25),
                 )
             )
