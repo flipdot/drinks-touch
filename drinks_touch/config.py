@@ -19,10 +19,17 @@ DEBUG_LEVEL = os.environ.get("DEBUG_LEVEL", "False") in [
 ]
 
 _INFRAGELB = (246, 198, 0, 255)
+_INFRAGELB_DARK = (173, 144, 23, 255)
+
+# def darken(color: tuple[int, int, int, int], factor: float) -> tuple[int, int, int, int]:
+#     t = color[:3]
+#     v = Vector3(*t) * (1 - factor)
+#     return int(v.x), int(v.y), int(v.z), color[3]
 
 
 class Color(enum.Enum):
     PRIMARY = _INFRAGELB
+    PRIMARY_DARK = _INFRAGELB_DARK
     GREY = (200, 200, 200, 255)
     DISABLED = (100, 100, 100, 255)
     ERROR = (255, 0, 0, 255)

@@ -1,5 +1,3 @@
-import functools
-
 from sqlalchemy import select
 from sqlalchemy.sql import text
 
@@ -19,6 +17,7 @@ from .confirm_payment_screen import ConfirmPaymentScreen
 from .id_card_screen import IDCardScreen
 from .screen import Screen
 from .screen_manager import ScreenManager
+from .transaction_history_screen import TransactionHistoryScreen
 from .transfer_balance_screen import TransferBalanceScreen
 
 
@@ -76,9 +75,8 @@ class ProfileScreen(Screen):
             VBox(
                 [
                     Button(
-                        on_click=functools.partial(
-                            self.alert,
-                            "Nicht implementiert",
+                        on_click=lambda: self.goto(
+                            TransactionHistoryScreen(self.account)
                         ),
                         inner=HBox(
                             [
@@ -95,9 +93,7 @@ class ProfileScreen(Screen):
                         width=button_width,
                     ),
                     Button(
-                        on_click=functools.partial(
-                            self.goto, RechargeScreen(self.account)
-                        ),
+                        on_click=lambda: self.goto(RechargeScreen(self.account)),
                         inner=HBox(
                             [
                                 SvgIcon(
@@ -113,10 +109,7 @@ class ProfileScreen(Screen):
                         width=button_width,
                     ),
                     Button(
-                        on_click=functools.partial(
-                            self.goto,
-                            TransferBalanceScreen(self.account),
-                        ),
+                        on_click=lambda: self.goto(TransferBalanceScreen(self.account)),
                         inner=HBox(
                             [
                                 SvgIcon(
@@ -133,9 +126,7 @@ class ProfileScreen(Screen):
                     ),
                     Button(
                         font=Font.MONOSPACE,
-                        on_click=functools.partial(
-                            self.goto, IDCardScreen(self.account)
-                        ),
+                        on_click=lambda: self.goto(IDCardScreen(self.account)),
                         inner=HBox(
                             [
                                 SvgIcon(

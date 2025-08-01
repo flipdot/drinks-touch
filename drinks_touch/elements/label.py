@@ -28,6 +28,8 @@ class Label(BaseElm):
         border_width=0,
         blink_frequency=0,
         max_width=None,
+        width=None,
+        height=None,
         *args,
         **kwargs,
     ):
@@ -41,6 +43,8 @@ class Label(BaseElm):
         self.blink_frequency = blink_frequency
         self.t = 0.0
         self.last_blink = 0.0
+        self.auto_width = width is None
+        self.auto_height = height is None
         today = datetime.now().date()
         april_fools = today.month == 4 and today.day == 1
         if april_fools:
@@ -49,10 +53,16 @@ class Label(BaseElm):
         else:
             self.flip_x = False
             self.flip_y = False
-
-        super().__init__(children, height=size, width=size, *args, **kwargs)
-
         self.font = Label.get_font(font, size)
+
+        super().__init__(children, height=height, width=width, *args, **kwargs)
+
+        if self.auto_width or self.auto_height:
+            text, pos, area = self._build_text()
+            if self.auto_width:
+                self.width = area.width + self.padding_left + self.padding_right
+            if self.auto_height:
+                self.height = area.height + self.padding_top + self.padding_bottom
 
     def __repr__(self):
         return f"<Label {self.text}>"
@@ -89,8 +99,10 @@ class Label(BaseElm):
 
     def _render(self, *args, **kwargs) -> pygame.Surface | None:
         text, pos, area = self._build_text()
-        self.width = area.width + self.padding_left + self.padding_right
-        self.height = area.height + self.padding_top + self.padding_bottom
+        if self.auto_width:
+            self.width = area.width + self.padding_left + self.padding_right
+        if self.auto_height:
+            self.height = area.height + self.padding_top + self.padding_bottom
         bg = self._render_background(area)
         surface = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
         if bg:

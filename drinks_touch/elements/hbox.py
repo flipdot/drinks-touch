@@ -13,11 +13,15 @@ class HBox(BaseElm):
         children: list["BaseElm"] | None = None,
         gap=5,
         pos=(0, 0),
+        width=None,
+        height=None,
         bg_color: Color | None = None,
         *args,
         **kwargs,
     ):
-        super().__init__(children, pos, 0, 0, *args, **kwargs)
+        super().__init__(children, pos, height, width, *args, **kwargs)
+        if children is None:
+            children = []
         if __debug__:
             for child in children:
                 assert (
@@ -73,6 +77,8 @@ class HBox(BaseElm):
 
     @property
     def width(self):
+        if self._width is not None:
+            return self._width
         return (
             sum([element.width for element in self.children])
             + (len(self.children) - 1) * self.gap
@@ -82,6 +88,8 @@ class HBox(BaseElm):
 
     @property
     def height(self):
+        if self._height is not None:
+            return self._height
         return (
             max([element.height for element in self.children])
             + self.padding_top
