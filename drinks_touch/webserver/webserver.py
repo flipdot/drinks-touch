@@ -68,13 +68,19 @@ def stats():
 def recharge_doit():
     user_id = request.form.get("user_user")
     if not user_id:
-        return "Bitte einen Nutzer auswählen!"
+        return (
+            render_template("message.html", message="Bitte einen Nutzer auswählen!"),
+            400,
+        )
     amount = request.form.get("amount")
     if not amount:
-        return "Bitte einen Betrag angeben!"
+        return (
+            render_template("message.html", message="Bitte einen Betrag angeben!"),
+            400,
+        )
 
     if amount == "0":
-        return "Ungültiger Betrag!"
+        return render_template("message.html", message="Ungültiger Betrag!"), 400
 
     account = db.session.query(Account).filter(Account.id == user_id).one()
 
@@ -128,9 +134,9 @@ def enable_transaction_history(signed_account_id):
             signed_account_id, max_age=timedelta(days=1).total_seconds()
         )
     except SignatureExpired:
-        return "Link abgelaufen", 400
+        return render_template("message.html", message="Link abgelaufen"), 400
     except BadSignature:
-        return "Ungültiger Link", 400
+        return render_template("message.html", message="Ungültiger Link"), 400
     query = (
         update(Account).where(Account.id == account_id).values(tx_history_visible=True)
     )
