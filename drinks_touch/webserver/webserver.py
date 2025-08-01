@@ -1,9 +1,11 @@
 import json
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 from decimal import Decimal
 
 from flask_sqlalchemy import SQLAlchemy
+from itsdangerous import TimedSerializer, BadSignature, SignatureExpired
+from sqlalchemy import update
 
 import config
 
@@ -116,6 +118,27 @@ def tx_png():
     response.headers["Content-Type"] = "image/png"
 
     return response
+
+
+@app.route("/enable_transaction_history/<signed_account_id>")
+def enable_transaction_history(signed_account_id):
+    signer = TimedSerializer(config.SECRET_KEY, salt="enable_transaction_history")
+    try:
+        account_id = signer.loads(
+            signed_account_id, max_age=timedelta(days=1).total_seconds()
+        )
+    except SignatureExpired:
+        return "Link abgelaufen", 400
+    except BadSignature:
+        return "Ungültiger Link", 400
+    query = (
+        update(Account).where(Account.id == account_id).values(tx_history_visible=True)
+    )
+    db.session.execute(query)
+    db.session.commit()
+    return render_template(
+        "enable_transaction_history_success.html", account_id=account_id
+    )
 
 
 def to_json(dict_arr):

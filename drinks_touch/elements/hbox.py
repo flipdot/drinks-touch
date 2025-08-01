@@ -79,6 +79,8 @@ class HBox(BaseElm):
     def width(self):
         if self._width is not None:
             return self._width
+        if not self.children:
+            return self.padding_left + self.padding_right
         return (
             sum([element.width for element in self.children])
             + (len(self.children) - 1) * self.gap
@@ -92,8 +94,8 @@ class HBox(BaseElm):
             return self._height
         return (
             max([element.height for element in self.children])
-            + self.padding_top
-            + self.padding_bottom
+            if self.children
+            else 0 + self.padding_top + self.padding_bottom
         )
 
     def render_debug(self) -> pygame.Surface:

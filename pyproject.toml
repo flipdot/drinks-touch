@@ -32,6 +32,7 @@ ics = "^0.7.2"
 alembic = "^1.15.1"
 cairosvg = "^2.8.2"
 flask-sqlalchemy = "^3.1.1"
+itsdangerous = "^2.2.0"
 
 
 [tool.poetry.group.dev.dependencies]

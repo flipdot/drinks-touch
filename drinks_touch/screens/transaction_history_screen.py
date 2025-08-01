@@ -4,7 +4,7 @@ import config
 from config import Color
 from database.models import Account, Tx
 from database.storage import with_db, Session
-from elements import Label, Button
+from elements import Label, Button, SvgIcon
 from elements.hbox import HBox
 from elements.vbox import VBox
 from screens.screen import Screen
@@ -31,6 +31,8 @@ class TransactionHistoryScreen(Screen):
 
     @with_db
     def on_start(self, *args, **kwargs):
+        if not self.account.tx_history_visible:
+            self.back()
         self.objects = [
             Label(
                 text=self.account.name,
@@ -49,6 +51,19 @@ class TransactionHistoryScreen(Screen):
                 ],
                 pos=(config.SCREEN_WIDTH - 5, 5),
                 align_right=True,
+            ),
+            HBox(
+                [
+                    Button(
+                        inner=SvgIcon(
+                            "drinks_touch/resources/images/lock.svg",
+                            color=Color.PRIMARY,
+                        ),
+                        on_click=self.toggle_history_lock,
+                        pass_on_click_kwargs=True,
+                    )
+                ],
+                pos=(config.SCREEN_WIDTH - 50, config.SCREEN_HEIGHT - 120),
             ),
             VBox(
                 [
@@ -91,6 +106,8 @@ class TransactionHistoryScreen(Screen):
 
     @with_db
     def load_transactions(self, page: int) -> list[Tx]:
+        if not self.account.tx_history_visible:
+            return []
         query = (
             select(Tx)
             .where(Tx.account_id == self.account.id)
@@ -106,6 +123,15 @@ class TransactionHistoryScreen(Screen):
         return Session().execute(query).scalar()
 
     @with_db
+    def toggle_history_lock(self, button: Button):
+        self.account.tx_history_visible = not self.account.tx_history_visible
+        if self.account.tx_history_visible:
+            button.inner.path = "drinks_touch/resources/images/lock.svg"
+        else:
+            button.inner.path = "drinks_touch/resources/images/unlock.svg"
+        self.go_to_page(1)
+
+    @with_db
     def go_to_page(self, page: int):
         if page < 1 or page > self.total_pages:
             return
@@ -116,7 +142,7 @@ class TransactionHistoryScreen(Screen):
         # to_item = min(self.page * TransactionHistoryScreen.PAGE_SIZE, self.total_items)
         # pagination_text = f"{from_item:4} - {to_item:4}"
         self.objects = [
-            *self.objects[:3],
+            *self.objects[:4],
             VBox(
                 [
                     HBox(
@@ -161,7 +187,7 @@ class TransactionHistoryScreen(Screen):
                         text=pagination_text,
                         size=14,
                         padding=(15, 0),
-                        width=90,
+                        width=110,
                         font=config.Font.MONOSPACE,
                     ),
                     Button(text=" › ", on_click=lambda: self.go_to_page(self.page + 1)),
@@ -169,7 +195,7 @@ class TransactionHistoryScreen(Screen):
                         text=" » ", on_click=lambda: self.go_to_page(self.total_pages)
                     ),
                 ],
-                pos=(10, config.SCREEN_HEIGHT - 140),
+                pos=(10, config.SCREEN_HEIGHT - 185),
                 gap=15,
             ),
         ]

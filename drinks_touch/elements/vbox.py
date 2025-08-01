@@ -68,14 +68,16 @@ class VBox(BaseElm):
             return self._width
         return (
             max([element.width for element in self.children])
-            + self.padding_left
-            + self.padding_right
+            if self.children
+            else 0 + self.padding_left + self.padding_right
         )
 
     @property
     def height(self):
         if self._height is not None:
             return self._height
+        if not self.children:
+            return self.padding_top + self.padding_bottom
         return (
             sum([element.height for element in self.children])
             + (len(self.children) - 1) * self.gap

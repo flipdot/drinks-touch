@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block body %}
+    <p>
+        Hallo {{ username }},
+    </p>
+    <p>
+        du hast am drinks-touch angefordert, dass deine Transaktionshistorie sichtbar geschaltet werden soll.
+        Wenn du das wirklich möchtest, klicke bitte auf den folgenden Link:
+    </p>
+    <p>
+        <a href="{{ url }}">{{ url }}</a>
+    </p>
+    <p>
+        Der Link ist 24 Stunden lang gültig. Du musst im flipdot Netz sein, um ihn öffnen zu können.
+        Andernfalls ignoriere diese E-Mail einfach. Deine Transaktionshistorie wird nicht sichtbar geschaltet.
+    </p>
+{% endblock %}

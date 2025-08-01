@@ -14,6 +14,7 @@ from elements.label import Label
 from elements.vbox import VBox
 from screens.recharge_screen import RechargeScreen
 from .confirm_payment_screen import ConfirmPaymentScreen
+from .enable_transaction_history_screen import EnableTransactionHistoryScreen
 from .id_card_screen import IDCardScreen
 from .screen import Screen
 from .screen_manager import ScreenManager
@@ -75,9 +76,7 @@ class ProfileScreen(Screen):
             VBox(
                 [
                     Button(
-                        on_click=lambda: self.goto(
-                            TransactionHistoryScreen(self.account)
-                        ),
+                        on_click=self.goto_transaction_history,
                         inner=HBox(
                             [
                                 SvgIcon(
@@ -208,6 +207,13 @@ class ProfileScreen(Screen):
         self.objects.extend(self.elements_drinks)
 
         self.render_aufladungen()
+
+    @with_db
+    def goto_transaction_history(self):
+        if self.account.tx_history_visible:
+            self.goto(TransactionHistoryScreen(self.account))
+        else:
+            self.goto(EnableTransactionHistoryScreen(self.account))
 
     def render_aufladungen(self):
         # aufladungen = Users.get_recharges(self.user["id"], limit=12)
