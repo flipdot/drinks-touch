@@ -18,7 +18,7 @@ from .enable_transaction_history_screen import EnableTransactionHistoryScreen
 from .id_card_screen import IDCardScreen
 from .screen import Screen
 from .screen_manager import ScreenManager
-from .transaction_history_screen import TransactionHistoryScreen
+from .transaction_history_log_screen import TransactionHistoryLogScreen
 from .transfer_balance_screen import TransferBalanceScreen
 
 
@@ -211,7 +211,7 @@ class ProfileScreen(Screen):
     @with_db
     def goto_transaction_history(self):
         if self.account.tx_history_visible:
-            self.goto(TransactionHistoryScreen(self.account))
+            self.goto(TransactionHistoryLogScreen(self.account))
         else:
             self.goto(EnableTransactionHistoryScreen(self.account))
 

@@ -8,9 +8,10 @@ from elements import Label, Button, SvgIcon
 from elements.hbox import HBox
 from elements.vbox import VBox
 from screens.screen import Screen
+from screens.transaction_history_stats_screen import TransactionHistoryStatsScreen
 
 
-class TransactionHistoryScreen(Screen):
+class TransactionHistoryLogScreen(Screen):
     PAGE_SIZE = 9
 
     def __init__(self, account: Account):
@@ -31,8 +32,6 @@ class TransactionHistoryScreen(Screen):
 
     @with_db
     def on_start(self, *args, **kwargs):
-        if not self.account.tx_history_visible:
-            self.back()
         self.objects = [
             Label(
                 text=self.account.name,
@@ -56,14 +55,25 @@ class TransactionHistoryScreen(Screen):
                 [
                     Button(
                         inner=SvgIcon(
+                            "drinks_touch/resources/images/bar-chart-2.svg",
+                            color=Color.PRIMARY,
+                        ),
+                        on_click=lambda: self.goto(
+                            TransactionHistoryStatsScreen(self.account)
+                        ),
+                    ),
+                    Button(
+                        inner=SvgIcon(
                             "drinks_touch/resources/images/lock.svg",
                             color=Color.PRIMARY,
                         ),
                         on_click=self.toggle_history_lock,
                         pass_on_click_kwargs=True,
-                    )
+                    ),
                 ],
-                pos=(config.SCREEN_WIDTH - 50, config.SCREEN_HEIGHT - 120),
+                pos=(config.SCREEN_WIDTH - 5, config.SCREEN_HEIGHT - 120),
+                gap=15,
+                align_right=True,
             ),
             VBox(
                 [
@@ -99,8 +109,8 @@ class TransactionHistoryScreen(Screen):
             ),
         ]
         self.total_items = self.count_transactions()
-        self.total_pages = self.total_items // TransactionHistoryScreen.PAGE_SIZE + (
-            1 if self.total_items % TransactionHistoryScreen.PAGE_SIZE > 0 else 0
+        self.total_pages = self.total_items // TransactionHistoryLogScreen.PAGE_SIZE + (
+            1 if self.total_items % TransactionHistoryLogScreen.PAGE_SIZE > 0 else 0
         )
         self.go_to_page(self.page)
 
@@ -112,8 +122,8 @@ class TransactionHistoryScreen(Screen):
             select(Tx)
             .where(Tx.account_id == self.account.id)
             .order_by(Tx.created_at.desc())
-            .offset((page - 1) * TransactionHistoryScreen.PAGE_SIZE)
-            .limit(TransactionHistoryScreen.PAGE_SIZE)
+            .offset((page - 1) * TransactionHistoryLogScreen.PAGE_SIZE)
+            .limit(TransactionHistoryLogScreen.PAGE_SIZE)
         )
         return Session().execute(query).scalars().all()
 
@@ -138,8 +148,8 @@ class TransactionHistoryScreen(Screen):
         self.page = page
         transactions = self.load_transactions(page)
         pagination_text = f"{self.page:4} / {self.total_pages:4}"
-        # from_item = (self.page - 1) * TransactionHistoryScreen.PAGE_SIZE + 1
-        # to_item = min(self.page * TransactionHistoryScreen.PAGE_SIZE, self.total_items)
+        # from_item = (self.page - 1) * TransactionHistoryLogScreen.PAGE_SIZE + 1
+        # to_item = min(self.page * TransactionHistoryLogScreen.PAGE_SIZE, self.total_items)
         # pagination_text = f"{from_item:4} - {to_item:4}"
         self.objects = [
             *self.objects[:4],
