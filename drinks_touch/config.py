@@ -24,11 +24,6 @@ SECRET_KEY = os.environ.get("SECRET_KEY", os.urandom(32).hex())
 _INFRAGELB = (246, 198, 0, 255)
 _INFRAGELB_DARK = (173, 144, 23, 255)
 
-# def darken(color: tuple[int, int, int, int], factor: float) -> tuple[int, int, int, int]:
-#     t = color[:3]
-#     v = Vector3(*t) * (1 - factor)
-#     return int(v.x), int(v.y), int(v.z), color[3]
-
 
 class Color(enum.Enum):
     PRIMARY = _INFRAGELB
