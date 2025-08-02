@@ -32,6 +32,7 @@ class Account(Base):
     last_balance_warning_email_sent_at = Column(DateTime(), unique=False)
     last_summary_email_sent_at = Column(DateTime(), unique=False)
     summary_email_notification_setting = Column(String(50), unique=False)
+    tx_history_visible = Column(Boolean, default=False)
 
     @with_db
     def _get_legacy_balance(self):

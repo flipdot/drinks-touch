@@ -1,0 +1,177 @@
+/* ---  1. Global Variables and Theme Setup --- */
+/*
+ * We define colors and other variables here.
+ * The :root selector targets the <html> element and is a great
+ * place for global variables.
+ *
+ * The `@media (prefers-color-scheme: dark)` block automatically
+ * switches the variables when the user's OS is in dark mode.
+*/
+
+:root {
+  /* Color Palette (Light Mode) */
+  --color-text: #212529;
+  --color-background: #f8f9fa;
+  --color-primary: #007bff;
+  --color-subtle-background: #e9ecef;
+  --color-border: #dee2e6;
+
+  /* Typography */
+  --font-family-sans-serif: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  --font-family-monospace: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --font-size-base: 1rem; /* ~16px */
+  --line-height-base: 1.6;
+
+  /* Sizing & Spacing */
+  --content-max-width: 80ch; /* ~80 characters wide for readability */
+  --spacing-unit: 1rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Color Palette (Dark Mode) */
+    --color-text: #e9ecef;
+    --color-background: #212529;
+    --color-primary: #58a6ff;
+    --color-subtle-background: #343a40;
+    --color-border: #495057;
+  }
+}
+
+/* --- 2. Basic Reset & Base Styles --- */
+/*
+ * A gentle reset to remove default browser margins and
+ * set a foundation for the whole page.
+*/
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  /* Smooth scrolling for anchor links */
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-family-sans-serif);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
+  color: var(--color-text);
+  background-color: var(--color-background);
+
+  /* Layout for main content */
+  max-width: var(--content-max-width);
+  margin-left: auto;
+  margin-right: auto;
+  padding: var(--spacing-unit);
+}
+
+
+/* --- 3. Typography --- */
+/*
+ * Styles for headings, paragraphs, links, etc.
+*/
+
+h1, h2, h3, h4, h5, h6 {
+  margin-top: calc(var(--spacing-unit) * 1.5);
+  margin-bottom: var(--spacing-unit);
+  line-height: 1.2;
+}
+
+p {
+  margin-top: 0;
+  margin-bottom: var(--spacing-unit);
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+code, pre {
+  font-family: var(--font-family-monospace);
+  background-color: var(--color-subtle-background);
+  border-radius: 4px;
+}
+
+code {
+  padding: 0.2em 0.4em;
+}
+
+pre {
+  padding: var(--spacing-unit);
+  border: 1px solid var(--color-border);
+  overflow-x: auto; /* Allow horizontal scrolling for long code blocks */
+}
+
+/* lobotomized owl selector */
+* + * {
+  margin-top: var(--spacing-unit);
+}
+
+/* --- 4. Responsive Media --- */
+/*
+ * Makes images and videos scale with their container.
+*/
+
+img,
+video,
+svg {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+
+/* --- 5. Forms & Buttons (Simple Styling) --- */
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+  font-size: inherit;
+  padding: 0.5rem 0.75rem;
+  border-radius: 4px;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-background);
+  color: var(--color-text);
+}
+
+button {
+  cursor: pointer;
+  background-color: var(--color-primary);
+  color: var(--color-background);
+  border-color: var(--color-primary);
+}
+
+button:hover {
+  opacity: 0.85;
+}
+
+/* --- 6. Form Grid Layout --- */
+
+.form-grid {
+  display: grid;
+  /* Create two columns: one for labels (auto-sized), one for inputs (takes rest of space) */
+  grid-template-columns: auto 1fr;
+  /* Add spacing between rows and columns */
+  gap: var(--spacing-unit);
+  /* Vertically align the label text with the center of the input box */
+  align-items: center;
+}
+
+/* On small screens, stack the form elements into a single column */
+@media (max-width: 400px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}
