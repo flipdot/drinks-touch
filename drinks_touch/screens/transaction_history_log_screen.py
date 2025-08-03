@@ -153,7 +153,7 @@ class TransactionHistoryLogScreen(Screen):
 
     @with_db
     def go_to_page(self, page: int):
-        if page < 1 or page > self.total_pages:
+        if not (1 <= page <= self.total_pages):
             return
         self.page = page
         transactions = self.load_transactions(page)
