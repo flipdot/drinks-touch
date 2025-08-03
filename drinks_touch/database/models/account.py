@@ -83,7 +83,7 @@ class Account(Base):
                 f"Balance mismatch for account {self.id}: "
                 f"Legacy balance: {legacy_balance}, Tx balance: {tx_balance}"
             )
-        return legacy_balance
+        return tx_balance
 
     def get_recharges(self):
         from database.models import RechargeEvent
