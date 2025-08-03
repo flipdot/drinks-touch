@@ -113,6 +113,7 @@ class EnableTransactionHistoryScreen(Screen):
         context = {
             "username": self.account.name,
             "url": url,
+            "uid": self.account.ldap_id,
         }
         content_html = render_jinja_template(
             "enable_transaction_history.html", **context
