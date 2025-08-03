@@ -19,7 +19,8 @@ DEBUG_LEVEL = os.environ.get("DEBUG_LEVEL", "False") in [
 ]
 
 BASE_URL = os.environ.get("BASE_URL", "http://localhost:5002")
-SECRET_KEY = os.environ.get("SECRET_KEY", os.urandom(32).hex())
+# Generate a secret with python3 -c 'import os; print(os.urandom(32).hex())'
+SECRET_KEY = os.environ.get("SECRET_KEY")
 
 _INFRAGELB = (246, 198, 0, 255)
 _INFRAGELB_DARK = (173, 144, 23, 255)
