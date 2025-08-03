@@ -67,9 +67,9 @@ class VBox(BaseElm):
         if self._width is not None:
             return self._width
         return (
-            max([element.width for element in self.children])
-            if self.children
-            else 0 + self.padding_left + self.padding_right
+            (max([element.width for element in self.children]) if self.children else 0)
+            + self.padding_left
+            + self.padding_right
         )
 
     @property

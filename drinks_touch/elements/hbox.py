@@ -93,9 +93,9 @@ class HBox(BaseElm):
         if self._height is not None:
             return self._height
         return (
-            max([element.height for element in self.children])
-            if self.children
-            else 0 + self.padding_top + self.padding_bottom
+            (max([element.height for element in self.children]) if self.children else 0)
+            + self.padding_top
+            + self.padding_bottom
         )
 
     def render_debug(self) -> pygame.Surface:
