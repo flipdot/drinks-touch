@@ -55,6 +55,13 @@ class TransactionHistoryLogScreen(Screen):
                 [
                     Button(
                         inner=SvgIcon(
+                            "drinks_touch/resources/images/trash-2.svg",
+                            color=Color.PRIMARY,
+                        ),
+                        on_click=lambda: self.alert("Nicht implementiert"),
+                    ),
+                    Button(
+                        inner=SvgIcon(
                             "drinks_touch/resources/images/bar-chart-2.svg",
                             color=Color.PRIMARY,
                         ),
