@@ -12,7 +12,7 @@ from screens.transaction_history_stats_screen import TransactionHistoryStatsScre
 
 
 class TransactionHistoryLogScreen(Screen):
-    PAGE_SIZE = 9
+    PAGE_SIZE = 8
 
     def __init__(self, account: Account):
         super().__init__()
@@ -57,6 +57,7 @@ class TransactionHistoryLogScreen(Screen):
                         inner=SvgIcon(
                             "drinks_touch/resources/images/trash-2.svg",
                             color=Color.PRIMARY,
+                            width=36,
                         ),
                         on_click=lambda: self.alert("Nicht implementiert"),
                     ),
@@ -64,6 +65,7 @@ class TransactionHistoryLogScreen(Screen):
                         inner=SvgIcon(
                             "drinks_touch/resources/images/bar-chart-2.svg",
                             color=Color.PRIMARY,
+                            width=36,
                         ),
                         on_click=lambda: self.goto(
                             TransactionHistoryStatsScreen(self.account)
@@ -73,12 +75,13 @@ class TransactionHistoryLogScreen(Screen):
                         inner=SvgIcon(
                             "drinks_touch/resources/images/lock.svg",
                             color=Color.PRIMARY,
+                            width=36,
                         ),
                         on_click=self.toggle_history_lock,
                         pass_on_click_kwargs=True,
                     ),
                 ],
-                pos=(config.SCREEN_WIDTH - 5, config.SCREEN_HEIGHT - 120),
+                pos=(config.SCREEN_WIDTH - 5, config.SCREEN_HEIGHT - 130),
                 gap=15,
                 align_right=True,
             ),
@@ -212,7 +215,7 @@ class TransactionHistoryLogScreen(Screen):
                         text=" » ", on_click=lambda: self.go_to_page(self.total_pages)
                     ),
                 ],
-                pos=(10, config.SCREEN_HEIGHT - 185),
+                pos=(10, config.SCREEN_HEIGHT - 255),
                 gap=15,
             ),
         ]
