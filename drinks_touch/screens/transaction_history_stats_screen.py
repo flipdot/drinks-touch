@@ -112,18 +112,36 @@ class TransactionHistoryStatsScreen(Screen):
         for spine in ax.spines.values():
             spine.set_color(text_color)
 
-        # Fill green where balance is positive, red when negative
-        for i in range(1, len(df)):
-            prev = df.iloc[i - 1]
-            curr = df.iloc[i]
-            x = [prev["timestamp"], curr["timestamp"]]
-            y = [prev["balance"], curr["balance"]]
-            color = "green" if prev["balance"] >= 0 else "red"
-            ax.plot(x, y, color=color)
-            ax.fill_between(
-                x, y, 0, where=[b >= 0 for b in y], color="green", alpha=0.3
-            )
-            ax.fill_between(x, y, 0, where=[b < 0 for b in y], color="red", alpha=0.3)
+        ax.step(
+            df["timestamp"],
+            df["balance"],
+            where="post",
+            color=text_color,
+            linewidth=2,
+        )
+
+        # where balance is negative / positive, or where previous balance was negative / positive
+        where_negative = (df["balance"] <= 0) | (df["balance"].shift(1) <= 0)
+        where_positive = (df["balance"] >= 0) | (df["balance"].shift(1) >= 0)
+
+        ax.fill_between(
+            df["timestamp"],
+            df["balance"],
+            0,
+            where=where_positive,
+            step="post",
+            color="green",
+            alpha=0.3,
+        )
+        ax.fill_between(
+            df["timestamp"],
+            df["balance"],
+            0,
+            where=where_negative,
+            step="post",
+            color="red",
+            alpha=0.3,
+        )
 
         # Format the x-axis
         ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y-%m-%d"))
