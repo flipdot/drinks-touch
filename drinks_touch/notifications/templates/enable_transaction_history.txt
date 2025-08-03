@@ -1,0 +1,14 @@
+{% extends "base.txt" %}
+
+{% block body %}
+Hallo {{ username }},
+
+du hast am drinks-touch angefordert, dass deine Transaktionshistorie sichtbar geschaltet werden soll.
+Wenn du das wirklich möchtest, klicke bitte auf den folgenden Link:
+
+{{ url }}
+
+Der Link ist 24 Stunden lang gültig. Du musst im flipdot Netz sein, um ihn öffnen zu können.
+
+Andernfalls ignoriere diese E-Mail einfach. Deine Transaktionshistorie wird nicht sichtbar geschaltet.
+{% endblock %}

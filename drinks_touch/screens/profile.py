@@ -1,5 +1,3 @@
-import functools
-
 from sqlalchemy import select
 from sqlalchemy.sql import text
 
@@ -9,14 +7,18 @@ from database.models import Account
 from database.storage import Session, with_db
 from drinks.drinks import get_by_ean
 from drinks.drinks_manager import DrinksManager
+from elements import SvgIcon
 from elements.button import Button
+from elements.hbox import HBox
 from elements.label import Label
 from elements.vbox import VBox
 from screens.recharge_screen import RechargeScreen
 from .confirm_payment_screen import ConfirmPaymentScreen
+from .enable_transaction_history_screen import EnableTransactionHistoryScreen
 from .id_card_screen import IDCardScreen
 from .screen import Screen
 from .screen_manager import ScreenManager
+from .transaction_history_log_screen import TransactionHistoryLogScreen
 from .transfer_balance_screen import TransferBalanceScreen
 
 
@@ -37,6 +39,7 @@ class ProfileScreen(Screen):
     @with_db
     def on_start(self, *args, **kwargs):
         button_width = config.SCREEN_WIDTH - 10
+        icon_text_gap = 15
         self.objects = [
             Label(
                 text=self.account.name,
@@ -73,36 +76,66 @@ class ProfileScreen(Screen):
             VBox(
                 [
                     Button(
-                        text="Buchungshistorie",
-                        on_click=functools.partial(
-                            self.alert,
-                            "Nicht implementiert",
+                        on_click=self.goto_transaction_history,
+                        inner=HBox(
+                            [
+                                SvgIcon(
+                                    "drinks_touch/resources/images/clock.svg",
+                                    height=40,
+                                    color=config.Color.PRIMARY,
+                                ),
+                                Label(text="Transaktionshistorie"),
+                            ],
+                            gap=icon_text_gap,
                         ),
                         padding=20,
                         width=button_width,
                     ),
                     Button(
-                        text="Aufladen",
-                        on_click=functools.partial(
-                            self.goto, RechargeScreen(self.account)
+                        on_click=lambda: self.goto(RechargeScreen(self.account)),
+                        inner=HBox(
+                            [
+                                SvgIcon(
+                                    "drinks_touch/resources/images/trending-up.svg",
+                                    height=40,
+                                    color=config.Color.PRIMARY,
+                                ),
+                                Label(text="Aufladen"),
+                            ],
+                            gap=icon_text_gap,
                         ),
                         padding=20,
                         width=button_width,
                     ),
                     Button(
-                        text="Guthaben übertragen",
-                        on_click=functools.partial(
-                            self.goto,
-                            TransferBalanceScreen(self.account),
+                        on_click=lambda: self.goto(TransferBalanceScreen(self.account)),
+                        inner=HBox(
+                            [
+                                SvgIcon(
+                                    "drinks_touch/resources/images/repeat.svg",
+                                    height=40,
+                                    color=config.Color.PRIMARY,
+                                ),
+                                Label(text="Guthaben übertragen"),
+                            ],
+                            gap=icon_text_gap,
                         ),
                         padding=20,
                         width=button_width,
                     ),
                     Button(
-                        text="ID card",
                         font=Font.MONOSPACE,
-                        on_click=functools.partial(
-                            self.goto, IDCardScreen(self.account)
+                        on_click=lambda: self.goto(IDCardScreen(self.account)),
+                        inner=HBox(
+                            [
+                                SvgIcon(
+                                    "drinks_touch/resources/images/link.svg",
+                                    height=40,
+                                    color=config.Color.PRIMARY,
+                                ),
+                                Label(text="ID card"),
+                            ],
+                            gap=icon_text_gap,
                         ),
                         padding=20,
                         width=button_width,
@@ -174,6 +207,13 @@ class ProfileScreen(Screen):
         self.objects.extend(self.elements_drinks)
 
         self.render_aufladungen()
+
+    @with_db
+    def goto_transaction_history(self):
+        if self.account.tx_history_visible:
+            self.goto(TransactionHistoryLogScreen(self.account))
+        else:
+            self.goto(EnableTransactionHistoryScreen(self.account))
 
     def render_aufladungen(self):
         # aufladungen = Users.get_recharges(self.user["id"], limit=12)

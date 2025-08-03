@@ -18,11 +18,17 @@ DEBUG_LEVEL = os.environ.get("DEBUG_LEVEL", "False") in [
     "yes",
 ]
 
+BASE_URL = os.environ.get("BASE_URL", "http://localhost:5002")
+# Generate a secret with python3 -c 'import os; print(os.urandom(32).hex())'
+SECRET_KEY = os.environ.get("SECRET_KEY")
+
 _INFRAGELB = (246, 198, 0, 255)
+_INFRAGELB_DARK = (173, 144, 23, 255)
 
 
 class Color(enum.Enum):
     PRIMARY = _INFRAGELB
+    PRIMARY_DARK = _INFRAGELB_DARK
     GREY = (200, 200, 200, 255)
     DISABLED = (100, 100, 100, 255)
     ERROR = (255, 0, 0, 255)

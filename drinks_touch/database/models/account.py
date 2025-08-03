@@ -32,6 +32,7 @@ class Account(Base):
     last_balance_warning_email_sent_at = Column(DateTime(), unique=False)
     last_summary_email_sent_at = Column(DateTime(), unique=False)
     summary_email_notification_setting = Column(String(50), unique=False)
+    tx_history_visible = Column(Boolean, default=False)
 
     @with_db
     def _get_legacy_balance(self):
@@ -82,7 +83,7 @@ class Account(Base):
                 f"Balance mismatch for account {self.id}: "
                 f"Legacy balance: {legacy_balance}, Tx balance: {tx_balance}"
             )
-        return legacy_balance
+        return tx_balance
 
     def get_recharges(self):
         from database.models import RechargeEvent
