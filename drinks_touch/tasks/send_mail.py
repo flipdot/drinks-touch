@@ -127,8 +127,8 @@ class SendMailTask(BaseTask):
         transactions = get_recent_transactions(account)
 
         if transactions:
-            # TODO: Was before only for drinks. Let's replace this function
-            #       by jinja template rendering.
+            # TODO: Was before only for drinks. Let's replace building content_text
+            #       by jinja template rendering, instead of this ugly string concatenation.
             content_text += format_drinks(transactions)
 
         content_text += FOOTER.format(uid=account.ldap_id)
