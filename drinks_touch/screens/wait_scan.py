@@ -65,6 +65,7 @@ class WaitScanScreen(Screen):
         super().__init__()
         self.events: list[FlipdotEvent] = []
 
+    @with_db
     def on_start(self, *args, **kwargs):
         if config.ICAL_FILE_PATH.exists():
             try:
@@ -91,7 +92,7 @@ class WaitScanScreen(Screen):
                     ),
                 ]
 
-        total_balance = WaitScanScreen.get_total_balance()
+        total_balance = Session().query(func.sum(Tx.amount)).scalar() or Decimal(0)
         total_balance_fmt = "{:.02f}€".format(total_balance)
 
         bottom_right_buttons = [
@@ -226,12 +227,6 @@ class WaitScanScreen(Screen):
             )
 
         DrinksManager.instance.set_selected_drink(None)
-
-    @staticmethod
-    @with_db
-    def get_total_balance() -> Decimal:
-        tx_total_balance = Session().query(func.sum(Tx.amount)).scalar() or Decimal(0)
-        return tx_total_balance
 
     @staticmethod
     @functools.cache
