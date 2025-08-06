@@ -1,5 +1,4 @@
 from sqlalchemy import select
-from sqlalchemy.sql import text
 
 import config
 from config import Font
@@ -170,44 +169,6 @@ class ProfileScreen(Screen):
             # self.objects.extend([self.zuordnen, self.drink_info])
         return
 
-        self.elements_aufladungen = [
-            self.btn_drinks,
-        ]
-        self.elements_drinks = [self.btn_abbrechen]
-        # if drink:
-        #     self.elements_drinks.extend([self.zuordnen, self.drink_info])
-        if not drink:
-            self.elements_drinks.append(self.btn_aufladungen)
-
-        drinks = self.get_stats(limit=12)
-        for i, drinks in enumerate(drinks):
-            x = 30
-            if i == 11:
-                self.elements_drinks.append(Label(text="...", pos=(x, 210 + (i * 35))))
-                break
-            ean_text = get_by_ean(drinks["name"])["name"]
-            count_width = 80
-            margin_right = 10
-            self.elements_drinks.append(
-                Label(
-                    text=ean_text,
-                    pos=(x, 210 + (i * 35)),
-                    max_width=480 - x - margin_right - count_width,
-                )
-            )
-            self.elements_drinks.append(
-                Label(
-                    text=str(drinks["count"]),
-                    align_right=True,
-                    pos=(480 - margin_right, 210 + (i * 35)),
-                    max_width=count_width,
-                )
-            )
-
-        self.objects.extend(self.elements_drinks)
-
-        self.render_aufladungen()
-
     @with_db
     def goto_transaction_history(self):
         if self.account.tx_history_visible:
@@ -298,23 +259,3 @@ class ProfileScreen(Screen):
         for d in self.elements_aufladungen:
             self.objects.remove(d)
         self.objects.extend(self.elements_drinks)
-
-    @with_db
-    def get_stats(self, limit=None):
-        sql = text(
-            """
-            SELECT COUNT(*) as count, barcode as name
-            FROM scanevent
-            WHERE user_id = :userid
-            GROUP BY barcode
-            ORDER by count DESC
-            LIMIT :limit
-        """
-        )
-        result = (
-            Session()
-            .execute(sql, {"userid": self.account.ldap_id, "limit": limit})
-            .fetchall()
-        )
-
-        return [{"count": x[0], "name": x[1]} for x in result]
