@@ -12,10 +12,10 @@
     {% endif %}
 </p>
 <h2>
-    Abbuchungen
+    Transaktionen
 </h2>
-{% if not drinks %}
-Keine neuen Abbuchungen.
+{% if not transactions %}
+Keine neuen Transaktionen.
 {% else %}
 <table>
     <thead>
@@ -27,70 +27,27 @@ Keine neuen Abbuchungen.
                 Datum
             </th>
             <th>
-                Getränk
+                Verwendungszweck
             </th>
             <th>
-                Größe
+                Betrag
             </th>
         </tr>
     </thead>
     <tbody>
-        {% for drink in drinks %}
+        {% for tx in transactions %}
         <tr>
             <td>
                 {{ loop.index }}
             </td>
             <td>
-                {{ drink.timestamp.strftime("%F %T Z") }}
+                {{ tx.created_at.strftime("%F %T Z") }}
             </td>
             <td>
-                {{ drink.name }}
+                {{ tx.payment_reference }}
             </td>
-            <td>
-                {{ drink.size }}&thinsp;l
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-{% endif %}
-<h2>
-    Aufladungen
-</h2>
-{% if not recharges %}
-Keine neuen Aufladungen.
-{% else %}
-<table>
-    <thead>
-        <tr>
-            <th>
-                #
-            </th>
-            <th>
-                Datum
-            </th>
-            <th>
-                4-Augen-Person
-            </th>
-            <th>
-                Wert
-            </th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for recharge in recharges %}
-        <tr>
-            <td>
-                {{ loop.index }}
-            </td>
-            <td>
-                {{ recharge.timestamp.strftime("%F %T Z") }}
-            </td>
-            <td>
-                {{ recharge.helper_user_id }}
-            </td>
-            <td>
-                {{ recharge.amount }}&thinsp;€
+            <td style="text-align: right;">
+                {{ tx.amount }}&thinsp;€
             </td>
         </tr>
         {% endfor %}

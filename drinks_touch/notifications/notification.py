@@ -11,9 +11,10 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.utils import formatdate, make_msgid
 from premailer import transform
-from sqlalchemy import text
+from sqlalchemy import select
 
 import config
+from database.models import Tx
 from database.models.account import Account
 from database.models.recharge_event import RechargeEvent
 from database.storage import Session, with_db
@@ -83,19 +84,18 @@ def send_drink(account: Account, drink):
     )
 
 
-def format_drinks(drinks_consumed):
-    drinks_fmt = "\nGetrunken:\n"
-    drinks_fmt += "    #                 datum                drink groesse\n"
+def format_drinks(drinks_consumed: list[Tx]):
+    drinks_fmt = "\nTransaktionen:\n"
+    drinks_fmt += (
+        "     #                 Datum               Verwendungszweck     Betrag\n"
+    )
 
-    for i, event in enumerate(drinks_consumed):
-        date = event["timestamp"].strftime("%F %T Z")
-        name = event["name"]
-        size = event["size"]
-        drinks_fmt += "  % 3d % 15s % 20s % 5s l\n" % (
+    for i, tx in enumerate(drinks_consumed):
+        drinks_fmt += "  % 4d % 15s % 30s % 8s €\n" % (
             i,
-            date,
-            name,
-            size if size else "?",
+            tx.created_at.strftime("%F %T Z"),
+            tx.payment_reference,
+            tx.amount,
         )
 
     return drinks_fmt
@@ -113,40 +113,13 @@ def format_recharges(recharges: list[RechargeEvent]):
 
 
 @with_db
-def get_drinks_consumed(account: Account):
-    if account.last_summary_email_sent_at:
-        since_timestamp = account.last_summary_email_sent_at.timestamp()
-    else:
-        since_timestamp = 0
-    sql = text(
-        """SELECT
-    se.barcode,
-    se.timestamp,
-    d.name,
-    d.size
-FROM scanevent se
-    LEFT OUTER JOIN drink d ON d.ean = se.barcode
-WHERE user_id = :userid
-    AND se.timestamp >= TO_TIMESTAMP('%d')
-ORDER BY se.timestamp"""
-        % since_timestamp
+def get_recent_transactions(account: Account) -> list[Tx]:
+    query = select(Tx).where(
+        Tx.account_id == account.id,
+        Tx.created_at >= account.last_summary_email_sent_at,
     )
-    drinks_consumed = (
-        Session().execute(sql, {"userid": account.ldap_id}).mappings().all()
-    )
-    return drinks_consumed
-
-
-@with_db
-def get_recharges(account: Account) -> list[RechargeEvent]:
-    query = (
-        Session().query(RechargeEvent).filter(RechargeEvent.user_id == account.ldap_id)
-    )
-    if account.last_summary_email_sent_at:
-        query = query.filter(
-            RechargeEvent.timestamp >= account.last_summary_email_sent_at
-        )
-    return query.order_by(RechargeEvent.timestamp).all()
+    transactions = Session().execute(query).scalars().all()
+    return transactions
 
 
 def render_jinja_template(

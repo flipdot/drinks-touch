@@ -25,6 +25,7 @@ def scans(limit=1000, hours=None):
     if hours:
         where = "WHERE se.timestamp > NOW() - INTERVAL ':hours HOUR'"
         params["hours"] = hours
+    raise NotImplementedError("Need to port it from scanevent to tx table")
     sql = text(
         """
     SELECT se.id, barcode, se.timestamp, name

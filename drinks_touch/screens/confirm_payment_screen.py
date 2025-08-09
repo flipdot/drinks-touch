@@ -1,9 +1,7 @@
-import datetime
-
 import pygame
 
 import config
-from database.models import ScanEvent, Tx, Sale
+from database.models import Tx, Sale
 from database.storage import Session, with_db
 from drinks.drinks_manager import DrinksManager
 from elements import Label, Button
@@ -95,14 +93,6 @@ class ConfirmPaymentScreen(Screen):
             amount=-1,  # "Alles 1 Euro" policy
         )
         Session().add(transaction)
-        Session().flush()
-        ev = ScanEvent(
-            self.drink["ean"],
-            self.account.ldap_id,
-            datetime.datetime.now(),
-            tx_id=transaction.id,
-        )
-        Session().add(ev)
         sale = Sale(ean=self.drink["ean"])
         Session().add(sale)
         DrinksManager.instance.set_selected_drink(None)
