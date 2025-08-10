@@ -10,10 +10,8 @@ from notifications.notification import (
     render_jinja_template,
     send_notification,
     format_drinks,
-    format_recharges,
     FOOTER,
-    get_recharges,
-    get_drinks_consumed,
+    get_recent_transactions,
 )
 from tasks.base import BaseTask
 
@@ -126,14 +124,12 @@ class SendMailTask(BaseTask):
         )
 
         self.logger.info(f"Account {account.id:3} | Checking history...")
-        drinks_consumed = get_drinks_consumed(account)
-        recharges = get_recharges(account)
+        transactions = get_recent_transactions(account)
 
-        if drinks_consumed:
-            content_text += format_drinks(drinks_consumed)
-
-        if recharges:
-            content_text += format_recharges(recharges)
+        if transactions:
+            # TODO: Was before only for drinks. Let's replace building content_text
+            #       by jinja template rendering, instead of this ugly string concatenation.
+            content_text += format_drinks(transactions)
 
         content_text += FOOTER.format(uid=account.ldap_id)
         content_html = render_jinja_template(
@@ -141,17 +137,16 @@ class SendMailTask(BaseTask):
             with_report=True,
             balance=account.balance,
             last_drink_notification_sent_at=account.last_summary_email_sent_at,
-            drinks=drinks_consumed,
-            recharges=recharges,
+            transactions=transactions,
             minimum_balance=config.MINIMUM_BALANCE,
             uid=account.ldap_id,
         )
 
-        if len(drinks_consumed) == 0 and len(recharges) == 0:
+        if len(transactions) == 0:
             return
 
         self.logger.info(
-            f"Account {account.id:3} | Summary mail, {len(drinks_consumed):2} drinks, {len(recharges):2} recharges"
+            f"Account {account.id:3} | Summary mail, {len(transactions):2} tx"
         )
         send_notification(
             account.email,
