@@ -1,5 +1,5 @@
 import config
-from database.models import RechargeEvent, Tx
+from database.models import Tx
 from database.storage import Session, with_db
 from elements import Label, Button
 from elements.hbox import HBox
@@ -74,9 +74,6 @@ class ConfirmRechargeScreen(Screen):
             amount=self.amount,
         )
         Session().add(tx)
-        Session().flush()
-        ev = RechargeEvent(self.account.ldap_id, "DISPLAY", self.amount, tx_id=tx.id)
-        Session().add(ev)
 
         self.goto(
             SuccessScreen(

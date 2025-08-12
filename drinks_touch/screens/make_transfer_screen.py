@@ -7,7 +7,7 @@ from pygame import Vector2
 from pygame.mixer import Sound
 
 import config
-from database.models import Account, RechargeEvent, Tx
+from database.models import Account, Tx
 from database.storage import Session, with_db
 from elements import Label, Animation, Image
 from elements.base_elm import BaseElm
@@ -133,21 +133,6 @@ class MakeTransferScreen(Screen):
         )
         session.add(positive_charge)
         session.add(negative_charge)
-        session.flush()
-        positive_charge_event = RechargeEvent(
-            self.to_account.ldap_id,
-            self.account.name,
-            self.amount,
-            tx_id=positive_charge.id,
-        )
-        negative_charge_event = RechargeEvent(
-            self.account.ldap_id,
-            self.to_account.name,
-            -self.amount,
-            tx_id=negative_charge.id,
-        )
-        session.add(negative_charge_event)
-        session.add(positive_charge_event)
 
     def on_start(self, *args, **kwargs):
         self.objects = [

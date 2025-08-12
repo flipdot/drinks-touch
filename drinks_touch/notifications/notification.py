@@ -16,7 +16,6 @@ from sqlalchemy import select
 import config
 from database.models import Tx
 from database.models.account import Account
-from database.models.recharge_event import RechargeEvent
 from database.storage import Session, with_db
 
 logger = logging.getLogger(__name__)
@@ -99,17 +98,6 @@ def format_drinks(drinks_consumed: list[Tx]):
         )
 
     return drinks_fmt
-
-
-def format_recharges(recharges: list[RechargeEvent]):
-    recharges_fmt = "\nAufladungen:\n" "    #                 datum     aufgeladen\n"
-
-    for i, event in enumerate(recharges):
-        date = event.timestamp.strftime("%F %T Z")
-        amount = event.amount
-        recharges_fmt += "  % 3d % 15s %10s\n" % (i, date, amount)
-
-    return recharges_fmt
 
 
 @with_db
