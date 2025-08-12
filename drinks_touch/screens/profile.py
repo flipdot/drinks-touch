@@ -176,61 +176,6 @@ class ProfileScreen(Screen):
         else:
             self.goto(EnableTransactionHistoryScreen(self.account))
 
-    def render_aufladungen(self):
-        # aufladungen = Users.get_recharges(self.user["id"], limit=12)
-        aufladungen = self.account.get_recharges().limit(12).all()
-        y = 210
-        prev_date = None
-        for i, aufladung in enumerate(aufladungen):
-            x = 30
-            if y + 45 * 2 >= self.btn_drinks.pos[1]:
-                self.elements_aufladungen.append(Label(text="...", pos=(x, y)))
-                break
-            date = aufladung.timestamp.strftime("%a, %-d.%-m.%Y")
-            time = aufladung.timestamp.strftime("%H:%M")
-            time_text = time
-            helper = aufladung.helper_user_id
-            if helper:
-                if helper == "SEPA":
-                    time_text += " mit SEPA"
-                elif helper == "DISPLAY":
-                    time_text += " mit DISPLAY"
-                else:
-                    # TODO: this was the slow part because it queried LDAP
-                    #             Currently the code is unreachable anyway,
-                    #             so commented out to get rid of ldap code
-                    # user = Users.get_by_id(aufladung.helper_user_id)
-                    user = None
-                    if user:
-                        helper = user["name"]
-                        time_text += " mit " + helper
-            if date != prev_date:
-                prev_date = date
-                self.elements_aufladungen.append(
-                    Label(text=date, size=30, pos=(x, y + 15))
-                )
-                y += 45
-            count_width = 120
-            margin_right = 10
-            self.elements_aufladungen.append(
-                Label(
-                    text=time_text,
-                    pos=(x + 10, y),
-                    size=25,
-                    max_width=480 - x - margin_right - count_width,
-                )
-            )
-            self.elements_aufladungen.append(
-                Label(
-                    text=str(aufladung.amount),
-                    align_right=True,
-                    pos=(480 - margin_right, y - 5),
-                    max_width=count_width,
-                    size=25,
-                )
-            )
-            y += 35
-
     @with_db
     def on_barcode(self, barcode):
         if not barcode:

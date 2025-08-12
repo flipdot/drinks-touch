@@ -16,7 +16,6 @@ from flask import send_file
 from flask_compress import Compress
 
 from database.models import Tx, Account
-from database.models.recharge_event import RechargeEvent
 from database.storage import Base
 from env import is_pi
 from stats.stats import scans
@@ -90,10 +89,6 @@ def recharge_doit():
         amount=Decimal(amount),
     )
     db.session.add(tx)
-    db.session.flush()
-    ev = RechargeEvent(account.ldap_id, "Web UI", amount, tx_id=tx.id)
-
-    db.session.add(ev)
     db.session.commit()
 
     return render_template("recharge_success.html", amount=amount, account=account)
