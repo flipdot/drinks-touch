@@ -1,4 +1,10 @@
 services:
+  adminer:
+    image: adminer:5.3.0-standalone
+    ports:
+      - 9090:8080
+
+
   postgres:
     image: "postgres:17.5"
     environment:

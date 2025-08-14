@@ -1,15 +1,18 @@
 #!/usr/bin/env python3
 
-import sys
-
+from datetime import datetime
+import json
+import os
 import re
+import sys
+import uuid
+
 from PIL import Image, ImageDraw, ImageFont, ImageMath
 
 from database.storage import Session, with_db
-from sqlalchemy import text
 from env import is_pi
+from sqlalchemy import text
 from stats.flipdot import create_socket, send_frame, w, h
-import os
 
 font = ImageFont.truetype(
     os.path.dirname(__file__) + "/../resources/fonts/slkscr.ttf", 7
@@ -17,28 +20,34 @@ font = ImageFont.truetype(
 
 max_drinks = 6
 
+class UUIDEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, uuid.UUID):
+            return str(obj)
+        if isinstance(obj, datetime):
+            return obj.isoformat()
+        return super().default(obj)
 
 @with_db
 def scans(limit=1000, hours=None):
     where = ""
     params = {}
     if hours:
-        where = "WHERE se.timestamp > NOW() - INTERVAL ':hours HOUR'"
+        where = "WHERE tx.created_at > NOW() - INTERVAL ':hours HOUR'"
         params["hours"] = hours
-    raise NotImplementedError("Need to port it from scanevent to tx table")
     sql = text(
         """
-    SELECT se.id, barcode, se.timestamp, name
-    FROM scanevent se
-    LEFT OUTER JOIN drink d on se.barcode = d.ean
+    SELECT tx.id, tx.ean, tx.created_at, tx.account_id
+    FROM tx
+    LEFT OUTER JOIN drink d on tx.ean = d.ean
     %s
-    ORDER BY timestamp DESC
+    ORDER BY created_at DESC
     LIMIT %d
     """
         % (where, int(limit))
     )
-    sql_scans = Session().execute(sql, params).fetchall()
-    return [dict(zip(row.keys(), row)) for row in sql_scans]
+    sql_scans = Session().execute(sql, params).mappings().all()
+    return [dict(row) for row in sql_scans]
 
 
 def create_image(scan_list):

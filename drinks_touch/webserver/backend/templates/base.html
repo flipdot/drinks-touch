@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Getränkescanner - {% block title %}{% endblock %}</title>
+    <link href="/favicon.png" type="image/png" rel="icon">
+    <link href="/src/style.css" rel="stylesheet">
+    {% if config['ENV'] == 'development' %}
+      <script type="module" src="http://localhost:5173/@vite/client"></script>
+      <script type="module" src="http://localhost:5173/main.js"></script>
+    {% else %}
+      {% set manifest = url_for('static', filename='dist/manifest.json') %}
+      {% set manifest_data = get_manifest(manifest) %}
+      <script type="module" src="{{ url_for('static', filename='dist/' ~ manifest_data['main.js']['file']) }}"></script>
+    {% endif %}
+  </head>
+  <body class="min-h-screen bg-gray-50 text-gray-900">
+    <div id="app" class="max-w-4xl mx-auto p-6">
+      {% block body %}
+        <h1 class="text-2xl font-bold">Empty site!</h1>
+      {% endblock %}
+    </div>
+  </body>
+</html>

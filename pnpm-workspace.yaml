@@ -1,2 +1,8 @@
 packages:
-  - "drinks_touch/webserver"
+  - drinks_touch/webserver/frontend
+
+ignoredBuiltDependencies:
+  - '@parcel/watcher'
+  - '@tailwindcss/oxide'
+  - esbuild
+  - unrs-resolver

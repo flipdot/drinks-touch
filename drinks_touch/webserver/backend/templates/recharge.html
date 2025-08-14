@@ -1,0 +1,29 @@
+<h2 class="text-xl font-semibold mb-2">Guthaben aufladen</h2>
+<p class="mb-4">Um Guthaben aufzuladen, gehe folgendermaßen vor:</p>
+<ol class="list-decimal list-inside mb-6 space-y-1">
+    <li>Zahle den aufzuladenden Betrag in die Kasse ein.</li>
+    <li>Wähle deinen Namen aus und gib den aufzuladenden Betrag ein.</li>
+</ol>
+
+<form action="/recharge/doit" method="POST" class="space-y-4">
+    <fieldset class="grid gap-4 border border-gray-300 rounded p-4">
+        <legend class="font-semibold text-gray-700">Aufladedaten</legend>
+
+        <label for="user_user" class="block font-medium">Aufladen für:</label>
+        <select name="user_user" id="user_user" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="" selected disabled>Konto wählen</option>
+            {% for account in accounts %}
+                <option value="{{ account.id }}">{{ account.name }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="amount" class="block font-medium">Betrag in €:</label>
+        <input type="number" name="amount" step="0.01" id="amount" value="" placeholder="0.00"
+               class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+    </fieldset>
+
+    <button type="submit"
+        class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium px-4 py-2 rounded shadow-sm transition">
+        Aufladung durchführen
+    </button>
+</form>

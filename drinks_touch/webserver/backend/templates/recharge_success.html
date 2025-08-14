@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Start{% endblock %}
+{% block body %}
+    <h2 class="text-xl font-semibold text-green-600 mb-4">
+        Aufladung in Höhe von {{ amount }}€ für {{ account.name }} erfolgreich
+    </h2>
+    <p class="text-gray-700">
+        Du wirst in 5&nbsp;Sekunden
+        <a href="/" class="text-blue-600 hover:underline">zur Hauptseite</a>
+        geleitet.
+    </p>
+    <script>
+        setTimeout(function() {
+            window.location.pathname = "/";
+        }, 5 * 1000);
+    </script>
+{% endblock %}

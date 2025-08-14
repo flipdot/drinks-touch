@@ -16,7 +16,7 @@ Digital replacement for the drinks tally list featuring a touchscreen, user mana
 Start dependencies like Postgre and keycloak with:
 
 ```
-docker compose -f docker-compose.dev.yml up
+docker compose -f compose.dev.yaml up
 ```
 
 - Mailpit: http://localhost:8025/
