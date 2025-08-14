@@ -16,8 +16,8 @@
     "select2": "4.1.0-rc.0"
   },
   "devDependencies": {
-    "@babel/core": "7.28.0",
-    "@babel/preset-env": "7.28.0",
+    "@babel/core": "7.28.3",
+    "@babel/preset-env": "7.28.3",
     "@popperjs/core": "2.11.8",
     "autoprefixer": "10.4.21",
     "babel-loader": "10.0.0",
@@ -39,7 +39,7 @@
     "terser-webpack-plugin": "5.3.14",
     "typescript": "5.9.2",
     "url-loader": "4.1.1",
-    "webpack": "5.101.1",
+    "webpack": "5.101.2",
     "webpack-cli": "6.0.1"
   }
 }
