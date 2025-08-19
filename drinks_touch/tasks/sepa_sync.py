@@ -36,7 +36,9 @@ class SepaSyncTask(BaseTask):
         except JSONDecodeError as e:
             raise Exception("Cannot decode JSON from money server") from e
 
-        # Sort recharges by "date" column
+        # Sort by "date" column, just to be sure the charges are processed in the right order.
+        # If it's in the wrong order, the "last_sepa_deposit" check may prevent old deposits
+        # from being processed.
         recharges = {
             uid: sorted(charges, key=lambda x: datetime.strptime(x["date"], "%Y-%m-%d"))
             for uid, charges in recharges.items()
