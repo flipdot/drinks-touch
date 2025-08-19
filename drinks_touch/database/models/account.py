@@ -1,7 +1,7 @@
 import logging
 from decimal import Decimal
 
-from sqlalchemy import Column, Integer, String, UUID, DateTime, Boolean, func
+from sqlalchemy import Column, Integer, String, UUID, DateTime, Boolean, func, Date
 
 
 from database.storage import Base, Session, with_db
@@ -30,6 +30,7 @@ class Account(Base):
     email = Column(String(320), unique=True)
     last_balance_warning_email_sent_at = Column(DateTime(), unique=False)
     last_summary_email_sent_at = Column(DateTime(), unique=False)
+    last_sepa_deposit = Column(Date())
     summary_email_notification_setting = Column(String(50), unique=False)
     tx_history_visible = Column(Boolean, default=False)
 

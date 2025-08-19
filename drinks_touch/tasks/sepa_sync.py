@@ -1,3 +1,5 @@
+from sqlalchemy import select
+
 from notifications.notification import send_notification
 from tasks.base import BaseTask
 
@@ -34,21 +36,49 @@ class SepaSyncTask(BaseTask):
         except JSONDecodeError as e:
             raise Exception("Cannot decode JSON from money server") from e
 
+        # Sort recharges by "date" column
+        recharges = {
+            uid: sorted(charges, key=lambda x: datetime.strptime(x["date"], "%Y-%m-%d"))
+            for uid, charges in recharges.items()
+        }
+
         got_by_user = self.get_existing()
 
         for uid, charges in recharges.items():
             if self.sig_killed:
                 self._fail()
                 break
-            self.logger.info("Syncing recharges for user %s", uid)
             if uid not in got_by_user:
                 self.logger.info("First recharge for user %s!", uid)
                 got_by_user[uid] = []
             got = got_by_user[uid]
             for charge in charges:
+                query = select(Account).filter(Account.ldap_id == uid)
+                account = Session().execute(query).scalar_one()
                 charge_date = datetime.strptime(charge["date"], "%Y-%m-%d")
+                if (
+                    account.last_sepa_deposit
+                    and charge_date.date() <= account.last_sepa_deposit
+                ):
+                    self.logger.debug(
+                        "Skip charge for user %s on %s, last SEPA deposit was on %s",
+                        uid,
+                        charge_date.date(),
+                        account.last_sepa_deposit,
+                    )
+                    continue
+                account.last_sepa_deposit = charge_date.date()
                 charge_amount = Decimal(charge["amount"])
-                self.logger.debug("charge: %s, %s", charge, charge_date)
+                self.logger.info(
+                    "Aufladung vom %s für %s", charge_date.date(), account.name
+                )
+
+                # Legacy check for existing transactions
+                # In the future we will only rely on "last_sepa_deposit",
+                # so we can remove the RechargeEvent table.
+                #
+                # Need to be kept in this PR, because the "account.last_sepa_deposit" timestamp
+                # is not yet set. It will be set after the first deployment.
                 found = False
                 for exist in got:
                     if exist.timestamp != charge_date:
