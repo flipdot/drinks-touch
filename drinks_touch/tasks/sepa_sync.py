@@ -71,9 +71,6 @@ class SepaSyncTask(BaseTask):
                     continue
                 account.last_sepa_deposit = charge_date.date()
                 charge_amount = Decimal(charge["amount"])
-                self.logger.info(
-                    "Aufladung vom %s für %s", charge_date.date(), account.name
-                )
 
                 # Legacy check for existing transactions
                 # In the future we will only rely on "last_sepa_deposit",
@@ -93,6 +90,12 @@ class SepaSyncTask(BaseTask):
                 if found:
                     continue
 
+                self.logger.info(
+                    "Aufladung vom %s, %s€ für %s",
+                    charge_date.date(),
+                    charge_amount,
+                    account.name,
+                )
                 self.handle_transferred(charge, charge_amount, charge_date, got, uid)
 
     def get_existing(self):
@@ -111,9 +114,6 @@ class SepaSyncTask(BaseTask):
 
     def handle_transferred(self, charge, charge_amount, charge_date, got, uid):
         session = Session()
-        self.logger.info(
-            "User %s transferred %s on %s: %s", uid, charge_amount, charge_date, charge
-        )
         account = Account.query.filter(Account.ldap_id == uid).one()
         tx = Tx(
             created_at=charge_date,
