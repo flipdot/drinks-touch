@@ -36,14 +36,6 @@ class SepaSyncTask(BaseTask):
         except JSONDecodeError as e:
             raise Exception("Cannot decode JSON from money server") from e
 
-        # Sort by "date" column, just to be sure the charges are processed in the right order.
-        # If it's in the wrong order, the "last_sepa_deposit" check may prevent old deposits
-        # from being processed.
-        recharges = {
-            uid: sorted(charges, key=lambda x: datetime.strptime(x["date"], "%Y-%m-%d"))
-            for uid, charges in recharges.items()
-        }
-
         got_by_user = self.get_existing()
 
         for uid, charges in recharges.items():
@@ -54,23 +46,36 @@ class SepaSyncTask(BaseTask):
                 self.logger.info("First recharge for user %s!", uid)
                 got_by_user[uid] = []
             got = got_by_user[uid]
-            for charge in charges:
-                query = select(Account).filter(Account.ldap_id == uid)
-                account = Session().execute(query).scalar_one()
-                charge_date = datetime.strptime(charge["date"], "%Y-%m-%d")
+            query = select(Account).filter(Account.ldap_id == uid)
+            account = Session().execute(query).scalar_one()
+
+            # Convert and sort by "date" column, just to be sure the charges are processed in the right order.
+            # If it's in the wrong order, the "last_sepa_deposit" check may prevent old deposits
+            # from being processed.
+            charges = [
+                {
+                    "uid": charge["uid"],
+                    "amount": Decimal(charge["amount"]),
+                    "date": datetime.strptime(charge["date"], "%Y-%m-%d").date(),
+                    "legacy_charge_date": datetime.strptime(charge["date"], "%Y-%m-%d"),
+                    "info": charge["info"],
+                }
+                for charge in charges
+            ]
+
+            for charge in sorted(charges, key=lambda x: x["date"]):
                 if (
                     account.last_sepa_deposit
-                    and charge_date.date() <= account.last_sepa_deposit
+                    and charge["date"] <= account.last_sepa_deposit
                 ):
                     self.logger.debug(
                         "Skip charge for user %s on %s, last SEPA deposit was on %s",
                         uid,
-                        charge_date.date(),
+                        charge["date"],
                         account.last_sepa_deposit,
                     )
                     continue
-                account.last_sepa_deposit = charge_date.date()
-                charge_amount = Decimal(charge["amount"])
+                account.last_sepa_deposit = charge["date"]
 
                 # Legacy check for existing transactions
                 # In the future we will only rely on "last_sepa_deposit",
@@ -80,9 +85,9 @@ class SepaSyncTask(BaseTask):
                 # is not yet set. It will be set after the first deployment.
                 found = False
                 for exist in got:
-                    if exist.timestamp != charge_date:
+                    if exist.timestamp != charge["legacy_charge_date"]:
                         continue
-                    if exist.amount != charge_amount:
+                    if exist.amount != charge["amount"]:
                         continue
                     # found a matching one
                     found = True
@@ -92,11 +97,11 @@ class SepaSyncTask(BaseTask):
 
                 self.logger.info(
                     "Aufladung vom %s, %s€ für %s",
-                    charge_date.date(),
-                    charge_amount,
+                    charge["date"],
+                    charge["amount"],
                     account.name,
                 )
-                self.handle_transferred(charge, charge_amount, charge_date, got, uid)
+                self.handle_transferred(charge, got, uid, account)
 
     def get_existing(self):
         rechargeevents = (
@@ -112,33 +117,29 @@ class SepaSyncTask(BaseTask):
             got_by_user[ev.user_id].append(ev)
         return got_by_user
 
-    def handle_transferred(self, charge, charge_amount, charge_date, got, uid):
+    def handle_transferred(self, charge, got, uid, account: Account):
         session = Session()
-        account = Account.query.filter(Account.ldap_id == uid).one()
         tx = Tx(
-            created_at=charge_date,
+            created_at=charge["date"],
             payment_reference="Aufladung via SEPA",
             account_id=account.id,
-            amount=charge_amount,
+            amount=charge["amount"],
         )
         session.add(tx)
         session.flush()
-        ev = RechargeEvent(uid, "SEPA", charge_amount, charge_date, tx_id=tx.id)
+        ev = RechargeEvent(uid, "SEPA", charge["amount"], charge["date"], tx_id=tx.id)
         got.append(ev)
         session.add(ev)
-        account = Session().query(Account).filter(Account.ldap_id == uid).one()
-        if not account:
-            self.logger.error("could not find user %s to send email", uid)
-        else:
-            subject = "Aufladung EUR %s für %s" % (charge_amount, account.name)
-            text = "Deine Aufladung über %s € am %s mit Text '%s' war erfolgreich." % (
-                charge_amount,
-                charge_date,
-                charge["info"],
-            )
-            content_text = text  # TODO: use jinja template
-            content_html = text  # TODO: use jinja template
-            send_notification(
-                account.email, subject, content_text, content_html, account.ldap_id
-            )
+
+        subject = "Aufladung EUR %s für %s" % (charge["amount"], account.name)
+        text = "Deine Aufladung über %s€ am %s mit Text '%s' war erfolgreich." % (
+            charge["amount"],
+            charge["date"],
+            charge["info"],
+        )
+        content_text = text  # TODO: use jinja template
+        content_html = text  # TODO: use jinja template
+        send_notification(
+            account.email, subject, content_text, content_html, account.ldap_id
+        )
         session.flush()
