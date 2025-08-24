@@ -117,6 +117,7 @@ class SepaSyncTask(BaseTask):
             got_by_user[ev.user_id].append(ev)
         return got_by_user
 
+    @with_db
     def handle_transferred(self, charge, got, uid, account: Account):
         session = Session()
         tx = Tx(
