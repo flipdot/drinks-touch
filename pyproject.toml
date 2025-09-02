@@ -26,7 +26,6 @@ pystrich = "^0.9"
 keyboard = "^0.13.5"
 sentry-sdk = "^2.17"
 babel = "^2.16.0"
-python-dotenv = "^1.0.1"
 pygit2 = "^1.16.0"
 ics = "^0.7.2"
 alembic = "^1.15.1"
@@ -35,6 +34,8 @@ flask-sqlalchemy = "^3.1.1"
 itsdangerous = "^2.2.0"
 matplotlib = "^3.10.5"
 pandas = "^2.3.1"
+flask-oidc = "^2.4.0"
+python-dotenv = "^1.1.1"
 
 
 [tool.poetry.group.dev.dependencies]

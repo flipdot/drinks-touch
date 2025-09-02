@@ -1,0 +1,15 @@
+<header class="header">
+    <div class="header-left">
+        <h1>drinks-touch</h1>
+    </div>
+    <div class="header-right">
+        {% if session['oidc_auth_profile'] %}
+            <span>
+                {{ session['oidc_auth_profile']['preferred_username'] }} |
+                <a href="/logout">Logout</a>
+            </span>
+        {% else %}
+            <a href="/login">Login</a>
+        {% endif %}
+    </div>
+</header>

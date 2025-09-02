@@ -20,7 +20,7 @@ from database.storage import Base
 from env import is_pi
 from stats.stats import scans
 from users.qr import make_sepa_qr
-
+from flask_oidc import OpenIDConnect
 
 db = SQLAlchemy(
     model_class=Base,
@@ -29,8 +29,15 @@ db = SQLAlchemy(
     },
 )
 app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = config.POSTGRES_CONNECTION_STRING
+app.config.update(
+    {
+        "SQLALCHEMY_DATABASE_URI": config.POSTGRES_CONNECTION_STRING,
+        "OIDC_CLIENT_SECRETS": "drinks_touch/webserver/client_secrets.json",  # TODO: dynamically?
+        "SECRET_KEY": config.SECRET_KEY,
+    }
+)
 db.init_app(app)
+oidc = OpenIDConnect(app)
 Compress(app)
 
 uid_pattern = re.compile(r"^\d+$")

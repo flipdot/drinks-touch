@@ -1,8 +1,11 @@
 {% extends "base.html" %}
 {% block title %}Start{% endblock %}
 {% block body %}
-    <h1>drinks-touch</h1>
-    <hr>
+    {% if session['oidc_auth_profile'] %}
+    <pre>{% for key, value in session['oidc_auth_profile'].items() -%}
+{{ key }}: {{ value }}
+{% endfor %}</pre>
+    {% endif %}
     {% include "recharge.html" %}
 {#        <div class="col-md-6">#}
 {#            <p>#}

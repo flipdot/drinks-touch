@@ -175,3 +175,23 @@ button:hover {
     grid-template-columns: 1fr;
   }
 }
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    /*background-color: #f8f9fa;*/
+    border-bottom: 1px solid #dee2e6;
+}
+.header * {
+    margin: 0;
+    padding: 0;
+}
+.header-left h1 {
+    font-size: 1.5rem;
+}
+.header-right {
+    display: flex;
+    align-items: center;
+}
