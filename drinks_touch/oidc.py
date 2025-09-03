@@ -15,8 +15,12 @@ class KeycloakAdmin:
         self.access_token = None
         self.access_token_expires_at = datetime.now()
         self.token_endpoint = None
+        self.userinfo_endpoint = None
+        self.issuer = None
         self.admin_base_url = None
+        self.authorization_endpoint = None
         self.timeout = timeout
+        self._reload_oidc_discovery()
 
     def _reload_oidc_discovery(self):
         discovery_response = requests.get(self.oidc_discovery_url, timeout=self.timeout)
@@ -25,6 +29,7 @@ class KeycloakAdmin:
         self.token_endpoint = discovery["token_endpoint"]
         self.userinfo_endpoint = discovery["userinfo_endpoint"]
         self.issuer = discovery["issuer"]
+        self.authorization_endpoint = discovery["authorization_endpoint"]
         parsed = urlparse(self.issuer)
         self.admin_base_url = (
             parsed.scheme + "://" + parsed.netloc + "/admin" + parsed.path

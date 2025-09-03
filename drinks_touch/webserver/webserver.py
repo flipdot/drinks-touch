@@ -18,9 +18,26 @@ from flask_compress import Compress
 from database.models import Tx, Account
 from database.storage import Base
 from env import is_pi
+from oidc import KeycloakAdmin
 from stats.stats import scans
 from users.qr import make_sepa_qr
 from flask_oidc import OpenIDConnect
+
+
+def create_oidc_config() -> dict:
+    kc_admin = KeycloakAdmin()
+    return {
+        "web": {
+            "client_id": kc_admin.client_id,
+            "client_secret": kc_admin.client_secret,
+            "auth_uri": kc_admin.authorization_endpoint,
+            "token_uri": kc_admin.token_endpoint,
+            "userinfo_uri": kc_admin.userinfo_endpoint,
+            "issuer": kc_admin.issuer,
+            "redirect_uris": [],
+        }
+    }
+
 
 db = SQLAlchemy(
     model_class=Base,
@@ -32,7 +49,7 @@ app = Flask(__name__)
 app.config.update(
     {
         "SQLALCHEMY_DATABASE_URI": config.POSTGRES_CONNECTION_STRING,
-        "OIDC_CLIENT_SECRETS": "drinks_touch/webserver/client_secrets.json",  # TODO: dynamically?
+        "OIDC_CLIENT_SECRETS": create_oidc_config(),
         "SECRET_KEY": config.SECRET_KEY,
     }
 )
