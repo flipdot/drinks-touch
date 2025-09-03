@@ -1,7 +1,10 @@
 <nav class="main-nav">
     <ul class="nav-list">
         {% for nav_item in navigation %}
-            <li {% if request.endpoint == nav_item.target %}class="active"{% endif %}
+            <li {% if request.endpoint == nav_item.target %}
+                class="active"
+                style="view-transition-name: nav-active-item"
+            {% endif %}
             >
                 <a href="{{ url_for(nav_item.target) }}">{{ nav_item.title }}</a>
             </li>

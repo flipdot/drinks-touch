@@ -1,19 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}drinks-touch{% endblock %}</title>
     <link href="/favicon.png" type="image/png" rel="icon">
     <link href="{{ url_for("static", filename="css/style.css") }}" rel="stylesheet">
+    <link href="{{ url_for("static", filename="css/view-transitions.css") }}" rel="stylesheet">
+    <link href="{{ url_for("static", filename="css/header.css") }}" rel="stylesheet">
     <link href="{{ url_for("static", filename="css/navigation.css") }}" rel="stylesheet">
-  </head>
-  <body>
-    {% include "includes/header.html" %}
-    {% include "includes/navigation.html" %}
+    <link href="{{ url_for("static", filename="css/footer.css") }}" rel="stylesheet">
+</head>
+<body>
+{% include "includes/header.html" %}
+{% include "includes/navigation.html" %}
+<div style="view-transition-name: main-content; z-index: -1;">
     {% block body %}
         <h1>Override the body block</h1>
     {% endblock %}
-  </body>
+</div>
+<div style="view-transition-name: footer">
+    {% include "includes/footer.html" %}
+</div>
+</body>
 </html>

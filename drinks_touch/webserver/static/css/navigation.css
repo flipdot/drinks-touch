@@ -3,6 +3,9 @@
     padding: 0.5rem 1rem;
     border-radius: 8px;
     margin-top: 1.5rem;
+    z-index: 100;
+    position: relative;
+    view-transition-name: navbar;
 }
 
 .nav-list {
@@ -20,6 +23,7 @@
 
 .nav-list li.active a {
     background-color: var(--color-border);
+    /*view-transition-name: nav-active-item;*/
 }
 
 .nav-list a {
