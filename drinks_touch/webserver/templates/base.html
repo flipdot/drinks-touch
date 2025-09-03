@@ -11,6 +11,7 @@
     <link href="{{ url_for("static", filename="css/header.css") }}" rel="stylesheet">
     <link href="{{ url_for("static", filename="css/navigation.css") }}" rel="stylesheet">
     <link href="{{ url_for("static", filename="css/footer.css") }}" rel="stylesheet">
+    {% block head %}{% endblock %}
 </head>
 <body>
 {% include "includes/header.html" %}
@@ -23,5 +24,10 @@
 <div style="view-transition-name: footer">
     {% include "includes/footer.html" %}
 </div>
+{% if auto_back_after %}
+<script>
+setTimeout(function() { window.history.back() }, {{ auto_back_after }}*1000);
+</script>
+{% endif %}
 </body>
 </html>

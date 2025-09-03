@@ -8,7 +8,7 @@ from sqlalchemy import update
 
 import config
 
-from flask import Flask, make_response
+from flask import Flask, make_response, session, g
 from flask import render_template
 from flask import request
 from flask import send_file
@@ -58,15 +58,35 @@ Compress(app)
 uid_pattern = re.compile(r"^\d+$")
 
 
+@app.before_request
+def load_current_user():
+    if oidc.user_loggedin:
+        # Check if the account is already loaded in g
+        if "account" not in g:
+            subject = session["oidc_auth_profile"]["sub"]
+            g.account = db.session.query(Account).filter_by(keycloak_sub=subject).one()
+    else:
+        g.account = None
+
+
 @app.context_processor
 def add_template_globals():
+    if g.account:
+        current_user = {
+            "name": g.account.name,
+            "sub": g.account.keycloak_sub,
+            "balance": g.account.balance,
+        }
+    else:
+        current_user = None
     return {
         "navigation": [
             {"target": "recharge", "title": "Guthaben aufladen"},
             # {"target": "recharge", "title": "Tetris"},
             {"target": "account", "title": "Einstellungen"},
             # {"target": "recharge", "title": "Transaktionshistorie"},
-        ]
+        ],
+        "current_user": current_user,
     }
 
 
@@ -98,41 +118,40 @@ def recharge():
     return render_template("recharge.html", accounts=accounts)
 
 
-@app.route("/stats")
-def stats():
-    return render_template("stats.html")
-
-
-@app.route("/recharge/doit", methods=["POST"])
-def recharge_doit():
-    # TODO: move to /recharge path, only recharge own account
-    user_id = request.form.get("user_user")
-    if not user_id:
-        return (
-            render_template("message.html", message="Bitte einen Nutzer auswählen!"),
-            400,
-        )
+@app.route("/recharge", methods=["POST"])
+@oidc.require_login
+def recharge_submit():
     amount = request.form.get("amount")
     if not amount:
         return (
-            render_template("message.html", message="Bitte einen Betrag angeben!"),
+            render_template(
+                "message.html", message="Bitte einen Betrag angeben!", auto_back_after=2
+            ),
+            400,
+        )
+
+    if not request.form.get("confirm_cash_deposited"):
+        return (
+            render_template(
+                "message.html",
+                message="Bitte bestätige, dass du das Geld eingeworfen hast!",
+                auto_back_after=2,
+            ),
             400,
         )
 
     if amount == "0":
         return render_template("message.html", message="Ungültiger Betrag!"), 400
 
-    account = db.session.query(Account).filter(Account.id == user_id).one()
-
     tx = Tx(
         payment_reference="Aufladung via Web",
-        account_id=account.id,
+        account_id=g.account.id,
         amount=Decimal(amount),
     )
     db.session.add(tx)
     db.session.commit()
 
-    return render_template("recharge_success.html", amount=amount, account=account)
+    return render_template("recharge_success.html", amount=amount, account=g.account)
 
 
 @app.route("/tx.png")
