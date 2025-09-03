@@ -181,15 +181,16 @@ button:hover {
     justify-content: space-between;
     align-items: center;
     padding: 10px 20px;
-    /*background-color: #f8f9fa;*/
     border-bottom: 1px solid #dee2e6;
 }
 .header * {
     margin: 0;
     padding: 0;
 }
-.header-left h1 {
+.header-left h1, .header-left h1 a {
     font-size: 1.5rem;
+    color: var(--color-text);
+    text-decoration: none;
 }
 .header-right {
     display: flex;

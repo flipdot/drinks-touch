@@ -1,6 +1,5 @@
-import json
 import re
-from datetime import datetime, timedelta
+from datetime import timedelta
 from decimal import Decimal
 
 from flask_sqlalchemy import SQLAlchemy
@@ -19,7 +18,6 @@ from database.models import Tx, Account
 from database.storage import Base
 from env import is_pi
 from oidc import KeycloakAdmin
-from stats.stats import scans
 from users.qr import make_sepa_qr
 from flask_oidc import OpenIDConnect
 
@@ -60,12 +58,16 @@ Compress(app)
 uid_pattern = re.compile(r"^\d+$")
 
 
-class DateTimeEncoder(json.JSONEncoder):
-    def default(self, o):
-        if isinstance(o, datetime):
-            return o.isoformat()
-
-        return json.JSONEncoder.default(self, o)
+@app.context_processor
+def add_template_globals():
+    return {
+        "navigation": [
+            {"target": "recharge", "title": "Guthaben aufladen"},
+            # {"target": "recharge", "title": "Tetris"},
+            {"target": "account", "title": "Einstellungen"},
+            # {"target": "recharge", "title": "Transaktionshistorie"},
+        ]
+    }
 
 
 @app.route("/favicon.png")
@@ -74,12 +76,26 @@ def favicon():
 
 
 @app.route("/")
-@app.route("/recharge")
 def index():
     accounts = (
         db.session.query(Account).filter(Account.enabled).order_by(Account.name).all()
     )
     return render_template("index.html", accounts=accounts)
+
+
+@app.route("/account")
+def account():
+    return render_template("account.html")
+
+
+@app.route("/recharge")
+@oidc.require_login
+def recharge():
+    # TODO: only recharge own account
+    accounts = (
+        db.session.query(Account).filter(Account.enabled).order_by(Account.name).all()
+    )
+    return render_template("recharge.html", accounts=accounts)
 
 
 @app.route("/stats")
@@ -89,6 +105,7 @@ def stats():
 
 @app.route("/recharge/doit", methods=["POST"])
 def recharge_doit():
+    # TODO: move to /recharge path, only recharge own account
     user_id = request.form.get("user_user")
     if not user_id:
         return (
@@ -118,12 +135,6 @@ def recharge_doit():
     return render_template("recharge_success.html", amount=amount, account=account)
 
 
-@app.route("/scans.json")
-def scans_json():
-    limit = int(request.args.get("limit", 1000))
-    return to_json(scans(limit))
-
-
 @app.route("/tx.png")
 def tx_png():
     uid = request.args.get("uid")
@@ -135,8 +146,6 @@ def tx_png():
 
     if Decimal(amount) <= 0:
         return "Please use an amount greater than 0!"
-
-    uid = int(uid)
 
     img_data = make_sepa_qr(amount, name, uid)
     response = make_response(img_data.getvalue())
@@ -164,10 +173,6 @@ def enable_transaction_history(signed_account_id):
     return render_template(
         "enable_transaction_history_success.html", account_id=account_id
     )
-
-
-def to_json(dict_arr):
-    return json.dumps(dict_arr, cls=DateTimeEncoder)
 
 
 def run():
