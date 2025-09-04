@@ -2,24 +2,25 @@ import re
 from datetime import timedelta
 from decimal import Decimal
 
-from flask_sqlalchemy import SQLAlchemy
 from itsdangerous import TimedSerializer, BadSignature, SignatureExpired
 from sqlalchemy import update
 
 import config
 
-from flask import Flask, make_response, session, g, url_for
+from flask import Flask, make_response, session, g
 from flask import render_template
 from flask import request
 from flask import send_file
 from flask_compress import Compress
 
-from database.models import Tx, Account
-from database.storage import Base
+from database.models import Account
 from env import is_pi
 from oidc import KeycloakAdmin
 from users.qr import make_sepa_qr
-from flask_oidc import OpenIDConnect
+
+from .shared import db, oidc
+from .blueprints.recharge import bp as recharge_bp
+from .blueprints.account import bp as account_bp
 
 
 def create_oidc_config() -> dict:
@@ -37,12 +38,6 @@ def create_oidc_config() -> dict:
     }
 
 
-db = SQLAlchemy(
-    model_class=Base,
-    engine_options={
-        "connect_args": {"application_name": "drinks_web"},
-    },
-)
 app = Flask(__name__)
 app.config.update(
     {
@@ -52,10 +47,14 @@ app.config.update(
     }
 )
 db.init_app(app)
-oidc = OpenIDConnect(app)
-Compress(app)
+oidc.init_app(app)
+Compress().init_app(app)
 
 uid_pattern = re.compile(r"^\d+$")
+
+
+app.register_blueprint(recharge_bp, url_prefix="/recharge")
+app.register_blueprint(account_bp, url_prefix="/account")
 
 
 @app.before_request
@@ -80,18 +79,13 @@ def add_template_globals():
         current_user = None
     return {
         "navigation": [
-            {"target": "recharge", "title": "Guthaben aufladen"},
+            {"target": "recharge.index", "title": "Guthaben aufladen"},
             # {"target": "recharge", "title": "Tetris"},
-            {"target": "account", "title": "Einstellungen"},
+            {"target": "account.index", "title": "Einstellungen"},
             # {"target": "recharge", "title": "Transaktionshistorie"},
         ],
         "current_user": current_user,
     }
-
-
-@app.route("/favicon.png")
-def favicon():
-    return send_file("../resources/images/favicon.png", mimetype="image/png")
 
 
 @app.route("/")
@@ -102,63 +96,9 @@ def index():
     return render_template("index.html", accounts=accounts)
 
 
-@app.route("/account")
-def account():
-    return render_template("account.html")
-
-
-@app.route("/recharge")
-@oidc.require_login
-def recharge():
-    # TODO: only recharge own account
-    accounts = (
-        db.session.query(Account).filter(Account.enabled).order_by(Account.name).all()
-    )
-    return render_template("recharge.html", accounts=accounts)
-
-
-@app.route("/recharge", methods=["POST"])
-@oidc.require_login
-def recharge_submit():
-    amount = request.form.get("amount")
-    if not amount:
-        return (
-            render_template(
-                "message.html",
-                message="Bitte einen Betrag angeben!",
-                auto_redirect_after=2,
-            ),
-            400,
-        )
-
-    if not request.form.get("confirm_cash_deposited"):
-        return (
-            render_template(
-                "message.html",
-                message="Bitte bestätige, dass du das Geld eingeworfen hast!",
-                auto_redirect_after=2,
-            ),
-            400,
-        )
-
-    if amount == "0":
-        return render_template("message.html", message="Ungültiger Betrag!"), 400
-
-    tx = Tx(
-        payment_reference="Aufladung via Web",
-        account_id=g.account.id,
-        amount=Decimal(amount),
-    )
-    db.session.add(tx)
-    db.session.commit()
-
-    return render_template(
-        "recharge_success.html",
-        amount=amount,
-        account=g.account,
-        auto_redirect_after=5,
-        redirect_url=url_for("index"),
-    )
+@app.route("/favicon.png")
+def favicon():
+    return send_file("../resources/images/favicon.png", mimetype="image/png")
 
 
 @app.route("/tx.png")
