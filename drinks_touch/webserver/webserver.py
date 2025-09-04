@@ -8,7 +8,7 @@ from sqlalchemy import update
 
 import config
 
-from flask import Flask, make_response, session, g
+from flask import Flask, make_response, session, g, url_for
 from flask import render_template
 from flask import request
 from flask import send_file
@@ -124,7 +124,9 @@ def recharge_submit():
     if not amount:
         return (
             render_template(
-                "message.html", message="Bitte einen Betrag angeben!", auto_back_after=2
+                "message.html",
+                message="Bitte einen Betrag angeben!",
+                auto_redirect_after=2,
             ),
             400,
         )
@@ -134,7 +136,7 @@ def recharge_submit():
             render_template(
                 "message.html",
                 message="Bitte bestätige, dass du das Geld eingeworfen hast!",
-                auto_back_after=2,
+                auto_redirect_after=2,
             ),
             400,
         )
@@ -150,7 +152,13 @@ def recharge_submit():
     db.session.add(tx)
     db.session.commit()
 
-    return render_template("recharge_success.html", amount=amount, account=g.account)
+    return render_template(
+        "recharge_success.html",
+        amount=amount,
+        account=g.account,
+        auto_redirect_after=5,
+        redirect_url=url_for("index"),
+    )
 
 
 @app.route("/tx.png")

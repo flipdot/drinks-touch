@@ -163,3 +163,26 @@ button:hover {
     color: var(--color-negative);
     font-weight: bold;
 }
+
+.timer-bar-container {
+    width: 100%;
+    height: 5px;
+    background-color: var(--color-background);
+    margin-top: 0;
+}
+
+.timer-bar {
+    width: 100%;
+    height: 100%;
+    background-color: var(--color-primary); /* A blue color for the bar itself */
+    animation: shrink linear forwards; /* The animation property */
+}
+
+@keyframes shrink {
+    from {
+        width: 100%;
+    }
+    to {
+        width: 0;
+    }
+}

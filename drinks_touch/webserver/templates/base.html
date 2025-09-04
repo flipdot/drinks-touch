@@ -16,6 +16,22 @@
 <body>
 {% include "includes/header.html" %}
 {% include "includes/navigation.html" %}
+{% if auto_redirect_after %}
+    <script>
+        {% if redirect_url %}
+            setTimeout(function () {
+                window.location.pathname = "{{ redirect_url }}"
+            }, {{ auto_redirect_after }} * 1000);
+        {% else %}
+            setTimeout(function () {
+                window.history.back()
+            }, {{ auto_redirect_after }} * 1000);
+        {% endif %}
+    </script>
+    <div class="timer-bar-container">
+        <div class="timer-bar" style="animation-duration: {{ auto_redirect_after }}s;"></div>
+    </div>
+{% endif %}
 <div style="view-transition-name: main-content; z-index: -1;">
     {% block body %}
         <h1>Override the body block</h1>
@@ -24,10 +40,6 @@
 <div style="view-transition-name: footer">
     {% include "includes/footer.html" %}
 </div>
-{% if auto_back_after %}
-<script>
-setTimeout(function() { window.history.back() }, {{ auto_back_after }}*1000);
-</script>
-{% endif %}
+
 </body>
 </html>

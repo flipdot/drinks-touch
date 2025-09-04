@@ -2,8 +2,5 @@
 {% block title %}Start{% endblock %}
 {% block body %}
     <h2>Aufladung in Höhe von {{ amount }}€ erfolgreich</h2>
-    <p>Du wirst in 5 Sekunden <a href="{{ url_for('index') }}">zur Hauptseite</a> geleitet.</p>
-<script>
-setTimeout(function(){window.location.pathname="{{ url_for('index') }}"}, 5*1000);
-</script>
+    <p>Du wirst gleich <a href="{{ url_for('index') }}">zur Hauptseite</a> geleitet.</p>
 {% endblock %}
