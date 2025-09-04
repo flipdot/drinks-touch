@@ -163,10 +163,3 @@ button:hover {
     color: var(--color-negative);
     font-weight: bold;
 }
-
-/* On small screens, stack the form elements into a single column */
-/*@media (max-width: 400px) {*/
-/*  .form-grid {*/
-/*    grid-template-columns: 10fr 1fr;*/
-/*  }*/
-/*}*/

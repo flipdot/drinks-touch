@@ -61,7 +61,6 @@ uid_pattern = re.compile(r"^\d+$")
 @app.before_request
 def load_current_user():
     if oidc.user_loggedin:
-        # Check if the account is already loaded in g
         if "account" not in g:
             subject = session["oidc_auth_profile"]["sub"]
             g.account = db.session.query(Account).filter_by(keycloak_sub=subject).one()
