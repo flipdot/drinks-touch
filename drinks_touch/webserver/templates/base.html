@@ -32,6 +32,20 @@
         <div class="timer-bar" style="animation-duration: {{ auto_redirect_after }}s;"></div>
     </div>
 {% endif %}
+{% with messages = get_flashed_messages(with_categories=True) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category or 'default' }}">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+{% if form %}
+    {% for field, errors in form.errors.items() %}
+        <div class="alert alert-error">
+            {{ form[field].label }}: {{ ', '.join(errors) }}
+        </div>
+    {% endfor %}
+{% endif %}
 <div style="view-transition-name: main-content; z-index: -1;">
     {% block body %}
         <h1>Override the body block</h1>
