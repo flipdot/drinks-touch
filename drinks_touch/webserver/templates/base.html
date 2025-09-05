@@ -11,6 +11,8 @@
     <link href="{{ url_for("static", filename="css/header.css") }}" rel="stylesheet">
     <link href="{{ url_for("static", filename="css/navigation.css") }}" rel="stylesheet">
     <link href="{{ url_for("static", filename="css/footer.css") }}" rel="stylesheet">
+    <link href="{{ url_for("static", filename="css/spinner.css") }}" rel="stylesheet">
+    <link href="{{ url_for("static", filename="css/alert-box.css") }}" rel="stylesheet">
     {% block head %}{% endblock %}
 </head>
 <body>
@@ -29,15 +31,29 @@
         {% endif %}
     </script>
     <div class="timer-bar-container">
-        <div class="timer-bar" style="animation-duration: {{ auto_redirect_after }}s;"></div>
+        <div class="timer-bar timer-bar-default" style="animation-duration: {{ auto_redirect_after }}s;"></div>
     </div>
 {% endif %}
 {% with messages = get_flashed_messages(with_categories=True) %}
-  {% if messages %}
-    {% for category, message in messages %}
-      <div class="alert alert-{{ category or 'default' }}">{{ message }}</div>
-    {% endfor %}
-  {% endif %}
+    {% if messages %}
+        <script>
+            // remove and re-add alert on tap to restart animation
+            function restartAnimation() {
+                const alertBox = event.currentTarget;
+                alertBox.classList.remove('alert');
+                // remove and re-add timer-circle animation as well
+                const timerCircle = alertBox.querySelector('.timer-circle');
+                timerCircle.classList.remove('timer-circle');
+                void timerCircle.offsetWidth; // trigger reflow
+                void alertBox.offsetWidth; // trigger reflow
+                alertBox.classList.add('alert');
+                timerCircle.classList.add('timer-circle');
+            }
+        </script>
+        {% for category, message in messages %}
+            {% include "includes/alert-box.html" %}
+        {% endfor %}
+    {% endif %}
 {% endwith %}
 {% if form %}
     {% for field, errors in form.errors.items() %}
