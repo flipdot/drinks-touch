@@ -1,0 +1,35 @@
+@view-transition {
+    navigation: auto;
+}
+
+@keyframes move-out {
+    from {
+        transform: translateY(0);
+        opacity: 1;
+    }
+
+    to {
+        transform: translateY(-5em);
+        opacity: 0;
+    }
+}
+
+@keyframes move-in {
+    from {
+        transform: translateY(-5em);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+::view-transition-old(main-content) {
+    animation: 0.2s ease-in both move-out;
+}
+
+::view-transition-new(main-content) {
+    animation: 0.2s ease-in both move-in;
+}

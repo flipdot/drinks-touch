@@ -1,0 +1,46 @@
+.alert {
+    padding: var(--spacing-unit);
+    border: 1px solid var(--color-border);
+    border-left-width: 4px;
+    background-color: var(--color-subtle-background);
+    color: var(--color-text);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    animation: fadeOut 0.8s ease-in-out forwards;
+    animation-delay: 8s;
+}
+
+@keyframes fadeOut {
+    70% {
+        opacity: 0;
+        transform: translateY(-2em) scaleY(0);
+    }
+    100% {
+        height: 0;
+        margin: 0;
+        padding: 0;
+        opacity: 0;
+        display: none;
+    }
+}
+
+.alert-default {
+    border-left-color: var(--color-primary);
+}
+
+.alert-error {
+    border-left-color: var(--color-negative);
+}
+
+.alert-warning {
+    border-left-color: var(--color-warning);
+}
+
+.alert-success {
+    border-left-color: var(--color-success);
+}
+
+.alert-info {
+    border-left-color: var(--color-primary);
+}

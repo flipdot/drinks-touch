@@ -1,0 +1,13 @@
+<header class="header">
+    <div class="header-left">
+        <h1><a href="{{ url_for('index') }}" >drinks-touch</a></h1>
+    </div>
+    <div class="header-right">
+        {% if current_user %}
+            <span>{{ current_user.name }}</span>
+            <span {% if current_user.balance < 0 %} class="text-negative"{% endif %}>{{ current_user.balance }}&nbsp;€</span>
+        {% else %}
+            <a href="{{ url_for('oidc_auth.login') }}">Anmelden</a>
+        {% endif %}
+    </div>
+</header>
