@@ -16,6 +16,9 @@ bp = Blueprint("recharge", __name__)
 
 
 def validate_amount(form, field):
+    if field.data is None:
+        # Handled by default DecimalField validator ("Not a valid decimal value")
+        return
     field.data = field.data.quantize(Decimal("0.01"), rounding=decimal.ROUND_DOWN)
     if field.data == 0:
         raise validators.ValidationError("Darf nicht 0 sein.")
