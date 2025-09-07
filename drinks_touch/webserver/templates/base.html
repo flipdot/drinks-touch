@@ -37,11 +37,10 @@
 {% with messages = get_flashed_messages(with_categories=True) %}
     {% if messages %}
         <script>
-            // remove and re-add alert on tap to restart animation
+            // remove and re-add css class on tap to restart animation
             function restartAnimation() {
                 const alertBox = event.currentTarget;
                 alertBox.classList.remove('alert');
-                // remove and re-add timer-circle animation as well
                 const timerCircle = alertBox.querySelector('.timer-circle');
                 timerCircle.classList.remove('timer-circle');
                 void timerCircle.offsetWidth; // trigger reflow
