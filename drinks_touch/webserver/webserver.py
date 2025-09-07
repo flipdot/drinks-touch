@@ -46,6 +46,7 @@ app.config.update(
         "SQLALCHEMY_DATABASE_URI": config.POSTGRES_CONNECTION_STRING,
         "OIDC_CLIENT_SECRETS": create_oidc_config(),
         "SECRET_KEY": config.SECRET_KEY,
+        "SERVER_NAME": config.DOMAIN,
     }
 )
 db.init_app(app)
