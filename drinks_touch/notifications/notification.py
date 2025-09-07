@@ -64,7 +64,9 @@ def send_notification(to_address, subject, content_text, content_html, uid):
 
 
 def send_drink(account: Account, drink):
-    if not account.email or "instant" not in account.summary_email_notification_setting:
+    if not account.email or "instant" not in (
+        account.summary_email_notification_setting or ""
+    ):
         return
     context = {
         "drink_name": drink["name"],

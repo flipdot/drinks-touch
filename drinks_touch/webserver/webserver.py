@@ -1,56 +1,112 @@
-import json
 import re
-from datetime import datetime, timedelta
+from datetime import timedelta
 from decimal import Decimal
 
-from flask_sqlalchemy import SQLAlchemy
 from itsdangerous import TimedSerializer, BadSignature, SignatureExpired
 from sqlalchemy import update
 
 import config
 
-from flask import Flask, make_response
+from flask import Flask, make_response, session, g
 from flask import render_template
 from flask import request
 from flask import send_file
 from flask_compress import Compress
 
-from database.models import Tx, Account
-from database.storage import Base
+from database.models import Account
 from env import is_pi
-from stats.stats import scans
+from oidc import KeycloakAdmin
 from users.qr import make_sepa_qr
 
+from .shared import db, oidc
+from .blueprints.recharge import bp as recharge_bp
+from .blueprints.account import bp as account_bp
 
-db = SQLAlchemy(
-    model_class=Base,
-    engine_options={
-        "connect_args": {"application_name": "drinks_web"},
-    },
-)
+
+def create_oidc_config() -> dict:
+    kc_admin = KeycloakAdmin()
+    return {
+        "web": {
+            "client_id": kc_admin.client_id,
+            "client_secret": kc_admin.client_secret,
+            "auth_uri": kc_admin.authorization_endpoint,
+            "token_uri": kc_admin.token_endpoint,
+            "userinfo_uri": kc_admin.userinfo_endpoint,
+            "issuer": kc_admin.issuer,
+            "redirect_uris": [
+                f"{config.BASE_URL}/authorize",
+            ],
+        }
+    }
+
+
 app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = config.POSTGRES_CONNECTION_STRING
+app.config.update(
+    {
+        "SQLALCHEMY_DATABASE_URI": config.POSTGRES_CONNECTION_STRING,
+        "OIDC_CLIENT_SECRETS": create_oidc_config(),
+        "SECRET_KEY": config.SECRET_KEY,
+        "SERVER_NAME": config.DOMAIN,
+    }
+)
 db.init_app(app)
-Compress(app)
+oidc.init_app(app)
+Compress().init_app(app)
 
 uid_pattern = re.compile(r"^\d+$")
 
 
-class DateTimeEncoder(json.JSONEncoder):
-    def default(self, o):
-        if isinstance(o, datetime):
-            return o.isoformat()
-
-        return json.JSONEncoder.default(self, o)
+app.register_blueprint(recharge_bp, url_prefix="/recharge")
+app.register_blueprint(account_bp, url_prefix="/account")
 
 
-@app.route("/favicon.png")
-def favicon():
-    return send_file("../resources/images/favicon.png", mimetype="image/png")
+@app.before_request
+def load_current_user():
+    if oidc.user_loggedin:
+        if "account" not in g:
+            subject = session["oidc_auth_profile"]["sub"]
+            g.account = db.session.query(Account).filter_by(keycloak_sub=subject).one()
+    else:
+        g.account = None
+
+
+@app.context_processor
+def add_template_globals():
+    if g.account:
+        current_user = {
+            "name": g.account.name,
+            "sub": g.account.keycloak_sub,
+            "balance": g.account.balance,
+        }
+    else:
+        current_user = None
+
+    navigation = [
+        {"target": "index", "title": "Home"},
+        # {"target": "pricelist.index", "title": "Preisliste"},
+        # {"target": "recharge", "title": "Tetris"},
+    ]
+    if current_user:
+        navigation.extend(
+            [
+                {"target": "recharge.index", "title": "Guthaben aufladen"},
+                # {"target": "account.index", "title": "Einstellungen"},
+                # {"target": "recharge", "title": "Transaktionshistorie"},
+            ]
+        )
+    return {
+        "navigation": navigation,
+        "current_user": current_user,
+    }
+
+
+# 404 handler
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template("404.html"), 404
 
 
 @app.route("/")
-@app.route("/recharge")
 def index():
     accounts = (
         db.session.query(Account).filter(Account.enabled).order_by(Account.name).all()
@@ -58,46 +114,9 @@ def index():
     return render_template("index.html", accounts=accounts)
 
 
-@app.route("/stats")
-def stats():
-    return render_template("stats.html")
-
-
-@app.route("/recharge/doit", methods=["POST"])
-def recharge_doit():
-    user_id = request.form.get("user_user")
-    if not user_id:
-        return (
-            render_template("message.html", message="Bitte einen Nutzer auswählen!"),
-            400,
-        )
-    amount = request.form.get("amount")
-    if not amount:
-        return (
-            render_template("message.html", message="Bitte einen Betrag angeben!"),
-            400,
-        )
-
-    if amount == "0":
-        return render_template("message.html", message="Ungültiger Betrag!"), 400
-
-    account = db.session.query(Account).filter(Account.id == user_id).one()
-
-    tx = Tx(
-        payment_reference="Aufladung via Web",
-        account_id=account.id,
-        amount=Decimal(amount),
-    )
-    db.session.add(tx)
-    db.session.commit()
-
-    return render_template("recharge_success.html", amount=amount, account=account)
-
-
-@app.route("/scans.json")
-def scans_json():
-    limit = int(request.args.get("limit", 1000))
-    return to_json(scans(limit))
+@app.route("/favicon.png")
+def favicon():
+    return send_file("../resources/images/favicon.png", mimetype="image/png")
 
 
 @app.route("/tx.png")
@@ -111,8 +130,6 @@ def tx_png():
 
     if Decimal(amount) <= 0:
         return "Please use an amount greater than 0!"
-
-    uid = int(uid)
 
     img_data = make_sepa_qr(amount, name, uid)
     response = make_response(img_data.getvalue())
@@ -140,10 +157,6 @@ def enable_transaction_history(signed_account_id):
     return render_template(
         "enable_transaction_history_success.html", account_id=account_id
     )
-
-
-def to_json(dict_arr):
-    return json.dumps(dict_arr, cls=DateTimeEncoder)
 
 
 def run():

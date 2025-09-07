@@ -1,17 +1,74 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Getränkescanner - {% block title %}{% endblock %}</title>
+    <title>{% block title %}drinks-touch{% endblock %}</title>
     <link href="/favicon.png" type="image/png" rel="icon">
-{#    <link href="/static/dist/main.css" rel="stylesheet">#}
-    <link href="/static/css/style.css" rel="stylesheet">
-  </head>
-  <body>
+    <link href="{{ url_for("static", filename="css/style.css") }}" rel="stylesheet">
+    <link href="{{ url_for("static", filename="css/view-transitions.css") }}" rel="stylesheet">
+    <link href="{{ url_for("static", filename="css/header.css") }}" rel="stylesheet">
+    <link href="{{ url_for("static", filename="css/navigation.css") }}" rel="stylesheet">
+    <link href="{{ url_for("static", filename="css/footer.css") }}" rel="stylesheet">
+    <link href="{{ url_for("static", filename="css/spinner.css") }}" rel="stylesheet">
+    <link href="{{ url_for("static", filename="css/alert-box.css") }}" rel="stylesheet">
+    {% block head %}{% endblock %}
+</head>
+<body>
+{% include "includes/header.html" %}
+{% include "includes/navigation.html" %}
+{% if auto_redirect_after %}
+    <script>
+        {% if redirect_url %}
+            setTimeout(function () {
+                window.location.pathname = "{{ redirect_url }}"
+            }, {{ auto_redirect_after }} * 1000);
+        {% else %}
+            setTimeout(function () {
+                window.history.back()
+            }, {{ auto_redirect_after }} * 1000);
+        {% endif %}
+    </script>
+    <div class="timer-bar-container">
+        <div class="timer-bar timer-bar-default" style="animation-duration: {{ auto_redirect_after }}s;"></div>
+    </div>
+{% endif %}
+{% with messages = get_flashed_messages(with_categories=True) %}
+    {% if messages %}
+        <script>
+            // remove and re-add css class on tap to restart animation
+            function restartAnimation() {
+                const alertBox = event.currentTarget;
+                alertBox.classList.remove('alert');
+                const timerCircle = alertBox.querySelector('.timer-circle');
+                timerCircle.classList.remove('timer-circle');
+                void timerCircle.offsetWidth; // trigger reflow
+                void alertBox.offsetWidth; // trigger reflow
+                alertBox.classList.add('alert');
+                timerCircle.classList.add('timer-circle');
+            }
+        </script>
+        {% for category, message in messages %}
+            {% include "includes/alert-box.html" %}
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+{% if form %}
+    {% for field, errors in form.errors.items() %}
+        <div class="alert alert-error">
+            {{ form[field].label }}: {{ ', '.join(errors) }}
+        </div>
+    {% endfor %}
+{% endif %}
+<div style="view-transition-name: main-content; z-index: -1;">
     {% block body %}
-        <h1>Empty site!</h1>
+        <h1>Override the body block</h1>
     {% endblock %}
-  </body>
+</div>
+<div style="view-transition-name: footer">
+    {% include "includes/footer.html" %}
+</div>
+
+</body>
 </html>

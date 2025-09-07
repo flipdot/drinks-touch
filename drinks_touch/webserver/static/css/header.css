@@ -1,0 +1,35 @@
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1em 0;
+    border-bottom: 1px solid #dee2e6;
+}
+.header * {
+    margin: 0;
+    padding: 0;
+}
+.header-left h1, .header-left h1 a {
+    font-size: 1.5rem;
+    color: var(--color-text);
+    text-decoration: none;
+}
+
+.header-left, .header-right {
+    display: flex;
+    align-items: center;
+}
+
+.header-left > * {
+    padding-right: 0.4em;
+}
+
+.header-right > span:not(:last-child)::after {
+    content: '|';
+    margin: 0 0.5em;
+    color: var(--color-border);
+}
+
+.logo {
+    height: 2em;
+}
