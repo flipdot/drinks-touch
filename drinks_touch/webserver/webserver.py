@@ -33,7 +33,9 @@ def create_oidc_config() -> dict:
             "token_uri": kc_admin.token_endpoint,
             "userinfo_uri": kc_admin.userinfo_endpoint,
             "issuer": kc_admin.issuer,
-            "redirect_uris": [],
+            "redirect_uris": [
+                f"{config.BASE_URL}/authorize",
+            ],
         }
     }
 
