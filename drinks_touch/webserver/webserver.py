@@ -77,13 +77,22 @@ def add_template_globals():
         }
     else:
         current_user = None
+
+    navigation = [
+        {"target": "index", "title": "Home"},
+        # {"target": "pricelist.index", "title": "Preisliste"},
+        # {"target": "recharge", "title": "Tetris"},
+    ]
+    if current_user:
+        navigation.extend(
+            [
+                {"target": "recharge.index", "title": "Guthaben aufladen"},
+                # {"target": "account.index", "title": "Einstellungen"},
+                # {"target": "recharge", "title": "Transaktionshistorie"},
+            ]
+        )
     return {
-        "navigation": [
-            {"target": "recharge.index", "title": "Guthaben aufladen"},
-            # {"target": "recharge", "title": "Tetris"},
-            {"target": "account.index", "title": "Einstellungen"},
-            # {"target": "recharge", "title": "Transaktionshistorie"},
-        ],
+        "navigation": navigation,
         "current_user": current_user,
     }
 

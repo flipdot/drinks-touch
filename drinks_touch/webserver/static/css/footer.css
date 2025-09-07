@@ -3,3 +3,12 @@
     align-items: center;
     justify-content: center;
 }
+
+.footer > span {
+    margin: 0;
+    padding: 0 1em;
+}
+
+.footer > span:not(:last-child) {
+    border-right: 2px solid var(--color-border);
+}
