@@ -21,6 +21,7 @@ jobs:
         uses: 8BitJonny/gh-get-current-pr@4.0.0
         with:
           filterOutClosed: true
+          filterOutDraft: true
   release_semantic_dry:
     needs: prepare_jobs
     name: Release (semantic, dry)
