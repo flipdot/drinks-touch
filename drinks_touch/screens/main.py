@@ -20,16 +20,14 @@ class MainScreen(Screen):
 
     @with_db
     def on_start(self, *args, **kwargs):
-        self.objects = []
-        self.objects.append(
+        self.objects = [
             SvgIcon(
                 "drinks_touch/resources/images/flipdot.svg",
-                width=400,
+                height=197,
                 pos=(40, 20),
             ),
-        )
-
-        self.objects.append(Label(text="member auswählen", pos=(65, 250), size=40))
+            Label(text="member auswählen", pos=(65, 250), size=40),
+        ]
 
         i = 0
 

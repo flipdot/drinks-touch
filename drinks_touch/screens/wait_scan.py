@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 import functools
 import logging
 from dataclasses import dataclass
@@ -19,6 +19,7 @@ from elements.hbox import HBox
 from elements.vbox import VBox
 from tasks import CheckForUpdatesTask
 from .drink_scanned import DrinkScannedScreen
+from .event_screen import PartyScreen
 from .settings.main_screen import SettingsMainScreen
 from .main import MainScreen
 from .screen import Screen
@@ -33,14 +34,14 @@ logger = logging.getLogger(__name__)
 @dataclass
 class FlipdotEvent:
     title: str
-    start: datetime.datetime
+    start: datetime
     color: Color
     recurring: bool = False
     # description: str
 
     @property
     def today(self) -> bool:
-        return self.start.date() == datetime.datetime.now().date()
+        return self.start.date() == datetime.now().date()
 
     @property
     def fg_color(self) -> Color:
@@ -67,6 +68,11 @@ class WaitScanScreen(Screen):
 
     @with_db
     def on_start(self, *args, **kwargs):
+
+        if datetime(2025, 10, 25, 13) < datetime.now() < datetime(2025, 10, 26, 8):
+            self.goto(PartyScreen(), replace=True)
+        # self.goto(PartyScreen(), replace=True)
+
         if config.ICAL_FILE_PATH.exists():
             try:
                 self.events = WaitScanScreen.load_events_from_ical(
@@ -77,17 +83,17 @@ class WaitScanScreen(Screen):
                 self.events = [
                     FlipdotEvent(
                         title="Error reading calendar",
-                        start=datetime.datetime.now(),
+                        start=datetime.now(),
                         color=Color.RED,
                     ),
                     FlipdotEvent(
                         title=config.ICAL_URL,
-                        start=datetime.datetime.now(),
+                        start=datetime.now(),
                         color=Color.RED,
                     ),
                     FlipdotEvent(
                         title=str(config.ICAL_FILE_PATH),
-                        start=datetime.datetime.now(),
+                        start=datetime.now(),
                         color=Color.RED,
                     ),
                 ]
@@ -151,8 +157,10 @@ class WaitScanScreen(Screen):
         self.objects = [
             SvgIcon(
                 "drinks_touch/resources/images/flipdot.svg",
-                width=400,
+                # width=400,
+                height=197,
                 pos=(40, 20),
+                color=config.Color.PRIMARY,
             ),
             Label(
                 text="Veranstaltungen",
@@ -243,7 +251,7 @@ class WaitScanScreen(Screen):
     @staticmethod
     def read_calendar(raw_ical: str) -> list[FlipdotEvent]:
         events = []
-        aware_now = pytz.utc.localize(datetime.datetime.utcnow())
+        aware_now = pytz.utc.localize(datetime.utcnow())
         naive_now = aware_now.replace(tzinfo=None)
 
         cal = WaitScanScreen.load_calendar(raw_ical)
