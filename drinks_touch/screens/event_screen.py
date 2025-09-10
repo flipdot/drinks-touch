@@ -1,3 +1,7 @@
+import math
+from pathlib import Path
+
+import pygame
 from sqlalchemy import select, insert
 
 import config
@@ -25,21 +29,39 @@ class PartyScreen(Screen):
                     color="#FF6633",
                 )
             )
+        self.hexagon = SvgIcon.load_image(
+            Path("drinks_touch/resources/images/recharge/hexagon.svg"), width=400
+        )
+        self.battery = SvgIcon.load_image(
+            Path("drinks_touch/resources/images/recharge/battery.svg"), width=400
+        )
+        self.thunderbolt = SvgIcon.load_image(
+            Path("drinks_touch/resources/images/recharge/thunderbolt.svg"), width=400
+        )
+        self.text = SvgIcon.load_image(
+            Path("drinks_touch/resources/images/recharge/text.svg"), width=400
+        )
+        self.ts = 0
+
+        self.hexagon_rotation = 0
+        self.zoom = 1
+
+        self.jump_animation_started_at = 0
 
     @with_db
     def on_start(self, *args, **kwargs):
         self.objects = [
-            SvgIcon(
-                "drinks_touch/resources/images/mate.svg",
-                width=config.SCREEN_WIDTH / 2,
-                pos=(config.SCREEN_WIDTH / 4, 20),
-                color=config.Color.PRIMARY,
-            ),
-            SvgIcon(
-                "drinks_touch/resources/images/recharge.svg",
-                width=400,
-                pos=(40, 400),
-            ),
+            # SvgIcon(
+            #     "drinks_touch/resources/images/mate.svg",
+            #     width=config.SCREEN_WIDTH / 2,
+            #     pos=(config.SCREEN_WIDTH / 4, 20),
+            #     color=config.Color.PRIMARY,
+            # ),
+            # SvgIcon(
+            #     "drinks_touch/resources/images/recharge.svg",
+            #     width=400,
+            #     pos=(40, 180),
+            # ),
             Button(
                 inner=HBox(
                     [
@@ -59,3 +81,106 @@ class PartyScreen(Screen):
 
     def on_barcode(self, barcode):
         self.goto(TetrisScreen(self.account))
+
+    def tick(self, dt: float):
+        super().tick(dt)
+        self.ts += dt
+        self.hexagon_rotation = (self.hexagon_rotation - dt * 3) % 360
+
+        if (self.ts - self.jump_animation_started_at) * 5 > math.pi:
+            self.zoom = 1
+        else:
+            self.zoom = (
+                1 + math.sin((self.ts - self.jump_animation_started_at) * 5) * 200
+            )
+
+    def _render(self) -> tuple[pygame.Surface, pygame.Surface | None]:
+        surface, debug_surface = super()._render()
+        # draw hexagon
+        hexagon_zoom = self.zoom * -0.3
+        hexagon_pos = (40, 180)
+        hexagon_size = (
+            self.hexagon.get_width() + hexagon_zoom,
+            self.hexagon.get_height() + hexagon_zoom,
+        )
+        scaled_hexagon = pygame.transform.scale(
+            self.hexagon, (int(hexagon_size[0]), int(hexagon_size[1]))
+        )
+        rotated_hexagon = pygame.transform.rotate(scaled_hexagon, self.hexagon_rotation)
+        hexagon_rect = rotated_hexagon.get_rect(
+            center=(
+                hexagon_pos[0] + self.hexagon.get_width() // 2,
+                hexagon_pos[1] + self.hexagon.get_height() // 2,
+            )
+        )
+        surface.blit(rotated_hexagon, hexagon_rect.topleft)
+
+        # draw battery
+        battery_zoom = self.zoom * 0.5
+        battery_pos = (40, 180)
+        battery_size = (
+            self.battery.get_width() + battery_zoom,
+            self.battery.get_height() + battery_zoom,
+        )
+        scaled_battery = pygame.transform.scale(
+            self.battery, (int(battery_size[0]), int(battery_size[1]))
+        )
+        battery_rect = scaled_battery.get_rect(
+            center=(
+                battery_pos[0] + self.battery.get_width() // 2,
+                battery_pos[1] + self.battery.get_height() // 2,
+            )
+        )
+        surface.blit(scaled_battery, battery_rect.topleft)
+
+        # draw thunderbolt
+        thunderbolt_zoom = self.zoom
+        thunderbolt_pos = (40, 180)
+        thunderbolt_size = (
+            self.thunderbolt.get_width() + thunderbolt_zoom,
+            self.thunderbolt.get_height() + thunderbolt_zoom,
+        )
+        scaled_thunderbolt = pygame.transform.scale(
+            self.thunderbolt, (int(thunderbolt_size[0]), int(thunderbolt_size[1]))
+        )
+        thunderbolt_rect = scaled_thunderbolt.get_rect(
+            center=(
+                thunderbolt_pos[0] + self.thunderbolt.get_width() // 2,
+                thunderbolt_pos[1] + self.thunderbolt.get_height() // 2,
+            )
+        )
+        surface.blit(scaled_thunderbolt, thunderbolt_rect.topleft)
+
+        # draw text
+        text_size = self.zoom * 0.4
+        text_pos = (40, 180)
+        scaled_text = pygame.transform.scale(
+            self.text,
+            (
+                int(self.text.get_width() + text_size),
+                int(self.text.get_height() + text_size),
+            ),
+        )
+        text_rect = scaled_text.get_rect(
+            center=(
+                text_pos[0] + self.text.get_width() // 2,
+                text_pos[1] + self.text.get_height() // 2,
+            )
+        )
+        surface.blit(scaled_text, text_rect.topleft)
+        return surface, debug_surface
+
+    def calculate_hash(self):
+        super_hash = super().calculate_hash()
+        return hash(
+            (
+                super_hash,
+                self.hexagon_rotation,
+                self.zoom,
+            )
+        )
+
+    def event(self, event) -> bool:
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            self.jump_animation_started_at = self.ts
+        return super().event(event)
