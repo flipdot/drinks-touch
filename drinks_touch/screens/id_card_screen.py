@@ -1,11 +1,11 @@
 import subprocess
 from pystrich.code128 import Code128Encoder
+from sqlalchemy import select
 
 from config import Font
-from database.models import Account
-from drinks.drinks import get_by_ean
+from database.models import Account, Drink
 from drinks.drinks_manager import DrinksManager
-from database.storage import with_db
+from database.storage import with_db, Session
 from elements.button import Button
 from elements.label import Label
 from .screen import Screen
@@ -94,11 +94,13 @@ class IDCardScreen(Screen):
         p = subprocess.Popen(["lp", "-d", "labeldrucker", "-"], stdin=subprocess.PIPE)
         p.communicate(input=png)
 
+    @with_db
     def on_barcode(self, barcode):
         if not barcode:
             return
-        drink = get_by_ean(barcode)
-        if drink and ("tags" not in drink or "unknown" not in drink["tags"]):
+        query = select(Drink).where(Drink.ean == barcode)
+        drink = Session().execute(query).scalar_one_or_none()
+        if drink:
             from .profile import ProfileScreen
 
             DrinksManager.instance.set_selected_drink(drink)

@@ -14,7 +14,7 @@ from premailer import transform
 from sqlalchemy import select
 
 import config
-from database.models import Tx
+from database.models import Tx, Drink
 from database.models.account import Account
 from database.storage import Session, with_db
 
@@ -63,13 +63,13 @@ def send_notification(to_address, subject, content_text, content_html, uid):
     s.quit()
 
 
-def send_drink(account: Account, drink):
+def send_drink(account: Account, drink: Drink):
     if not account.email or "instant" not in (
         account.summary_email_notification_setting or ""
     ):
         return
     context = {
-        "drink_name": drink["name"],
+        "drink_name": drink.name,
         "uid": account.ldap_id,
         "balance": account.balance,
     }

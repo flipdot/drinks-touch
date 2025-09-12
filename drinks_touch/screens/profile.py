@@ -2,9 +2,8 @@ from sqlalchemy import select
 
 import config
 from config import Font
-from database.models import Account
+from database.models import Account, Drink
 from database.storage import Session, with_db
-from drinks.drinks import get_by_ean
 from drinks.drinks_manager import DrinksManager
 from elements import SvgIcon
 from elements.button import Button
@@ -159,7 +158,7 @@ class ProfileScreen(Screen):
 
         drink = DrinksManager.instance.get_selected_drink()
         self.drink_info = Label(
-            text=drink["name"] if drink else "",
+            text=drink.name if drink else "",
             size=30,
             pos=(30, 580),
         )
@@ -188,11 +187,12 @@ class ProfileScreen(Screen):
             ScreenManager.instance.set_active(ProfileScreen(account))
             self.processing.visible = False
             return
-        drink = get_by_ean(barcode)
+        query = select(Drink).where(Drink.ean == barcode)
+        drink = Session().execute(query).scalar_one_or_none()
         DrinksManager.instance.set_selected_drink(drink)
         if drink:
             self.goto(ConfirmPaymentScreen(self.account, drink))
-        self.drink_info.text = drink["name"]
+        self.drink_info.text = drink.name
         self.processing.visible = False
 
     def show_aufladungen(self):

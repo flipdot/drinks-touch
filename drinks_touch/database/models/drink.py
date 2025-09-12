@@ -1,5 +1,3 @@
-import datetime
-
 from sqlalchemy import Column, Integer, String, DateTime, Numeric
 
 from database.storage import Base
@@ -12,9 +10,4 @@ class Drink(Base):
     name = Column(String(40), unique=False)
     size = Column(Numeric, unique=False)
     timestamp = Column(DateTime(), unique=False)
-
-    def __init__(self, ean, name, size, timestamp=datetime.datetime.now()):
-        self.ean = ean
-        self.name = name
-        self.size = size
-        self.timestamp = timestamp
+    price = Column(Numeric(precision=8, scale=2, asdecimal=True))

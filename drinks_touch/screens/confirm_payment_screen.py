@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 import pygame
 
 import config
@@ -21,6 +23,8 @@ class ConfirmPaymentScreen(Screen):
 
     @with_db
     def on_start(self):
+        DrinksManager.instance.set_selected_drink(self.drink)
+        price = self.drink.price or Decimal("1.00")
         self.objects = [
             Label(
                 text=self.account.name,
@@ -48,17 +52,17 @@ class ConfirmPaymentScreen(Screen):
             VBox(
                 [
                     Label(
-                        text=self.drink["name"],
+                        text=self.drink.name,
                         size=30,
                     ),
                     Spacer(height=20),
                     Label(
-                        text="Preis: 1 €",
+                        text=f"Preis: {price:.03} €",
                         size=50,
                     ),
                     Spacer(height=10),
                     Label(
-                        text=f"EAN: {self.drink['ean']}",
+                        text=f"EAN: {self.drink.ean}",
                         size=20,
                     ),
                 ],
@@ -87,13 +91,13 @@ class ConfirmPaymentScreen(Screen):
     @with_db
     def save_drink(self):
         transaction = Tx(
-            payment_reference=f'Kauf "{self.drink["name"]}"',
-            ean=self.drink["ean"],
+            payment_reference=f'Kauf "{self.drink.name}"',
+            ean=self.drink.ean,
             account_id=self.account.id,
-            amount=-1,  # "Alles 1 Euro" policy
+            amount=-1 * (self.drink.price or Decimal("1.00")),
         )
         Session().add(transaction)
-        sale = Sale(ean=self.drink["ean"])
+        sale = Sale(ean=self.drink.ean)
         Session().add(sale)
         DrinksManager.instance.set_selected_drink(None)
 
@@ -101,7 +105,7 @@ class ConfirmPaymentScreen(Screen):
             SuccessScreen(
                 self.account,
                 self.drink,
-                f"getrunken: {self.drink['name']}",
+                f"getrunken: {self.drink.name}",
                 offer_games=True,
             ),
             replace=True,
