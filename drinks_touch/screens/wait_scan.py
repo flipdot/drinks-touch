@@ -71,7 +71,6 @@ class WaitScanScreen(Screen):
 
         if datetime(2025, 10, 25, 13) < datetime.now() < datetime(2025, 10, 26, 8):
             self.goto(PartyScreen(), replace=True)
-        self.goto(PartyScreen(), replace=True)
 
         if config.ICAL_FILE_PATH.exists():
             try:
