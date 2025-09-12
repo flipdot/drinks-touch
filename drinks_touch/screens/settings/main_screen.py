@@ -1,6 +1,11 @@
+from decimal import Decimal
+
 from pygame.mixer import Sound
+from sqlalchemy import func
 
 import config
+from database.models import Tx
+from database.storage import with_db, Session
 from elements import Button, SvgIcon, Label
 from elements.hbox import HBox
 from elements.vbox import VBox
@@ -18,6 +23,7 @@ from tasks import (
 
 
 class SettingsMainScreen(Screen):
+    @with_db
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.soundcheck = False
@@ -25,6 +31,8 @@ class SettingsMainScreen(Screen):
         self.sound = Sound("drinks_touch/resources/sounds/smb_pipe.wav")
 
         icon_text_gap = 15
+        total_balance = Session().query(func.sum(Tx.amount)).scalar() or Decimal(0)
+        total_balance_fmt = "{:.02f}€".format(total_balance)
 
         button_width = config.SCREEN_WIDTH - 10
         self.objects = [
@@ -197,6 +205,22 @@ class SettingsMainScreen(Screen):
                 ],
                 pos=(5, 70),
                 gap=15,
+            ),
+            VBox(
+                [
+                    Label(
+                        text="∑ = {}".format(total_balance_fmt),
+                        size=25,
+                    ),
+                    Label(
+                        font=config.Font.MONOSPACE,
+                        text=f"Build: {config.BUILD_NUMBER}",
+                        size=20,
+                    ),
+                ],
+                pos=(0, config.SCREEN_HEIGHT - ScreenManager.MENU_BAR_HEIGHT),
+                padding=(5, 5),
+                align_bottom=True,
             ),
         ]
 

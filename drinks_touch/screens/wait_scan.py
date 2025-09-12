@@ -2,17 +2,14 @@ import datetime
 import functools
 import logging
 from dataclasses import dataclass
-from decimal import Decimal
 from pathlib import Path
 
 import pytz
 from dateutil.rrule import rrulestr
-from sqlalchemy import func
 
 import config
 from config import Color
-from database.models import Tx
-from database.storage import Session, with_db
+from database.storage import with_db
 from drinks.drinks_manager import DrinksManager
 from elements import SvgIcon, Label, Button
 from elements.hbox import HBox
@@ -92,9 +89,6 @@ class WaitScanScreen(Screen):
                     ),
                 ]
 
-        total_balance = Session().query(func.sum(Tx.amount)).scalar() or Decimal(0)
-        total_balance_fmt = "{:.02f}€".format(total_balance)
-
         bottom_right_buttons = [
             Button(
                 text=None,
@@ -160,22 +154,6 @@ class WaitScanScreen(Screen):
                 size=34,
             ),
             event_labels,
-            VBox(
-                [
-                    Label(
-                        text="∑ = {}".format(total_balance_fmt),
-                        size=25,
-                    ),
-                    Label(
-                        font=config.Font.MONOSPACE,
-                        text=f"Build: {config.BUILD_NUMBER}",
-                        size=20,
-                    ),
-                ],
-                pos=(0, config.SCREEN_HEIGHT),
-                padding=(5, 5),
-                align_bottom=True,
-            ),
             HBox(
                 [
                     Button(
