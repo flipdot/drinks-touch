@@ -19,7 +19,7 @@ from elements.hbox import HBox
 from elements.vbox import VBox
 from tasks import CheckForUpdatesTask
 from .drink_scanned import DrinkScannedScreen
-from .event_screen import PartyScreen
+from .party_screen import PartyScreen
 from .settings.main_screen import SettingsMainScreen
 from .main import MainScreen
 from .screen import Screen
@@ -71,7 +71,7 @@ class WaitScanScreen(Screen):
 
         if datetime(2025, 10, 25, 13) < datetime.now() < datetime(2025, 10, 26, 8):
             self.goto(PartyScreen(), replace=True)
-        # self.goto(PartyScreen(), replace=True)
+        self.goto(PartyScreen(), replace=True)
 
         if config.ICAL_FILE_PATH.exists():
             try:
