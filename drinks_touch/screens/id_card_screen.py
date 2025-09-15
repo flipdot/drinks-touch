@@ -103,7 +103,7 @@ class IDCardScreen(Screen):
         if drink:
             from .profile import ProfileScreen
 
-            DrinksManager.instance.set_selected_drink(drink)
+            DrinksManager.instance.selected_barcode = barcode
             ScreenManager.instance.set_active(ProfileScreen(self.account))
             return
         self.set_id(barcode)

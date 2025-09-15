@@ -204,7 +204,7 @@ class WaitScanScreen(Screen):
                 )
             )
 
-        DrinksManager.instance.set_selected_drink(None)
+        DrinksManager.instance.selected_barcode = None
 
     @staticmethod
     @functools.cache
