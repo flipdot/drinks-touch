@@ -18,7 +18,6 @@ from tasks import (
     SepaSyncTask,
     SendMailTask,
     SyncFromKeycloakTask,
-    InitializeBarcodeScannerTask,
 )
 
 
@@ -112,23 +111,25 @@ class SettingsMainScreen(Screen):
                         ),
                         width=button_width,
                     ),
-                    Button(
-                        on_click=lambda: self.goto(
-                            TasksScreen(tasks=[InitializeBarcodeScannerTask()])
-                        ),
-                        inner=HBox(
-                            [
-                                SvgIcon(
-                                    "drinks_touch/resources/images/barcode.svg",
-                                    height=40,
-                                    color=config.Color.PRIMARY,
-                                ),
-                                Label(text="Barcode-Scanner Init"),
-                            ],
-                            gap=icon_text_gap,
-                        ),
-                        width=button_width,
-                    ),
+                    # Barcode scanner is now configured to be a keyboard.
+                    # Therefore, no need to initialize serial device
+                    # Button(
+                    #     on_click=lambda: self.goto(
+                    #         TasksScreen(tasks=[InitializeBarcodeScannerTask()])
+                    #     ),
+                    #     inner=HBox(
+                    #         [
+                    #             SvgIcon(
+                    #                 "drinks_touch/resources/images/barcode.svg",
+                    #                 height=40,
+                    #                 color=config.Color.PRIMARY,
+                    #             ),
+                    #             Label(text="Barcode-Scanner Init"),
+                    #         ],
+                    #         gap=icon_text_gap,
+                    #     ),
+                    #     width=button_width,
+                    # ),
                     # Transaction migration was done already.
                     # Keeping it here as long as we have the old data model still in place
                     # Button(

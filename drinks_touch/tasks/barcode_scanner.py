@@ -15,7 +15,9 @@ logger = logging.getLogger(__name__)
 
 class InitializeBarcodeScannerTask(BaseTask):
     LABEL = "Initialisiere Barcode-Scanner"
-    ON_STARTUP = True
+    # Disabled startup, because our barcode scanner is now configured as a keyboard.
+    # This task is only required for serial barcode scanners.
+    ON_STARTUP = False
     thread = None
 
     def run(self):
