@@ -1,3 +1,5 @@
+from typing import Callable
+
 import pygame
 from pygame.mixer import Sound
 
@@ -10,7 +12,6 @@ from elements.base_elm import BaseElm
 from elements.hbox import HBox
 from elements.label import Label
 from elements.vbox import VBox
-from notifications.notification import send_drink
 from .screen import Screen
 from .tetris.constants import SPRITE_RESOLUTION
 from .tetris.screen import TetrisScreen, Shape, BlockType
@@ -38,12 +39,18 @@ class TetrisIcon(BaseElm):
 class SuccessScreen(Screen):
     idle_timeout = 10
 
-    def __init__(self, account: Account, drink, text, offer_games: bool = False):
+    def __init__(
+        self,
+        account: Account,
+        text,
+        offer_games: bool = False,
+        on_start_fn: Callable | None = None,
+    ):
         super().__init__()
 
         self.account = account
         self.text = text
-        self.drink = drink
+        self.on_start_fn = on_start_fn
         self.offer_games = offer_games
 
     @with_db
@@ -107,8 +114,8 @@ class SuccessScreen(Screen):
 
         self.play_sound()
 
-        if self.drink:
-            send_drink(self.account, self.drink)
+        if self.on_start_fn:
+            self.on_start_fn()
 
     def event(self, event) -> BaseElm | None:
         if event.type == pygame.KEYUP and event.key == pygame.K_RETURN:

@@ -78,7 +78,6 @@ class ConfirmRechargeScreen(Screen):
         self.goto(
             SuccessScreen(
                 self.account,
-                None,
                 f"{self.amount} € aufgeladen",
             ),
             replace=True,

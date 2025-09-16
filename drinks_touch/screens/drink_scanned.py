@@ -3,9 +3,8 @@ import functools
 from sqlalchemy import select
 
 import config
-from database.models import Account
+from database.models import Account, Drink
 from database.storage import with_db, Session
-from drinks.drinks import get_by_ean
 from drinks.drinks_manager import DrinksManager
 from elements import Label, Button, SvgIcon
 from elements.hbox import HBox
@@ -19,11 +18,12 @@ from screens.search_account import SearchAccountScreen
 
 class DrinkScannedScreen(Screen):
 
+    @with_db
     def __init__(self, barcode: str):
         super().__init__()
         self.barcode = barcode
-        self.drink = get_by_ean(barcode)
-        self.ean = barcode
+        query = select(Drink).where(Drink.ean == barcode)
+        self.drink = Session().execute(query).scalar_one_or_none()
 
     @with_db
     def on_start(self, *args, **kwargs):
@@ -32,7 +32,19 @@ class DrinkScannedScreen(Screen):
         if account:
             self.goto(ProfileScreen(account), replace=True)
             return
-        DrinksManager.instance.set_selected_drink(self.drink)
+        DrinksManager.instance.selected_barcode = self.barcode
+        if self.drink:
+            price = self.drink.price or config.DEFAULT_DRINK_PRICE
+            drink_name = self.drink.name
+            ean = self.drink.ean
+        else:
+            price = config.DEFAULT_DRINK_PRICE
+            drink_name = "Unbekanntes Getränk"
+            ean = self.barcode
+
+        if price is None:
+            raise NotImplementedError("Display that a price has yet to be determined")
+
         self.objects = [
             Label(
                 text="Getränk gescannt",
@@ -42,17 +54,17 @@ class DrinkScannedScreen(Screen):
             VBox(
                 [
                     Label(
-                        text=self.drink["name"],
+                        text=drink_name,
                         size=30,
                     ),
                     Spacer(height=20),
                     Label(
-                        text="Preis: 1 €",
+                        text=f"Preis: {price:.02f} €",
                         size=50,
                     ),
                     Spacer(height=10),
                     Label(
-                        text=f"EAN: {self.ean}",
+                        text=f"EAN: {ean}",
                         size=20,
                     ),
                 ],
@@ -63,9 +75,7 @@ class DrinkScannedScreen(Screen):
                     Button(
                         size=45,
                         text=" Buchen ",
-                        on_click=functools.partial(
-                            self.goto, MainScreen(), replace=True
-                        ),
+                        on_click=lambda: self.goto(MainScreen(), replace=True),
                     ),
                     Button(
                         text=None,
