@@ -98,8 +98,6 @@ class ConfirmPaymentScreen(Screen):
         if not barcode:
             self.save_drink()
             return
-        # DrinksManager.instance.selected_barcode = barcode
-        # self.goto(ConfirmPaymentScreen(self.account, barcode), replace=True)
 
     @with_db
     def save_drink(self):
