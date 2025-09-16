@@ -93,6 +93,7 @@ class SyncFromKeycloakTask(BaseTask):
             account.name = user["username"]
             account.email = user.get("email")
             account.enabled = user["enabled"]
+            account.ldap_path = ldap_entry_dn
             if notification_settings := user["attributes"].get("drink_notification"):
                 account.summary_email_notification_setting = notification_settings[0]
             self.progress = (i + 1) / total_users
