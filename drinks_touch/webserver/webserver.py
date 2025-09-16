@@ -65,7 +65,17 @@ def load_current_user():
     if oidc.user_loggedin:
         if "account" not in g:
             subject = session["oidc_auth_profile"]["sub"]
-            g.account = db.session.query(Account).filter_by(keycloak_sub=subject).one()
+            g.account = (
+                db.session.query(Account).filter_by(keycloak_sub=subject).one_or_none()
+            )
+            if g.account is None:
+                g.account = Account(
+                    keycloak_sub=subject,
+                    name=session["oidc_auth_profile"]["preferred_username"],
+                    email=session["oidc_auth_profile"]["email"],
+                )
+                db.session.add(g.account)
+                db.session.commit()
     else:
         g.account = None
 

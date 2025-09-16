@@ -106,7 +106,7 @@ def format_drinks(drinks_consumed: list[Tx]):
 def get_recent_transactions(account: Account) -> list[Tx]:
     query = select(Tx).where(
         Tx.account_id == account.id,
-        Tx.created_at >= account.last_summary_email_sent_at,
+        Tx.created_at >= (account.last_summary_email_sent_at or datetime.min),
     )
     transactions = Session().execute(query).scalars().all()
     return transactions
