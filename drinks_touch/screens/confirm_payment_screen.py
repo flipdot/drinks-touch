@@ -88,22 +88,22 @@ class ConfirmPaymentScreen(Screen):
 
     @with_db
     def save_drink(self):
-        assert self.price, "Price must be set before saving a drink"
+        assert self.drink.price, "Price must be set before saving a drink"
         transaction = Tx(
-            payment_reference=f'Kauf "{self.drink_name}"',
-            ean=self.barcode,
+            payment_reference=f'Kauf "{self.drink.name}"',
+            ean=self.drink.ean,
             account_id=self.account.id,
-            amount=-1 * self.price,
+            amount=-1 * self.drink.price,
         )
         Session().add(transaction)
-        sale = Sale(ean=self.barcode)
+        sale = Sale(ean=self.drink.ean)
         Session().add(sale)
 
         self.goto(
             SuccessScreen(
                 self.account,
-                f"getrunken: {self.drink_name}",
-                on_start_fn=lambda: send_drink(self.account, self.drink_name),
+                f"getrunken: {self.drink.name}",
+                on_start_fn=lambda: send_drink(self.account, self.drink.name),
                 offer_games=True,
             ),
             replace=True,
