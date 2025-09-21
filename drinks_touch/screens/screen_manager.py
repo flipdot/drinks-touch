@@ -4,6 +4,7 @@ from pygame.event import EventType
 import config
 from config import Color, Font
 from database.storage import Session
+from drinks.drinks_manager import GlobalState
 from elements import Button, Progress, Label
 from elements.base_elm import BaseElm
 from overlays.keyboard import KeyboardOverlay
@@ -83,6 +84,7 @@ class ScreenManager:
 
         self.reset_history()
         self.set_active(WaitScanScreen())
+        GlobalState.reset()
 
     def set_active(
         self, screen: "Screen", replace=False, replace_last_n=1, *args, **kwargs

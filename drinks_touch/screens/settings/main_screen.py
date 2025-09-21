@@ -18,6 +18,7 @@ from tasks import (
     SepaSyncTask,
     SendMailTask,
     SyncFromKeycloakTask,
+    CheckForUpdatesTask,
 )
 
 
@@ -224,6 +225,24 @@ class SettingsMainScreen(Screen):
                 align_bottom=True,
             ),
         ]
+        if (
+            CheckForUpdatesTask.newest_version_sha_short
+            and config.BUILD_NUMBER != CheckForUpdatesTask.newest_version_sha_short
+        ):
+            # make build number flash, show "Update available" when flashing
+            self.objects.append(
+                Label(
+                    font=config.Font.MONOSPACE,
+                    text=f"Build: {CheckForUpdatesTask.newest_version_sha_short} <- Update available",
+                    size=20,
+                    pos=(5, config.SCREEN_HEIGHT - 70),
+                    align_bottom=True,
+                    color=config.Color.BACKGROUND,
+                    bg_color=config.Color.PRIMARY,
+                    padding=0,
+                    blink_frequency=0.5,
+                )
+            )
 
     def toggle_debug(self, button: Button):
         ScreenManager.instance.DEBUG_LEVEL += 1

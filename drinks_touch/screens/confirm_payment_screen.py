@@ -1,7 +1,6 @@
 import config
 from database.models import Tx, Sale, Account, Drink
 from database.storage import Session, with_db
-from drinks.drinks_manager import DrinksManager
 from elements import Label, Button
 from elements.spacer import Spacer
 from elements.vbox import VBox
@@ -12,30 +11,21 @@ from screens.success import SuccessScreen
 
 class ConfirmPaymentScreen(Screen):
 
-    def __init__(self, account: Account, barcode: str | None):
+    def __init__(self, account: Account, drink: Drink):
         super().__init__()
         self.account = account
-        self.barcode = barcode
-        self.drink: Drink | None = None
-
-        # Keeping name and price as separate attributes, to allow
-        # drinking unknown drinks.
-        # Will be refactored later to allow users to create new drink entries in the DB
-        self.drink_name = "Unbekannt"
-        self.price = config.DEFAULT_DRINK_PRICE
+        self.drink = drink
 
     @with_db
     def on_start(self):
-        self.drink = (
-            Session().query(Drink).filter(Drink.ean == self.barcode).one_or_none()
-        )
 
-        if self.drink:
-            self.drink_name = self.drink.name
-            self.price = self.drink.price or config.DEFAULT_DRINK_PRICE
-
-        if not self.price:
-            raise NotImplementedError("Display that a price has yet to be determined")
+        if not self.drink.price:
+            if config.DEFAULT_DRINK_PRICE:
+                self.drink.price = config.DEFAULT_DRINK_PRICE
+            else:
+                raise NotImplementedError(
+                    "Display that a price has yet to be determined"
+                )
 
         self.objects = [
             Label(
@@ -64,17 +54,17 @@ class ConfirmPaymentScreen(Screen):
             VBox(
                 [
                     Label(
-                        text=self.drink_name,
+                        text=self.drink.name,
                         size=30,
                     ),
                     Spacer(height=20),
                     Label(
-                        text=f"Preis: {self.price:.02f} €",
+                        text=f"Preis: {self.drink.price:.02f} €",
                         size=50,
                     ),
                     Spacer(height=10),
                     Label(
-                        text=f"EAN: {self.barcode}",
+                        text=f"EAN: {self.drink.ean}",
                         size=20,
                     ),
                 ],
@@ -90,9 +80,6 @@ class ConfirmPaymentScreen(Screen):
                 align_bottom=True,
             ),
         ]
-
-    def on_stop(self, *args, **kwargs):
-        DrinksManager.instance.selected_barcode = None
 
     def on_barcode(self, barcode: str):
         if not barcode:

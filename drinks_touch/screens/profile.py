@@ -1,10 +1,8 @@
-from sqlalchemy import select
-
 import config
 from config import Font
 from database.models import Account
-from database.storage import Session, with_db
-from drinks.drinks_manager import DrinksManager
+from database.storage import with_db
+from drinks.drinks_manager import GlobalState
 from elements import SvgIcon
 from elements.button import Button
 from elements.hbox import HBox
@@ -15,7 +13,6 @@ from .confirm_payment_screen import ConfirmPaymentScreen
 from .enable_transaction_history_screen import EnableTransactionHistoryScreen
 from .id_card_screen import IDCardScreen
 from .screen import Screen
-from .screen_manager import ScreenManager
 from .transaction_history_log_screen import TransactionHistoryLogScreen
 from .transfer_balance_screen import TransferBalanceScreen
 
@@ -36,6 +33,10 @@ class ProfileScreen(Screen):
 
     @with_db
     def on_start(self, *args, **kwargs):
+        if GlobalState.selected_drink:
+            self.goto(ConfirmPaymentScreen(self.account, GlobalState.selected_drink))
+            return
+
         button_width = config.SCREEN_WIDTH - 10
         icon_text_gap = 15
         self.objects = [
@@ -147,19 +148,6 @@ class ProfileScreen(Screen):
             #     pos=(330, 370),
             # ),
         ]
-
-        self.processing = Label(
-            text="Moment bitte...",
-            size=20,
-            pos=(150, 750),
-        )
-        self.processing.visible = False
-        self.objects.append(self.processing)
-
-        barcode = DrinksManager.instance.selected_barcode
-
-        if barcode:
-            self.goto(ConfirmPaymentScreen(self.account, barcode))
         return
 
     @with_db
@@ -171,19 +159,11 @@ class ProfileScreen(Screen):
 
     @with_db
     def on_barcode(self, barcode):
+        from .drink_scanned import DrinkScannedScreen
+
         if not barcode:
             return
-        self.processing.text = f"Gescannt: {barcode}"
-        self.processing.visible = True
-        query = select(Account).filter(Account.id_card == barcode)
-        account = Session().execute(query).scalars().first()
-        if account:
-            ScreenManager.instance.set_active(ProfileScreen(account))
-            self.processing.visible = False
-            return
-        DrinksManager.instance.selected_barcode = barcode
-        self.goto(ConfirmPaymentScreen(self.account, barcode))
-        self.processing.visible = False
+        self.goto(DrinkScannedScreen(barcode))
 
     def show_aufladungen(self):
         for d in self.elements_drinks:
