@@ -49,8 +49,8 @@ class ConfirmPaymentScreen(Screen):
             ),
             Label(
                 text="Auswahl bestätigen",
-                pos=(5, 100),
-                size=48,
+                pos=(5, 120),
+                size=32,
             ),
             VBox(
                 [
@@ -87,9 +87,12 @@ class ConfirmPaymentScreen(Screen):
         ]
 
     def on_barcode(self, barcode: str):
+        from screens.drink_scanned import DrinkScannedScreen
+
         if not barcode:
             self.save_drink()
             return
+        self.goto(DrinkScannedScreen(barcode), replace=True)
 
     @with_db
     def save_drink(self):

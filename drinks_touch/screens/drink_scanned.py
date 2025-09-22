@@ -5,7 +5,9 @@ from sqlalchemy import select
 import config
 from database.models import Account, Drink
 from database.storage import with_db, Session
+from screens.add_new_drink import AddNewDrinkScreen
 from screens.confirm_payment_screen import ConfirmPaymentScreen
+from screens.edit_drink import EditDrinkScreen
 from state import GlobalState
 from elements import Label, Button, SvgIcon
 from elements.hbox import HBox
@@ -35,10 +37,21 @@ class DrinkScannedScreen(Screen):
         query = select(Drink).where(Drink.ean == self.barcode)
         drink = Session().execute(query).scalar_one_or_none()
         if drink is None:
+            if not config.DEFAULT_DRINK_PRICE:
+                self.goto(AddNewDrinkScreen(self.barcode), replace=True)
+                return
             drink = Drink(
                 ean=self.barcode, name="Unbekannt", price=config.DEFAULT_DRINK_PRICE
             )
             Session().add(drink)
+
+        if not drink.price:
+            if config.DEFAULT_DRINK_PRICE:
+                drink.price = config.DEFAULT_DRINK_PRICE
+            else:
+                self.goto(EditDrinkScreen(drink), replace=True)
+                return
+
         GlobalState.selected_drink = drink
         if GlobalState.selected_account:
             self.goto(
@@ -47,28 +60,21 @@ class DrinkScannedScreen(Screen):
                 ),
                 replace=True,
             )
-
-        if not drink.price:
-            if config.DEFAULT_DRINK_PRICE:
-                drink.price = config.DEFAULT_DRINK_PRICE
-            else:
-                raise NotImplementedError(
-                    "Display that a price has yet to be determined"
-                )
+            return
 
         self.objects = [
             Label(
-                text="Getränk gescannt",
+                text=drink.name,
                 size=40,
                 pos=(5, 5),
             ),
             VBox(
                 [
-                    Label(
-                        text=drink.name,
-                        size=30,
-                    ),
-                    Spacer(height=20),
+                    # Label(
+                    #     text=drink.name,
+                    #     size=30,
+                    # ),
+                    # Spacer(height=20),
                     HBox(
                         [
                             Spacer(width=config.SCREEN_WIDTH / 4),
@@ -84,7 +90,7 @@ class DrinkScannedScreen(Screen):
                         size=20,
                     ),
                 ],
-                pos=(5, 250),
+                pos=(5, 270),
             ),
             HBox(
                 [
