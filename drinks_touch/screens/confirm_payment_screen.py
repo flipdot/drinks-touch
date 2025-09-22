@@ -2,6 +2,7 @@ import config
 from database.models import Tx, Sale, Account, Drink
 from database.storage import Session, with_db
 from elements import Label, Button
+from elements.hbox import HBox
 from elements.spacer import Spacer
 from elements.vbox import VBox
 from notifications.notification import send_drink
@@ -58,9 +59,14 @@ class ConfirmPaymentScreen(Screen):
                         size=30,
                     ),
                     Spacer(height=20),
-                    Label(
-                        text=f"Preis: {self.drink.price:.02f} €",
-                        size=50,
+                    HBox(
+                        [
+                            Spacer(width=config.SCREEN_WIDTH / 4),
+                            Label(
+                                text=f"{self.drink.price:.02f} €",
+                                size=70,
+                            ),
+                        ]
                     ),
                     Spacer(height=10),
                     Label(
@@ -68,8 +74,7 @@ class ConfirmPaymentScreen(Screen):
                         size=20,
                     ),
                 ],
-                gap=15,
-                pos=(5, 200),
+                pos=(5, 250),
             ),
             Button(
                 text="Trinken",
@@ -108,3 +113,8 @@ class ConfirmPaymentScreen(Screen):
             ),
             replace=True,
         )
+
+    # @staticmethod
+    # def back():
+    #     GlobalState.reset()
+    #     super(ConfirmPaymentScreen, ConfirmPaymentScreen).back()

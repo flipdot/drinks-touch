@@ -4,7 +4,7 @@ from sqlalchemy import select
 
 from config import Font
 from database.models import Account, Drink
-from drinks.drinks_manager import GlobalState
+from state import GlobalState
 from database.storage import with_db, Session
 from elements.button import Button
 from elements.label import Label

@@ -13,6 +13,7 @@ from database.storage import with_db
 from elements import SvgIcon, Label, Button
 from elements.hbox import HBox
 from elements.vbox import VBox
+from state import GlobalState
 from .drink_scanned import DrinkScannedScreen
 from .party_screen import PartyScreen
 from .settings.main_screen import SettingsMainScreen
@@ -63,6 +64,7 @@ class WaitScanScreen(Screen):
 
     @with_db
     def on_start(self, *args, **kwargs):
+        GlobalState.reset()
 
         if datetime(2025, 10, 25, 13) < datetime.now() < datetime(2025, 10, 26, 8):
             self.goto(PartyScreen(), replace=True)

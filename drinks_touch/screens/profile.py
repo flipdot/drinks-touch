@@ -2,7 +2,7 @@ import config
 from config import Font
 from database.models import Account
 from database.storage import with_db
-from drinks.drinks_manager import GlobalState
+from state import GlobalState
 from elements import SvgIcon
 from elements.button import Button
 from elements.hbox import HBox
@@ -33,9 +33,14 @@ class ProfileScreen(Screen):
 
     @with_db
     def on_start(self, *args, **kwargs):
-        if GlobalState.selected_drink:
-            self.goto(ConfirmPaymentScreen(self.account, GlobalState.selected_drink))
-            return
+        GlobalState.selected_account = self.account
+        if GlobalState.selected_account and GlobalState.selected_drink:
+            self.goto(
+                ConfirmPaymentScreen(
+                    GlobalState.selected_account, GlobalState.selected_drink
+                ),
+                replace=True,
+            )
 
         button_width = config.SCREEN_WIDTH - 10
         icon_text_gap = 15

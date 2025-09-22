@@ -5,7 +5,8 @@ from sqlalchemy import select
 import config
 from database.models import Account, Drink
 from database.storage import with_db, Session
-from drinks.drinks_manager import GlobalState
+from screens.confirm_payment_screen import ConfirmPaymentScreen
+from state import GlobalState
 from elements import Label, Button, SvgIcon
 from elements.hbox import HBox
 from elements.spacer import Spacer
@@ -39,6 +40,13 @@ class DrinkScannedScreen(Screen):
             )
             Session().add(drink)
         GlobalState.selected_drink = drink
+        if GlobalState.selected_account:
+            self.goto(
+                ConfirmPaymentScreen(
+                    GlobalState.selected_account, GlobalState.selected_drink
+                ),
+                replace=True,
+            )
 
         if not drink.price:
             if config.DEFAULT_DRINK_PRICE:
@@ -61,9 +69,14 @@ class DrinkScannedScreen(Screen):
                         size=30,
                     ),
                     Spacer(height=20),
-                    Label(
-                        text=f"Preis: {drink.price:.02f} €",
-                        size=50,
+                    HBox(
+                        [
+                            Spacer(width=config.SCREEN_WIDTH / 4),
+                            Label(
+                                text=f"{drink.price:.02f} €",
+                                size=70,
+                            ),
+                        ]
                     ),
                     Spacer(height=10),
                     Label(
