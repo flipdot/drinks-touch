@@ -20,13 +20,17 @@ def make_sepa_qr(
     #            https://community.tomorrow.one/t/support-fuer-alternative-qr-code-ueberweisungen/5196
     info = "".join(random.choices(string.ascii_lowercase, k=12))
     url = tx_url(uid, name, info, amount)
+    return make_qr_code(url, pixel_width, border, color, bg)
+
+
+def make_qr_code(data, pixel_width=10, border=4, color="black", bg="white"):
     qr = qrcode.QRCode(
         version=None,
         error_correction=qrcode.constants.ERROR_CORRECT_L,
         box_size=pixel_width,
         border=border,
     )
-    qr.add_data(url)
+    qr.add_data(data)
     qr.make(fit=True)
     img = qr.make_image(fill_color=color, back_color=bg)
     img_data = io.BytesIO()

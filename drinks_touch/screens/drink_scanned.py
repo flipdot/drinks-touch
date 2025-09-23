@@ -5,7 +5,10 @@ from sqlalchemy import select
 import config
 from database.models import Account, Drink
 from database.storage import with_db, Session
-from drinks.drinks_manager import DrinksManager
+from screens.add_new_drink import AddNewDrinkScreen
+from screens.confirm_payment_screen import ConfirmPaymentScreen
+from screens.edit_drink import EditDrinkScreen
+from state import GlobalState
 from elements import Label, Button, SvgIcon
 from elements.hbox import HBox
 from elements.spacer import Spacer
@@ -22,8 +25,6 @@ class DrinkScannedScreen(Screen):
     def __init__(self, barcode: str):
         super().__init__()
         self.barcode = barcode
-        query = select(Drink).where(Drink.ean == barcode)
-        self.drink = Session().execute(query).scalar_one_or_none()
 
     @with_db
     def on_start(self, *args, **kwargs):
@@ -32,43 +33,64 @@ class DrinkScannedScreen(Screen):
         if account:
             self.goto(ProfileScreen(account), replace=True)
             return
-        DrinksManager.instance.selected_barcode = self.barcode
-        if self.drink:
-            price = self.drink.price or config.DEFAULT_DRINK_PRICE
-            drink_name = self.drink.name
-            ean = self.drink.ean
-        else:
-            price = config.DEFAULT_DRINK_PRICE
-            drink_name = "Unbekanntes Getränk"
-            ean = self.barcode
 
-        if price is None:
-            raise NotImplementedError("Display that a price has yet to be determined")
+        query = select(Drink).where(Drink.ean == self.barcode)
+        drink = Session().execute(query).scalar_one_or_none()
+        if drink is None:
+            if not config.DEFAULT_DRINK_PRICE:
+                self.goto(AddNewDrinkScreen(self.barcode), replace=True)
+                return
+            drink = Drink(
+                ean=self.barcode, name="Unbekannt", price=config.DEFAULT_DRINK_PRICE
+            )
+            Session().add(drink)
+
+        if not drink.price:
+            if config.DEFAULT_DRINK_PRICE:
+                drink.price = config.DEFAULT_DRINK_PRICE
+            else:
+                self.goto(EditDrinkScreen(drink), replace=True)
+                return
+
+        GlobalState.selected_drink = drink
+        if GlobalState.selected_account:
+            self.goto(
+                ConfirmPaymentScreen(
+                    GlobalState.selected_account, GlobalState.selected_drink
+                ),
+                replace=True,
+            )
+            return
 
         self.objects = [
             Label(
-                text="Getränk gescannt",
+                text=drink.name,
                 size=40,
                 pos=(5, 5),
             ),
             VBox(
                 [
-                    Label(
-                        text=drink_name,
-                        size=30,
-                    ),
-                    Spacer(height=20),
-                    Label(
-                        text=f"Preis: {price:.02f} €",
-                        size=50,
+                    # Label(
+                    #     text=drink.name,
+                    #     size=30,
+                    # ),
+                    # Spacer(height=20),
+                    HBox(
+                        [
+                            Spacer(width=config.SCREEN_WIDTH / 4),
+                            Label(
+                                text=f"{drink.price:.02f} €",
+                                size=70,
+                            ),
+                        ]
                     ),
                     Spacer(height=10),
                     Label(
-                        text=f"EAN: {ean}",
+                        text=f"EAN: {drink.ean}",
                         size=20,
                     ),
                 ],
-                pos=(5, 250),
+                pos=(5, 270),
             ),
             HBox(
                 [

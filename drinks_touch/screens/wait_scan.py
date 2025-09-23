@@ -10,11 +10,10 @@ from dateutil.rrule import rrulestr
 import config
 from config import Color
 from database.storage import with_db
-from drinks.drinks_manager import DrinksManager
 from elements import SvgIcon, Label, Button
 from elements.hbox import HBox
 from elements.vbox import VBox
-from tasks import CheckForUpdatesTask
+from state import GlobalState
 from .drink_scanned import DrinkScannedScreen
 from .party_screen import PartyScreen
 from .settings.main_screen import SettingsMainScreen
@@ -65,6 +64,7 @@ class WaitScanScreen(Screen):
 
     @with_db
     def on_start(self, *args, **kwargs):
+        GlobalState.reset()
 
         if datetime(2025, 10, 25, 13) < datetime.now() < datetime(2025, 10, 26, 8):
             self.goto(PartyScreen(), replace=True)
@@ -191,27 +191,6 @@ class WaitScanScreen(Screen):
                 padding=(5, 5),
             ),
         ]
-
-        if (
-            CheckForUpdatesTask.newest_version_sha_short
-            and not config.BUILD_NUMBER == CheckForUpdatesTask.newest_version_sha_short
-        ):
-            # make build number flash, show "Update available" when flashing
-            self.objects.append(
-                Label(
-                    font=config.Font.MONOSPACE,
-                    text=f"Build: {CheckForUpdatesTask.newest_version_sha_short} <- Update available",
-                    size=20,
-                    pos=(5, config.SCREEN_HEIGHT - 5),
-                    align_bottom=True,
-                    color=config.Color.BACKGROUND,
-                    bg_color=Color.PRIMARY,
-                    padding=0,
-                    blink_frequency=0.5,
-                )
-            )
-
-        DrinksManager.instance.selected_barcode = None
 
     @staticmethod
     @functools.cache

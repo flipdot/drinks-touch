@@ -14,6 +14,7 @@ MONEY_PASSWORD = os.environ.get("MONEY_PASSWORD", "my_basicauth_passwd")
 DOMAIN = os.environ.get("DOMAIN", "localhost")
 
 DEFAULT_DRINK_PRICE = Decimal("1.00")
+# DEFAULT_DRINK_PRICE = None
 
 DEBUG_LEVEL = os.environ.get("DEBUG_LEVEL", "False") in [
     "True",

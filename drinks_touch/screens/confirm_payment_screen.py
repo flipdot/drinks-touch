@@ -1,8 +1,8 @@
 import config
 from database.models import Tx, Sale, Account, Drink
 from database.storage import Session, with_db
-from drinks.drinks_manager import DrinksManager
 from elements import Label, Button
+from elements.hbox import HBox
 from elements.spacer import Spacer
 from elements.vbox import VBox
 from notifications.notification import send_drink
@@ -12,30 +12,21 @@ from screens.success import SuccessScreen
 
 class ConfirmPaymentScreen(Screen):
 
-    def __init__(self, account: Account, barcode: str | None):
+    def __init__(self, account: Account, drink: Drink):
         super().__init__()
         self.account = account
-        self.barcode = barcode
-        self.drink: Drink | None = None
-
-        # Keeping name and price as separate attributes, to allow
-        # drinking unknown drinks.
-        # Will be refactored later to allow users to create new drink entries in the DB
-        self.drink_name = "Unbekannt"
-        self.price = config.DEFAULT_DRINK_PRICE
+        self.drink = drink
 
     @with_db
     def on_start(self):
-        self.drink = (
-            Session().query(Drink).filter(Drink.ean == self.barcode).one_or_none()
-        )
 
-        if self.drink:
-            self.drink_name = self.drink.name
-            self.price = self.drink.price or config.DEFAULT_DRINK_PRICE
-
-        if not self.price:
-            raise NotImplementedError("Display that a price has yet to be determined")
+        if not self.drink.price:
+            if config.DEFAULT_DRINK_PRICE:
+                self.drink.price = config.DEFAULT_DRINK_PRICE
+            else:
+                raise NotImplementedError(
+                    "Display that a price has yet to be determined"
+                )
 
         self.objects = [
             Label(
@@ -58,28 +49,32 @@ class ConfirmPaymentScreen(Screen):
             ),
             Label(
                 text="Auswahl bestätigen",
-                pos=(5, 100),
-                size=48,
+                pos=(5, 120),
+                size=32,
             ),
             VBox(
                 [
                     Label(
-                        text=self.drink_name,
+                        text=self.drink.name,
                         size=30,
                     ),
                     Spacer(height=20),
-                    Label(
-                        text=f"Preis: {self.price:.02f} €",
-                        size=50,
+                    HBox(
+                        [
+                            Spacer(width=config.SCREEN_WIDTH / 4),
+                            Label(
+                                text=f"{self.drink.price:.02f} €",
+                                size=70,
+                            ),
+                        ]
                     ),
                     Spacer(height=10),
                     Label(
-                        text=f"EAN: {self.barcode}",
+                        text=f"EAN: {self.drink.ean}",
                         size=20,
                     ),
                 ],
-                gap=15,
-                pos=(5, 200),
+                pos=(5, 250),
             ),
             Button(
                 text="Trinken",
@@ -91,33 +86,38 @@ class ConfirmPaymentScreen(Screen):
             ),
         ]
 
-    def on_stop(self, *args, **kwargs):
-        DrinksManager.instance.selected_barcode = None
-
     def on_barcode(self, barcode: str):
+        from screens.drink_scanned import DrinkScannedScreen
+
         if not barcode:
             self.save_drink()
             return
+        self.goto(DrinkScannedScreen(barcode), replace=True)
 
     @with_db
     def save_drink(self):
-        assert self.price, "Price must be set before saving a drink"
+        assert self.drink.price, "Price must be set before saving a drink"
         transaction = Tx(
-            payment_reference=f'Kauf "{self.drink_name}"',
-            ean=self.barcode,
+            payment_reference=f'Kauf "{self.drink.name}"',
+            ean=self.drink.ean,
             account_id=self.account.id,
-            amount=-1 * self.price,
+            amount=-1 * self.drink.price,
         )
         Session().add(transaction)
-        sale = Sale(ean=self.barcode)
+        sale = Sale(ean=self.drink.ean)
         Session().add(sale)
 
         self.goto(
             SuccessScreen(
                 self.account,
-                f"getrunken: {self.drink_name}",
-                on_start_fn=lambda: send_drink(self.account, self.drink_name),
+                f"getrunken: {self.drink.name}",
+                on_start_fn=lambda: send_drink(self.account, self.drink.name),
                 offer_games=True,
             ),
             replace=True,
         )
+
+    # @staticmethod
+    # def back():
+    #     GlobalState.reset()
+    #     super(ConfirmPaymentScreen, ConfirmPaymentScreen).back()

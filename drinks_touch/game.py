@@ -14,7 +14,6 @@ from alembic.script import ScriptDirectory
 
 import config
 from database.storage import engine
-from drinks.drinks_manager import DrinksManager
 from overlays import MouseOverlay, BaseOverlay
 from overlays.keyboard import KeyboardOverlay
 from screens.message_screen import MessageScreen
@@ -60,8 +59,6 @@ def handle_events(events, t: int, dt: float, overlays: list[BaseOverlay]) -> boo
 # Rendering #
 def main():
     locale.setlocale(locale.LC_ALL, "de_DE.UTF-8")
-
-    DrinksManager()
 
     screen_manager = ScreenManager()
 
