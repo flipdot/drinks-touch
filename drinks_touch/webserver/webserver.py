@@ -21,6 +21,7 @@ from users.qr import make_sepa_qr
 from .shared import db, oidc
 from .blueprints.recharge import bp as recharge_bp
 from .blueprints.account import bp as account_bp
+from .blueprints.drinks import bp as drinks_bp
 
 
 def create_oidc_config() -> dict:
@@ -58,6 +59,7 @@ uid_pattern = re.compile(r"^\d+$")
 
 app.register_blueprint(recharge_bp, url_prefix="/recharge")
 app.register_blueprint(account_bp, url_prefix="/account")
+app.register_blueprint(drinks_bp, url_prefix="/drinks")
 
 
 @app.before_request
@@ -93,7 +95,7 @@ def add_template_globals():
 
     navigation = [
         {"target": "index", "title": "Home"},
-        # {"target": "pricelist.index", "title": "Preisliste"},
+        {"target": "drinks.pricelist", "title": "Preisliste"},
         # {"target": "recharge", "title": "Tetris"},
     ]
     if current_user:

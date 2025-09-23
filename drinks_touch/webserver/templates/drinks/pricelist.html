@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% from "macros.html" import render_pagination %}
+
+{% block body %}
+	<h2>Preisliste</h2>
+    <table>
+            <thead>
+                <tr>
+                    <th>Getränk</th>
+                    <th>EAN</th>
+                    <th>Preis</th>
+                </tr>
+            </thead>
+    <tbody>
+        {% for drink in drinks %}
+            <tr>
+                <td>{{ drink.name }}</td>
+                <td>{{ drink.ean }}</td>
+                <td>{{ drink.price }} €</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+    </table>
+    {{ render_pagination(drinks, 'drinks.pricelist') }}
+{% endblock %}
