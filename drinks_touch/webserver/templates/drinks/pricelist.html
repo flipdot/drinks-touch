@@ -1,22 +1,27 @@
 {% extends "base.html" %}
 {% from "macros.html" import render_pagination %}
 
+{% block head %}
+    <link href="{{ url_for("static", filename="css/table.css") }}" rel="stylesheet">
+    <link href="{{ url_for("static", filename="css/pagination.css") }}" rel="stylesheet">
+{% endblock %}
+
 {% block body %}
 	<h2>Preisliste</h2>
     <table>
-            <thead>
-                <tr>
-                    <th>Getränk</th>
-                    <th>EAN</th>
-                    <th>Preis</th>
-                </tr>
-            </thead>
+        <thead>
+            <tr>
+                <th>Getränk</th>
+                <th>EAN</th>
+                <th>Preis</th>
+            </tr>
+        </thead>
     <tbody>
         {% for drink in drinks %}
-            <tr>
+            <tr class="{{ loop.cycle('odd', 'even') }}">
                 <td>{{ drink.name }}</td>
                 <td>{{ drink.ean }}</td>
-                <td>{{ drink.price }} €</td>
+                <td class="align-right">{{ drink.price or '-.--' }} €</td>
             </tr>
         {% endfor %}
     </tbody>

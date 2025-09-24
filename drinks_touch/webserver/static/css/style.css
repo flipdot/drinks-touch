@@ -11,9 +11,12 @@
 :root {
     /* Color Palette (Light Mode) */
     --color-text: #212529;
+    --color-text-on-primary-bg: #e9ecef;
     --color-muted-text: #6c757d;
     --color-background: #f8f9fa;
+    --color-background-focus: #d3d3d3;
     --color-primary: #007bff;
+    /*--color-primary: #58a6ff;*/
     --color-subtle-background: #e9ecef;
     --color-border: #dee2e6;
 
@@ -30,14 +33,18 @@
     /* Sizing & Spacing */
     --content-max-width: 80ch; /* ~80 characters wide for readability */
     --spacing-unit: 1rem;
+
+    --border-radius: 8px;
 }
 
 @media (prefers-color-scheme: dark) {
     :root {
         /* Color Palette (Dark Mode) */
         --color-text: #e9ecef;
+        --color-text-on-primary-bg: #e9ecef;
         --color-muted-text: #adb5bd;
         --color-background: #212529;
+        --color-background-focus: #3a3f46;
         --color-primary: #58a6ff;
         --color-subtle-background: #343a40;
         --color-border: #495057;

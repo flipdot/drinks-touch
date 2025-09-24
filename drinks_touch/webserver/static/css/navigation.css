@@ -1,7 +1,7 @@
 .main-nav {
     background-color: var(--color-subtle-background);
     padding: 0.5rem 1rem;
-    border-radius: 8px;
+    border-radius: var(--border-radius);
     margin-top: 1.5rem;
     z-index: 100;
     position: relative;

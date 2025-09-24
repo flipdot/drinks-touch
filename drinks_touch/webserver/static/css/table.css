@@ -1,0 +1,29 @@
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+th, td {
+    padding: 8px;
+}
+
+tr {
+    transition: background-color 0.2s ease;
+}
+
+tr.even {
+    background-color: color-mix(in srgb, var(--color-subtle-background) 40%, transparent);
+}
+
+tr:hover {
+    background-color: var(--color-background-focus);
+}
+
+td.align-right {
+    text-align: right;
+}
+
+th {
+    background-color: var(--color-subtle-background);
+    border-color: var(--color-subtle-background);
+}
