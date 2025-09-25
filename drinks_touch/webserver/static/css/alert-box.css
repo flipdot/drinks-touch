@@ -1,5 +1,6 @@
 .alert {
     padding: var(--spacing-unit);
+    margin-top: var(--spacing-unit);
     border: 1px solid var(--color-border);
     border-left-width: 4px;
     background-color: var(--color-subtle-background);

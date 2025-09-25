@@ -1,8 +1,10 @@
 {% extends "base.html" %}
 {% block title %}{{ super() }} – Aufladen{% endblock %}
+
 {% block head %}
-    <link href="{{ url_for("static", filename="css/recharge.css") }}" rel="stylesheet">
+    <link href="{{ url_for("static", filename="css/form.css") }}" rel="stylesheet">
 {% endblock %}
+
 {% block body %}
     <h2>Guthaben aufladen</h2>
     <ol>
@@ -17,8 +19,10 @@
             {{ form.amount.label }} {{ form.amount(size=20) }}
             {{ form.confirm_cash_deposited.label }} {{ form.confirm_cash_deposited(size=20) }}
         </fieldset>
-        <button type="submit" class="btn btn-default">
-            Aufladung durchführen
-        </button>
+        <div class="btn-group">
+            <button type="submit" class="btn btn-default">
+                Aufladung durchführen
+            </button>
+        </div>
     </form>
 {% endblock %}

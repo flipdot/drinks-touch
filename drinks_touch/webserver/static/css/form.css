@@ -12,7 +12,7 @@
 
 .form-grid input[type="number"],
 .form-grid input[type="text"] {
-    width: 7em;
+    width: 12em;
     padding: 0.75rem;
     border: 1px solid var(--color-border);
     border-radius: 8px;

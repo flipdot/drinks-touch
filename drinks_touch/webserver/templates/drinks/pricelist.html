@@ -13,7 +13,10 @@
             <tr>
                 <th>Getränk</th>
                 <th>EAN</th>
-                <th>Preis</th>
+                <th class="align-right">Preis</th>
+                {% if current_user %}
+                    <th></th>
+                {% endif %}
             </tr>
         </thead>
     <tbody>
@@ -22,6 +25,13 @@
                 <td>{{ drink.name }}</td>
                 <td>{{ drink.ean }}</td>
                 <td class="align-right">{{ drink.price or '-.--' }} €</td>
+                {% if current_user %}
+                    <td class="actions">
+                        <a href="{{ url_for('drinks.edit', ean=drink.ean) }}">
+                            <i class="feather icon-edit"></i>
+                        </a>
+                    </td>
+                {% endif %}
             </tr>
         {% endfor %}
     </tbody>

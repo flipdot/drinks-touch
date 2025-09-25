@@ -126,9 +126,9 @@ pre {
 }
 
 /* lobotomized owl selector */
-* + * {
-    margin-top: var(--spacing-unit);
-}
+/** + * {*/
+/*    margin-top: var(--spacing-unit);*/
+/*}*/
 
 /* --- 4. Responsive Media --- */
 /*
@@ -147,6 +147,7 @@ svg {
 /* --- 5. Forms & Buttons (Simple Styling) --- */
 
 button,
+.btn,
 input,
 select,
 textarea {
@@ -159,14 +160,26 @@ textarea {
     color: var(--color-text);
 }
 
-button {
+button, .btn {
     cursor: pointer;
     background-color: var(--color-primary);
     color: var(--color-background);
     border-color: var(--color-primary);
 }
 
-button:hover {
+.btn-secondary {
+    background-color: transparent;
+    color: var(--color-text);
+    border-color: var(--color-primary);
+}
+
+.btn-danger {
+    background-color: var(--color-negative);
+    border-color: var(--color-negative);
+    color: var(--color-background);
+}
+
+button:hover, .btn:hover {
     opacity: 0.85;
 }
 
@@ -195,4 +208,18 @@ button:hover {
     to {
         width: 0;
     }
+}
+
+.align-right {
+    text-align: right;
+}
+
+.btn-group {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: var(--spacing-unit);
+}
+
+.btn-group > * {
+    margin-top: 0;
 }

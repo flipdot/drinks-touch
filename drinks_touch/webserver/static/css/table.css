@@ -3,6 +3,10 @@ table {
     width: 100%;
 }
 
+table a:hover {
+    text-decoration: none;
+}
+
 th, td {
     padding: 8px;
 }
@@ -19,11 +23,17 @@ tr:hover {
     background-color: var(--color-background-focus);
 }
 
-td.align-right {
-    text-align: right;
-}
-
 th {
     background-color: var(--color-subtle-background);
     border-color: var(--color-subtle-background);
+}
+
+td.actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+}
+
+td.actions > * {
+    margin: 0;
 }

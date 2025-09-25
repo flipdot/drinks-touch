@@ -16,7 +16,7 @@ class EditDrinkScreen(screen.Screen):
         self.drink = drink
 
     def on_start(self, *args, **kwargs):
-        url = f"{config.BASE_URL}/drinks/{self.drink.ean}"
+        url = f"{config.BASE_URL}/drinks/{self.drink.ean}/edit"
         if self.drink.price:
             price = f"{self.drink.price} €"
         else:

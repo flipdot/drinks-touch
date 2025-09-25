@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <link href="{{ url_for("static", filename="css/form.css") }}" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+    <h2>Bearbeite „{{ drink.ean }}“</h2>
+    <form method="POST">
+        {{ form.csrf_token }}
+        <fieldset class="form-grid">
+            {{ form.name.label }} {{ form.name(size=200) }}
+            {{ form.price.label }} {{ form.price(size=20) }}
+        </fieldset>
+        <div class="btn-group">
+            <button type="submit">
+                <i class="feather icon-save"></i> Speichern
+            </button>
+            <button type="submit" name="action" value="delete" class="btn-danger">
+                <i class="feather icon-trash-2"></i> Löschen
+            </button>
+            <a href="{{ url_for('drinks.pricelist') }}" class="btn btn-secondary">
+                Abbrechen
+            </a>
+        </div>
+    </form>
+{% endblock %}
