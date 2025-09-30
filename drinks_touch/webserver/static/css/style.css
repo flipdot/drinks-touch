@@ -11,9 +11,12 @@
 :root {
     /* Color Palette (Light Mode) */
     --color-text: #212529;
+    --color-text-on-primary-bg: #e9ecef;
     --color-muted-text: #6c757d;
     --color-background: #f8f9fa;
+    --color-background-focus: #d3d3d3;
     --color-primary: #007bff;
+    /*--color-primary: #58a6ff;*/
     --color-subtle-background: #e9ecef;
     --color-border: #dee2e6;
 
@@ -30,14 +33,18 @@
     /* Sizing & Spacing */
     --content-max-width: 80ch; /* ~80 characters wide for readability */
     --spacing-unit: 1rem;
+
+    --border-radius: 8px;
 }
 
 @media (prefers-color-scheme: dark) {
     :root {
         /* Color Palette (Dark Mode) */
         --color-text: #e9ecef;
+        --color-text-on-primary-bg: #e9ecef;
         --color-muted-text: #adb5bd;
         --color-background: #212529;
+        --color-background-focus: #3a3f46;
         --color-primary: #58a6ff;
         --color-subtle-background: #343a40;
         --color-border: #495057;
@@ -119,9 +126,9 @@ pre {
 }
 
 /* lobotomized owl selector */
-* + * {
-    margin-top: var(--spacing-unit);
-}
+/** + * {*/
+/*    margin-top: var(--spacing-unit);*/
+/*}*/
 
 /* --- 4. Responsive Media --- */
 /*
@@ -140,6 +147,7 @@ svg {
 /* --- 5. Forms & Buttons (Simple Styling) --- */
 
 button,
+.btn,
 input,
 select,
 textarea {
@@ -152,14 +160,26 @@ textarea {
     color: var(--color-text);
 }
 
-button {
+button, .btn {
     cursor: pointer;
     background-color: var(--color-primary);
     color: var(--color-background);
     border-color: var(--color-primary);
 }
 
-button:hover {
+.btn-secondary {
+    background-color: transparent;
+    color: var(--color-text);
+    border-color: var(--color-primary);
+}
+
+.btn-danger {
+    background-color: var(--color-negative);
+    border-color: var(--color-negative);
+    color: var(--color-background);
+}
+
+button:hover, .btn:hover {
     opacity: 0.85;
 }
 
@@ -188,4 +208,18 @@ button:hover {
     to {
         width: 0;
     }
+}
+
+.align-right {
+    text-align: right;
+}
+
+.btn-group {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: var(--spacing-unit);
+}
+
+.btn-group > * {
+    margin-top: 0;
 }

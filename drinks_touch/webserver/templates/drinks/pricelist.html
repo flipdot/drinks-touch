@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% from "macros.html" import render_pagination %}
+
+{% block head %}
+    <link href="{{ url_for("static", filename="css/table.css") }}" rel="stylesheet">
+    <link href="{{ url_for("static", filename="css/pagination.css") }}" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+	<h2>Preisliste</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Getränk</th>
+                <th>EAN</th>
+                <th class="align-right">Preis</th>
+                {% if current_user %}
+                    <th></th>
+                {% endif %}
+            </tr>
+        </thead>
+    <tbody>
+        {% for drink in drinks %}
+            <tr class="{{ loop.cycle('odd', 'even') }}">
+                <td>{{ drink.name }}</td>
+                <td>{{ drink.ean }}</td>
+                <td class="align-right">{{ drink.price or '-.--' }} €</td>
+                {% if current_user %}
+                    <td class="actions">
+                        <a href="{{ url_for('drinks.edit', ean=drink.ean) }}">
+                            <i class="feather icon-edit"></i>
+                        </a>
+                    </td>
+                {% endif %}
+            </tr>
+        {% endfor %}
+    </tbody>
+    </table>
+    {{ render_pagination(drinks, 'drinks.pricelist') }}
+{% endblock %}

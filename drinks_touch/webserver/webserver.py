@@ -21,6 +21,7 @@ from users.qr import make_sepa_qr
 from .shared import db, oidc
 from .blueprints.recharge import bp as recharge_bp
 from .blueprints.account import bp as account_bp
+from .blueprints.drinks import bp as drinks_bp
 
 
 def create_oidc_config() -> dict:
@@ -45,6 +46,8 @@ app.config.update(
     {
         "SQLALCHEMY_DATABASE_URI": config.POSTGRES_CONNECTION_STRING,
         "OIDC_CLIENT_SECRETS": create_oidc_config(),
+        "OIDC_CALLBACK_ROUTE": "/authorize",
+        "OVERWRITE_REDIRECT_URI": f"{config.BASE_URL}/authorize",
         "SECRET_KEY": config.SECRET_KEY,
         "SERVER_NAME": config.DOMAIN,
     }
@@ -58,6 +61,7 @@ uid_pattern = re.compile(r"^\d+$")
 
 app.register_blueprint(recharge_bp, url_prefix="/recharge")
 app.register_blueprint(account_bp, url_prefix="/account")
+app.register_blueprint(drinks_bp, url_prefix="/drinks")
 
 
 @app.before_request
@@ -93,17 +97,18 @@ def add_template_globals():
 
     navigation = [
         {"target": "index", "title": "Home"},
-        # {"target": "pricelist.index", "title": "Preisliste"},
+        {"target": "drinks.pricelist", "title": "Preisliste"},
+        {"target": "recharge.index", "title": "Guthaben aufladen"},
         # {"target": "recharge", "title": "Tetris"},
     ]
-    if current_user:
-        navigation.extend(
-            [
-                {"target": "recharge.index", "title": "Guthaben aufladen"},
-                # {"target": "account.index", "title": "Einstellungen"},
-                # {"target": "recharge", "title": "Transaktionshistorie"},
-            ]
-        )
+    # if current_user:
+    #     navigation.extend(
+    #         [
+    #             {"target": "recharge.index", "title": "Guthaben aufladen"},
+    #             # {"target": "account.index", "title": "Einstellungen"},
+    #             # {"target": "recharge", "title": "Transaktionshistorie"},
+    #         ]
+    #     )
     return {
         "navigation": navigation,
         "current_user": current_user,
