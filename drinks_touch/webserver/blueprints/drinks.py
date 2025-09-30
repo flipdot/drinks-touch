@@ -9,7 +9,7 @@ from wtforms.fields.simple import StringField
 from wtforms.validators import InputRequired
 
 from database.models import Drink
-from webserver.shared import db
+from webserver.shared import db, oidc
 
 bp = Blueprint("drinks", __name__)
 
@@ -44,6 +44,7 @@ def pricelist():
 
 
 @bp.route("/<ean>/edit", methods=["GET", "POST"])
+@oidc.require_login
 def edit(ean):
     drink = db.one_or_404(db.select(Drink).filter_by(ean=ean))
     if not drink:
