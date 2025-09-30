@@ -47,6 +47,7 @@ app.config.update(
         "SQLALCHEMY_DATABASE_URI": config.POSTGRES_CONNECTION_STRING,
         "OIDC_CLIENT_SECRETS": create_oidc_config(),
         "OIDC_CALLBACK_ROUTE": "/authorize",
+        "OVERWRITE_REDIRECT_URI": f"{config.BASE_URL}/authorize",
         "SECRET_KEY": config.SECRET_KEY,
         "SERVER_NAME": config.DOMAIN,
     }
