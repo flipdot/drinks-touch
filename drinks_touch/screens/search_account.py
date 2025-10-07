@@ -15,7 +15,17 @@ class SearchAccountScreen(Screen):
 
     idle_timeout = 30
 
+    def __init__(self, initial_text: str = ""):
+        super().__init__()
+        self.initial_text = initial_text
+
     def on_start(self, *args, **kwargs):
+        if self.initial_text:
+            completions = auto_complete_account_name(self.initial_text)
+            if len(completions) == 1:
+                self.select_account(completions[0], replace=True)
+                return
+
         self.objects = [
             Label(
                 text="Account suchen",
@@ -30,6 +40,7 @@ class SearchAccountScreen(Screen):
                     height=80,
                     auto_complete=auto_complete_account_name,
                     only_auto_complete=True,
+                    initial_text=self.initial_text,
                 )
             ),
         ]
@@ -41,10 +52,10 @@ class SearchAccountScreen(Screen):
             self.back()
 
     @with_db
-    def select_account(self, text: str):
+    def select_account(self, text: str, replace: bool = False):
         query = select(Account).filter(Account.name == text)
         account = Session().execute(query).scalar_one_or_none()
         if account:
-            self.goto(ProfileScreen(account))
+            self.goto(ProfileScreen(account), replace=replace)
         else:
             self.alert(f'Account "{text}" nicht gefunden')

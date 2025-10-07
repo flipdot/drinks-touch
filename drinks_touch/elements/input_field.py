@@ -42,6 +42,7 @@ class InputField(BaseElm):
         auto_complete: callable | None = None,
         only_auto_complete: bool = False,
         on_submit: callable | None = None,
+        initial_text: str = "",
         **kwargs,
     ):
         """
@@ -64,7 +65,7 @@ class InputField(BaseElm):
         self.auto_complete = auto_complete
         self.only_auto_complete = only_auto_complete
         self.on_submit = on_submit
-        self.text = ""
+        self.text = initial_text
         self.is_active = False
 
     def __repr__(self):

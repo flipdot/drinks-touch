@@ -1,3 +1,4 @@
+import re
 from datetime import datetime
 import functools
 import logging
@@ -280,3 +281,10 @@ class WaitScanScreen(Screen):
             self.goto(SearchAccountScreen())
             return
         self.goto(DrinkScannedScreen(barcode))
+
+    def event(self, event) -> bool:
+        ret = super().event(event)
+        if self._keyboard_input and not re.fullmatch(r"\d+", self._keyboard_input):
+            self.goto(SearchAccountScreen(self._keyboard_input))
+            self._keyboard_input = ""
+        return ret
