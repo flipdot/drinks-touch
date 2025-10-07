@@ -1,4 +1,5 @@
 import functools
+import re
 
 from sqlalchemy import select
 
@@ -122,3 +123,10 @@ class DrinkScannedScreen(Screen):
             self.goto(SearchAccountScreen(), replace=True)
             return
         self.goto(DrinkScannedScreen(barcode), replace=True)
+
+    def event(self, event) -> bool:
+        ret = super().event(event)
+        if self._keyboard_input and not re.fullmatch(r"\d+", self._keyboard_input):
+            self.goto(SearchAccountScreen(self._keyboard_input))
+            self._keyboard_input = ""
+        return ret
