@@ -118,7 +118,7 @@ class Screen:
         for obj in self.objects[::-1]:
             if obj.event(event):
                 return True
-        if event.type == pygame.KEYUP:
+        if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_RETURN:
                 self.on_barcode(self._keyboard_input)
                 self._keyboard_input = ""
