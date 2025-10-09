@@ -3,9 +3,7 @@ from decimal import Decimal
 
 from flask import Blueprint, render_template, g, url_for, flash, redirect
 from flask_wtf import FlaskForm
-from wtforms import validators
-from wtforms.fields.numeric import DecimalField
-from wtforms.fields.simple import BooleanField
+from wtforms import validators, DecimalField, BooleanField
 from wtforms.validators import InputRequired
 
 from webserver.shared import db, oidc

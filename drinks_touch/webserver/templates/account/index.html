@@ -1,8 +1,22 @@
 {% extends "base.html" %}
 
+{% block head %}
+    <link href="{{ url_for("static", filename="css/form.css") }}" rel="stylesheet">
+{% endblock %}
+
 {% block body %}
     <h2>Account</h2>
     <form method="POST">
-    Work in progress
+        {{ form.csrf_token }}
+        <fieldset class="form-grid">
+            <legend>Kontoeinstellungen</legend>
+            {{ form.tx_history_visible.label }} {{ form.tx_history_visible }}
+            {{ form.summary_email_notification_setting.label }} {{ form.summary_email_notification_setting(size=10) }}
+        </fieldset>
+        <div class="btn-group">
+            <button type="submit" class="btn btn-default">
+                Speichern
+            </button>
+        </div>
     </form>
 {% endblock %}
