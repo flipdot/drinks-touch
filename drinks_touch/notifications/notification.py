@@ -1,4 +1,5 @@
 import functools
+import threading
 import time
 from datetime import datetime
 
@@ -53,6 +54,10 @@ def send_notification(to_address, subject, content_text, content_html, uid):
     logger.info("Mailing %s: '%s'", to_address, subject)
     logger.debug("Content: ---\n%s\n---", content_text)
 
+    from time import sleep
+
+    # TODO: remove, just testing bad performance
+    sleep(3)
     s = smtplib.SMTP(config.MAIL_HOST, port=config.MAIL_PORT)
     s.connect(host=config.MAIL_HOST, port=config.MAIL_PORT)
     s.ehlo()
@@ -76,13 +81,17 @@ def send_drink(account: Account, drink_name: str):
     content_text = render_jinja_template("instant.txt", **context)
     content_html = render_jinja_template("instant.html", **context)
 
-    send_notification(
-        account.email,
-        "Getränk getrunken",
-        content_text,
-        content_html,
-        account.ldap_id,
+    thread = threading.Thread(
+        target=lambda: send_notification(
+            account.email,
+            "Getränk getrunken",
+            content_text,
+            content_html,
+            account.ldap_id,
+        )
     )
+    thread.daemon = True
+    thread.start()
 
 
 def format_drinks(drinks_consumed: list[Tx]):

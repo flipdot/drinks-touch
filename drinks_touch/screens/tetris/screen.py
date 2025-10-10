@@ -850,6 +850,9 @@ class TetrisScreen(Screen):
         if event.type != pygame.KEYDOWN:
             return super().event(event)
 
+        if not self.game_started:
+            return super().event(event)
+
         if event.key == pygame.K_LEFT:
             self.on_left()
         elif event.key == pygame.K_RIGHT:
@@ -862,9 +865,6 @@ class TetrisScreen(Screen):
             self.on_rotate(clockwise=False)
         elif event.key == pygame.K_r:
             self.use_reserve_block()
-        elif event.key == pygame.K_x:
-            # for debugging purposes
-            self.game_over = True
         else:
             return super().event(event)
         return True

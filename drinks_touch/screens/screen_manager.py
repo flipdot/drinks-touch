@@ -123,6 +123,9 @@ class ScreenManager:
         self.set_idle_timeout(new_active_screen.idle_timeout)
 
     def reset_history(self):
+        current_screen = self.get_active()
+        if current_screen is not None:
+            current_screen.on_stop()
         self.screen_history = []
 
     @property

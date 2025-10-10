@@ -45,13 +45,20 @@ class SuccessScreen(Screen):
         text,
         offer_games: bool = False,
         on_start_fn: Callable | None = None,
+        on_stop_fn: Callable | None = None,
     ):
         super().__init__()
 
         self.account = account
         self.text = text
         self.on_start_fn = on_start_fn
+        self.on_stop_fn = on_stop_fn
         self.offer_games = offer_games
+
+    @with_db
+    def on_stop(self, *args, **kwargs):
+        if self.on_stop_fn:
+            self.on_stop_fn()
 
     @with_db
     def on_start(self, *args, **kwargs):
@@ -118,7 +125,7 @@ class SuccessScreen(Screen):
             self.on_start_fn()
 
     def event(self, event) -> BaseElm | None:
-        if event.type == pygame.KEYUP and event.key == pygame.K_RETURN:
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
             if self.offer_games:
                 self.goto(TetrisScreen(self.account))
             else:
