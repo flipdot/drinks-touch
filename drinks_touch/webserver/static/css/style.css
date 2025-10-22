@@ -219,6 +219,10 @@ button:hover, .btn:hover {
     text-align: right;
 }
 
+.align-left {
+    text-align: left;
+}
+
 .btn-group {
     display: flex;
     gap: 1.5rem;
