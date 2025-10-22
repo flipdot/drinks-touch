@@ -98,6 +98,7 @@ def add_template_globals():
     navigation = [
         {"target": "index", "title": "Home"},
         {"target": "drinks.pricelist", "title": "Preisliste"},
+        {"target": "account.txhistory", "title": "Historie"},
         {"target": "recharge.index", "title": "Guthaben aufladen"},
         # {"target": "recharge", "title": "Tetris"},
     ]

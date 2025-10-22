@@ -2,13 +2,14 @@ from flask import Blueprint, render_template, g, redirect, url_for, flash
 from flask_wtf import FlaskForm
 from wtforms import SelectField, BooleanField
 
+from database.models import Tx
 from webserver.shared import oidc, db
 
 bp = Blueprint("account", __name__)
 
 
 class AccountForm(FlaskForm):
-    tx_history_visible = BooleanField("Transaktionshistorie anzeigen")
+    tx_history_visible = BooleanField("Transaktionshistorie am Scanner anzeigen")
     summary_email_notification_setting = SelectField(
         "Benachrichtigungen",
         choices=[
@@ -38,3 +39,21 @@ def index():
         flash("Einstellungen gespeichert", "success")
         return redirect(url_for("account.index"))
     return render_template("account/index.html", form=form)
+
+
+@bp.route("/tx-history", methods=["GET"])
+@oidc.require_login
+def txhistory():
+    # txs = (
+    #     db.session.query(db.models.Tx)
+    #     .filter_by(account_id=g.account.id)
+    #     .order_by(db.models.Tx.created_at.desc())
+    #     .all()
+    # )
+    query = (
+        db.select(Tx)
+        .where(Tx.account_id == g.account.id)
+        .order_by(Tx.created_at.desc())
+    )
+    txs = db.paginate(query, per_page=20, max_per_page=100)
+    return render_template("account/tx_history.html", transactions=txs)

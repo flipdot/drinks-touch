@@ -188,6 +188,11 @@ button:hover, .btn:hover {
     font-weight: bold;
 }
 
+.text-positive {
+    color: var(--color-success);
+    font-weight: bold;
+}
+
 .timer-bar-container {
     width: 100%;
     height: 5px;

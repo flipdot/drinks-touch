@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% from "macros.html" import render_pagination %}
+
+{% block title %}Transaktionshistorie{% endblock %}
+
+{% block head %}
+    <link href="{{ url_for("static", filename="css/table.css") }}" rel="stylesheet">
+    <link href="{{ url_for("static", filename="css/pagination.css") }}" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+    <h1>Meine Transaktionshistorie</h1>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Datum</th>
+            <th>Beschreibung</th>
+            <th>Betrag</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for transaction in transactions %}
+            <tr class="{{ loop.cycle('odd', 'even') }}">
+                <td>{{ transaction.created_at.strftime("%Y-%m-%d %H:%M") }}</td>
+                <td>{{ transaction.payment_reference }}</td>
+                <td class="align-right text-{{ 'negative' if transaction.amount < 0 else 'positive' }}">{{ transaction.amount }}
+                    €
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="4">Keine Transaktionen gefunden.</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {{ render_pagination(transactions, 'account.txhistory') }}
+{% endblock %}
