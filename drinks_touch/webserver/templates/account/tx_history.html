@@ -23,8 +23,7 @@
             <tr class="{{ loop.cycle('odd', 'even') }}">
                 <td>{{ transaction.created_at.strftime("%Y-%m-%d %H:%M") }}</td>
                 <td>{{ transaction.payment_reference }}</td>
-                <td class="align-right text-{{ 'negative' if transaction.amount < 0 else 'positive' }}">{{ transaction.amount }}
-                    €
+                <td class="align-right text-{{ 'negative' if transaction.amount < 0 else 'positive' }}">{{ transaction.amount }}&nbsp;€
                 </td>
             </tr>
         {% else %}
