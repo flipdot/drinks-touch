@@ -67,9 +67,6 @@ class WaitScanScreen(Screen):
     def on_start(self, *args, **kwargs):
         GlobalState.reset()
 
-        if datetime(2025, 10, 25, 13) < datetime.now() < datetime(2025, 10, 26, 8):
-            self.goto(PartyScreen(), replace=True)
-
         if config.ICAL_FILE_PATH.exists():
             try:
                 self.events = WaitScanScreen.load_events_from_ical(
@@ -166,8 +163,14 @@ class WaitScanScreen(Screen):
                 [
                     Button(
                         size=45,
-                        text="Benutzer",
-                        on_click=lambda: self.goto(MainScreen()),
+                        text=(
+                            "Party!"
+                            if datetime(2025, 10, 25, 13)
+                            < datetime.now()
+                            < datetime(2025, 10, 26, 8)
+                            else "Benutzer"
+                        ),
+                        on_click=self.goto_main_screen,
                     ),
                     Button(
                         text=None,
@@ -204,6 +207,12 @@ class WaitScanScreen(Screen):
     @functools.lru_cache(maxsize=1)
     def load_calendar(raw_ical: str) -> Calendar:
         return Calendar(raw_ical)
+
+    def goto_main_screen(self):
+        if datetime(2025, 10, 25, 13) < datetime.now() < datetime(2025, 10, 26, 8):
+            self.goto(PartyScreen())
+        else:
+            self.goto(MainScreen())
 
     @staticmethod
     def read_calendar(raw_ical: str) -> list[FlipdotEvent]:

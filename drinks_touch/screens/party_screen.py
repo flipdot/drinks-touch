@@ -14,7 +14,9 @@ from screens.tetris.screen import TetrisScreen
 
 
 class PartyScreen(Screen):
+    idle_timeout = 60000
 
+    @with_db
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         query = select(Account).filter(Account.name == "recharge")
@@ -76,7 +78,7 @@ class PartyScreen(Screen):
                 ),
                 on_click=lambda: self.goto(TetrisScreen(self.account)),
                 size=20,
-                pos=(40, config.SCREEN_HEIGHT - 100),
+                pos=(40, config.SCREEN_HEIGHT - 200),
             ),
         ]
 
