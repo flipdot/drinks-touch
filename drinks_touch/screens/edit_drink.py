@@ -1,6 +1,7 @@
 import config
 from config import Color
 from database.models import Drink
+from database.storage import with_db
 from elements import Label, Image
 from elements.hbox import HBox
 from elements.spacer import Spacer
@@ -15,6 +16,7 @@ class EditDrinkScreen(screen.Screen):
         super().__init__()
         self.drink = drink
 
+    @with_db
     def on_start(self, *args, **kwargs):
         url = f"{config.BASE_URL}/drinks/{self.drink.ean}/edit"
         if self.drink.price:

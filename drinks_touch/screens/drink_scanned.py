@@ -93,6 +93,12 @@ class DrinkScannedScreen(Screen):
                 ],
                 pos=(5, 270),
             ),
+            Button(
+                size=25,
+                text="Preis ändern",
+                on_click=lambda: self.goto(EditDrinkScreen(drink)),
+                pos=(150, 550),
+            ),
             HBox(
                 [
                     Button(
