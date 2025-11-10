@@ -2,5 +2,33 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "github>dargmuesli/renovate-config"
+  ],
+  "ignorePresets": ["group:allNonMajor"],
+  "packageRules": [
+    {
+      "groupName": "all non-major dependencies, except python",
+      "groupSlug": "all-minor-patch",
+      "matchPackageNames": [
+        "*",
+        "!python",
+        "!actions/python-versions"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ]
+    },
+    {
+      "groupName": "all non-major python dependencies",
+      "groupSlug": "all-minor-patch-python",
+      "matchPackageNames": [
+        "python",
+        "actions/python-versions"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ]
+    }
   ]
 }
