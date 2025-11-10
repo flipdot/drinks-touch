@@ -1,41 +1,44 @@
 name: CI
 
+permissions: {}
+
 on:
   pull_request:
   push:
     branches:
       - alpha
       - beta
+      - main
       - master
       - renovate/**
 
 jobs:
-  prepare_jobs:
-    name: "Prepare: job optimization"
-    runs-on: ubuntu-latest
-    outputs:
-      pr_found: ${{ steps.pr.outputs.pr_found }}
-    steps:
-      - name: Get current PR
-        id: pr
-        uses: 8BitJonny/gh-get-current-pr@4056877062a1f3b624d5d4c2bedefa9cf51435c9 # 4.0.0
-        with:
-          filterOutClosed: true
-          filterOutDraft: true
+  ci-optimization:
+    name: CI optimization
+    uses: dargmuesli/github-actions/.github/workflows/ci-optimization.yml@a8900fcf9e9d1e7f4c1138484cb7bf8d7bd3f3cb # 3.0.0
+    permissions:
+      pull-requests: read
   release_semantic_dry:
-    needs: prepare_jobs
+    needs: ci-optimization
+    if: needs.ci-optimization.outputs.continue == 'true'
     name: Release (semantic, dry)
     uses: dargmuesli/github-actions/.github/workflows/release-semantic.yml@714a68188444d710ffa3e9f35a05f6a9d420931d # 3.2.0
-    if: needs.prepare_jobs.outputs.pr_found == 'false' || github.event_name == 'pull_request'
+    permissions:
+      contents: write
+      id-token: write
     secrets:
       PERSONAL_ACCESS_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
     with:
       DRY_RUN: true
   pre-commit:
+    needs: ci-optimization
+    if: needs.ci-optimization.outputs.continue == 'true'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
-    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
-    - uses: actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c # v6
+    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+    - uses: actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c # v6.0.0
       with:
           python-version: '3.13'
     - uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # v3.0.1
@@ -43,6 +46,8 @@ jobs:
     name: Build
     uses: dargmuesli/github-actions/.github/workflows/docker.yml@714a68188444d710ffa3e9f35a05f6a9d420931d # 3.2.0
     needs: [release_semantic_dry, pre-commit]
+    permissions:
+      packages: write
     with:
       TAG: ${{ needs.release_semantic_dry.outputs.new_release_version }}
   release_semantic:
@@ -51,5 +56,6 @@ jobs:
     uses: dargmuesli/github-actions/.github/workflows/release-semantic.yml@714a68188444d710ffa3e9f35a05f6a9d420931d # 3.2.0
     permissions:
       contents: write
+      id-token: write
     secrets:
       PERSONAL_ACCESS_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
