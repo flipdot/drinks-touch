@@ -37,14 +37,14 @@ importers:
         specifier: 2.11.8
         version: 2.11.8
       autoprefixer:
-        specifier: 10.4.21
-        version: 10.4.21(postcss@8.5.6)
+        specifier: 10.4.22
+        version: 10.4.22(postcss@8.5.6)
       babel-loader:
         specifier: 10.0.0
         version: 10.0.0(@babel/core@7.28.5)(webpack@5.102.1)
       bootstrap-loader:
         specifier: 4.0.5
-        version: 4.0.5(css-loader@7.1.2(webpack@5.102.1))(mini-css-extract-plugin@2.9.4(webpack@5.102.1))(resolve-url-loader@5.0.0)(sass-loader@16.0.6(sass@1.93.3)(webpack@5.102.1))(sass@1.93.3)(url-loader@4.1.1(file-loader@6.2.0(webpack@5.102.1))(webpack@5.102.1))(webpack@5.102.1)
+        version: 4.0.5(css-loader@7.1.2(webpack@5.102.1))(mini-css-extract-plugin@2.9.4(webpack@5.102.1))(resolve-url-loader@5.0.0)(sass-loader@16.0.6(sass@1.94.0)(webpack@5.102.1))(sass@1.94.0)(url-loader@4.1.1(file-loader@6.2.0(webpack@5.102.1))(webpack@5.102.1))(webpack@5.102.1)
       bootstrap-sass:
         specifier: 3.4.3
         version: 3.4.3
@@ -79,11 +79,11 @@ importers:
         specifier: 5.0.0
         version: 5.0.0
       sass:
-        specifier: 1.93.3
-        version: 1.93.3
+        specifier: 1.94.0
+        version: 1.94.0
       sass-loader:
         specifier: 16.0.6
-        version: 16.0.6(sass@1.93.3)(webpack@5.102.1)
+        version: 16.0.6(sass@1.94.0)(webpack@5.102.1)
       style-loader:
         specifier: 4.0.0
         version: 4.0.0(webpack@5.102.1)
@@ -952,8 +952,8 @@ packages:
   array-ify@1.0.0:
     resolution: {integrity: sha512-c5AMf34bKdvPhQ7tBGhqkgKNUzMr4WUs+WDtC2ZUGOUncbxKMTvqxYctiseW3+L4bA8ec+GcZ6/A/FW4m8ukng==}
 
-  autoprefixer@10.4.21:
-    resolution: {integrity: sha512-O+A6LWV5LDHSJD3LjHYoNi4VLsj/Whi7k6zG12xTYaU4cQ8oxQGckXNX8cRHK5yOZ/ppVHe0ZBXGzSV9jXdVbQ==}
+  autoprefixer@10.4.22:
+    resolution: {integrity: sha512-ARe0v/t9gO28Bznv6GgqARmVqcWOV3mfgUPn9becPHMiD3o9BwlRgaeccZnwTpZ7Zwqrm+c1sUSsMxIzQzc8Xg==}
     engines: {node: ^10 || ^12 || >=14}
     hasBin: true
     peerDependencies:
@@ -1383,8 +1383,8 @@ packages:
     resolution: {integrity: sha512-b6suED+5/3rTpUBdG1gupIl8MPFCAMA0QXwmljLhvCUKcUvdE4gWky9zpuGCcXHOsz4J9wPGNWq6OKpmIzz3hQ==}
     hasBin: true
 
-  fraction.js@4.3.7:
-    resolution: {integrity: sha512-ZsDfxO51wGAXREY55a7la9LScWpwv9RxIrYABrlvOFBlH/ShPnrtsXeuUIfXKKOVicNxQ+o8JTbJvjS4M89yew==}
+  fraction.js@5.3.4:
+    resolution: {integrity: sha512-1X1NTtiJphryn/uLQz3whtY6jK3fTqoE3ohKs0tT+Ujr1W59oopxmoEh7Lu5p6vBaPbgoM0bzveAW4Qi5RyWDQ==}
 
   function-bind@1.1.2:
     resolution: {integrity: sha512-7XHNxH7qX9xG5mIwxkhumTox/MIRNcOgDrxWsMt2pAr23WHp6MrRlN7FBSFpCpr+oVO0F744iUgR82nJMfG2SA==}
@@ -2056,8 +2056,8 @@ packages:
       webpack:
         optional: true
 
-  sass@1.93.3:
-    resolution: {integrity: sha512-elOcIZRTM76dvxNAjqYrucTSI0teAF/L2Lv0s6f6b7FOwcwIuA357bIE871580AjHJuSvLIRUosgV+lIWx6Rgg==}
+  sass@1.94.0:
+    resolution: {integrity: sha512-Dqh7SiYcaFtdv5Wvku6QgS5IGPm281L+ZtVD1U2FJa7Q0EFRlq8Z3sjYtz6gYObsYThUOz9ArwFqPZx+1azILQ==}
     engines: {node: '>=14.0.0'}
     hasBin: true
 
@@ -3397,11 +3397,11 @@ snapshots:
 
   array-ify@1.0.0: {}
 
-  autoprefixer@10.4.21(postcss@8.5.6):
+  autoprefixer@10.4.22(postcss@8.5.6):
     dependencies:
       browserslist: 4.27.0
       caniuse-lite: 1.0.30001754
-      fraction.js: 4.3.7
+      fraction.js: 5.3.4
       normalize-range: 0.1.2
       picocolors: 1.1.1
       postcss: 8.5.6
@@ -3443,7 +3443,7 @@ snapshots:
 
   boolbase@1.0.0: {}
 
-  bootstrap-loader@4.0.5(css-loader@7.1.2(webpack@5.102.1))(mini-css-extract-plugin@2.9.4(webpack@5.102.1))(resolve-url-loader@5.0.0)(sass-loader@16.0.6(sass@1.93.3)(webpack@5.102.1))(sass@1.93.3)(url-loader@4.1.1(file-loader@6.2.0(webpack@5.102.1))(webpack@5.102.1))(webpack@5.102.1):
+  bootstrap-loader@4.0.5(css-loader@7.1.2(webpack@5.102.1))(mini-css-extract-plugin@2.9.4(webpack@5.102.1))(resolve-url-loader@5.0.0)(sass-loader@16.0.6(sass@1.94.0)(webpack@5.102.1))(sass@1.94.0)(url-loader@4.1.1(file-loader@6.2.0(webpack@5.102.1))(webpack@5.102.1))(webpack@5.102.1):
     dependencies:
       chalk: 2.4.2
       css-loader: 7.1.2(webpack@5.102.1)
@@ -3454,8 +3454,8 @@ snapshots:
       mini-css-extract-plugin: 2.9.4(webpack@5.102.1)
       resolve: 1.10.0
       resolve-url-loader: 5.0.0
-      sass: 1.93.3
-      sass-loader: 16.0.6(sass@1.93.3)(webpack@5.102.1)
+      sass: 1.94.0
+      sass-loader: 16.0.6(sass@1.94.0)(webpack@5.102.1)
       semver: 5.7.2
       strip-json-comments: 2.0.1
       url-loader: 4.1.1(file-loader@6.2.0(webpack@5.102.1))(webpack@5.102.1)
@@ -3821,7 +3821,7 @@ snapshots:
 
   flat@5.0.2: {}
 
-  fraction.js@4.3.7: {}
+  fraction.js@5.3.4: {}
 
   function-bind@1.1.2: {}
 
@@ -4384,14 +4384,14 @@ snapshots:
 
   safe-buffer@5.2.1: {}
 
-  sass-loader@16.0.6(sass@1.93.3)(webpack@5.102.1):
+  sass-loader@16.0.6(sass@1.94.0)(webpack@5.102.1):
     dependencies:
       neo-async: 2.6.2
     optionalDependencies:
-      sass: 1.93.3
+      sass: 1.94.0
       webpack: 5.102.1(webpack-cli@6.0.1)
 
-  sass@1.93.3:
+  sass@1.94.0:
     dependencies:
       chokidar: 4.0.3
       immutable: 5.1.4
