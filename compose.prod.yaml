@@ -6,7 +6,7 @@ services:
       POSTGRES_PASSWORD: drinks
       POSTGRES_DB: drinks
     volumes:
-      - db:/var/lib/postgresql/data
+      - db:/var/lib/postgresql
 
   drinks:
     build: .
