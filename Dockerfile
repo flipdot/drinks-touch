@@ -20,7 +20,7 @@ RUN pnpm install --offline
 
 ######################################################################
 # Stage name "development" is required for development with dargstack.
-FROM python:3.14.0-slim AS development
+FROM python:3.14.1-slim AS development
 
 ENV PYTHONUNBUFFERED=1
 
