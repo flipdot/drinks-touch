@@ -44,7 +44,7 @@ importers:
         version: 10.0.0(@babel/core@7.28.5)(webpack@5.104.1)
       bootstrap-loader:
         specifier: 4.0.5
-        version: 4.0.5(css-loader@7.1.2(webpack@5.104.1))(mini-css-extract-plugin@2.9.4(webpack@5.104.1))(resolve-url-loader@5.0.0)(sass-loader@16.0.6(sass@1.97.0)(webpack@5.104.1))(sass@1.97.0)(url-loader@4.1.1(file-loader@6.2.0(webpack@5.104.1))(webpack@5.104.1))(webpack@5.104.1)
+        version: 4.0.5(css-loader@7.1.2(webpack@5.104.1))(mini-css-extract-plugin@2.9.4(webpack@5.104.1))(resolve-url-loader@5.0.0)(sass-loader@16.0.6(sass@1.97.1)(webpack@5.104.1))(sass@1.97.1)(url-loader@4.1.1(file-loader@6.2.0(webpack@5.104.1))(webpack@5.104.1))(webpack@5.104.1)
       bootstrap-sass:
         specifier: 3.4.3
         version: 3.4.3
@@ -79,11 +79,11 @@ importers:
         specifier: 5.0.0
         version: 5.0.0
       sass:
-        specifier: 1.97.0
-        version: 1.97.0
+        specifier: 1.97.1
+        version: 1.97.1
       sass-loader:
         specifier: 16.0.6
-        version: 16.0.6(sass@1.97.0)(webpack@5.104.1)
+        version: 16.0.6(sass@1.97.1)(webpack@5.104.1)
       style-loader:
         specifier: 4.0.0
         version: 4.0.0(webpack@5.104.1)
@@ -2067,8 +2067,8 @@ packages:
       webpack:
         optional: true
 
-  sass@1.97.0:
-    resolution: {integrity: sha512-KR0igP1z4avUJetEuIeOdDlwaUDvkH8wSx7FdSjyYBS3dpyX3TzHfAMO0G1Q4/3cdjcmi3r7idh+KCmKqS+KeQ==}
+  sass@1.97.1:
+    resolution: {integrity: sha512-uf6HoO8fy6ClsrShvMgaKUn14f2EHQLQRtpsZZLeU/Mv0Q1K5P0+x2uvH6Cub39TVVbWNSrraUhDAoFph6vh0A==}
     engines: {node: '>=14.0.0'}
     hasBin: true
 
@@ -3461,7 +3461,7 @@ snapshots:
 
   boolbase@1.0.0: {}
 
-  bootstrap-loader@4.0.5(css-loader@7.1.2(webpack@5.104.1))(mini-css-extract-plugin@2.9.4(webpack@5.104.1))(resolve-url-loader@5.0.0)(sass-loader@16.0.6(sass@1.97.0)(webpack@5.104.1))(sass@1.97.0)(url-loader@4.1.1(file-loader@6.2.0(webpack@5.104.1))(webpack@5.104.1))(webpack@5.104.1):
+  bootstrap-loader@4.0.5(css-loader@7.1.2(webpack@5.104.1))(mini-css-extract-plugin@2.9.4(webpack@5.104.1))(resolve-url-loader@5.0.0)(sass-loader@16.0.6(sass@1.97.1)(webpack@5.104.1))(sass@1.97.1)(url-loader@4.1.1(file-loader@6.2.0(webpack@5.104.1))(webpack@5.104.1))(webpack@5.104.1):
     dependencies:
       chalk: 2.4.2
       css-loader: 7.1.2(webpack@5.104.1)
@@ -3472,8 +3472,8 @@ snapshots:
       mini-css-extract-plugin: 2.9.4(webpack@5.104.1)
       resolve: 1.10.0
       resolve-url-loader: 5.0.0
-      sass: 1.97.0
-      sass-loader: 16.0.6(sass@1.97.0)(webpack@5.104.1)
+      sass: 1.97.1
+      sass-loader: 16.0.6(sass@1.97.1)(webpack@5.104.1)
       semver: 5.7.2
       strip-json-comments: 2.0.1
       url-loader: 4.1.1(file-loader@6.2.0(webpack@5.104.1))(webpack@5.104.1)
@@ -4406,14 +4406,14 @@ snapshots:
 
   safe-buffer@5.2.1: {}
 
-  sass-loader@16.0.6(sass@1.97.0)(webpack@5.104.1):
+  sass-loader@16.0.6(sass@1.97.1)(webpack@5.104.1):
     dependencies:
       neo-async: 2.6.2
     optionalDependencies:
-      sass: 1.97.0
+      sass: 1.97.1
       webpack: 5.104.1(webpack-cli@6.0.1)
 
-  sass@1.97.0:
+  sass@1.97.1:
     dependencies:
       chokidar: 4.0.3
       immutable: 5.1.4
