@@ -10,7 +10,6 @@ from elements import Button, SvgIcon, Label
 from elements.hbox import HBox
 from elements.vbox import VBox
 from screens.screen_manager import ScreenManager
-from screens.settings.git_branch_screen import GitBranchScreen
 from screens.screen import Screen
 from screens.tasks_screen import TasksScreen
 from tasks import (
@@ -61,23 +60,24 @@ class SettingsMainScreen(Screen):
                                     ],
                                     gap=icon_text_gap,
                                 ),
-                                width=button_width / 2 - 15,
+                                width=button_width,
+                                # width=button_width / 2 - 15,
                             ),
-                            Button(
-                                on_click=lambda: self.go_if_git(GitBranchScreen()),
-                                inner=HBox(
-                                    [
-                                        SvgIcon(
-                                            "drinks_touch/resources/images/git-branch.svg",
-                                            height=40,
-                                            color=config.Color.PRIMARY,
-                                        ),
-                                        Label(text="Branches"),
-                                    ],
-                                    gap=icon_text_gap,
-                                ),
-                                width=button_width / 2,
-                            ),
+                            # Button(
+                            #     on_click=lambda: self.go_if_git(GitBranchScreen()),
+                            #     inner=HBox(
+                            #         [
+                            #             SvgIcon(
+                            #                 "drinks_touch/resources/images/git-branch.svg",
+                            #                 height=40,
+                            #                 color=config.Color.PRIMARY,
+                            #             ),
+                            #             Label(text="Branches"),
+                            #         ],
+                            #         gap=icon_text_gap,
+                            #     ),
+                            #     width=button_width / 2,
+                            # ),
                         ],
                         gap=15,
                     ),
