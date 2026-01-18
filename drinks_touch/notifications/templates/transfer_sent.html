@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block body %}
+    <h1>
+        {{amount}}&thinsp;€ Guthaben gesendet
+    </h1>
+    <p>
+        Du hast Getränkeguthaben im Wert von {{amount}}&thinsp;€ an {{to_account}} übertragen.
+        <br>
+        Dein aktuelles Guthaben beträgt <strong>{{balance}}&thinsp;€</strong>.
+    </p>
+{% endblock %}

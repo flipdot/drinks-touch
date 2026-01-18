@@ -99,5 +99,10 @@ class SepaSyncTask(BaseTask):
         content_text = text  # TODO: use jinja template
         content_html = text  # TODO: use jinja template
         send_notification(
-            account.email, subject, content_text, content_html, account.ldap_id
+            account.email,
+            subject,
+            content_text,
+            content_html,
+            account.ldap_id,
+            blocking=True,
         )
