@@ -1,0 +1,7 @@
+{% extends "base.txt" %}
+
+{%- block body -%}
+Du hast Getränkeguthaben im Wert von {{amount}}€ von {{from_account}} erhalten.
+Dein neues Guthaben beträgt {{balance}}€.
+
+{%- endblock -%}

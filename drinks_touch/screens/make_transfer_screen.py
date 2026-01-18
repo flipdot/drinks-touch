@@ -13,6 +13,7 @@ from elements import Label, Animation, Image
 from elements.base_elm import BaseElm
 from elements.spacer import Spacer
 from elements.vbox import VBox
+from notifications.notification import send_notification, render_jinja_template
 from screens.screen import Screen
 from screens.screen_manager import ScreenManager
 
@@ -133,6 +134,33 @@ class MakeTransferScreen(Screen):
         )
         session.add(positive_charge)
         session.add(negative_charge)
+        context = {
+            "amount": self.amount,
+            "to_account": self.to_account.name,
+            "from_account": self.account.name,
+        }
+        send_notification(
+            self.account.email,
+            f"{self.amount} € Guthaben an '{self.to_account.name}' gesendet",
+            render_jinja_template(
+                "transfer_sent.txt", balance=self.account.balance, **context
+            ),
+            render_jinja_template(
+                "transfer_sent.html", balance=self.account.balance, **context
+            ),
+            self.account.ldap_id,
+        )
+        send_notification(
+            self.to_account.email,
+            f"{self.amount} € Guthaben von '{self.account.name}' erhalten",
+            render_jinja_template(
+                "transfer_received.txt", balance=self.to_account.balance, **context
+            ),
+            render_jinja_template(
+                "transfer_received.html", balance=self.to_account.balance, **context
+            ),
+            self.to_account.ldap_id,
+        )
 
     def on_start(self, *args, **kwargs):
         self.objects = [

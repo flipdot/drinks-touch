@@ -1,5 +1,4 @@
 import functools
-import threading
 import time
 from datetime import datetime
 
@@ -18,6 +17,7 @@ import config
 from database.models import Tx
 from database.models.account import Account
 from database.storage import Session, with_db
+from overlays.background import BackgroundOverlay
 
 logger = logging.getLogger(__name__)
 
@@ -35,37 +35,46 @@ Oder per SEPA:
 """
 
 
-def send_notification(to_address, subject, content_text, content_html, uid):
-    msg = MIMEMultipart("alternative")
+def send_notification(
+    to_address, subject, content_text, content_html, uid, blocking=False
+):
+    """
+    Send an email notification to the given address in the background.
+    If blocking is set to True, the email is sent in the current thread.
+    """
 
-    plain = MIMEText(content_text, "plain", _charset="utf-8")
-    html = MIMEText(transform(content_html), "html", _charset="utf-8")
+    def f():
+        msg = MIMEMultipart("alternative")
 
-    msg.attach(plain)
-    msg.attach(html)
+        plain = MIMEText(content_text, "plain", _charset="utf-8")
+        html = MIMEText(transform(content_html), "html", _charset="utf-8")
 
-    msg["Subject"] = Header(SUBJECT_PREFIX + " " + subject, "utf-8")
-    msg["From"] = config.MAIL_FROM
-    msg["To"] = to_address
-    msg["Date"] = formatdate(time.time(), localtime=True)
-    msg["Message-id"] = make_msgid()
-    msg["X-LDAP-ID"] = str(uid)
+        msg.attach(plain)
+        msg.attach(html)
 
-    logger.info("Mailing %s: '%s'", to_address, subject)
-    logger.debug("Content: ---\n%s\n---", content_text)
+        msg["Subject"] = Header(SUBJECT_PREFIX + " " + subject, "utf-8")
+        msg["From"] = config.MAIL_FROM
+        msg["To"] = to_address
+        msg["Date"] = formatdate(time.time(), localtime=True)
+        msg["Message-id"] = make_msgid()
+        msg["X-LDAP-ID"] = str(uid)
 
-    from time import sleep
+        logger.info("Mailing %s: '%s'", to_address, subject)
+        logger.debug("Content: ---\n%s\n---", content_text)
 
-    # TODO: remove, just testing bad performance
-    sleep(3)
-    s = smtplib.SMTP(config.MAIL_HOST, port=config.MAIL_PORT)
-    s.connect(host=config.MAIL_HOST, port=config.MAIL_PORT)
-    s.ehlo()
-    if config.MAIL_USE_STARTTLS:
-        s.starttls()
-    s.login(user=config.MAIL_FROM, password=config.MAIL_PW)
-    s.sendmail(config.MAIL_FROM, [to_address], msg.as_string())
-    s.quit()
+        s = smtplib.SMTP(config.MAIL_HOST, port=config.MAIL_PORT)
+        s.connect(host=config.MAIL_HOST, port=config.MAIL_PORT)
+        s.ehlo()
+        if config.MAIL_USE_STARTTLS:
+            s.starttls()
+        s.login(user=config.MAIL_FROM, password=config.MAIL_PW)
+        s.sendmail(config.MAIL_FROM, [to_address], msg.as_string())
+        s.quit()
+
+    if blocking:
+        f()
+    else:
+        BackgroundOverlay.run(f, label="Sending email")
 
 
 def send_drink(account: Account, drink_name: str):
@@ -81,17 +90,13 @@ def send_drink(account: Account, drink_name: str):
     content_text = render_jinja_template("instant.txt", **context)
     content_html = render_jinja_template("instant.html", **context)
 
-    thread = threading.Thread(
-        target=lambda: send_notification(
-            account.email,
-            "Getränk getrunken",
-            content_text,
-            content_html,
-            account.ldap_id,
-        )
+    send_notification(
+        account.email,
+        "Getränk getrunken",
+        content_text,
+        content_html,
+        account.ldap_id,
     )
-    thread.daemon = True
-    thread.start()
 
 
 def format_drinks(drinks_consumed: list[Tx]):

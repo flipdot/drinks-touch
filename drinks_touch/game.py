@@ -15,6 +15,7 @@ from alembic.script import ScriptDirectory
 import config
 from database.storage import engine
 from overlays import MouseOverlay, BaseOverlay
+from overlays.background import BackgroundOverlay
 from overlays.keyboard import KeyboardOverlay
 from screens.message_screen import MessageScreen
 from screens.screen_manager import ScreenManager
@@ -90,6 +91,7 @@ def main():
 
     overlays = [
         KeyboardOverlay(screen_manager),
+        BackgroundOverlay(screen_manager),
         MouseOverlay(screen_manager),
     ]
 

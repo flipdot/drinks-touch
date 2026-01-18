@@ -84,6 +84,7 @@ class SendMailTask(BaseTask):
             content_text,
             content_html,
             account.ldap_id,
+            blocking=True,
         )
 
         account.last_balance_warning_email_sent_at = datetime.now()
@@ -154,6 +155,7 @@ class SendMailTask(BaseTask):
             content_text,
             content_html,
             account.ldap_id,
+            blocking=True,
         )
 
         account.last_summary_email_sent_at = datetime.now()
