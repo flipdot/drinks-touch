@@ -19,7 +19,7 @@
     "@babel/core": "7.28.6",
     "@babel/preset-env": "7.28.6",
     "@popperjs/core": "2.11.8",
-    "autoprefixer": "10.4.23",
+    "autoprefixer": "10.4.24",
     "babel-loader": "10.0.0",
     "bootstrap-loader": "4.0.5",
     "bootstrap-sass": "3.4.3",
