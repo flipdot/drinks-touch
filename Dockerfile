@@ -1,4 +1,4 @@
-FROM node:24.13.1-alpine AS base-image
+FROM node:24.13.1-alpine@sha256:4f696fbf39f383c1e486030ba6b289a5d9af541642fc78ab197e584a113b9c03 AS base-image
 
 ENV CI=true
 
@@ -20,7 +20,7 @@ RUN pnpm install --offline
 
 ######################################################################
 # Stage name "development" is required for development with dargstack.
-FROM python:3.14.3-slim AS development
+FROM python:3.14.3-slim@sha256:486b8092bfb12997e10d4920897213a06563449c951c5506c2a2cfaf591c599f AS development
 
 ENV PYTHONUNBUFFERED=1
 

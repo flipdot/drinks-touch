@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: "postgres:17.8"
+    image: "postgres:17.8@sha256:1eada89ec2521ae0f61125f6bdaf83bbbf88a43fecda48d112a83bb92df75c36"
     environment:
       POSTGRES_USER: drinks
       POSTGRES_PASSWORD: drinks
@@ -10,7 +10,7 @@ services:
 
 
   keycloak:
-    image: "quay.io/keycloak/keycloak:26.5"
+    image: "quay.io/keycloak/keycloak:26.5@sha256:5a236ae4dd8ece77490115bace15a11a4d15e9cbcf58a490b95a7da2cd71d32a"
     environment:
         KC_BOOTSTRAP_ADMIN_USERNAME: admin
         KC_BOOTSTRAP_ADMIN_PASSWORD: admin
@@ -29,7 +29,7 @@ services:
 
 
   mailpit:
-    image: axllent/mailpit
+    image: axllent/mailpit@sha256:7c38788069433ba9d2d9131abac8d17da0fb18f09b689207ec7a773dcb8d6eee
     restart: always
     environment:
       MP_SMTP_AUTH_ACCEPT_ANY: true
