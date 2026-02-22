@@ -1,2 +1,5 @@
 packages:
-  - "drinks_touch/webserver"
+  - drinks_touch/webserver
+
+ignoredBuiltDependencies:
+  - '@parcel/watcher'
