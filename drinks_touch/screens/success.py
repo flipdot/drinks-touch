@@ -137,7 +137,9 @@ class SuccessScreen(Screen):
         balance = self.account.balance
         if balance >= 0:
             filename = "smb_coin.wav"
-        elif balance < -10:
+        elif balance <= -30:
+            filename = "rottenwarnanlage.mp3"
+        elif balance <= -10:
             filename = "alarm.wav"
         else:
             filename = "smb_bowserfalls.wav"
