@@ -117,8 +117,7 @@ def main():
                             "",
                             "",
                             "Tipp: Wenn du lokal entwickelst, setze lieber die",
-                            "SSH-URL als remote. Du findest die volle Adresse auf",
-                            "der Projektseite.",
+                            "SSH-URL als remote. Der Befehl steht in stdout.",
                         ],
                         logo="drinks_touch/resources/images/forgejo-wordmark.svg",
                         buttons=[
@@ -137,6 +136,9 @@ def main():
                         button_size=20,
                     ),
                     replace=True,
+                )
+                print(
+                    "git remote set-url origin ssh://git@code.flipdot.org:222/flipdot/drinks-touch.git"
                 )
             else:
                 screen_manager.set_active(TasksScreen())
