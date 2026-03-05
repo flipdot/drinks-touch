@@ -11,7 +11,9 @@ class CheckForUpdatesTask(BaseTask):
 
     def run(self):
         # download latest commit sha from github
-        request_url = "https://api.github.com/repos/flipdot/drinks-touch/commits/master?per_page=1"
+        request_url = (
+            "https://code.flipdot.org/api/v1/repos/flipdot/drinks-touch/branches/main"
+        )
         self.logger.info(f"GET {request_url}")
         response = requests.get(
             request_url,
@@ -19,8 +21,9 @@ class CheckForUpdatesTask(BaseTask):
         )
         response.raise_for_status()
         json = response.json()
+        sha = json["commit"]["id"]
         self.logger.info(f"Response: {response.status_code}")
-        self.logger.info(f"Latest: {json['sha']}")
+        self.logger.info(f"Latest: {sha}")
 
         with CheckForUpdatesTask.newest_version_lock:
-            CheckForUpdatesTask.newest_version_sha_short = json["sha"][:7]
+            CheckForUpdatesTask.newest_version_sha_short = sha[:7]

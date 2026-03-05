@@ -21,6 +21,7 @@ from screens.message_screen import MessageScreen
 from screens.screen_manager import ScreenManager
 
 from screens.tasks_screen import TasksScreen
+from tasks.run_cmd import UpdateGitRemoteTask
 import sentry_sdk
 
 with contextlib.redirect_stdout(None):
@@ -86,6 +87,59 @@ def main():
                 ),
                 replace=True,
             )
+        elif config.GIT_REPO_AVAILABLE:
+            remote_url = (
+                subprocess.check_output(
+                    ["git", "remote", "get-url", "origin"],
+                    cwd=config.REPO_PATH,
+                    stderr=subprocess.STDOUT,
+                )
+                .decode()
+                .strip()
+            )
+
+            if remote_url not in [
+                "https://code.flipdot.org/flipdot/drinks-touch.git",
+                "ssh://git@code.flipdot.org:222/flipdot/drinks-touch.git",
+            ]:
+                screen_manager.set_active(
+                    MessageScreen(
+                        title="Wir sind umgezogen",
+                        message=[
+                            "Dieses Projekt wird nun primär auf der Forgejo-",
+                            "Instanz des flipdot e.V. gehostet.",
+                            "",
+                            "Wenn du weiter automatische Updates erhalten",
+                            "möchtest, erlaube uns dein git remote zu ändern auf:",
+                            "",
+                            "  https://code.flipdot.org/flipdot/drinks-touch.git",
+                            "",
+                            "",
+                            "",
+                            "Tipp: Wenn du lokal entwickelst, setze lieber die",
+                            "SSH-URL als remote. Du findest die volle Adresse auf",
+                            "der Projektseite.",
+                        ],
+                        logo="drinks_touch/resources/images/forgejo-wordmark.svg",
+                        buttons=[
+                            {
+                                "text": "git remote aktualisieren",
+                                "on_click": lambda: screen_manager.set_active(
+                                    TasksScreen(tasks=[UpdateGitRemoteTask()]),
+                                    replace=True,
+                                ),
+                            },
+                            {
+                                "text": "Jetzt nicht",
+                                "on_click": screen_manager.set_default,
+                            },
+                        ],
+                        button_size=20,
+                    ),
+                    replace=True,
+                )
+            else:
+                screen_manager.set_active(TasksScreen())
         else:
             screen_manager.set_active(TasksScreen())
 

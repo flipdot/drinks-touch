@@ -66,8 +66,8 @@ class UpdateAndRestartTask(RunCmdTask):
     PWD = config.REPO_PATH
     CMDS = (
         ["git", "fetch", "-p"],
-        ["git", "checkout", "master"],
-        ["git", "merge", "--ff-only", "origin/master"],
+        ["git", "checkout", "main"],
+        ["git", "merge", "--ff-only", "origin/main"],
         ["sudo", "systemctl", "restart", "drinks-touch"],
     )
 
@@ -76,6 +76,23 @@ class RestartTask(RunCmdTask):
     ON_STARTUP = False
     PWD = config.REPO_PATH
     CMDS = (["sudo", "systemctl", "restart", "drinks-touch"],)
+
+
+class UpdateGitRemoteTask(RunCmdTask):
+    ON_STARTUP = False
+    PWD = config.REPO_PATH
+    CMDS = (
+        [
+            "git",
+            "remote",
+            "set-url",
+            "origin",
+            "https://code.flipdot.org/flipdot/drinks-touch.git",
+        ],
+        ["git", "fetch", "-p"],
+        ["git", "checkout", "main"],
+        ["sudo", "systemctl", "restart", "drinks-touch"],
+    )
 
 
 class CheckoutAndRestartTask(RunCmdTask):
