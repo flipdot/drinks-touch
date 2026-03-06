@@ -80,7 +80,9 @@ def create_image(scan_list):
             _x = di % (width - 5)
             _y = di / (width - 5)
             draw.point((width * i + _x * 2 + 2, h - 1 - _y * 2), 0)
-    result = ImageMath.eval("255 - (a ^ b)", a=image, b=text_image)
+    result = ImageMath.lambda_eval(
+        lambda args: 255 - (args["a"] ^ args["b"]), a=image, b=text_image
+    )
     # result = ImageChops.add_modulo(image, text_image)
     # result = ImageChops.invert(result)
     return result
