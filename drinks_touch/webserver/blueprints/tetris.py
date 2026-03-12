@@ -23,12 +23,12 @@ _I_VARIANTS = {8, 9, 10, 11, 12, 13}
 # CSS class names for each CellType value
 _CELL_CSS = {
     0: "cell-empty",
-    2: "cell-filled",
-    3: "cell-filled",
-    4: "cell-filled",
-    5: "cell-filled",
-    6: "cell-filled",
-    7: "cell-filled",
+    2: "cell-filled",  # J – frame + hollow + center dot
+    3: "cell-filled",  # L – frame + hollow + center dot
+    4: "cell-filled",  # S – frame + hollow + center dot
+    5: "cell-filled",  # T – frame + hollow + center dot
+    6: "cell-filled",  # Z – frame + hollow + center dot
+    7: "cell-filled cell-o",  # O – frame + hollow, NO center dot
     8: "cell-filled cell-i-h1",
     9: "cell-filled cell-i-h2",
     10: "cell-filled cell-i-h3",

@@ -20,21 +20,23 @@
 }
 
 .tetris-board {
+    --tetris-cell-size: 16px;
     display: grid;
-    grid-template-columns: repeat(12, 16px);
+    grid-template-columns: repeat(12, var(--tetris-cell-size));
     gap: 1px;
     background-color: #0d0d1a;
     padding: 3px;
     border: 2px solid var(--color-border);
     border-radius: var(--border-radius);
-    line-height: 0; /* suppress inline-block gap */
+    line-height: 0;
+    cursor: pointer; /* hint: click reveals player colours */
 }
 
 /* ── Individual cells ───────────────────────────────── */
 
 .tetris-cell {
-    width: 16px;
-    height: 16px;
+    width: var(--tetris-cell-size);
+    height: var(--tetris-cell-size);
     border-radius: 1px;
 }
 
@@ -61,69 +63,106 @@
         );
 }
 
-/* Regular filled cell – highlight on top-left, shadow on bottom-right */
+/*
+ * Regular piece cells (J, L, S, T, Z)
+ * Recreates the pygame sprite "hollow-frame + centre dot" style:
+ *   – outer 12.5 % ring:  transparent → board background shows through
+ *   – coloured frame band: 12.5 %–37.5 % from each edge
+ *   – dark hollow area:    25 %–75 % (50 % wide/tall)
+ *   – bright centre dot:   37.5 %–62.5 % (25 % wide/tall)
+ */
 .tetris-cell.cell-filled {
-    background-color: var(--cell-color, #888888);
-    box-shadow:
-        inset 3px 3px 0 rgba(255, 255, 255, 0.45),
-        inset -2px -2px 0 rgba(0, 0, 0, 0.45);
-    border: 1px solid rgba(0, 0, 0, 0.35);
+    --c: var(--cell-color, var(--color-primary));
+    background:
+        /* centre dot */
+        linear-gradient(var(--c), var(--c)) center / 25% 25% no-repeat,
+        /* dark hollow */
+        rgba(0, 0, 0, 0.6) center / 50% 50% no-repeat,
+        /* coloured outer frame */
+        linear-gradient(var(--c), var(--c)) center / 75% 75% no-repeat;
+    background-color: transparent;
+    box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.3),
+        inset -1px -1px 0 rgba(0, 0, 0, 0.35);
 }
 
 /*
- * I-piece segment variants
- * The I piece consists of four connected cells, so we remove the border/shadow
- * on the sides where adjacent segments connect, creating a seamless look.
+ * O piece – same frame + hollow, but WITHOUT a centre dot.
+ * The pure hollow interior makes the O unmistakable.
+ */
+.tetris-cell.cell-filled.cell-o {
+    background:
+        rgba(0, 0, 0, 0.6) center / 50% 50% no-repeat,
+        linear-gradient(var(--c), var(--c)) center / 75% 75% no-repeat;
+    background-color: transparent;
+}
+
+/*
+ * I-piece segments – "stipple-tube" style
+ * Matches the pygame sprite: a mostly-filled rectangle with
+ * scattered dark stipple dots, top/bottom bright edge highlights
+ * for horizontal runs, left/right for vertical runs.
  */
 
-/* Left cap of a horizontal I piece */
-.tetris-cell.cell-i-h1 {
-    box-shadow:
-        inset 3px 3px 0 rgba(255, 255, 255, 0.45),
-        inset 0 -2px 0 rgba(0, 0, 0, 0.45);
-    border-right-color: transparent;
+/* ── shared base for all I-piece cells ── */
+.tetris-cell.cell-i-h1,
+.tetris-cell.cell-i-h2,
+.tetris-cell.cell-i-h3,
+.tetris-cell.cell-i-v1,
+.tetris-cell.cell-i-v2,
+.tetris-cell.cell-i-v3 {
+    --c: var(--cell-color, var(--color-primary));
+    background:
+        radial-gradient(circle, rgba(0, 0, 0, 0.3) 1px, transparent 1px)
+            2px 2px / 5px 5px,
+        var(--c);
+    background-color: transparent;
+    border-radius: 0;
 }
 
-/* Middle of a horizontal I piece */
-.tetris-cell.cell-i-h2 {
-    box-shadow:
-        inset 0 3px 0 rgba(255, 255, 255, 0.45),
-        inset 0 -2px 0 rgba(0, 0, 0, 0.45);
-    border-left-color: transparent;
-    border-right-color: transparent;
-}
-
-/* Right cap of a horizontal I piece */
+/* Horizontal I-piece: bright top, shadow bottom */
+.tetris-cell.cell-i-h1,
+.tetris-cell.cell-i-h2,
 .tetris-cell.cell-i-h3 {
     box-shadow:
-        inset 0 3px 0 rgba(255, 255, 255, 0.45),
-        inset -2px -2px 0 rgba(0, 0, 0, 0.45);
-    border-left-color: transparent;
+        inset 0 2px 0 rgba(255, 255, 255, 0.4),
+        inset 0 -2px 0 rgba(0, 0, 0, 0.4);
 }
 
-/* Top cap of a vertical I piece */
-.tetris-cell.cell-i-v1 {
+/* Left cap: add left highlight */
+.tetris-cell.cell-i-h1 {
     box-shadow:
-        inset 3px 3px 0 rgba(255, 255, 255, 0.45),
-        inset -2px 0 0 rgba(0, 0, 0, 0.45);
-    border-bottom-color: transparent;
+        inset 2px 2px 0 rgba(255, 255, 255, 0.4),
+        inset 0 -2px 0 rgba(0, 0, 0, 0.4);
 }
 
-/* Middle of a vertical I piece */
-.tetris-cell.cell-i-v2 {
+/* Right cap: add right shadow */
+.tetris-cell.cell-i-h3 {
     box-shadow:
-        inset 3px 0 0 rgba(255, 255, 255, 0.45),
-        inset -2px 0 0 rgba(0, 0, 0, 0.45);
-    border-top-color: transparent;
-    border-bottom-color: transparent;
+        inset 0 2px 0 rgba(255, 255, 255, 0.4),
+        inset -2px -2px 0 rgba(0, 0, 0, 0.4);
 }
 
-/* Bottom cap of a vertical I piece */
+/* Vertical I-piece: bright left, shadow right */
+.tetris-cell.cell-i-v1,
+.tetris-cell.cell-i-v2,
 .tetris-cell.cell-i-v3 {
     box-shadow:
-        inset 3px 0 0 rgba(255, 255, 255, 0.45),
-        inset -2px -2px 0 rgba(0, 0, 0, 0.45);
-    border-top-color: transparent;
+        inset 2px 0 0 rgba(255, 255, 255, 0.4),
+        inset -2px 0 0 rgba(0, 0, 0, 0.4);
+}
+
+/* Top cap: add top highlight */
+.tetris-cell.cell-i-v1 {
+    box-shadow:
+        inset 2px 2px 0 rgba(255, 255, 255, 0.4),
+        inset -2px 0 0 rgba(0, 0, 0, 0.4);
+}
+
+/* Bottom cap: add bottom shadow */
+.tetris-cell.cell-i-v3 {
+    box-shadow:
+        inset 2px 0 0 rgba(255, 255, 255, 0.4),
+        inset -2px -2px 0 rgba(0, 0, 0, 0.4);
 }
 
 /* ── Info boxes (score, level, etc.) ────────────────── */
@@ -170,10 +209,14 @@
 }
 
 .tetris-block-preview .preview-cell.preview-filled {
-    background-color: var(--color-primary);
-    box-shadow:
-        inset 2px 2px 0 rgba(255, 255, 255, 0.4),
-        inset -1px -1px 0 rgba(0, 0, 0, 0.4);
+    background:
+        linear-gradient(var(--color-primary), var(--color-primary))
+            center / 30% 30% no-repeat,
+        rgba(0, 0, 0, 0.55) center / 55% 55% no-repeat,
+        linear-gradient(var(--color-primary), var(--color-primary))
+            center / 80% 80% no-repeat;
+    background-color: transparent;
+    box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.3);
 }
 
 /* ── Scoreboard table ───────────────────────────────── */
@@ -217,10 +260,24 @@
     border: 1px solid rgba(0, 0, 0, 0.2);
 }
 
-/* ── Responsive: stack sidebar below board on small screens ── */
+/* ── Responsive: on mobile the board fills the full viewport width ── */
 
-@media (max-width: 520px) {
+@media (max-width: 600px) {
     .tetris-layout {
         flex-direction: column;
     }
+
+    .tetris-sidebar {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .tetris-board {
+        /*
+         * Scale cells so the board fills the available width.
+         * 10px = board padding (2 × 3px) + board border (2 × 2px) = 6px + 4px
+         */
+        --tetris-cell-size: calc((100vw - 2 * var(--spacing-unit) - 10px) / 12);
+    }
 }
+

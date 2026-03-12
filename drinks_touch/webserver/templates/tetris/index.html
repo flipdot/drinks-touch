@@ -89,11 +89,11 @@
 
     {# ── Main: game board ──────────────────────────────────────── #}
     <div class="tetris-board-wrapper">
-        <div class="tetris-board">
+        <div class="tetris-board" title="Klicken zum Anzeigen der Spielerfarben">
             {% for row in board %}
                 {% for cell in row %}
                     <div class="tetris-cell {{ cell.css_class }}"
-                         {% if cell.color %}style="--cell-color: {{ cell.color }};"{% endif %}
+                         {% if cell.color %}data-color="{{ cell.color }}"{% endif %}
                     ></div>
                 {% endfor %}
             {% endfor %}
@@ -129,6 +129,48 @@
     </div>
 
 </div>
+
+<script>
+(function () {
+    var board = document.querySelector('.tetris-board');
+    if (!board) return;
+
+    var allRevealed = false;
+
+    /* Apply or remove --cell-color for every cell that has a data-color */
+    function applyColors(cells, on) {
+        cells.forEach(function (cell) {
+            if (on) {
+                cell.style.setProperty('--cell-color', cell.dataset.color);
+            } else {
+                cell.style.removeProperty('--cell-color');
+            }
+        });
+    }
+
+    var colorCells = Array.from(board.querySelectorAll('.tetris-cell[data-color]'));
+
+    /* Click / tap on board: toggle all player colours */
+    board.addEventListener('click', function () {
+        allRevealed = !allRevealed;
+        applyColors(colorCells, allRevealed);
+    });
+
+    /* Hover: show colour for the hovered cell only */
+    colorCells.forEach(function (cell) {
+        cell.addEventListener('mouseenter', function () {
+            if (!allRevealed) {
+                cell.style.setProperty('--cell-color', cell.dataset.color);
+            }
+        });
+        cell.addEventListener('mouseleave', function () {
+            if (!allRevealed) {
+                cell.style.removeProperty('--cell-color');
+            }
+        });
+    });
+})();
+</script>
 
 {% endif %}
 {% endblock %}
