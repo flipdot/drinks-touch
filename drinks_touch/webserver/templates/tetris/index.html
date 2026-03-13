@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+
+{% block title %}Tetris – drinks-touch{% endblock %}
+
+{% block head %}
+    <link href="{{ url_for("static", filename="css/tetris.css") }}" rel="stylesheet">
+    <link href="{{ url_for("static", filename="css/table.css") }}" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+<h2>Tetris</h2>
+
+{% if not game %}
+    <p>Es läuft gerade kein Spiel.</p>
+{% else %}
+
+{# ── Helper macro: render a block preview grid ─────────────────── #}
+{% macro block_preview(block) %}
+    {% if block and block.matrix %}
+    <div class="tetris-block-preview"
+         style="grid-template-columns: repeat({{ block.matrix[0]|length }}, 12px);">
+        {% for row in block.matrix %}
+            {% for filled in row %}
+                <div class="preview-cell {{ 'preview-filled' if filled else 'preview-empty' }}"></div>
+            {% endfor %}
+        {% endfor %}
+    </div>
+    {% endif %}
+{% endmacro %}
+
+{# ── Helper macro: scoreboard table ───────────────────────────── #}
+{% macro scoreboard(title, rows) %}
+<div class="tetris-info-box">
+    <h3>{{ title }}</h3>
+    {% if rows %}
+    <table class="tetris-scoreboard">
+        <thead>
+            <tr>
+                <th>Spieler</th>
+                <th>Blöcke</th>
+                <th>Punkte</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in rows %}
+            <tr>
+                <td>
+                    <span class="player-color-dot"
+                          style="background-color: {{ row.color }};"></span>{{ row.name }}
+                </td>
+                <td>{{ row.blocks }}</td>
+                <td>{{ row.points }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <p style="color: var(--color-muted-text); font-size: 0.875rem; margin: 0;">
+            Noch keine Einträge.
+        </p>
+    {% endif %}
+</div>
+{% endmacro %}
+
+<div class="tetris-layout">
+
+    {# ── Left sidebar: next blocks + hold ──────────────────────── #}
+    <div class="tetris-sidebar">
+
+        {% if reserve_block %}
+        <div class="tetris-info-box">
+            <h3>Reserve</h3>
+            {{ block_preview(reserve_block) }}
+        </div>
+        {% endif %}
+
+        {% if next_blocks %}
+        <div class="tetris-info-box">
+            <h3>Nächste</h3>
+            <div style="display: flex; flex-direction: column; gap: 6px; align-items: flex-start;">
+                {% for block in next_blocks %}
+                    {{ block_preview(block) }}
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+
+    {# ── Main: game board ──────────────────────────────────────── #}
+    <div class="tetris-board-wrapper">
+        <div class="tetris-board" title="Klicken zum Anzeigen der Spielerfarben">
+            {% for row in board %}
+                {% for cell in row %}
+                    <div class="tetris-cell {{ cell.css_class }}"
+                         {% if cell.color %}data-color="{{ cell.color }}"{% endif %}
+                    ></div>
+                {% endfor %}
+            {% endfor %}
+        </div>
+    </div>
+
+    {# ── Right sidebar: score + scoreboards ────────────────────── #}
+    <div class="tetris-sidebar">
+
+        <div class="tetris-info-box">
+            <h3>Score</h3>
+            <span class="tetris-value">{{ game.score }}</span>
+        </div>
+
+        <div class="tetris-info-box">
+            <h3>Highscore</h3>
+            <span class="tetris-value">{{ game.highscore }}</span>
+        </div>
+
+        <div class="tetris-info-box">
+            <h3>Level</h3>
+            <span class="tetris-value">{{ game.level }}</span>
+        </div>
+
+        <div class="tetris-info-box">
+            <h3>Lines</h3>
+            <span class="tetris-value">{{ game.lines }}</span>
+        </div>
+
+        {{ scoreboard("Spiel", scores) }}
+        {{ scoreboard("Allzeit", all_time_scores) }}
+
+    </div>
+
+</div>
+
+<script>
+(function () {
+    var board = document.querySelector('.tetris-board');
+    if (!board) return;
+
+    var allRevealed = false;
+
+    /* Apply or remove --cell-color for every cell that has a data-color */
+    function applyColors(cells, on) {
+        cells.forEach(function (cell) {
+            if (on) {
+                cell.style.setProperty('--cell-color', cell.dataset.color);
+            } else {
+                cell.style.removeProperty('--cell-color');
+            }
+        });
+    }
+
+    var colorCells = Array.from(board.querySelectorAll('.tetris-cell[data-color]'));
+
+    /* Click / tap on board: toggle all player colours */
+    board.addEventListener('click', function () {
+        allRevealed = !allRevealed;
+        applyColors(colorCells, allRevealed);
+    });
+
+    /* Hover: show colour for the hovered cell only */
+    colorCells.forEach(function (cell) {
+        cell.addEventListener('mouseenter', function () {
+            if (!allRevealed) {
+                cell.style.setProperty('--cell-color', cell.dataset.color);
+            }
+        });
+        cell.addEventListener('mouseleave', function () {
+            if (!allRevealed) {
+                cell.style.removeProperty('--cell-color');
+            }
+        });
+    });
+})();
+</script>
+
+{% endif %}
+{% endblock %}
